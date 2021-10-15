@@ -1,0 +1,7 @@
+#dependencies
+
+/node_modules
+/.vscode
+/dist
+/.idea
+/frontend/node_modules
