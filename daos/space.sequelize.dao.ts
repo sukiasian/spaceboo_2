@@ -81,6 +81,7 @@ export class SpaceSequelizeDao extends Dao {
                         timesToReserve[1],
                         timezone
                     );
+                    console.log('hey');
 
                     const spaces = this.model.findAll({
                         ...query,
