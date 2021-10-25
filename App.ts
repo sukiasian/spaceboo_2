@@ -29,6 +29,7 @@ export class Application extends Singleton {
         password: process.env.DATABASE_PASSWORD || 'postgres',
         database: process.env.DATABASE_NAME || 'postgres',
         models: [City, User, Space, Test, Appointment],
+        logging: false,
     });
 
     public configureApp(): void {

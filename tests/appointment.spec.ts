@@ -7,7 +7,6 @@ import {
     clearDb,
     closeTestEnv,
     createApplicationInstance,
-    createCustomDate,
     createSpaceData,
     createTokenAndSign,
     createUserData,
@@ -18,7 +17,8 @@ import { ApiRoutes, HttpStatus } from '../types/enums';
 import { ISpaceCreate, Space } from '../models/space.model';
 import { Appointment } from '../models/appointment.model';
 import { City } from '../models/city.model';
-import { TDatesReserved } from '../models/appointment.model';
+import { TIsoDatesReserved } from '../models/appointment.model';
+import UtilFunctions from '../utils/UtilFunctions';
 
 describe('Appointment (e2e)', () => {
     let app: express.Express;
@@ -35,9 +35,9 @@ describe('Appointment (e2e)', () => {
     let cityModel: typeof City;
     let space: Space;
     let appointmentModel: typeof Appointment;
-    let beginningDate: string;
-    let endingDate: string;
-    let datesToReserve: TDatesReserved;
+    let isoDatesToReserve: TIsoDatesReserved;
+    let isoDatesToReserveNarrow: TIsoDatesReserved;
+    let isoDatesToReserveWide: TIsoDatesReserved;
 
     beforeAll(async () => {
         dotenv.config({ path: '../test.env' });
@@ -60,20 +60,36 @@ describe('Appointment (e2e)', () => {
         city = await cityModel.findOne({ raw: true });
         user = await userModel.create(userData);
         spaceData = createSpaceData(user.id, city.id);
-        space = await spaceModel.create(spaceData, { include: [{ model: City, as: 'city' }] });
+        space = await spaceModel.create(spaceData, { include: [City] });
         space = await spaceModel.findOne({
             where: { id: space.id },
-            raw: true,
-            include: [{ model: City, as: 'city' }],
+            include: [City, Appointment],
         });
 
-        beginningDate = createCustomDate('2020-12-15', space['city.timezone']);
-        endingDate = createCustomDate('2020-12-20', space['city.timezone']);
-        datesToReserve = [
-            { inclusive: true, value: beginningDate },
-            { inclusive: false, value: endingDate },
-        ];
+        // 2020-12-20 2020-12-15
+        isoDatesToReserve = UtilFunctions.createIsoDatesRangeToCreateAppointments(
+            '2020-12-15',
+            '14:00',
+            '2020-12-20',
+            '12:00',
+            space.city['dataValues']['timezone']
+        );
+        isoDatesToReserveNarrow = UtilFunctions.createIsoDatesRangeToCreateAppointments(
+            '2020-12-17',
+            '14:00',
+            '2020-12-19',
+            '12:00',
+            space.city['dataValues']['timezone']
+        );
+        isoDatesToReserveWide = UtilFunctions.createIsoDatesRangeToCreateAppointments(
+            '2020-12-10',
+            '14:00',
+            '2020-12-24',
+            '12:00',
+            space.city['dataValues']['timezone']
+        );
         token = await createTokenAndSign(user.id);
+        console.log(isoDatesToReserve, 'isoooooooo');
     });
 
     afterEach(async () => {
@@ -88,7 +104,7 @@ describe('Appointment (e2e)', () => {
         const res = await request(app)
             .post(`${ApiRoutes.APPOINTMENTS}`)
             .send({
-                datesToReserve,
+                isoDatesToReserve,
                 spaceId: space.id,
             })
             .set('Authorization', `Bearer ${token}`);
@@ -99,19 +115,43 @@ describe('Appointment (e2e)', () => {
         const res = await request(app)
             .post(`${ApiRoutes.APPOINTMENTS}`)
             .send({
-                datesToReserve,
+                isoDatesToReserve,
                 spaceId: space.id,
             })
             .set('Authorization', `Bearer ${token}`);
-        expect(res.body.data.datesReserved).toStrictEqual([
-            { inclusive: true, value: '2020-12-15T00:00:00.000Z' },
-            { inclusive: false, value: '2020-12-20T00:00:00.000Z' },
+
+        expect(res.body.data.isoDatesReserved).toStrictEqual([
+            { inclusive: true, value: '2020-12-15T11:00:00.000Z' },
+            { inclusive: false, value: '2020-12-20T09:00:00.000Z' },
         ]);
     });
 
-    it('POST /appointments should not allow to register if a space is unavailable', async () => {
-        await request(app).post(`${ApiRoutes.APPOINTMENTS}`).send({ datesToReserve, spaceId: space.id });
-        await request(app).post(`${ApiRoutes.APPOINTMENTS}`).send({ datesToReserve, spaceId: space.id });
-        // validator
+    it('POST /appointments should not allow to register if a space is unavailable (range contains)', async () => {
+        // TODO refactor from using request to using model directly
+        await request(app)
+            .post(`${ApiRoutes.APPOINTMENTS}`)
+            .send({ isoDatesToReserve, spaceId: space.id })
+            .set('Authorization', `Bearer ${token}`);
+
+        const res = await request(app)
+            .post(`${ApiRoutes.APPOINTMENTS}`)
+            .send({ isoDatesToReserve: isoDatesToReserveWide, spaceId: space.id })
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.status).toBe(HttpStatus.FORBIDDEN);
+    });
+
+    it('POST /appointments should not allow to register if a space is unavailable (range is contained)', async () => {
+        await request(app)
+            .post(`${ApiRoutes.APPOINTMENTS}`)
+            .send({ isoDatesToReserve, spaceId: space.id })
+            .set('Authorization', `Bearer ${token}`);
+
+        const res = await request(app)
+            .post(`${ApiRoutes.APPOINTMENTS}`)
+            .send({ isoDatesToReserve: isoDatesToReserveNarrow, spaceId: space.id })
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.status).toBe(HttpStatus.FORBIDDEN);
     });
 });

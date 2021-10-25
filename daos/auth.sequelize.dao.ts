@@ -11,7 +11,7 @@ export class AuthSequelizeDao extends Dao {
         return this.userModel;
     }
 
-    signUpLocal = async (data: any): Promise<User> => {
+    public signUpLocal = async (data: any): Promise<User> => {
         // NOTE we do so because password and passwordConfirmation are required
         if (data.password && data.passwordConfirmation) {
             return this.model.create(data);

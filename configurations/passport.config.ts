@@ -112,16 +112,9 @@ export class PassportConfig extends Singleton {
                 async (jwt_payload, done) => {
                     try {
                         const user = await this.userModel.findOne({ where: { id: jwt_payload }, raw: true });
-                        console.log(user, 'userrrrrrr');
 
-                        if (user) {
-                            return done(null, { id: user.id });
-                        } else {
-                            return done(null, false);
-                        }
+                        return user ? done(null, { id: user.id }) : done(null, false);
                     } catch (err) {
-                        console.log(err, 'errrrrrr');
-
                         return done(err, false);
                     }
                 }

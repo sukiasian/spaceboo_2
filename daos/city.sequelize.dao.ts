@@ -14,6 +14,8 @@ export class CitySequelizeDao extends Dao {
 
         return this.model.findAll(query);
     };
+
+    // public getTimezoneByCityName = async (cityName: string): Promise<string> => {};
 }
 
 export const citySequelizeDao = SingletonFactory.produce<CitySequelizeDao>(CitySequelizeDao);

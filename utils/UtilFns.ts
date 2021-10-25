@@ -1,13 +1,8 @@
 import { Response } from 'express';
 import { applicationInstance } from '../App';
-import { TIsoDatesToFindAppointments, TIsoDatesReserved } from '../models/appointment.model';
+import { TDatesReserved } from '../models/appointment.model';
 import { Space } from '../models/space.model';
 import { HttpStatus } from '../types/enums';
-
-enum DateFormat {
-    NATIVE = 'native',
-    POSTGRES = 'postgres',
-}
 
 class UtilFunctions {
     public static sendResponse = (res: Response): ((statusCode: HttpStatus, message?: string, data?: any) => void) => {
@@ -98,48 +93,22 @@ class UtilFunctions {
         };
     };
 
-    // public static timezoneParserPostgresFormat = (timezone: string): string => {
-    //     const timezoneSignAndValue = timezone.match(/[+-]\d/g)[0];
-    //     const timezoneSign = timezoneSignAndValue[0];
-    //     const timezoneValue = parseInt(timezoneSignAndValue.substring(1), 10);
-
-    //     return timezoneValue < 10 ? `${timezoneSign}0${timezoneValue}:00` : `${timezoneSign}${timezoneValue}:00`;
-    // };
-
-    // public static timezoneParserNativeFormat = (timezone: string): string => {
-    //     const timezoneSignAndValue = timezone.match(/[+-]\d/g)[0];
-    //     const timezoneSign = timezoneSignAndValue[0];
-    //     const timezoneValue = parseInt(timezoneSignAndValue.substring(1), 10);
-
-    //     return timezoneValue < 10 ? `${timezoneSign}0${timezoneValue}00` : `${timezoneSign}${timezoneValue}00`;
-    // };
-
-    public static timezoneParserByFormat = (timezone: string, format: DateFormat) => {
+    public static timezoneParser = (timezone: string): string => {
         const timezoneSignAndValue = timezone.match(/[+-]\d/g)[0];
         const timezoneSign = timezoneSignAndValue[0];
         const timezoneValue = parseInt(timezoneSignAndValue.substring(1), 10);
 
-        switch (format) {
-            case DateFormat.NATIVE:
-                return timezoneValue < 10 ? `${timezoneSign}0${timezoneValue}00` : `${timezoneSign}${timezoneValue}00`;
-
-            case DateFormat.POSTGRES:
-                return timezoneValue < 10
-                    ? `${timezoneSign}0${timezoneValue}:00`
-                    : `${timezoneSign}${timezoneValue}:00`;
-        }
+        return timezoneValue < 10 ? `${timezoneSign}0${timezoneValue}:00` : `${timezoneSign}${timezoneValue}:00`;
     };
 
     // NOTE PROBABLY make timezoneParser private and create here dateToPostgresFormat which will format a date into a postgres format date (iso)
 
-    private static timeValueToDoubleDigitParser = (value: number): string => {
+    private static timeValueToDoubleDigitParser = (value) => {
         return value > 9 ? `${value}` : `0${value}`;
     };
 
-    public static createIsoDate = (dateRawValue: string, timeRawValue: string, timezone: string): string => {
-        const date = new Date(
-            `${dateRawValue} ${timeRawValue} ${UtilFunctions.timezoneParserByFormat(timezone, DateFormat.NATIVE)}`
-        );
+    public static createCustomDate = (dateRawValue: string, timezone?: string): string => {
+        const date = new Date(dateRawValue);
         const year = date.getFullYear();
         const month = UtilFunctions.timeValueToDoubleDigitParser(date.getMonth() + 1);
         const day = UtilFunctions.timeValueToDoubleDigitParser(date.getDate());
@@ -149,65 +118,33 @@ class UtilFunctions {
         let milliseconds: any = date.getMilliseconds() / 1000;
         milliseconds = Math.floor(milliseconds.toFixed(2) * 100);
 
-        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}${UtilFunctions.timezoneParserByFormat(
-            timezone,
-            DateFormat.POSTGRES
-        )}`;
+        if (timezone) {
+            if (milliseconds === 0) {
+                return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000Z}`;
+            } else {
+                return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}${UtilFunctions.timezoneParser(
+                    timezone
+                )}`;
+            }
+        } else {
+            return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds * 1000}Z`;
+        }
 
-        // NOTE probably we will always use timezone so we will not need if timezone === true.
-        // To check that we need to check if postgres allows format ...T15:00:00.234+0000 instead of Z
-        // return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds * 1000}Z`;
+        return timezone
+            ? `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}${UtilFunctions.timezoneParser(
+                  timezone
+              )}`
+            : `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}z`;
     };
 
-    public static createIsoUtcZeroDate = (dateRawValue: string, timeRawValue: string, timezone: string): string => {
-        const date = new Date(
-            `${dateRawValue} ${timeRawValue} ${UtilFunctions.timezoneParserByFormat(timezone, DateFormat.NATIVE)}`
-        );
-        const year = date.getFullYear();
-        const month = UtilFunctions.timeValueToDoubleDigitParser(date.getUTCMonth() + 1);
-        const day = UtilFunctions.timeValueToDoubleDigitParser(date.getUTCDate());
-        const hours = UtilFunctions.timeValueToDoubleDigitParser(date.getUTCHours());
-        const minutes = UtilFunctions.timeValueToDoubleDigitParser(date.getUTCMinutes());
-        const seconds = UtilFunctions.timeValueToDoubleDigitParser(date.getUTCSeconds());
-        const milliseconds = date.getUTCMilliseconds();
-
-        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`;
-    };
-    public static createIsoDatesRangeToCreateAppointments = (
+    public static createDatesToReserve = (
         beginningDate: string,
-        beginningTime: string,
         endingDate: string,
-        endingTime: string,
-        timezone: string
-    ): TIsoDatesReserved => {
+        timezone = null
+    ): TDatesReserved => {
         return [
-            { inclusive: true, value: UtilFunctions.createIsoDate(beginningDate, beginningTime, timezone) },
-            { inclusive: false, value: UtilFunctions.createIsoDate(endingDate, endingTime, timezone) },
-        ];
-    };
-
-    // public static createIsoDatesRangeToFindAppointments = (
-    //     beginningDate: string,
-    //     beginningTime: string,
-    //     endingDate: string,
-    //     endingTime: string,
-    //     timezone: string
-    // ): TIsoDatesToFindAppointments => {
-    //     return [
-    //         UtilFunctions.createIsoDate(beginningDate, beginningTime, timezone),
-    //         UtilFunctions.createIsoDate(endingDate, endingTime, timezone),
-    //     ];
-    // };
-    public static createIsoDatesRangeToFindAppointments = (
-        beginningDate: string,
-        beginningTime: string,
-        endingDate: string,
-        endingTime: string,
-        timezone: string
-    ): TIsoDatesToFindAppointments => {
-        return [
-            UtilFunctions.createIsoUtcZeroDate(beginningDate, beginningTime, timezone),
-            UtilFunctions.createIsoUtcZeroDate(endingDate, endingTime, timezone),
+            { inclusive: true, value: UtilFunctions.createCustomDate(beginningDate, timezone) },
+            { inclusive: false, value: UtilFunctions.createCustomDate(endingDate, timezone) },
         ];
     };
 }

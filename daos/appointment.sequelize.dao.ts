@@ -1,6 +1,6 @@
 import { Op } from 'sequelize';
 import { Dao } from '../configurations/dao.config';
-import { Appointment } from '../models/appointment.model';
+import { Appointment, TIsoDatesReserved } from '../models/appointment.model';
 import { SingletonFactory } from '../utils/Singleton';
 
 export class AppointmentSequelizeDao extends Dao {
@@ -10,15 +10,35 @@ export class AppointmentSequelizeDao extends Dao {
         return this.appointmentModel;
     }
 
-    createAppointment = async (dates, spaceId: string, userId: string): Promise<Appointment> => {
+    public createAppointment = async (
+        isoDatesReserved: TIsoDatesReserved,
+        spaceId: string,
+        userId: string
+    ): Promise<Appointment> => {
         // use space id and check if space is available
 
-        return this.model.create({ datesReserved: dates, spaceId, userId });
+        return this.model.create({ isoDatesReserved, spaceId, userId });
     };
 
-    checkAvailability = async (dates): Promise<void | boolean> => {
-        // const appointment = this.model.findOne({ where: { datesReserved: { [Op.between]: { dates }}} }); // true
-        // return appointment ? false : true;
+    public checkAvailability = async (isoDatesToReserve: any): Promise<boolean> => {
+        const appointment = await this.model.findOne({
+            where: {
+                [Op.or]: [
+                    {
+                        isoDatesReserved: {
+                            [Op.contains]: isoDatesToReserve,
+                        },
+                    },
+                    {
+                        isoDatesReserved: {
+                            [Op.contained]: isoDatesToReserve,
+                        },
+                    },
+                ],
+            },
+        });
+
+        return appointment ? false : true;
     };
 
     // getAppointmentsByPickedDates = async (data): Promise<Appointment[]> => {

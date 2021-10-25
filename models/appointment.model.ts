@@ -3,24 +3,25 @@ import { Optional } from 'sequelize';
 import { Space } from './space.model';
 import { User } from './user.model';
 
-interface IReservationDatePart {
+interface IReservationIsoDatePart {
     inclusive: boolean;
     value: string;
 }
+export type TIsoDatesReserved = [IReservationIsoDatePart, IReservationIsoDatePart];
+export type TIsoDatesToFindAppointments = [string, string];
 interface IAppointmentAttributes {
     id: string;
-    datesReserved: TDatesReserved;
+    isoDatesReserved: TIsoDatesReserved | TIsoDatesToFindAppointments;
     spaceId: string;
     userId: string;
 }
 export interface IAppointment {
     id: string;
-    datesReserved: TDatesReserved;
+    datesReserved: TIsoDatesReserved;
     spaceId: string;
     userId: string;
 }
 interface IAppointmentCreationAttributes extends Optional<IAppointmentAttributes, 'id'> {}
-export type TDatesReserved = [IReservationDatePart, IReservationDatePart];
 
 @Table({ timestamps: true })
 export class Appointment
@@ -31,8 +32,10 @@ export class Appointment
     @Column({ type: DataType.UUID, defaultValue: DataType.UUIDV4 })
     public id!: string;
 
-    @Column({ type: DataType.RANGE(DataType.DATE) })
-    public datesReserved: TDatesReserved;
+    @Column({
+        type: DataType.RANGE(DataType.DATE),
+    })
+    public isoDatesReserved: TIsoDatesReserved;
 
     @ForeignKey(() => Space)
     @Column({ type: DataType.UUID })

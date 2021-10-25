@@ -1,7 +1,8 @@
 import * as bcrypt from 'bcrypt';
 import { Optional } from 'sequelize';
 import { Column, Model, Table, PrimaryKey, DataType, BeforeCreate, BeforeUpdate, HasMany } from 'sequelize-typescript';
-import { ErrorMessages } from '../types/enums';
+import { ErrorMessages, HttpStatus } from '../types/enums';
+import AppError from '../utils/AppError';
 import { Appointment } from './appointment.model';
 
 export interface IUserAttributes {
@@ -119,10 +120,9 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
     @Column({
         validate: {
             len: { msg: ErrorMessages.PASSWORD_LENGTH_VALIDATE, args: [8, 25] },
-            checkPasswords(this: User) {
+            checkAvailability(this: User): void {
                 if (this.password !== this.passwordConfirmation) {
-                    // FIXME should be AppError
-                    throw new Error(ErrorMessages.PASSWORDS_DO_NOT_MATCH_VALIDATE);
+                    throw new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.PASSWORDS_DO_NOT_MATCH_VALIDATE);
                 }
             },
         },

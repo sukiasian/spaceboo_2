@@ -149,7 +149,7 @@ describe('Auth (e2e)', () => {
             passwordConfirmation: userData.passwordConfirmation,
         });
 
-        console.log(res, 'ressssssss');
+        // console.log(res, 'ressssssss');
     });
 
     it('/auth/signup passwords should containt at least 1 capital letter and 1 number', async () => {});

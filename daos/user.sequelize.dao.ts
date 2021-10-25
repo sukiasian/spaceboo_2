@@ -10,7 +10,7 @@ export class UserSequelizeDao extends Dao {
     }
 
     // FIXME
-    signUpLocal = async function (this: UserSequelizeDao, data: any): Promise<User> {
+    public signUpLocal = async function (this: UserSequelizeDao, data: any): Promise<User> {
         return this.model.create(data);
     };
 }

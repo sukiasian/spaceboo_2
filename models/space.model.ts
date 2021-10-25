@@ -30,10 +30,6 @@ export interface ISpaceEdit {
     facilities?: string[];
 }
 
-export enum SpaceQuerySorting {
-    NAME = 'name',
-    DATE_OF_CREATION = 'dateOfCreation',
-}
 export enum SpaceType {
     FLAT = 'Квартира',
     HOUSE = 'Жилой дом',
@@ -57,7 +53,7 @@ export class Space extends Model<ISpaceAttributes, ISpaceCreationAttributes> imp
     // @IsIn([Object.values(Facilities)])
 
     @ForeignKey(() => City)
-    @Column
+    @Column({ allowNull: false })
     public cityId: number;
 
     @BelongsTo(() => City)

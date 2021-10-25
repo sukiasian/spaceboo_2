@@ -59,6 +59,10 @@ export enum ModelNames {
     CITY = 'City',
 }
 
+export enum SequelizeModelProps {
+    DATA_VALUES = 'dataValues',
+}
+
 // NOTE do not use v1 hardcoded
 export enum ApiRoutes {
     AUTH = '/api/v1/auth',
@@ -90,6 +94,7 @@ export enum ErrorMessages {
     IS_EMAIL_VALIDATE = 'Пожалуйста, введите действительный эл. адрес.',
     EMAIL_UNIQUE_VALIDATE = 'Пользователь с таким эл. адресом уже существует.',
     REQUIRED_FIELDS_VALIDATE = 'Пожалуйста, заполните все обязательные поля.',
+    SPACE_IS_UNAVAILABLE = 'К сожалению, пространство занято. Вы можете посмотреть другие даты.',
     APPLICATION_ERROR = 'Application Error',
     UNKNOWN_ERROR = 'Произошла серьезная ошибка',
 }

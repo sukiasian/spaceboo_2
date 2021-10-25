@@ -23,8 +23,6 @@ export class SpaceController extends Singleton {
 
     // TODO pagination, limitation, sorting продумать логику как это будет работать
     public getSpacesByQuery = UtilFunctions.catchAsync(async (req, res, next) => {
-        console.log(req.query, 'queryyyy');
-
         const spaces = await this.dao.getSpacesByQuery(req.query);
 
         UtilFunctions.sendResponse(res)(HttpStatus.OK, null, spaces);
