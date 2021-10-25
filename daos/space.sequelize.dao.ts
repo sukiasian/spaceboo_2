@@ -11,6 +11,8 @@ import { citySequelizeDao, CitySequelizeDao } from './city.sequelize.dao';
 import * as sequelize from 'sequelize';
 import { DataType } from 'sequelize-typescript';
 
+console.log('hi');
+
 interface IQueryString {
     page?: string | number;
     limit?: string | number;
