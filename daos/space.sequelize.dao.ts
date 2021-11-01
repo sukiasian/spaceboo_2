@@ -48,55 +48,48 @@ export class SpaceSequelizeDao extends Dao {
     };
 
     public getSpacesByQuery = async (queryStr: IQueryString): Promise<any> => {
-        try {
-            let { page, limit, sortBy, datesToReserveQuery, timesToReserveQuery, cityId } = queryStr;
-            let isoDatesRange: string;
+        let { page, limit, sortBy, datesToReserveQuery, timesToReserveQuery, cityId } = queryStr;
+        let isoDatesRange: string;
 
-            if (datesToReserveQuery) {
-                datesToReserveQuery = (datesToReserveQuery as string).split(',');
-                timesToReserveQuery = (timesToReserveQuery as string).split(',');
+        if (datesToReserveQuery) {
+            datesToReserveQuery = (datesToReserveQuery as string).split(',');
+            timesToReserveQuery = (timesToReserveQuery as string).split(',');
 
-                isoDatesRange = UtilFunctions.createIsoDatesRangeToFindAppointments(
-                    datesToReserveQuery[0],
-                    timesToReserveQuery[0],
-                    datesToReserveQuery[1],
-                    timesToReserveQuery[1]
-                );
-            }
-
-            page = page ? (page as number) * 1 : 1;
-            limit = limit ? (limit as number) * 1 : 20;
-
-            const offset = (page - 1) * limit;
-            const order = sortBy
-                ? this.defineSortOrder(sortBy)
-                : `"${SpaceSortFields.DATE_OF_CREATION}" ${QuerySortDirection.DESC}`;
-            let spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
-
-            // NOTE horrible architecture
-            if (datesToReserveQuery && !cityId) {
-                spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" WHERE NOT EXISTS
-                (SELECT 1 FROM "Appointments" a WHERE a."spaceId" = s."id"
-                AND a."isoDatesReserved" && '${isoDatesRange}') ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
-            }
-            if (cityId && !datesToReserveQuery) {
-                spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" AND c."cityId" = ${cityId} ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
-            }
-            if (datesToReserveQuery && cityId) {
-                spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" AND c."cityId" = ${cityId} WHERE NOT EXISTS
-                (SELECT 1 FROM "Appointments" a WHERE a."spaceId" = s."id"
-                AND a."isoDatesReserved" && '${isoDatesRange}') ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
-            }
-
-            const spaces = await this.utilFunctions.createSequelizeRawQuery(
-                applicationInstance.sequelize,
-                spacesRawQuery
+            isoDatesRange = UtilFunctions.createIsoDatesRangeToFindAppointments(
+                datesToReserveQuery[0],
+                timesToReserveQuery[0],
+                datesToReserveQuery[1],
+                timesToReserveQuery[1]
             );
-
-            return spaces;
-        } catch (err) {
-            console.log(err, 'errrrrrr');
         }
+
+        page = page ? (page as number) * 1 : 1;
+        limit = limit ? (limit as number) * 1 : 20;
+
+        const offset = (page - 1) * limit;
+        const order = sortBy
+            ? this.defineSortOrder(sortBy)
+            : `"${SpaceSortFields.DATE_OF_CREATION}" ${QuerySortDirection.DESC}`;
+        let spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
+
+        // NOTE horrible architecture
+        if (datesToReserveQuery && !cityId) {
+            spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" WHERE NOT EXISTS
+                (SELECT 1 FROM "Appointments" a WHERE a."spaceId" = s."id"
+                AND a."isoDatesReserved" && '${isoDatesRange}') ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
+        }
+        if (cityId && !datesToReserveQuery) {
+            spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" AND c."cityId" = ${cityId} ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
+        }
+        if (datesToReserveQuery && cityId) {
+            spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" AND c."cityId" = ${cityId} WHERE NOT EXISTS
+                (SELECT 1 FROM "Appointments" a WHERE a."spaceId" = s."id"
+                AND a."isoDatesReserved" && '${isoDatesRange}') ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
+        }
+
+        const spaces = await this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, spacesRawQuery);
+
+        return spaces;
     };
 
     // NOTE аутентификация

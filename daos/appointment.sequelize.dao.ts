@@ -20,23 +20,15 @@ export class AppointmentSequelizeDao extends Dao {
         resIsoDatesToReserve: IResIsoDatesReserved,
         spaceId: string,
         userId: string
-    ): Promise<any> => {
-        console.log(3333333);
-        console.log(resIsoDatesToReserve, 'dddddddd');
-
+    ): Promise<Appointment> => {
         const { beginningDate, beginningTime, endingDate, endingTime } = resIsoDatesToReserve;
-        console.log(444444);
-
         const isoDatesToReserveToCheckAvailability = this.utilFunctions.createIsoDatesRangeToFindAppointments(
             beginningDate,
             beginningTime,
             endingDate,
             endingTime
         );
-        console.log(5555555);
-
         const isAvailable = await this.checkAvailability(spaceId, isoDatesToReserveToCheckAvailability);
-        console.log(isAvailable, 'avvvvvvvv');
 
         if (isAvailable) {
             const isoDatesToReserveToCreateAppointment = this.utilFunctions.createIsoDatesRangeToCreateAppointments(
@@ -45,7 +37,7 @@ export class AppointmentSequelizeDao extends Dao {
                 endingDate,
                 endingTime
             );
-            console.log(777777);
+
             return this.model.create({ isoDatesReserved: isoDatesToReserveToCreateAppointment, spaceId, userId });
         } else {
             throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.SPACE_IS_UNAVAILABLE);

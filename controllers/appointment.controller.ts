@@ -21,5 +21,4 @@ export class AppointmentController extends Singleton {
     public stopAppointment = UtilFunctions.catchAsync(async (req, res, next) => {});
 }
 
-// NOTE export keeping the same style - if we export const then we need to export const everywhere. If default - then default everywhere.
 export const appointmentController = SingletonFactory.produce<AppointmentController>(AppointmentController);
