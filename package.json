@@ -55,7 +55,6 @@
     "dependencies": {
         "@types/bcrypt": "^5.0.0",
         "bcrypt": "^5.0.1",
-        "create-react-app": "^4.0.3",
         "express": "^4.17.1",
         "jsonwebtoken": "^8.5.1",
         "mongoose-validator": "^2.1.0",
@@ -91,6 +90,7 @@
         "@typescript-eslint/eslint-plugin": "^4.31.1",
         "@typescript-eslint/parser": "^4.31.1",
         "concurrently": "^6.1.0",
+        "create-react-app": "^4.0.3",
         "dotenv": "^9.0.2",
         "eslint": "^7.32.0",
         "eslint-config-node": "^4.1.0",

@@ -1,6 +1,6 @@
 import { Dao } from '../configurations/dao.config';
 import { User } from '../models/user.model';
-import { HttpStatus } from '../types/enums';
+import { ErrorMessages, HttpStatus } from '../types/enums';
 import AppError from '../utils/AppError';
 import { SingletonFactory } from '../utils/Singleton';
 
@@ -16,7 +16,7 @@ export class AuthSequelizeDao extends Dao {
         if (data.password && data.passwordConfirmation) {
             return this.model.create(data);
         } else {
-            throw new AppError(HttpStatus.BAD_REQUEST, 'Пожалуйста, введите действительный пароль');
+            throw new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.PASSPORT_IS_NOT_VALID);
         }
     };
 }

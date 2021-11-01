@@ -89,6 +89,7 @@ export enum ResponseMessages {
 export enum ErrorMessages {
     PASSWORDS_DO_NOT_MATCH_VALIDATE = 'Пароли должны совпадать.',
     PASSWORD_LENGTH_VALIDATE = 'Пароль должен состоять от 8 до 25 символов.',
+    PASSPORT_IS_NOT_VALID = 'Пожалуйста, введите действительный пароль',
     NAME_LENGTH_VALIDATE = 'Имя должно состоять от 2 до 25 символов.',
     MIDDLE_NAME_LENGTH_VALIDATE = 'Отчество должно состоять от 2 до 25 символов.',
     IS_EMAIL_VALIDATE = 'Пожалуйста, введите действительный эл. адрес.',

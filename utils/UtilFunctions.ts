@@ -116,8 +116,6 @@ class UtilFunctions {
         }
     };
 
-    // NOTE PROBABLY make timezoneParser private and create here dateToPostgresFormat which will format a date into a postgres format date (iso)
-
     private static timeValueToDoubleDigitParser = (value: number): string => {
         return value > 9 ? `${value}` : `0${value}`;
     };
@@ -161,7 +159,7 @@ class UtilFunctions {
     public static createSequelizeRawQuery = async (
         sequelize: Sequelize,
         query: string,
-        isPlain = true
+        isPlain = false
     ): Promise<unknown | unknown[]> => {
         return sequelize.query(query, { type: QueryTypes.SELECT, plain: isPlain });
     };

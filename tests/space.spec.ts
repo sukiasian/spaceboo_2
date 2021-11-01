@@ -39,6 +39,8 @@ describe('Space (e2e)', () => {
     let isoDatesToReserve_1: TIsoDatesReserved;
     let isoDatesToReserve_2: TIsoDatesReserved;
     let isoDatesToReserve_3: TIsoDatesReserved;
+    let space_1: Space;
+    let space_2: Space;
 
     beforeAll(async () => {
         dotenv.config({ path: '../test.env' });
@@ -80,6 +82,13 @@ describe('Space (e2e)', () => {
         spaceData = createSpaceData(user.id, city.id, 1500);
         spaceData_2 = createSpaceData(user.id, city_2.id);
         token = await createTokenAndSign(user.id);
+        space_1 = await spaceModel.create(spaceData);
+        space_1 = await spaceModel.findOne({
+            where: { id: space_1.id },
+            include: [cityModel, appointmentModel],
+        });
+        space_2 = await spaceModel.create(spaceData_2);
+        space_2 = await spaceModel.findOne({ where: { id: space_2.id }, include: [cityModel, appointmentModel] });
     });
 
     afterEach(async () => {
@@ -92,6 +101,8 @@ describe('Space (e2e)', () => {
     });
 
     it('POST /spaces should create a space', async () => {
+        await spaceModel.destroy({ truncate: true, cascade: true });
+
         const spaces = await spaceModel.findAll({ raw: true });
 
         expect(spaces.length).toBe(0);
@@ -110,26 +121,19 @@ describe('Space (e2e)', () => {
     });
 
     it('Created appointments should relate to space', async () => {
-        let space = await spaceModel.create(spaceData);
-
-        space = await spaceModel.findOne({
-            where: { id: space.id },
-            include: [City, Appointment],
-        });
-
         await appointmentModel.create({
             userId: user.id,
-            spaceId: space.id,
+            spaceId: space_1.id,
             isoDatesReserved: isoDatesToReserve_1,
         });
         await appointmentModel.create({
             userId: user.id,
-            spaceId: space.id,
+            spaceId: space_1.id,
             isoDatesReserved: isoDatesToReserve_2,
         });
 
         const spaceFresh = await spaceModel.findOne({
-            where: { id: space.id },
+            where: { id: space_1.id },
             include: { all: true },
             nest: true,
         });
@@ -139,15 +143,6 @@ describe('Space (e2e)', () => {
     });
 
     it('GET /spaces should get all spaces by city', async () => {
-        let space_1 = await spaceModel.create(spaceData);
-        space_1 = await spaceModel.findOne({
-            where: { id: space_1.id },
-            include: [cityModel, appointmentModel],
-        });
-
-        let space_2 = await spaceModel.create(spaceData_2);
-        space_2 = await spaceModel.findOne({ where: { id: space_2.id }, include: [cityModel, appointmentModel] });
-
         await appointmentModel.create({
             userId: user.id,
             spaceId: space_1.id,
@@ -163,12 +158,10 @@ describe('Space (e2e)', () => {
             spaceId: space_2.id,
             isoDatesReserved: isoDatesToReserve_2,
         });
-        console.log(space_2[SequelizeModelProps.DATA_VALUES].cityId, 'aaaaaaaaa');
 
         const res = await request(app).get(`${ApiRoutes.SPACES}`).query({
             cityId: space_2.cityId,
         });
-        // console.log(res.body.data, '¡111resssssss');
 
         expect(res.body.data.length).toBe(1);
         expect(res.body.data[0].cityId).toBe(space_2.cityId);
@@ -176,15 +169,6 @@ describe('Space (e2e)', () => {
 
     ///// 2️⃣
     it('GET /spaces should get all spaces by dates to reserve', async () => {
-        let space_1 = await spaceModel.create(spaceData);
-
-        space_1 = await spaceModel.findOne({
-            where: { id: space_1.id },
-            include: [cityModel, appointmentModel],
-        });
-        let space_2 = await spaceModel.create(spaceData_2);
-        space_2 = await spaceModel.findOne({ where: { id: space_2.id }, include: [cityModel, appointmentModel] });
-
         // FIXME if appointment already overlaps then we should be unable to create a new one
         await appointmentModel.create({
             userId: user.id,
@@ -218,15 +202,6 @@ describe('Space (e2e)', () => {
 
     ///// 3️⃣
     it('GET /spaces should get all spaces without query strings', async () => {
-        let space_1 = await spaceModel.create(spaceData);
-
-        space_1 = await spaceModel.findOne({
-            where: { id: space_1.id },
-            include: [cityModel, appointmentModel],
-        });
-        let space_2 = await spaceModel.create(spaceData_2);
-        space_2 = await spaceModel.findOne({ where: { id: space_2.id }, include: [cityModel, appointmentModel] });
-
         await appointmentModel.create({
             userId: user.id,
             spaceId: space_1.id,
@@ -244,19 +219,11 @@ describe('Space (e2e)', () => {
         });
 
         const res = await request(app).get(`${ApiRoutes.SPACES}`);
+
         expect(res.body.data.length).toBe(2);
     });
     ///// 4️⃣
     it('GET /spaces should get all spaces with city and dates to reserve queries', async () => {
-        let space_1 = await spaceModel.create(spaceData);
-
-        space_1 = await spaceModel.findOne({
-            where: { id: space_1.id },
-            include: [cityModel, appointmentModel],
-        });
-        let space_2 = await spaceModel.create(spaceData_2);
-        space_2 = await spaceModel.findOne({ where: { id: space_2.id }, include: [cityModel, appointmentModel] });
-
         await appointmentModel.create({
             userId: user.id,
             spaceId: space_1.id,
@@ -288,6 +255,7 @@ describe('Space (e2e)', () => {
             timesToReserveQuery: '13:00,12:00',
             cityId: space_1.cityId,
         });
+
         expect(res_1.body.data.length).toBe(1);
         expect(res_2.body.data.length).toBe(1);
         expect(res_3.body.data.length).toBe(0);
@@ -296,15 +264,6 @@ describe('Space (e2e)', () => {
     /// 5️⃣
     it('GET /spaces should get all spaces should be able to sort', async () => {
         // NOTE put everything in beforeEach ?
-        let space_1 = await spaceModel.create(spaceData);
-
-        space_1 = await spaceModel.findOne({
-            where: { id: space_1.id },
-            include: [cityModel, appointmentModel],
-        });
-        let space_2 = await spaceModel.create(spaceData_2);
-        space_2 = await spaceModel.findOne({ where: { id: space_2.id }, include: [cityModel, appointmentModel] });
-
         await appointmentModel.create({
             userId: user.id,
             spaceId: space_1.id,
@@ -324,45 +283,43 @@ describe('Space (e2e)', () => {
         const res_1 = await request(app).get(`${ApiRoutes.SPACES}`).query({
             sortBy: SpaceQuerySortFields.PRICEUP,
         });
+
         expect(res_1.body.data[0].pricePerNight < res_1.body.data[1].pricePerNight);
 
         const res_2 = await request(app).get(`${ApiRoutes.SPACES}`).query({
             sortBy: SpaceQuerySortFields.PRICEDOWN,
         });
+
         expect(res_2.body.data[0].pricePerNight > res_2.body.data[1].pricePerNight);
     });
 
-    it('PUT /spaces should edit space by id', async () => {});
+    it('PUT /spaces should edit space by id', async () => {
+        // get spaceId and check if the userId in space === req.user.id
+        // if yes, then accept changes (for images we need a separate route)
+        //
+    });
 
     it('DELETE /spaces should delete space from database', async () => {});
 
     it('Created appointments should relate to space', async () => {
-        let space = await spaceModel.create(spaceData);
-
-        space = await spaceModel.findOne({
-            where: { id: space.id },
-            include: [City, Appointment],
-        });
-
         await appointmentModel.create({
             userId: user.id,
-            spaceId: space.id,
+            spaceId: space_1.id,
             isoDatesReserved: isoDatesToReserve_1,
         });
         await appointmentModel.create({
             userId: user.id,
-            spaceId: space.id,
+            spaceId: space_1.id,
             isoDatesReserved: isoDatesToReserve_2,
         });
 
         const spaceFresh = await spaceModel.findOne({
-            where: { id: space.id },
+            where: { id: space_1.id },
             include: { all: true },
             nest: true,
         });
 
         expect(spaceFresh[SequelizeModelProps.DATA_VALUES].appointments).toBeTruthy();
         expect(spaceFresh[SequelizeModelProps.DATA_VALUES].appointments.length).toBe(2);
-        // NOTE перед записью аппоинтмента нужно проверить чтобы время было свободно
     });
 });

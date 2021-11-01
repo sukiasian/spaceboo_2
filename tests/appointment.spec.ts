@@ -17,8 +17,7 @@ import { ApiRoutes, HttpStatus } from '../types/enums';
 import { ISpaceCreate, Space } from '../models/space.model';
 import { Appointment } from '../models/appointment.model';
 import { City } from '../models/city.model';
-import { TIsoDatesReserved } from '../models/appointment.model';
-import UtilFunctions from '../utils/UtilFunctions';
+import { IResIsoDatesReserved } from '../frontend/src/types/resTypes';
 
 describe('Appointment (e2e)', () => {
     let app: express.Express;
@@ -35,9 +34,9 @@ describe('Appointment (e2e)', () => {
     let cityModel: typeof City;
     let space: Space;
     let appointmentModel: typeof Appointment;
-    let isoDatesToReserve: TIsoDatesReserved;
-    let isoDatesToReserveNarrow: TIsoDatesReserved;
-    let isoDatesToReserveWide: TIsoDatesReserved;
+    let resIsoDatesToReserve: IResIsoDatesReserved;
+    let resIsoDatesToReserveNarrow: IResIsoDatesReserved;
+    let resIsoDatesToReserveWide: IResIsoDatesReserved;
 
     beforeAll(async () => {
         dotenv.config({ path: '../test.env' });
@@ -53,6 +52,24 @@ describe('Appointment (e2e)', () => {
         appointmentModel = Appointment;
 
         userData = createUserData();
+        resIsoDatesToReserve = {
+            beginningDate: '2020-12-15',
+            beginningTime: '14:00',
+            endingDate: '2020-12-20',
+            endingTime: '12:00',
+        };
+        resIsoDatesToReserveNarrow = {
+            beginningDate: '2020-12-17',
+            beginningTime: '14:00',
+            endingDate: '2020-12-19',
+            endingTime: '12:00',
+        };
+        resIsoDatesToReserveWide = {
+            beginningDate: '2020-12-12',
+            beginningTime: '14:00',
+            endingDate: '2020-12-25',
+            endingTime: '12:00',
+        };
         server = (await openTestEnv(applicationInstance)).server;
     });
 
@@ -65,25 +82,6 @@ describe('Appointment (e2e)', () => {
             where: { id: space.id },
             include: [City, Appointment],
         });
-
-        isoDatesToReserve = UtilFunctions.createIsoDatesRangeToCreateAppointments(
-            '2020-12-15',
-            '14:00',
-            '2020-12-20',
-            '12:00'
-        );
-        isoDatesToReserveNarrow = UtilFunctions.createIsoDatesRangeToCreateAppointments(
-            '2020-12-17',
-            '14:00',
-            '2020-12-19',
-            '12:00'
-        );
-        isoDatesToReserveWide = UtilFunctions.createIsoDatesRangeToCreateAppointments(
-            '2020-12-10',
-            '14:00',
-            '2020-12-24',
-            '12:00'
-        );
         token = await createTokenAndSign(user.id);
     });
 
@@ -99,18 +97,61 @@ describe('Appointment (e2e)', () => {
         const res = await request(app)
             .post(`${ApiRoutes.APPOINTMENTS}`)
             .send({
-                isoDatesToReserve,
+                resIsoDatesToReserve,
                 spaceId: space.id,
             })
             .set('Authorization', `Bearer ${token}`);
+
         expect(res.status).toBe(HttpStatus.CREATED);
+    });
+
+    it('POST /appointments should not create an appointment if the space is unavailable', async () => {
+        const appointments = await appointmentModel.count({ where: { spaceId: space.id } });
+        expect(appointments).toBe(0);
+        await request(app)
+            .post(`${ApiRoutes.APPOINTMENTS}`)
+            .send({
+                resIsoDatesToReserve,
+                spaceId: space.id,
+            })
+            .set('Authorization', `Bearer ${token}`);
+
+        const res_1 = await request(app)
+            .post(`${ApiRoutes.APPOINTMENTS}`)
+            .send({
+                resIsoDatesToReserve,
+                spaceId: space.id,
+            })
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res_1.status).toBe(HttpStatus.FORBIDDEN);
+
+        const res_2 = await request(app)
+            .post(`${ApiRoutes.APPOINTMENTS}`)
+            .send({
+                resIsoDatesToReserve: resIsoDatesToReserveNarrow,
+                spaceId: space.id,
+            })
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res_2.status).toBe(HttpStatus.FORBIDDEN);
+
+        const res_3 = await request(app)
+            .post(`${ApiRoutes.APPOINTMENTS}`)
+            .send({
+                resIsoDatesToReserve: resIsoDatesToReserveWide,
+                spaceId: space.id,
+            })
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res_3.status).toBe(HttpStatus.FORBIDDEN);
     });
 
     it('POST /appointments should parse timezones properly and store appointments in +0 timezone', async () => {
         const res = await request(app)
             .post(`${ApiRoutes.APPOINTMENTS}`)
             .send({
-                isoDatesToReserve,
+                resIsoDatesToReserve,
                 spaceId: space.id,
             })
             .set('Authorization', `Bearer ${token}`);
@@ -119,34 +160,5 @@ describe('Appointment (e2e)', () => {
             { inclusive: true, value: '2020-12-15T14:00:00.000Z' },
             { inclusive: false, value: '2020-12-20T12:00:00.000Z' },
         ]);
-    });
-
-    it('POST /appointments should not allow to register if a space is unavailable (range contains)', async () => {
-        // TODO refactor from using request to using model directly
-        await request(app)
-            .post(`${ApiRoutes.APPOINTMENTS}`)
-            .send({ isoDatesToReserve, spaceId: space.id })
-            .set('Authorization', `Bearer ${token}`);
-
-        const res = await request(app)
-            .post(`${ApiRoutes.APPOINTMENTS}`)
-            .send({ isoDatesToReserve: isoDatesToReserveWide, spaceId: space.id })
-            .set('Authorization', `Bearer ${token}`);
-
-        expect(res.status).toBe(HttpStatus.FORBIDDEN);
-    });
-
-    it('POST /appointments should not allow to register if a space is unavailable (range is contained)', async () => {
-        await request(app)
-            .post(`${ApiRoutes.APPOINTMENTS}`)
-            .send({ isoDatesToReserve, spaceId: space.id })
-            .set('Authorization', `Bearer ${token}`);
-
-        const res = await request(app)
-            .post(`${ApiRoutes.APPOINTMENTS}`)
-            .send({ isoDatesToReserve: isoDatesToReserveNarrow, spaceId: space.id })
-            .set('Authorization', `Bearer ${token}`);
-
-        expect(res.status).toBe(HttpStatus.FORBIDDEN);
     });
 });

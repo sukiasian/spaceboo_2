@@ -1,9 +1,8 @@
 import * as dotenv from 'dotenv';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
-import { ErrorMessages, HttpStatus, ResponseMessages, SequelizeModelProps } from '../types/enums';
+import { HttpStatus, ResponseMessages } from '../types/enums';
 import { appointmentSequelizeDao, AppointmentSequelizeDao } from '../daos/appointment.sequelize.dao';
-import AppError from '../utils/AppError';
 
 dotenv.config();
 
@@ -11,18 +10,14 @@ export class AppointmentController extends Singleton {
     private readonly dao: AppointmentSequelizeDao = appointmentSequelizeDao;
 
     public createAppointment = UtilFunctions.catchAsync(async (req, res, next) => {
-        const { isoDatesToReserve, spaceId } = req.body;
+        const { resIsoDatesToReserve, spaceId } = req.body;
         const userId = req.user.id;
-        const availability = await this.dao.checkAvailability(isoDatesToReserve);
-
-        if (!availability) {
-            throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.SPACE_IS_UNAVAILABLE);
-        }
-
-        const appointment = await this.dao.createAppointment(isoDatesToReserve, spaceId, userId);
+        const appointment = await this.dao.createAppointment(resIsoDatesToReserve, spaceId, userId);
 
         UtilFunctions.sendResponse(res)(HttpStatus.CREATED, ResponseMessages.APPOINTMENT_CREATED, appointment);
     });
+
+    // PASS THE SPACE LITERALLY
     public stopAppointment = UtilFunctions.catchAsync(async (req, res, next) => {});
 }
 

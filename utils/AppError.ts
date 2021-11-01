@@ -1,9 +1,11 @@
+import { ErrorMessages, HttpStatus } from '../types/enums';
+
 export default class AppError extends Error {
-    public statusCode: number;
+    public statusCode: HttpStatus;
     public isOperational: boolean;
     public status: string;
 
-    constructor(statusCode: number, message: string) {
+    constructor(statusCode: HttpStatus, message: ErrorMessages) {
         super(message);
         this.statusCode = statusCode;
         this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';

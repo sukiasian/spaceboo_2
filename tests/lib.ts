@@ -10,6 +10,7 @@ import { SingletonFactory } from '../utils/Singleton';
 import * as dotenv from 'dotenv';
 import { ErrorMessages, ModelNames } from '../types/enums';
 import { ISpaceCreate, SpaceType } from '../models/space.model';
+import { IAppointmentCreate, TIsoDatesReserved } from '../models/appointment.model';
 
 dotenv.config({ path: '../test.env' });
 
@@ -102,31 +103,17 @@ export const createSpaceData = (userId: string, cityId: number, pricePerNight = 
     };
 };
 
-// export const createDatesToReserve = (beginningDate: string, endingDate: string, space: Space): TDatesReserved => {
-//     return [
-//         { inclusive: true, value: createCustomDate(beginningDate, space['city.timezone']) },
-//         { inclusive: false, value: createCustomDate(endingDate, space['city.timezone']) },
-//     ];
-// };
-// const timeValueToDoubleDigitParser = (value) => {
-//     return value > 9 ? `${value}` : `0${value}`;
-// };
-
-// export const createCustomDate = (dateRawValue: string, timezone: string): string => {
-//     const date = new Date(dateRawValue);
-//     const year = date.getFullYear();
-//     const month = timeValueToDoubleDigitParser(date.getMonth() + 1);
-//     const day = timeValueToDoubleDigitParser(date.getDate());
-//     const hours = timeValueToDoubleDigitParser(date.getHours());
-//     const minutes = timeValueToDoubleDigitParser(date.getMinutes());
-//     const seconds = timeValueToDoubleDigitParser(date.getSeconds());
-//     let milliseconds: any = date.getMilliseconds() / 1000;
-//     milliseconds = Math.floor(milliseconds.toFixed(2) * 100);
-
-//     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}${UtilFunctions.timezoneParser(
-//         timezone
-//     )}`;
-// };
+export const createAppoinmentData = (
+    isoDatesReserved: TIsoDatesReserved,
+    spaceId: string,
+    userId: string
+): IAppointmentCreate => {
+    return {
+        isoDatesReserved,
+        userId,
+        spaceId,
+    };
+};
 
 export const createTokenAndSign = async (payload: string | object): Promise<string> => {
     const signToken = promisify(jwt.sign);

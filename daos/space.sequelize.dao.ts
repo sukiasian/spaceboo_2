@@ -43,11 +43,11 @@ export class SpaceSequelizeDao extends Dao {
     }
 
     // NOTE аутентификация - протекция роута (только для авторизованных пользователей)
-    createSpace = async (data: ISpaceCreate): Promise<Space> => {
+    public createSpace = async (data: ISpaceCreate): Promise<Space> => {
         return this.model.create(data);
     };
 
-    getSpacesByQuery = async (queryStr: IQueryString): Promise<any> => {
+    public getSpacesByQuery = async (queryStr: IQueryString): Promise<any> => {
         try {
             let { page, limit, sortBy, datesToReserveQuery, timesToReserveQuery, cityId } = queryStr;
             let isoDatesRange: string;
@@ -90,8 +90,7 @@ export class SpaceSequelizeDao extends Dao {
 
             const spaces = await this.utilFunctions.createSequelizeRawQuery(
                 applicationInstance.sequelize,
-                spacesRawQuery,
-                false
+                spacesRawQuery
             );
 
             return spaces;
@@ -101,13 +100,13 @@ export class SpaceSequelizeDao extends Dao {
     };
 
     // NOTE аутентификация
-    editSpaceById = async (spaceId: string, userId: string, data: ISpaceEdit) => {
+    public editSpaceById = async (spaceId: string, userId: string, data: ISpaceEdit) => {
         const space = (await this.findById(spaceId, true)) as Space;
         await space.update(data);
     };
 
     // NOTE аутентификация и проверка на то что
-    deleteSpaceById = async () => {};
+    public deleteSpaceById = async () => {};
 
     private defineSortOrder = (sortBy: SpaceQuerySortFields): string => {
         switch (sortBy) {

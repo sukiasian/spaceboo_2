@@ -1,59 +1,72 @@
 import { Op } from 'sequelize';
+import { applicationInstance } from '../App';
 import { Dao } from '../configurations/dao.config';
-import { Appointment, TIsoDatesReserved } from '../models/appointment.model';
+import { IResIsoDatesReserved } from '../frontend/src/types/resTypes';
+import { Appointment } from '../models/appointment.model';
+import { ErrorMessages, HttpStatus } from '../types/enums';
+import AppError from '../utils/AppError';
 import { SingletonFactory } from '../utils/Singleton';
+import UtilFunctions from '../utils/UtilFunctions';
 
 export class AppointmentSequelizeDao extends Dao {
     private readonly appointmentModel: typeof Appointment = Appointment;
+    private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
 
     get model(): typeof Appointment {
         return this.appointmentModel;
     }
 
     public createAppointment = async (
-        isoDatesReserved: TIsoDatesReserved,
+        resIsoDatesToReserve: IResIsoDatesReserved,
         spaceId: string,
         userId: string
-    ): Promise<Appointment> => {
-        // use space id and check if space is available
+    ): Promise<any> => {
+        console.log(3333333);
+        console.log(resIsoDatesToReserve, 'dddddddd');
 
-        return this.model.create({ isoDatesReserved, spaceId, userId });
+        const { beginningDate, beginningTime, endingDate, endingTime } = resIsoDatesToReserve;
+        console.log(444444);
+
+        const isoDatesToReserveToCheckAvailability = this.utilFunctions.createIsoDatesRangeToFindAppointments(
+            beginningDate,
+            beginningTime,
+            endingDate,
+            endingTime
+        );
+        console.log(5555555);
+
+        const isAvailable = await this.checkAvailability(spaceId, isoDatesToReserveToCheckAvailability);
+        console.log(isAvailable, 'avvvvvvvv');
+
+        if (isAvailable) {
+            const isoDatesToReserveToCreateAppointment = this.utilFunctions.createIsoDatesRangeToCreateAppointments(
+                beginningDate,
+                beginningTime,
+                endingDate,
+                endingTime
+            );
+            console.log(777777);
+            return this.model.create({ isoDatesReserved: isoDatesToReserveToCreateAppointment, spaceId, userId });
+        } else {
+            throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.SPACE_IS_UNAVAILABLE);
+        }
     };
 
-    public checkAvailability = async (isoDatesToReserve: any): Promise<boolean> => {
-        const appointment = await this.model.findOne({
-            where: {
-                [Op.or]: [
-                    {
-                        isoDatesReserved: {
-                            [Op.contains]: isoDatesToReserve,
-                        },
-                    },
-                    {
-                        isoDatesReserved: {
-                            [Op.contained]: isoDatesToReserve,
-                        },
-                    },
-                ],
-            },
-        });
+    public checkAvailability = async (spaceId: string, isoDatesToReserve: string): Promise<boolean> => {
+        const findAppointmentRawQuery = `SELECT COUNT(*) FROM "Appointments" WHERE "spaceId" = '${spaceId}' AND "isoDatesReserved" && '${isoDatesToReserve}';`;
+        const appointmentCount = await this.utilFunctions.createSequelizeRawQuery(
+            applicationInstance.sequelize,
+            findAppointmentRawQuery
+        );
 
-        return appointment ? false : true;
+        switch (appointmentCount[0].count) {
+            case '0':
+                return true;
+
+            case '1':
+                return false;
+        }
     };
-
-    // getAppointmentsByPickedDates = async (data): Promise<Appointment[]> => {
-    //     // FIXME fromDate and toDate should come from data
-    //     const fromDate = new Date('09/19/2021').getTime();
-    //     const toDate = new Date('09/20/2021').getTime();
-
-    //     return await this.model.findAll({
-    //         where: {
-    //             startDate: {
-    //                 [Op.notBetween]: [fromDate, toDate],
-    //             },
-    //         },
-    //     });
-    // };
 }
 
 export const appointmentSequelizeDao = SingletonFactory.produce<AppointmentSequelizeDao>(AppointmentSequelizeDao);

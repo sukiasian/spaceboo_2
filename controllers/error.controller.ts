@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
-import { Environment, ErrorMessages, HttpStatus } from '../types/enums';
+import logger from '../loggers/logger';
+import { Environment, ErrorMessages, HttpStatus, LoggerLevels } from '../types/enums';
 
 class ErrorController {
-    public static sendErrorDevAndTest = (err: any, res: Response): void => {
+    private static readonly logger = logger;
+    public static sendErrorDev = (err: any, res: Response): void => {
         console.log(err, ErrorMessages.APPLICATION_ERROR);
         res.status(err.statusCode).json({
             status: err.status,
@@ -30,6 +32,7 @@ class ErrorController {
 
     public static sendErrorTest = (err: any, res: Response): void => {
         if (!err.isOperational) {
+            this.logger.log({ level: LoggerLevels.ERROR, message: err });
             res.status(err.statusCode).json({
                 status: err.status,
                 message: ErrorMessages.UNKNOWN_ERROR,
@@ -52,7 +55,7 @@ class ErrorController {
 
         switch (process.env.NODE_ENV) {
             case Environment.DEVELOPMENT:
-                ErrorController.sendErrorDevAndTest(err, res);
+                ErrorController.sendErrorDev(err, res);
                 break;
 
             case Environment.TEST:

@@ -7,8 +7,9 @@ import { IRouter } from './router';
 
 class SpaceRouter extends Singleton implements IRouter {
     private readonly spaceController = spaceController;
-    public readonly router = Router();
     private readonly passport = passport;
+    public readonly router = Router();
+
     public prepareRouter = function (this: SpaceRouter): void {
         this.router
             .route('/')
@@ -16,6 +17,7 @@ class SpaceRouter extends Singleton implements IRouter {
                 this.passport.authenticate(PassportStrategies.JWT, { session: false }),
                 this.spaceController.createSpace
             );
+        this.router.route('/');
         this.router.route('/').get(this.spaceController.getSpacesByQuery);
         this.router.route('/:id').get(this.spaceController.getSpaceById);
     };

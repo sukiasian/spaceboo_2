@@ -22,6 +22,7 @@ export interface IAppointment {
     userId: string;
 }
 interface IAppointmentCreationAttributes extends Optional<IAppointmentAttributes, 'id'> {}
+export interface IAppointmentCreate extends IAppointmentCreationAttributes {}
 
 @Table({ timestamps: true })
 export class Appointment
