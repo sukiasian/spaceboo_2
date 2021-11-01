@@ -115,3 +115,8 @@ export enum QuerySortDirection {
     ASC = 'ASC',
     DESC = 'DESC',
 }
+
+// NOTE guees we need that for everything
+export enum SpaceFields {
+    PRICE_PER_NIGHT = 'pricePerNight',
+}

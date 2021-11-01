@@ -66,30 +66,25 @@ describe('Appointment (e2e)', () => {
             include: [City, Appointment],
         });
 
-        // 2020-12-20 2020-12-15
         isoDatesToReserve = UtilFunctions.createIsoDatesRangeToCreateAppointments(
             '2020-12-15',
             '14:00',
             '2020-12-20',
-            '12:00',
-            space.city['dataValues']['timezone']
+            '12:00'
         );
         isoDatesToReserveNarrow = UtilFunctions.createIsoDatesRangeToCreateAppointments(
             '2020-12-17',
             '14:00',
             '2020-12-19',
-            '12:00',
-            space.city['dataValues']['timezone']
+            '12:00'
         );
         isoDatesToReserveWide = UtilFunctions.createIsoDatesRangeToCreateAppointments(
             '2020-12-10',
             '14:00',
             '2020-12-24',
-            '12:00',
-            space.city['dataValues']['timezone']
+            '12:00'
         );
         token = await createTokenAndSign(user.id);
-        console.log(isoDatesToReserve, 'isoooooooo');
     });
 
     afterEach(async () => {
@@ -121,8 +116,8 @@ describe('Appointment (e2e)', () => {
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.body.data.isoDatesReserved).toStrictEqual([
-            { inclusive: true, value: '2020-12-15T11:00:00.000Z' },
-            { inclusive: false, value: '2020-12-20T09:00:00.000Z' },
+            { inclusive: true, value: '2020-12-15T14:00:00.000Z' },
+            { inclusive: false, value: '2020-12-20T12:00:00.000Z' },
         ]);
     });
 

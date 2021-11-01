@@ -7,6 +7,7 @@ import { User } from './user.model';
 interface ISpaceAttributes {
     id: string;
     address: string;
+    pricePerNight: number;
     type: SpaceType;
     description: string;
     roomsNumber: number;
@@ -43,6 +44,9 @@ export class Space extends Model<ISpaceAttributes, ISpaceCreationAttributes> imp
 
     @Column
     public address: string;
+
+    @Column
+    public pricePerNight: number;
 
     @Column({ type: DataType.STRING })
     public type: SpaceType;

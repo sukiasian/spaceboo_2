@@ -4,7 +4,7 @@ import { Environment, LoggerLevels } from '../types/enums';
 
 export default async (sequelize: Sequelize): Promise<void> => {
     try {
-        await sequelize.sync({ force: process.env.NODE_ENV === Environment.DEVELOPMENT ? true : false });
+        await sequelize.sync({ force: process.env.NODE_ENV !== Environment.PRODUCTION ? true : false });
         logger.log({ level: LoggerLevels.INFO, message: 'Synchronized' });
         if (process.env.NODE_ENV !== Environment.PRODUCTION) {
             await sequelize.query(

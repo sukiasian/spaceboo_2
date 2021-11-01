@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import * as passport from 'passport';
 import { authController } from '../controllers/auth.controller';
-import { PassportStrategies } from '../types/enums';
+import logger from '../loggers/logger';
+import { LoggerLevels, PassportStrategies } from '../types/enums';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
 import { IRouter } from './router';
 
@@ -21,7 +22,9 @@ class AuthRouter extends Singleton implements IRouter {
         this.router.route('/signup').post(this.authController.signUpLocal);
         this.router
             .route('/facebook')
-            .get(this.passport.authenticate('facebook'), () => console.log('signed up to facebook'));
+            .get(this.passport.authenticate(PassportStrategies.FACEBOOK), () =>
+                logger.log({ level: LoggerLevels.INFO, message: 'signed up in Facebook' })
+            );
         this.router.route('/facebook/callback').get((req, res) => {
             res.redirect('/');
             console.log('redirected');

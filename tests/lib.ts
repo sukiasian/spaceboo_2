@@ -87,9 +87,10 @@ export const testUserValidationByMessages = async (
     }
 };
 
-export const createSpaceData = (userId: string, cityId: number): ISpaceCreate => {
+export const createSpaceData = (userId: string, cityId: number, pricePerNight = 1000): ISpaceCreate => {
     return {
         address: faker.address.streetAddress(),
+        pricePerNight,
         type: SpaceType.FLAT,
         roomsNumber: 2,
         imagesUrl: ['/public/images/space/1.jpg'],

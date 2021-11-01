@@ -3,20 +3,8 @@ import * as request from 'supertest';
 import {} from 'jest';
 import * as dotenv from 'dotenv';
 import { Application } from '../App';
-import { IUserCreate, User } from '../models/user.model';
-import {
-    clearDb,
-    closeTestEnv,
-    createApplicationInstance,
-    createInvalidUserData,
-    createSpaceData,
-    createUserData,
-    openTestEnv,
-} from './lib';
+import { clearDb, closeTestEnv, createApplicationInstance, openTestEnv } from './lib';
 import { Sequelize } from 'sequelize-typescript';
-import { ApiRoutes, HttpStatus } from '../types/enums';
-import { ISpaceCreate, Space } from '../models/space.model';
-import { Appointment } from '../models/appointment.model';
 import { City } from '../models/city.model';
 
 describe('City (e2e)', () => {

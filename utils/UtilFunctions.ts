@@ -1,8 +1,10 @@
 import { Response } from 'express';
+import logger from '../loggers/logger';
 import { applicationInstance } from '../App';
-import { TIsoDatesToFindAppointments, TIsoDatesReserved } from '../models/appointment.model';
-import { Space } from '../models/space.model';
-import { HttpStatus } from '../types/enums';
+import { TIsoDatesReserved } from '../models/appointment.model';
+import { HttpStatus, LoggerLevels } from '../types/enums';
+import { Sequelize } from 'sequelize-typescript';
+import { QueryTypes } from 'sequelize';
 
 enum DateFormat {
     NATIVE = 'native',
@@ -42,24 +44,24 @@ class UtilFunctions {
                 console.error(reason, 'Unhandled Rejection at Promise', p);
                 server.close((err: any) => {
                     if (err) {
-                        console.error(err);
+                        logger.log({ level: LoggerLevels.ERROR, message: err });
                         process.exit(1);
                     }
                     applicationInstance.sequelize.close().then(() => {
-                        console.log('Sequelize connection disconnected');
+                        logger.log({ level: LoggerLevels.INFO, message: 'Sequelize connection disconnected' });
                         process.exit(0);
                     });
                 });
             })
             .on('uncaughtException', (err) => {
-                console.error(err, 'Uncaught Exception thrown');
+                logger.log({ level: LoggerLevels.ERROR, message: 'Uncaught Exception thrown' });
                 server.close((err: any) => {
                     if (err) {
-                        console.error(err);
+                        logger.log({ level: LoggerLevels.ERROR, message: err });
                         process.exit(1);
                     }
                     applicationInstance.sequelize.close().then(() => {
-                        console.log('Sequelize connection disconnected');
+                        logger.log({ level: LoggerLevels.INFO, message: 'Sequelize connection disconnected' });
                         process.exit(0);
                     });
                 });
@@ -68,11 +70,11 @@ class UtilFunctions {
                 console.info('SIGTERM signal received.');
                 server.close((err: any) => {
                     if (err) {
-                        console.error(err);
+                        logger.log({ level: LoggerLevels.ERROR, message: err });
                         process.exit(1);
                     }
                     applicationInstance.sequelize.close().then(() => {
-                        console.log('Sequelize connection disconnected');
+                        logger.log({ level: LoggerLevels.INFO, message: 'Sequelize connection disconnected' });
                         process.exit(0);
                     });
                 });
@@ -81,11 +83,11 @@ class UtilFunctions {
                 console.info('SIGINT signal received.');
                 server.close((err: any) => {
                     if (err) {
-                        console.error(err);
+                        logger.log({ level: LoggerLevels.ERROR, message: err });
                         process.exit(1);
                     }
                     applicationInstance.sequelize.close().then(() => {
-                        console.log('Sequelize connection disconnected');
+                        logger.log({ level: LoggerLevels.INFO, message: 'Sequelize connection disconnected' });
                         process.exit(0);
                     });
                 });
@@ -97,22 +99,6 @@ class UtilFunctions {
             fn(req, res, next).catch(next);
         };
     };
-
-    // public static timezoneParserPostgresFormat = (timezone: string): string => {
-    //     const timezoneSignAndValue = timezone.match(/[+-]\d/g)[0];
-    //     const timezoneSign = timezoneSignAndValue[0];
-    //     const timezoneValue = parseInt(timezoneSignAndValue.substring(1), 10);
-
-    //     return timezoneValue < 10 ? `${timezoneSign}0${timezoneValue}:00` : `${timezoneSign}${timezoneValue}:00`;
-    // };
-
-    // public static timezoneParserNativeFormat = (timezone: string): string => {
-    //     const timezoneSignAndValue = timezone.match(/[+-]\d/g)[0];
-    //     const timezoneSign = timezoneSignAndValue[0];
-    //     const timezoneValue = parseInt(timezoneSignAndValue.substring(1), 10);
-
-    //     return timezoneValue < 10 ? `${timezoneSign}0${timezoneValue}00` : `${timezoneSign}${timezoneValue}00`;
-    // };
 
     public static timezoneParserByFormat = (timezone: string, format: DateFormat) => {
         const timezoneSignAndValue = timezone.match(/[+-]\d/g)[0];
@@ -136,33 +122,8 @@ class UtilFunctions {
         return value > 9 ? `${value}` : `0${value}`;
     };
 
-    public static createIsoDate = (dateRawValue: string, timeRawValue: string, timezone: string): string => {
-        const date = new Date(
-            `${dateRawValue} ${timeRawValue} ${UtilFunctions.timezoneParserByFormat(timezone, DateFormat.NATIVE)}`
-        );
-        const year = date.getFullYear();
-        const month = UtilFunctions.timeValueToDoubleDigitParser(date.getMonth() + 1);
-        const day = UtilFunctions.timeValueToDoubleDigitParser(date.getDate());
-        const hours = UtilFunctions.timeValueToDoubleDigitParser(date.getHours());
-        const minutes = UtilFunctions.timeValueToDoubleDigitParser(date.getMinutes());
-        const seconds = UtilFunctions.timeValueToDoubleDigitParser(date.getSeconds());
-        let milliseconds: any = date.getMilliseconds() / 1000;
-        milliseconds = Math.floor(milliseconds.toFixed(2) * 100);
-
-        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}${UtilFunctions.timezoneParserByFormat(
-            timezone,
-            DateFormat.POSTGRES
-        )}`;
-
-        // NOTE probably we will always use timezone so we will not need if timezone === true.
-        // To check that we need to check if postgres allows format ...T15:00:00.234+0000 instead of Z
-        // return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds * 1000}Z`;
-    };
-
-    public static createIsoUtcZeroDate = (dateRawValue: string, timeRawValue: string, timezone: string): string => {
-        const date = new Date(
-            `${dateRawValue} ${timeRawValue} ${UtilFunctions.timezoneParserByFormat(timezone, DateFormat.NATIVE)}`
-        );
+    public static createIsoUtcZeroDate = (dateRawValue: string, timeRawValue: string): string => {
+        const date = new Date(`${dateRawValue} ${timeRawValue} +0000`);
         const year = date.getFullYear();
         const month = UtilFunctions.timeValueToDoubleDigitParser(date.getUTCMonth() + 1);
         const day = UtilFunctions.timeValueToDoubleDigitParser(date.getUTCDate());
@@ -173,42 +134,36 @@ class UtilFunctions {
 
         return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`;
     };
+
     public static createIsoDatesRangeToCreateAppointments = (
         beginningDate: string,
         beginningTime: string,
         endingDate: string,
-        endingTime: string,
-        timezone: string
+        endingTime: string
     ): TIsoDatesReserved => {
         return [
-            { inclusive: true, value: UtilFunctions.createIsoDate(beginningDate, beginningTime, timezone) },
-            { inclusive: false, value: UtilFunctions.createIsoDate(endingDate, endingTime, timezone) },
+            { inclusive: true, value: UtilFunctions.createIsoUtcZeroDate(beginningDate, beginningTime) },
+            { inclusive: false, value: UtilFunctions.createIsoUtcZeroDate(endingDate, endingTime) },
         ];
     };
 
-    // public static createIsoDatesRangeToFindAppointments = (
-    //     beginningDate: string,
-    //     beginningTime: string,
-    //     endingDate: string,
-    //     endingTime: string,
-    //     timezone: string
-    // ): TIsoDatesToFindAppointments => {
-    //     return [
-    //         UtilFunctions.createIsoDate(beginningDate, beginningTime, timezone),
-    //         UtilFunctions.createIsoDate(endingDate, endingTime, timezone),
-    //     ];
-    // };
     public static createIsoDatesRangeToFindAppointments = (
         beginningDate: string,
         beginningTime: string,
         endingDate: string,
-        endingTime: string,
-        timezone: string
-    ): TIsoDatesToFindAppointments => {
-        return [
-            UtilFunctions.createIsoUtcZeroDate(beginningDate, beginningTime, timezone),
-            UtilFunctions.createIsoUtcZeroDate(endingDate, endingTime, timezone),
-        ];
+        endingTime: string
+    ): string => {
+        return `[${UtilFunctions.createIsoUtcZeroDate(beginningDate, beginningTime)},
+            ${UtilFunctions.createIsoUtcZeroDate(endingDate, endingTime)}
+        )`;
+    };
+
+    public static createSequelizeRawQuery = async (
+        sequelize: Sequelize,
+        query: string,
+        isPlain = true
+    ): Promise<unknown | unknown[]> => {
+        return sequelize.query(query, { type: QueryTypes.SELECT, plain: isPlain });
     };
 }
 

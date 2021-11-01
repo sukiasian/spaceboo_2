@@ -15,10 +15,10 @@ import {
 import { Sequelize } from 'sequelize-typescript';
 import { ApiRoutes, HttpStatus, SequelizeModelProps } from '../types/enums';
 import { ISpaceCreate, Space } from '../models/space.model';
-import { Appointment } from '../models/appointment.model';
+import { Appointment, TIsoDatesReserved } from '../models/appointment.model';
 import { City } from '../models/city.model';
-import { TIsoDatesReserved } from '../models/appointment.model';
 import UtilFunctions from '../utils/UtilFunctions';
+import { SpaceQuerySortFields } from '../daos/space.sequelize.dao';
 
 describe('Space (e2e)', () => {
     let app: express.Express;
@@ -29,15 +29,38 @@ describe('Space (e2e)', () => {
     let user: User;
     let userModel: typeof User;
     let spaceData: ISpaceCreate;
+    let spaceData_2: ISpaceCreate;
     let spaceModel: typeof Space;
     let city: City;
+    let city_2: City;
     let cityModel: typeof City;
     let appointmentModel: typeof Appointment;
     let token: string;
+    let isoDatesToReserve_1: TIsoDatesReserved;
+    let isoDatesToReserve_2: TIsoDatesReserved;
+    let isoDatesToReserve_3: TIsoDatesReserved;
 
     beforeAll(async () => {
         dotenv.config({ path: '../test.env' });
 
+        isoDatesToReserve_1 = UtilFunctions.createIsoDatesRangeToCreateAppointments(
+            '2020-12-15',
+            '14:00',
+            '2020-12-20',
+            '12:00'
+        );
+        isoDatesToReserve_2 = UtilFunctions.createIsoDatesRangeToCreateAppointments(
+            '2021-12-15',
+            '14:00',
+            '2021-12-20',
+            '12:00'
+        );
+        isoDatesToReserve_3 = UtilFunctions.createIsoDatesRangeToCreateAppointments(
+            '2022-12-15',
+            '14:00',
+            '2022-12-20',
+            '12:00'
+        );
         applicationInstance = createApplicationInstance();
 
         app = applicationInstance.app;
@@ -52,8 +75,10 @@ describe('Space (e2e)', () => {
     });
     beforeEach(async () => {
         city = await cityModel.findOne({ raw: true });
+        city_2 = await cityModel.findOne({ where: { city: 'Краснодар' } });
         user = await userModel.create(userData);
-        spaceData = createSpaceData(user.id, city.id);
+        spaceData = createSpaceData(user.id, city.id, 1500);
+        spaceData_2 = createSpaceData(user.id, city_2.id);
         token = await createTokenAndSign(user.id);
     });
 
@@ -84,8 +109,7 @@ describe('Space (e2e)', () => {
         expect(spacesFresh[0].userId).toBe(spaceData.userId);
     });
 
-    it('GET /spaces should get all spaces by query', async () => {
-        // FIXME tests below are copy-pasted
+    it('Created appointments should relate to space', async () => {
         let space = await spaceModel.create(spaceData);
 
         space = await spaceModel.findOne({
@@ -93,30 +117,15 @@ describe('Space (e2e)', () => {
             include: [City, Appointment],
         });
 
-        const datesToReserve_1 = UtilFunctions.createIsoDatesRangeToCreateAppointments(
-            '2020-12-15',
-            '14:00',
-            '2020-12-20',
-            '12:00',
-            space.city['dataValues']['timezone']
-        );
-        const datesToReserve_2 = UtilFunctions.createIsoDatesRangeToCreateAppointments(
-            '2021-12-15',
-            '14:00',
-            '2021-12-20',
-            '12:00',
-            space.city['dataValues']['timezone']
-        );
-
         await appointmentModel.create({
             userId: user.id,
             spaceId: space.id,
-            isoDatesReserved: datesToReserve_1,
+            isoDatesReserved: isoDatesToReserve_1,
         });
         await appointmentModel.create({
             userId: user.id,
             spaceId: space.id,
-            isoDatesReserved: datesToReserve_2,
+            isoDatesReserved: isoDatesToReserve_2,
         });
 
         const spaceFresh = await spaceModel.findOne({
@@ -124,16 +133,203 @@ describe('Space (e2e)', () => {
             include: { all: true },
             nest: true,
         });
-        console.log(spaceFresh['appointments']);
 
-        const res = await request(app)
-            .get(`${ApiRoutes.SPACES}`)
-            .query({ datesToReserve: '2020-12-15,2020-12-20', timesToReserve: '14:00,12:00' });
+        expect(spaceFresh[SequelizeModelProps.DATA_VALUES].appointments).toBeTruthy();
+        expect(spaceFresh[SequelizeModelProps.DATA_VALUES].appointments.length).toBe(2);
+    });
 
-        console.log(res.body.data[0], 'dataaaaaa');
-        console.log(res.body.data[0].appointments[0].isoDatesReserved, 'bodyyyyyyyy');
+    it('GET /spaces should get all spaces by city', async () => {
+        let space_1 = await spaceModel.create(spaceData);
+        space_1 = await spaceModel.findOne({
+            where: { id: space_1.id },
+            include: [cityModel, appointmentModel],
+        });
 
-        const appointment = await appointmentModel.findOne();
+        let space_2 = await spaceModel.create(spaceData_2);
+        space_2 = await spaceModel.findOne({ where: { id: space_2.id }, include: [cityModel, appointmentModel] });
+
+        await appointmentModel.create({
+            userId: user.id,
+            spaceId: space_1.id,
+            isoDatesReserved: isoDatesToReserve_1,
+        });
+        await appointmentModel.create({
+            userId: user.id,
+            spaceId: space_1.id,
+            isoDatesReserved: isoDatesToReserve_2,
+        });
+        await appointmentModel.create({
+            userId: user.id,
+            spaceId: space_2.id,
+            isoDatesReserved: isoDatesToReserve_2,
+        });
+        console.log(space_2[SequelizeModelProps.DATA_VALUES].cityId, 'aaaaaaaaa');
+
+        const res = await request(app).get(`${ApiRoutes.SPACES}`).query({
+            cityId: space_2.cityId,
+        });
+        // console.log(res.body.data, '¡111resssssss');
+
+        expect(res.body.data.length).toBe(1);
+        expect(res.body.data[0].cityId).toBe(space_2.cityId);
+    });
+
+    ///// 2️⃣
+    it('GET /spaces should get all spaces by dates to reserve', async () => {
+        let space_1 = await spaceModel.create(spaceData);
+
+        space_1 = await spaceModel.findOne({
+            where: { id: space_1.id },
+            include: [cityModel, appointmentModel],
+        });
+        let space_2 = await spaceModel.create(spaceData_2);
+        space_2 = await spaceModel.findOne({ where: { id: space_2.id }, include: [cityModel, appointmentModel] });
+
+        // FIXME if appointment already overlaps then we should be unable to create a new one
+        await appointmentModel.create({
+            userId: user.id,
+            spaceId: space_1.id,
+            isoDatesReserved: isoDatesToReserve_1,
+        });
+        await appointmentModel.create({
+            userId: user.id,
+            spaceId: space_1.id,
+            isoDatesReserved: isoDatesToReserve_2,
+        });
+        await appointmentModel.create({
+            userId: user.id,
+            spaceId: space_2.id,
+            isoDatesReserved: isoDatesToReserve_2,
+        });
+        await appointmentModel.create({
+            userId: user.id,
+            spaceId: space_2.id,
+            isoDatesReserved: isoDatesToReserve_3,
+        });
+
+        const res = await request(app).get(`${ApiRoutes.SPACES}`).query({
+            datesToReserveQuery: '2020-12-15,2020-12-20',
+            timesToReserveQuery: '13:00,12:00',
+        });
+
+        expect(res.body.data.length).toBe(1);
+        expect(res.body.data[0].id).toBe(space_2.id);
+    });
+
+    ///// 3️⃣
+    it('GET /spaces should get all spaces without query strings', async () => {
+        let space_1 = await spaceModel.create(spaceData);
+
+        space_1 = await spaceModel.findOne({
+            where: { id: space_1.id },
+            include: [cityModel, appointmentModel],
+        });
+        let space_2 = await spaceModel.create(spaceData_2);
+        space_2 = await spaceModel.findOne({ where: { id: space_2.id }, include: [cityModel, appointmentModel] });
+
+        await appointmentModel.create({
+            userId: user.id,
+            spaceId: space_1.id,
+            isoDatesReserved: isoDatesToReserve_1,
+        });
+        await appointmentModel.create({
+            userId: user.id,
+            spaceId: space_1.id,
+            isoDatesReserved: isoDatesToReserve_2,
+        });
+        await appointmentModel.create({
+            userId: user.id,
+            spaceId: space_2.id,
+            isoDatesReserved: isoDatesToReserve_2,
+        });
+
+        const res = await request(app).get(`${ApiRoutes.SPACES}`);
+        expect(res.body.data.length).toBe(2);
+    });
+    ///// 4️⃣
+    it('GET /spaces should get all spaces with city and dates to reserve queries', async () => {
+        let space_1 = await spaceModel.create(spaceData);
+
+        space_1 = await spaceModel.findOne({
+            where: { id: space_1.id },
+            include: [cityModel, appointmentModel],
+        });
+        let space_2 = await spaceModel.create(spaceData_2);
+        space_2 = await spaceModel.findOne({ where: { id: space_2.id }, include: [cityModel, appointmentModel] });
+
+        await appointmentModel.create({
+            userId: user.id,
+            spaceId: space_1.id,
+            isoDatesReserved: isoDatesToReserve_1,
+        });
+        await appointmentModel.create({
+            userId: user.id,
+            spaceId: space_1.id,
+            isoDatesReserved: isoDatesToReserve_2,
+        });
+        await appointmentModel.create({
+            userId: user.id,
+            spaceId: space_2.id,
+            isoDatesReserved: isoDatesToReserve_2,
+        });
+
+        const res_1 = await request(app).get(`${ApiRoutes.SPACES}`).query({
+            datesToReserveQuery: '2025-12-15,2025-12-20',
+            timesToReserveQuery: '13:00,12:00',
+            cityId: space_1.cityId,
+        });
+        const res_2 = await request(app).get(`${ApiRoutes.SPACES}`).query({
+            datesToReserveQuery: '2025-12-15,2025-12-20',
+            timesToReserveQuery: '13:00,12:00',
+            cityId: space_2.cityId,
+        });
+        const res_3 = await request(app).get(`${ApiRoutes.SPACES}`).query({
+            datesToReserveQuery: '2020-12-15,2020-12-20',
+            timesToReserveQuery: '13:00,12:00',
+            cityId: space_1.cityId,
+        });
+        expect(res_1.body.data.length).toBe(1);
+        expect(res_2.body.data.length).toBe(1);
+        expect(res_3.body.data.length).toBe(0);
+    });
+
+    /// 5️⃣
+    it('GET /spaces should get all spaces should be able to sort', async () => {
+        // NOTE put everything in beforeEach ?
+        let space_1 = await spaceModel.create(spaceData);
+
+        space_1 = await spaceModel.findOne({
+            where: { id: space_1.id },
+            include: [cityModel, appointmentModel],
+        });
+        let space_2 = await spaceModel.create(spaceData_2);
+        space_2 = await spaceModel.findOne({ where: { id: space_2.id }, include: [cityModel, appointmentModel] });
+
+        await appointmentModel.create({
+            userId: user.id,
+            spaceId: space_1.id,
+            isoDatesReserved: isoDatesToReserve_1,
+        });
+        await appointmentModel.create({
+            userId: user.id,
+            spaceId: space_1.id,
+            isoDatesReserved: isoDatesToReserve_2,
+        });
+        await appointmentModel.create({
+            userId: user.id,
+            spaceId: space_2.id,
+            isoDatesReserved: isoDatesToReserve_2,
+        });
+
+        const res_1 = await request(app).get(`${ApiRoutes.SPACES}`).query({
+            sortBy: SpaceQuerySortFields.PRICEUP,
+        });
+        expect(res_1.body.data[0].pricePerNight < res_1.body.data[1].pricePerNight);
+
+        const res_2 = await request(app).get(`${ApiRoutes.SPACES}`).query({
+            sortBy: SpaceQuerySortFields.PRICEDOWN,
+        });
+        expect(res_2.body.data[0].pricePerNight > res_2.body.data[1].pricePerNight);
     });
 
     it('PUT /spaces should edit space by id', async () => {});
@@ -147,21 +343,6 @@ describe('Space (e2e)', () => {
             where: { id: space.id },
             include: [City, Appointment],
         });
-
-        const isoDatesToReserve_1 = UtilFunctions.createIsoDatesRangeToCreateAppointments(
-            '2020-12-15',
-            '14:00',
-            '2020-12-20',
-            '12:00',
-            space.city['dataValues']['timezone']
-        );
-        const isoDatesToReserve_2 = UtilFunctions.createIsoDatesRangeToCreateAppointments(
-            '2021-12-15',
-            '14:00',
-            '2021-12-20',
-            '12:00',
-            space.city['dataValues']['timezone']
-        );
 
         await appointmentModel.create({
             userId: user.id,
