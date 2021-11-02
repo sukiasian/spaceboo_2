@@ -3,6 +3,7 @@ import { Optional } from 'sequelize';
 import { City } from './city.model';
 import { Appointment } from './appointment.model';
 import { User } from './user.model';
+import { ErrorMessages } from '../types/enums';
 
 interface ISpaceAttributes {
     id: string;
@@ -12,7 +13,7 @@ interface ISpaceAttributes {
     description: string;
     roomsNumber: number;
     lockerConnected: boolean;
-    imagesUrl: string[];
+    imagesUrl?: string[];
     cityId: number;
     userId: string;
     facilities?: string[];
@@ -42,16 +43,16 @@ export class Space extends Model<ISpaceAttributes, ISpaceCreationAttributes> imp
     @Column({ type: DataType.UUID, defaultValue: DataType.UUIDV4 })
     public id!: string;
 
-    @Column
+    @Column({ allowNull: false })
     public address: string;
 
-    @Column
+    @Column({ allowNull: false })
     public pricePerNight: number;
 
-    @Column({ type: DataType.STRING })
+    @Column({ allowNull: false, type: DataType.STRING })
     public type: SpaceType;
 
-    @Column({ type: DataType.SMALLINT })
+    @Column({ allowNull: false, type: DataType.SMALLINT })
     public roomsNumber: number;
     // TODO Should be array of PREDEFINED values - TV, A/C and other stuff
     // @IsIn([Object.values(Facilities)])
@@ -73,7 +74,13 @@ export class Space extends Model<ISpaceAttributes, ISpaceCreationAttributes> imp
     @BelongsTo(() => User)
     public user: User;
 
-    @Column({ type: DataType.ARRAY(DataType.STRING) })
+    @Column({
+        type: DataType.ARRAY(DataType.STRING),
+        validate: {
+            max: 10,
+            msg: ErrorMessages.SPACE_IMAGES_VALIDATE,
+        },
+    })
     public imagesUrl: string[];
 
     @Column({ type: DataType.CHAR(200) })

@@ -5,17 +5,23 @@ import { ErrorMessages, HttpStatus } from '../types/enums';
 import AppError from '../utils/AppError';
 import { Appointment } from './appointment.model';
 
+enum UserRoles {
+    ADMIN = 'admin',
+    USER = 'user',
+}
 export interface IUserAttributes {
     id: string;
     name: string;
     middleName: string;
     surname: string;
     email: string;
+    role: UserRoles;
     password?: string;
     passwordConfirmation?: string;
     facebookId?: string;
     vkontakteId?: string;
     odnoklassnikiId?: string;
+    avatarUrl?: string;
     verifyPassword?(instance: User): (password: string) => Promise<boolean>;
 }
 export interface IUserCreationAttributes extends Optional<IUserAttributes, 'id'> {}
@@ -109,11 +115,11 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
             isEmail: {
                 msg: ErrorMessages.IS_EMAIL_VALIDATE,
             },
-            // notNull: {
-            //     msg: ErrorMessages.REQUIRED_FIELDS_VALIDATE,
-            // },
         },
-        // unique: { name: 'email', msg: 'not uniqueeee' },
+        unique: {
+            name: 'email',
+            msg: ErrorMessages.EMAIL_UNIQUE_VALIDATE,
+        },
     })
     public email: string;
 
@@ -129,6 +135,9 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
     })
     public password: string;
 
+    @Column({ allowNull: false, defaultValue: UserRoles.USER })
+    role: UserRoles;
+
     @Column
     public passwordConfirmation: string;
 
@@ -140,6 +149,9 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
 
     @Column
     public odnoklassnikiId: string;
+
+    @Column
+    public avatarUrl: string;
 
     @HasMany(() => Appointment)
     public appointments: Appointment[];

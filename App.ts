@@ -45,8 +45,6 @@ export class Application extends Singleton {
     }
 
     public setupPassport(): void {
-        // 1. извлекает из req.body username, password. 2. ищет пользователя по юзернейму и сверяет пароль по password. 3. если находит то пропускает вперед, соответственно разделяет jwt в дальнейшем уже после пропуска вперед,то это авторизация. А вот passport jwt это аутентификация
-        // this.passportConfig.userSerialization();
         this.passportConfig.configurePassport();
     }
 }
