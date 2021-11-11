@@ -76,9 +76,13 @@ export class Space extends Model<ISpaceAttributes, ISpaceCreationAttributes> imp
 
     @Column({
         type: DataType.ARRAY(DataType.STRING),
+        allowNull: false,
         validate: {
-            max: 10,
-            msg: ErrorMessages.SPACE_IMAGES_VALIDATE,
+            isSpecificLength(value) {
+                if (value.length > 10) {
+                    throw new Error(ErrorMessages.SPACE_IMAGES_VALIDATE);
+                }
+            },
         },
     })
     public imagesUrl: string[];

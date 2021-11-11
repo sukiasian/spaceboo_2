@@ -15,7 +15,7 @@ export interface IUserAttributes {
     middleName: string;
     surname: string;
     email: string;
-    role: UserRoles;
+    // role?: UserRoles;
     password?: string;
     passwordConfirmation?: string;
     facebookId?: string;
@@ -123,9 +123,13 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
     })
     public email: string;
 
+    // @Column({ allowNull: false, defaultValue: UserRoles.USER })
+    // role: UserRoles;
+
     @Column({
         validate: {
             len: { msg: ErrorMessages.PASSWORD_LENGTH_VALIDATE, args: [8, 25] },
+            // FIXME comparePasswords, not checkAvailability
             checkAvailability(this: User): void {
                 if (this.password !== this.passwordConfirmation) {
                     throw new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.PASSWORDS_DO_NOT_MATCH_VALIDATE);
@@ -134,9 +138,6 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
         },
     })
     public password: string;
-
-    @Column({ allowNull: false, defaultValue: UserRoles.USER })
-    role: UserRoles;
 
     @Column
     public passwordConfirmation: string;
@@ -154,7 +155,8 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
     public avatarUrl: string;
 
     @HasMany(() => Appointment)
-    public appointments: Appointment[];
+    public appointments?: Appointment[];
+
     @BeforeUpdate
     @BeforeCreate // === pre-hook
     static async hashPasswordAndRemovePasswordConfirmation(instance: User): Promise<void> {

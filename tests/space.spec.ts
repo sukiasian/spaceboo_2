@@ -82,7 +82,11 @@ describe('Space (e2e)', () => {
         spaceData = createSpaceData(user.id, city.id, 1500);
         spaceData_2 = createSpaceData(user.id, city_2.id);
         token = await createTokenAndSign(user.id);
-        space_1 = await spaceModel.create(spaceData);
+        try {
+            space_1 = await spaceModel.create(spaceData);
+        } catch (err) {
+            console.log(err, 'errrrrr');
+        }
         space_1 = await spaceModel.findOne({
             where: { id: space_1.id },
             include: [cityModel, appointmentModel],
