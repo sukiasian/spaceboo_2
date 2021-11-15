@@ -100,6 +100,7 @@ export enum ErrorMessages {
     SPACE_IMAGES_VALIDATE = 'Максимальное количество изображений для пространства — 10.',
     APPLICATION_ERROR = 'Application Error',
     UNKNOWN_ERROR = 'Произошла серьезная ошибка',
+    NO_IMAGE_FOUND_TO_DELETE = 'Не найдено изображений для удаления.',
 }
 
 export enum Environment {

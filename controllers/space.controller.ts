@@ -1,3 +1,6 @@
+import * as express from 'express';
+import * as path from 'path';
+import * as fs from 'fs';
 import * as dotenv from 'dotenv';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
 import { spaceSequelizeDao, SpaceSequelizeDao } from '../daos/space.sequelize.dao';
@@ -39,7 +42,27 @@ export class SpaceController extends Singleton {
 
     // NOTE
     public updateImages = UtilFunctions.catchAsync(async (req, res, next) => {});
+
     public removeImages = UtilFunctions.catchAsync(async (req, res, next) => {});
+
+    public getSpaceImages = UtilFunctions.catchAsync(async (req, res: express.Response, next): Promise<void> => {
+        const { imagesUrl } = req.body;
+
+        imagesUrl.forEach((imageUrl: string): void => {
+            res.sendFile(path.join(__dirname, imageUrl));
+        });
+    });
+
+    // NOTE для удаления лишних изображений можно создать кронджоб который будет проходиться
+    // по всем спейсам в базе данных и проверять - если к примеру avatarUrl === samvel_5,
+    // а в папке изображений есть и нынешний samvel_5, и предыдущий samvel_4,
+    // то тот удаляет samvel_4. Говоря иначе, заходим в папку. Берем фото. Проходим по
+    // всем записям в бд, если samvel_4 нет нигде, то удаляем.
+
+    // NOTE другой вариант это делать все "на месте" - обновил фотки - сразу обновил и
+    // uploads (т.е. при удалении мы формируем массив of filenames of removed files, передаем
+    // с фронта на бэк, на эндпоинт removeOutdatedImagesFromUploads). В таком случае
+    // возможно будет уместнее создать контроллер изображений.
 }
 
 // NOTE export keeping the same style - if we export const then we need to export const everywhere. If default - then default everywhere.
