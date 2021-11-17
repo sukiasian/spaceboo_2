@@ -1,10 +1,12 @@
 import { Response } from 'express';
+import { Sequelize } from 'sequelize-typescript';
+import { QueryTypes } from 'sequelize';
+import { promisify } from 'util';
+import * as fs from 'fs';
 import logger from '../loggers/logger';
 import { applicationInstance } from '../App';
 import { TIsoDatesReserved } from '../models/appointment.model';
 import { HttpStatus, LoggerLevels } from '../types/enums';
-import { Sequelize } from 'sequelize-typescript';
-import { QueryTypes } from 'sequelize';
 
 enum DateFormat {
     NATIVE = 'native',
@@ -163,6 +165,16 @@ class UtilFunctions {
     ): Promise<unknown | unknown[]> => {
         return sequelize.query(query, { type: QueryTypes.SELECT, plain: isPlain });
     };
+
+    public static makeDirectory = promisify(fs.mkdir);
+
+    public static readDirectory = promisify(fs.readdir);
+
+    public static checkIfExists = promisify(fs.exists);
+
+    public static removeDirectory = promisify(fs.rmdir);
+
+    public static removeFile = promisify(fs.rm);
 }
 
 export default UtilFunctions;

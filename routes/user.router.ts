@@ -10,6 +10,7 @@ class UserRouter extends Singleton implements IRouter {
     public readonly router = Router();
 
     public prepareRouter = function (this: UserRouter): void {
+        // FIXME 2 routes with same request type ?
         this.router.route('/').post(this.userController.findUserById);
         this.router.route('/').post(this.authController.signUpLocal);
     };

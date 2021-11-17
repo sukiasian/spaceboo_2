@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import * as passport from 'passport';
-import { spaceController } from '../controllers/space.controller';
+import { SpaceController, spaceController } from '../controllers/space.controller';
 import { PassportStrategies } from '../types/enums';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
 import { IRouter } from './router';
 
 class SpaceRouter extends Singleton implements IRouter {
-    private readonly spaceController = spaceController;
+    private readonly spaceController: SpaceController = spaceController;
     private readonly passport = passport;
     public readonly router = Router();
 
@@ -16,9 +16,8 @@ class SpaceRouter extends Singleton implements IRouter {
             .post(
                 this.passport.authenticate(PassportStrategies.JWT, { session: false }),
                 this.spaceController.createSpace
-            );
-        this.router.route('/');
-        this.router.route('/').get(this.spaceController.getSpacesByQuery);
+            )
+            .get(this.spaceController.getSpacesByQuery);
         this.router.route('/:id').get(this.spaceController.getSpaceById);
     };
 }

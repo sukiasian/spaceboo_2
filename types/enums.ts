@@ -69,6 +69,7 @@ export enum ApiRoutes {
     USERS = '/api/v1/users',
     SPACES = '/api/v1/spaces',
     APPOINTMENTS = '/api/v1/appointments',
+    IMAGES = '/api/v1/images',
 }
 
 export enum PassportStrategies {
@@ -87,6 +88,7 @@ export enum ResponseMessages {
 }
 
 export enum ErrorMessages {
+    USER_NOT_FOUND = 'Пользователь не найден',
     PASSWORDS_DO_NOT_MATCH_VALIDATE = 'Пароли должны совпадать.',
     PASSWORD_LENGTH_VALIDATE = 'Пароль должен состоять от 8 до 25 символов.',
     PASSPORT_IS_NOT_VALID = 'Пожалуйста, введите действительный пароль',
@@ -100,7 +102,9 @@ export enum ErrorMessages {
     SPACE_IMAGES_VALIDATE = 'Максимальное количество изображений для пространства — 10.',
     APPLICATION_ERROR = 'Application Error',
     UNKNOWN_ERROR = 'Произошла серьезная ошибка',
-    NO_IMAGE_FOUND_TO_DELETE = 'Не найдено изображений для удаления.',
+    NO_IMAGE_FOUND = 'Изображение не найдено.',
+    DIR_IS_NOT_FOUND = 'Директория не найдена.',
+    SPACE_IS_NOT_FOUND = 'Пространство не найдено.',
 }
 
 export enum Environment {
