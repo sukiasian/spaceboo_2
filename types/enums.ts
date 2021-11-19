@@ -105,6 +105,8 @@ export enum ErrorMessages {
     NO_IMAGE_FOUND = 'Изображение не найдено.',
     DIR_IS_NOT_FOUND = 'Директория не найдена.',
     SPACE_IS_NOT_FOUND = 'Пространство не найдено.',
+    MULTER_ERROR = 'Произошла ошибка при загрузке файла',
+    NOT_ENOUGH_RIGHTS = 'Недостаточно прав.',
 }
 
 export enum Environment {

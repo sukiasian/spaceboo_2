@@ -1,64 +1,137 @@
 import * as dotenv from 'dotenv';
 import * as path from 'path';
-import * as express from 'express';
+import * as multer from 'multer';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
 import { UserSequelizeDao } from '../daos/user.sequelize.dao';
 import AppError from '../utils/AppError';
 import { ErrorMessages, HttpStatus } from '../types/enums';
-import { User } from '../models/user.model';
-import { userImagesRelativePath } from '../configurations/storage.config';
+import {
+    spaceImagesRelativeDir,
+    StorageEntityReference,
+    userAvatarRelativePath,
+} from '../configurations/storage.config';
 import { SpaceSequelizeDao } from '../daos/space.sequelize.dao';
-import { Space } from '../models/space.model';
+import { Dao } from '../configurations/dao.config';
+import { Model } from 'sequelize/types';
+import e = require('express');
 
 dotenv.config();
 
 export class ImageController extends Singleton {
     private readonly userDao: UserSequelizeDao;
     private readonly spaceDao: SpaceSequelizeDao;
-    private readonly userImagesRelativePath = userImagesRelativePath;
+    private readonly userAvatarRelativePath = userAvatarRelativePath;
+    private readonly spaceImagesRelativePath = spaceImagesRelativeDir;
     private readonly UtilFunctions = UtilFunctions;
 
-    public getSpacesImages = this.UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
-        const { spaceId } = req.query;
-        const space: Space = await this.spaceDao.findById(spaceId);
+    public multerUploadHandler = (uploader) => {
+        return (req, res, next) => {
+            uploader(req, res, (err) => {
+                if (err instanceof multer.MulterError) {
+                    next(new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.MULTER_ERROR));
+                } else {
+                    next(err);
+                }
+            });
+        };
+    };
 
-        res.sendFile('');
-    });
+    private getImageFunctionFactory = async (
+        req,
+        res,
+        storageEntityReference: StorageEntityReference,
+        dirPath: string,
+        dao: Dao,
+        entityNotFoundErrorMessage: ErrorMessages
+    ): Promise<void> => {
+        const id = req.query[storageEntityReference];
+        const { fileName } = req.body;
+        const entity: Model = await dao.findById(id);
 
-    public uploadUserAvatar = this.UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
-        res.status(200).json('hi');
-    });
-
-    public getUserAvatar = this.UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
-        const { userId, fileName } = req.body;
-        const user: User = await this.userDao.findById(userId);
-
-        if (!user) {
-            throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+        if (!entity) {
+            throw new AppError(HttpStatus.NOT_FOUND, entityNotFoundErrorMessage);
         }
 
-        const pathToUserAvatar = path.resolve(this.userImagesRelativePath, userId, user.avatarUrl);
-        const checkIfAvatarExists = await this.UtilFunctions.checkIfExists(pathToUserAvatar);
+        const pathToImage = path.resolve(dirPath, id, fileName);
+        const checkIfImageExists = await this.UtilFunctions.checkIfExists(pathToImage);
 
-        if (!checkIfAvatarExists) {
+        if (!checkIfImageExists) {
             throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.NO_IMAGE_FOUND);
         }
 
-        res.sendFile(pathToUserAvatar);
+        res.sendFile(pathToImage);
+    };
+
+    public getSpacesImageByFileName = this.UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        // NOTE await
+        this.getImageFunctionFactory(
+            req,
+            res,
+            StorageEntityReference.SPACE_ID,
+            this.spaceImagesRelativePath,
+            this.spaceDao,
+            ErrorMessages.SPACE_IS_NOT_FOUND
+        );
     });
 
-    // NOTE for internal use only
-    public destroyOutdatedImages = this.UtilFunctions.catchAsync(async (req, res, next) => {
-        const { imagesToRemove } = req.files;
-        const userId = req.user.id;
+    // public getSpacesImageByFileName = this.UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+    //     const { spaceId } = req.query;
+    //     const { fileName } = req.body;
 
-        await this.findAndRemoveUserImages(userId, imagesToRemove);
+    //     // NOTE because if space is removed and images are not, other people might still be able to access it
+    //     const space: Space = await this.spaceDao.findById(spaceId);
+
+    //     if (!space) {
+    //         throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.SPACE_IS_NOT_FOUND);
+    //     }
+
+    //     const pathToSpaceImage = path.resolve(this.spaceImagesRelativePath, spaceId, fileName);
+    //     const checkIfSpaceImageExists = await this.UtilFunctions.checkIfExists(pathToSpaceImage);
+
+    //     if (!checkIfSpaceImageExists) {
+    //         throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.NO_IMAGE_FOUND);
+    //     }
+
+    //     res.sendFile(pathToSpaceImage);
+    // });
+
+    // NOTE
+    // public uploadUserAvatar = this.UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+    //     next();
+    // });
+
+    public removeUserAvatar = this.UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {});
+    public getUserAvatarByFileName = this.UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        // NOTE await
+        this.getImageFunctionFactory(
+            req,
+            res,
+            StorageEntityReference.USER_ID,
+            this.userAvatarRelativePath,
+            this.userDao,
+            ErrorMessages.USER_NOT_FOUND
+        );
+    });
+
+    // NOTE недоступно пользователю и выполняетс яавтоматически
+    public destroyOutdatedUserAvatar = this.UtilFunctions.catchAsync(async (req, res, next) => {
+        const { userAvatarToRemove } = req.body;
+        const { id: userId } = req.user;
+
+        await this.findAndRemoveImage(userId, userAvatarToRemove, this.userAvatarRelativePath);
+    });
+
+    public destroyOutdatedSpaceImage = this.UtilFunctions.catchAsync(async (req, res, next) => {
+        const { spaceImageToRemove } = req.body;
+        const { id: spaceId } = req.space;
+
+        await this.findAndRemoveImage(spaceId, spaceImageToRemove, this.spaceImagesRelativePath);
     });
 
     // NOTE admin access only
-    public destroyAllUserImages = this.UtilFunctions.catchAsync(async (req, res, next) => {
-        const pathToUserImagesDir = path.resolve(userImagesRelativePath, req.user.id);
+    public destroyAllUserImages = this.UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        const pathToUserImagesDir = path.resolve(userAvatarRelativePath, req.user.id);
         const checkIfUserImagesDirExists = await this.UtilFunctions.checkIfExists(pathToUserImagesDir);
 
         if (!checkIfUserImagesDirExists) {
@@ -68,21 +141,27 @@ export class ImageController extends Singleton {
         await this.UtilFunctions.removeDirectory(pathToUserImagesDir, { recursive: true });
     });
 
-    private findAndRemoveUserImages = async (userId: string, imagesToRemove: string[]) => {
-        if (imagesToRemove.length === 0) {
+    private findAndRemoveImage = async (
+        id: string,
+        imageToRemoveFilename: string,
+        entityDirPath: string
+    ): Promise<void> => {
+        if (!imageToRemoveFilename || imageToRemoveFilename.length === 0) {
             throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.NO_IMAGE_FOUND);
         }
 
-        const pathToUserImagesDir = path.resolve(`uploads/images/users/${userId}`);
-        const userImages = await this.UtilFunctions.readDirectory(pathToUserImagesDir);
+        const pathToEntityIndividualDir = path.resolve(entityDirPath, id);
+        const pathToImage = path.resolve(entityDirPath, id, imageToRemoveFilename);
+        const checkIfEntityIndividualDirExists = await this.UtilFunctions.checkIfExists(pathToEntityIndividualDir);
+        const checkIfFileExists = await this.UtilFunctions.checkIfExists(pathToImage);
 
-        if (!userImages) {
+        if (!checkIfEntityIndividualDirExists) {
+            throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.DIR_IS_NOT_FOUND);
+        } else if (!checkIfFileExists) {
             throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.DIR_IS_NOT_FOUND);
         }
 
-        for (const imageToRemove of imagesToRemove) {
-            await UtilFunctions.removeFile(pathToUserImagesDir);
-        }
+        await this.UtilFunctions.removeFile(pathToImage);
     };
 }
 

@@ -2,21 +2,18 @@ import * as express from 'express';
 import * as path from 'path';
 import { userSequelizeDao, UserSequelizeDao } from '../daos/user.sequelize.dao';
 import { User } from '../models/user.model';
+import { HttpStatus } from '../types/enums';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
 
 class UserController extends Singleton {
+    private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
     private readonly dao: UserSequelizeDao = userSequelizeDao;
 
-    public findUserById = UtilFunctions.catchAsync(async (req, res, next): Promise<User> => {
-        return this.dao.findById('sdfsdfsdfsdfsf');
-    });
+    public updateUserAvatar = UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        await this.dao.updateUserImage(req.user.id, req.file.filename);
 
-    public getUserAvatar = UtilFunctions.catchAsync(async (req, res: express.Response, next) => {
-        // accept avatarUrl
-        // find the avatar by req.body.avatarUrl
-
-        res.sendFile(path.join(__dirname, `${req.user.id}`));
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK);
     });
 }
 

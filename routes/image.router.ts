@@ -1,7 +1,10 @@
 import { Router } from 'express';
 import * as passport from 'passport';
-import { userImagesUpload } from '../configurations/storage.config';
+import { StorageUploadFilenames, userAvatarUpload } from '../configurations/storage.config';
+import { spaceImageUpload } from '../configurations/storage.config';
 import { imageController } from '../controllers/image.controller';
+import { spaceController } from '../controllers/space.controller';
+import { userController } from '../controllers/user.controller';
 import { PassportStrategies } from '../types/enums';
 import { RouteProtector } from '../utils/RouteProtector';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
@@ -10,26 +13,44 @@ import { IRouter } from './router';
 class ImageRouter extends Singleton implements IRouter {
     private readonly routeProtector = RouteProtector;
     private readonly imageController = imageController;
-    private readonly userImagesUpload = userImagesUpload;
+    private readonly userController = userController;
+    private readonly spaceController = spaceController;
     private readonly passport = passport;
+    private readonly userAvatarUpload = userAvatarUpload;
+    private readonly spaceImageUpload = spaceImageUpload;
     public readonly router = Router();
 
     public prepareRouter = (): void => {
+        // FIXME если в req есть и space, и user (req.space by spaceOwnerProtector, req.user by passport.authenticate('JWT'))
+        // то нет необходимости передавать req.params
         this.router
-            .route('/user')
-            .post(this.passport.authenticate(PassportStrategies.JWT), this.imageController.uploadUserAvatar);
-
-        this.router
-            .route('/user/userAvatar')
+            .route('/users/:userId')
             .post(
                 this.passport.authenticate(PassportStrategies.JWT, { session: false }),
-                userImagesUpload.single('userAvatar'),
-                this.imageController.uploadUserAvatar
-            );
+                this.imageController.multerUploadHandler(
+                    this.userAvatarUpload.single(StorageUploadFilenames.USER_AVATAR)
+                ),
+                this.userController.updateUserAvatar
+            )
+            .get(this.imageController.getUserAvatarByFileName)
+            .delete(this.passport.authenticate(PassportStrategies.JWT), this.imageController.destroyOutdatedUserAvatar);
 
-        this.router.route('/user/userAvatar/:userId').get(this.imageController.getUserAvatar);
-        this.router.route('/user/userAvatar/:spaceId').get(this.imageController.getSpacesImages);
-        // the way is to send userId/spaceId and fileName in req.body and use one function only
+        this.router
+            .route('/spaces/:spaceId')
+            .post(
+                this.passport.authenticate(PassportStrategies.JWT, { session: false }),
+                this.routeProtector.spaceOwnerProtector,
+                this.imageController.multerUploadHandler(
+                    this.spaceImageUpload.array(StorageUploadFilenames.SPACE_IMAGE)
+                ),
+                this.spaceController.uploadSpaceImages
+            )
+            .get(this.imageController.getSpacesImageByFileName)
+            .delete(
+                this.passport.authenticate(PassportStrategies.JWT, { session: false }),
+                this.routeProtector.spaceOwnerProtector,
+                this.imageController.destroyOutdatedSpaceImage
+            );
     };
 }
 

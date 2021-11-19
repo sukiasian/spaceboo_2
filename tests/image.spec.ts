@@ -5,7 +5,6 @@ import * as dotenv from 'dotenv';
 import { Application } from '../App';
 import { IUserCreate, User } from '../models/user.model';
 import {
-    clearDb,
     clearDbAndStorage,
     closeTestEnv,
     createApplicationInstance,
@@ -17,18 +16,18 @@ import {
 import { Sequelize } from 'sequelize-typescript';
 import { ApiRoutes, HttpStatus, SequelizeModelProps } from '../types/enums';
 import { ISpaceCreate, Space } from '../models/space.model';
-import { Appointment, TIsoDatesReserved } from '../models/appointment.model';
+import { Appointment } from '../models/appointment.model';
 import { City } from '../models/city.model';
 import UtilFunctions from '../utils/UtilFunctions';
-import { SpaceQuerySortFields } from '../daos/space.sequelize.dao';
+import { StorageUploadFilenames } from '../configurations/storage.config';
 
 describe('Image (e2e)', () => {
     let app: express.Express;
     let server: any;
     let applicationInstance: Application;
     let db: Sequelize;
-    let userData: IUserCreate;
     let user: User;
+    let userData: IUserCreate;
     let userModel: typeof User;
     let spaceData: ISpaceCreate;
     let spaceData_2: ISpaceCreate;
@@ -75,7 +74,7 @@ describe('Image (e2e)', () => {
     });
 
     afterEach(async () => {
-        await clearDbAndStorage(db);
+        clearDbAndStorage(db);
 
         userData = createUserData();
     });
@@ -86,13 +85,13 @@ describe('Image (e2e)', () => {
 
     it("POST /images/user/userImages should upload a file into user's individual directory", async () => {
         await request(app)
-            .post(`${ApiRoutes.IMAGES}/user/userAvatar`)
+            .post(`${ApiRoutes.IMAGES}/users/${user.id}`)
             .set('Authorization', `Bearer ${token}`)
-            .attach('userAvatar', pathToTestImage, { filename: 'userAvatar' });
+            .attach(StorageUploadFilenames.USER_AVATAR, pathToTestImage);
         await request(app)
-            .post(`${ApiRoutes.IMAGES}/user/userAvatar`)
+            .post(`${ApiRoutes.IMAGES}/users/${user.id}`)
             .set('Authorization', `Bearer ${token}`)
-            .attach('userAvatar', pathToTestImage, { filename: 'userAvatar' });
+            .attach(StorageUploadFilenames.USER_AVATAR, pathToTestImage);
 
         const pathToUserImagesDir = path.resolve('assets', 'images', 'users', user.id);
 
@@ -105,7 +104,7 @@ describe('Image (e2e)', () => {
 
     it('POST /images/user/userImages should disallow not authorized users to upload images', async () => {
         const res = await request(app)
-            .post(`${ApiRoutes.IMAGES}/user/userAvatar`)
+            .post(`${ApiRoutes.IMAGES}/users/${user.id}`)
             .attach('userAvatar', pathToTestImage, { filename: 'userAvatar' });
 
         expect(res.status).toBe(HttpStatus.UNAUTHORIZED);

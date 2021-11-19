@@ -60,5 +60,3 @@ applicationInstance.setupPassport();
 applicationInstance.configureApp();
 
 export const app = applicationInstance.app;
-// export const userImagesUpload = applicationInstance.userImagesUpload;
-// console.log(userImagesUpload, 33333);

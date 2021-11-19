@@ -44,11 +44,15 @@ export const clearDb = (sequelize: Sequelize): void => {
         })
     );
 };
-export const clearStorage = async (): Promise<void> => {
-    const usersImagesDirectoryPath = path.resolve('assets', 'images', 'users');
+export const clearStorage = (): void => {
+    const dirPaths = [path.resolve('assets', 'images', 'users'), path.resolve('assets', 'images', 'spaces')];
 
-    await UtilFunctions.removeDirectory(usersImagesDirectoryPath, { recursive: true });
-    UtilFunctions.makeDirectory(usersImagesDirectoryPath);
+    Promise.all(
+        dirPaths.map(async (dirPath) => {
+            await UtilFunctions.removeDirectory(dirPath, { recursive: true });
+            await UtilFunctions.makeDirectory(dirPath);
+        })
+    );
 };
 
 export const clearDbAndStorage = async (sequelize: Sequelize): Promise<void> => {
@@ -65,7 +69,8 @@ export const createUserData = (): IUserCreate => {
         name: faker.name.firstName(),
         middleName: faker.name.firstName(),
         surname: faker.name.lastName(),
-        email: 'testuser@gmail.com',
+        // email: 'testuser@gmail.com',
+        email: faker.internet.email(),
         password: 'TestUser123',
         passwordConfirmation: 'TestUser123',
     };

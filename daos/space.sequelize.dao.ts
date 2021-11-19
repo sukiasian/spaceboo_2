@@ -101,6 +101,16 @@ export class SpaceSequelizeDao extends Dao {
     // NOTE аутентификация и проверка на то что
     public deleteSpaceById = async () => {};
 
+    public updateSpaceImages = async (spaceId: string, spaceImagesUrl: string[]): Promise<void> => {
+        // NOTE if this doesnt work then try to use method .update and then .save instead of assigning directly
+
+        const space: Space = await this.findById(spaceId);
+
+        space.imagesUrl = spaceImagesUrl;
+
+        await space.save();
+    };
+
     private defineSortOrder = (sortBy: SpaceQuerySortFields): string => {
         switch (sortBy) {
             case SpaceQuerySortFields.PRICEUP:

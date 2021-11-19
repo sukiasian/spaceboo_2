@@ -11,37 +11,48 @@ dotenv.config();
 
 export class SpaceController extends Singleton {
     private readonly dao: SpaceSequelizeDao = spaceSequelizeDao;
+    private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
 
     public createSpace = UtilFunctions.catchAsync(async (req, res, next) => {
         const space = await this.dao.createSpace(req.body);
 
-        UtilFunctions.sendResponse(res)(HttpStatus.CREATED, ResponseMessages.SPACE_CREATED, space);
+        this.utilFunctions.sendResponse(res)(HttpStatus.CREATED, ResponseMessages.SPACE_CREATED, space);
     });
 
     public getSpaceById = UtilFunctions.catchAsync(async (req, res, next) => {
         const space = await this.dao.findById(req.params.id);
 
-        UtilFunctions.sendResponse(res)(HttpStatus.OK, null, space);
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, space);
     });
 
     // TODO pagination, limitation, sorting продумать логику как это будет работать
     public getSpacesByQuery = UtilFunctions.catchAsync(async (req, res, next) => {
         const spaces = await this.dao.getSpacesByQuery(req.query);
 
-        UtilFunctions.sendResponse(res)(HttpStatus.OK, null, spaces);
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, spaces);
     });
 
     public editSpaceById = UtilFunctions.catchAsync(async (req, res, next) => {
         // const space = await this.dao.editSpaceById(req.params.id, req.body);
         const space = await this.dao.editSpaceById(req.params.spaceId, req.user.id, req.body);
 
-        UtilFunctions.sendResponse(res)(HttpStatus.OK, null);
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, null);
     });
 
     public deleteSpaceById = UtilFunctions.catchAsync(async (req, res, next) => {});
 
-    // NOTE
-    public updateImages = UtilFunctions.catchAsync(async (req, res, next) => {});
+    public uploadSpaceImages = UtilFunctions.catchAsync(async (req, res, next) => {
+        // NOTE What if no file is uploaded? Will ther ebe an error?
+        const { id: spaceId } = req.space;
+        const uploadedFiles = req.files as Express.Multer.File[];
+        const uploadedFilesFilenames = uploadedFiles.map((file: Express.Multer.File) => {
+            return file.filename;
+        });
+        const spaceImagesRemaining = req.body.spaceImagesRemaining as string[];
+        const spaceNewImagesFilenames = [...spaceImagesRemaining, ...uploadedFilesFilenames];
+
+        await this.dao.updateSpaceImages(spaceId, spaceNewImagesFilenames);
+    });
 
     public removeImages = UtilFunctions.catchAsync(async (req, res, next) => {});
 

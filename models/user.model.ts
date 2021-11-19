@@ -151,7 +151,7 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
     @Column
     public odnoklassnikiId: string;
 
-    @Column
+    @Column({ allowNull: true })
     public avatarUrl: string;
 
     @HasMany(() => Appointment)
