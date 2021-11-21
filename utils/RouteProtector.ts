@@ -14,7 +14,6 @@ export class RouteProtector {
         next();
     });
 
-    // NOTE should we have a SpaceOwner protector
     public static spaceOwnerProtector = this.UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const { id: userId } = req.user;
         const { spaceId } = req.params;
@@ -27,6 +26,7 @@ export class RouteProtector {
         req.space = {
             id: space.id,
         };
+
         next();
     });
 }

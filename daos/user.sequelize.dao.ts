@@ -18,13 +18,16 @@ export class UserSequelizeDao extends Dao {
 
     public editUserById;
 
-    public updateUserImage = async (userId: string, avatarUrl: string): Promise<void> => {
-        const user: User = await this.findById(userId);
+    public updateUserAvatar = async (userId: string, avatarUrl: string): Promise<void> => {
+        const updateRawQuery = `UPDATE "Users" SET "avatarUrl" = '${avatarUrl}' WHERE id = '${userId}'`;
 
-        const updateQuery = `UPDATE "Users" SET "avatarUrl" = '${avatarUrl}' WHERE id = '${userId}'`;
+        await this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, updateRawQuery);
+    };
 
-        await this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, updateQuery);
-        const freshUser = await this.findById(userId);
+    public cleanUserAvatarData = async (userId: string): Promise<void> => {
+        const annualizeRawQuery = `UPDATE "Users" SET "avatarUrl" = NULL WHERE id = '${userId}'`;
+
+        await this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, annualizeRawQuery);
     };
 }
 

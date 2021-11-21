@@ -121,6 +121,14 @@ export const createSpaceData = (userId: string, cityId: number, pricePerNight = 
     };
 };
 
+export const createPathToUserAvatarDir = (userId: string) => {
+    return path.resolve('assets', 'images', 'users', userId);
+};
+
+export const createPathToSpaceImagesDir = (spaceId: string) => {
+    return path.resolve('assets', 'images', 'spaces', spaceId);
+};
+
 export const createAppoinmentData = (
     isoDatesReserved: TIsoDatesReserved,
     spaceId: string,

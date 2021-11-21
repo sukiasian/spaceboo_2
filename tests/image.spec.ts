@@ -8,18 +8,22 @@ import {
     clearDbAndStorage,
     closeTestEnv,
     createApplicationInstance,
+    createPathToSpaceImagesDir,
+    createPathToUserAvatarDir,
     createSpaceData,
     createTokenAndSign,
     createUserData,
     openTestEnv,
 } from './lib';
 import { Sequelize } from 'sequelize-typescript';
-import { ApiRoutes, HttpStatus, SequelizeModelProps } from '../types/enums';
+import { ApiRoutes, HttpStatus } from '../types/enums';
 import { ISpaceCreate, Space } from '../models/space.model';
 import { Appointment } from '../models/appointment.model';
 import { City } from '../models/city.model';
 import UtilFunctions from '../utils/UtilFunctions';
 import { StorageUploadFilenames } from '../configurations/storage.config';
+import { SpaceSequelizeDao, spaceSequelizeDao } from '../daos/space.sequelize.dao';
+import { userSequelizeDao, UserSequelizeDao } from '../daos/user.sequelize.dao';
 
 describe('Image (e2e)', () => {
     let app: express.Express;
@@ -29,8 +33,10 @@ describe('Image (e2e)', () => {
     let user: User;
     let userData: IUserCreate;
     let userModel: typeof User;
+    let userDao: UserSequelizeDao;
     let spaceData: ISpaceCreate;
     let spaceData_2: ISpaceCreate;
+    let spaceDao: SpaceSequelizeDao;
     let spaceModel: typeof Space;
     let city: City;
     let city_2: City;
@@ -50,6 +56,10 @@ describe('Image (e2e)', () => {
         db = applicationInstance.sequelize;
 
         pathToTestImage = path.resolve('tests', 'files', 'images', '1.png');
+
+        spaceDao = spaceSequelizeDao;
+        userDao = userSequelizeDao;
+
         userModel = User;
         spaceModel = Space;
         cityModel = City;
@@ -83,30 +93,119 @@ describe('Image (e2e)', () => {
         await closeTestEnv(db, server);
     });
 
-    it("POST /images/user/userImages should upload a file into user's individual directory", async () => {
+    it("POST /images/users should upload a file into user's individual directory", async () => {
         await request(app)
-            .post(`${ApiRoutes.IMAGES}/users/${user.id}`)
+            .post(`${ApiRoutes.IMAGES}/users`)
             .set('Authorization', `Bearer ${token}`)
             .attach(StorageUploadFilenames.USER_AVATAR, pathToTestImage);
         await request(app)
-            .post(`${ApiRoutes.IMAGES}/users/${user.id}`)
+            .post(`${ApiRoutes.IMAGES}/users`)
             .set('Authorization', `Bearer ${token}`)
             .attach(StorageUploadFilenames.USER_AVATAR, pathToTestImage);
 
-        const pathToUserImagesDir = path.resolve('assets', 'images', 'users', user.id);
+        const pathToUserAvatarDir = createPathToUserAvatarDir(user.id);
+        const checkIfUserAvatarDirExists = await UtilFunctions.checkIfExists(pathToUserAvatarDir);
 
-        expect(await UtilFunctions.checkIfExists(pathToUserImagesDir)).toBe(true);
+        expect(checkIfUserAvatarDirExists).toBe(true);
 
-        const userImagesDirFiles = await UtilFunctions.readDirectory(pathToUserImagesDir);
+        const userImagesDirFiles = await UtilFunctions.readDirectory(pathToUserAvatarDir);
 
         expect(userImagesDirFiles.length).toBe(2);
     });
 
-    it('POST /images/user/userImages should disallow not authorized users to upload images', async () => {
+    it("POST /images/spaces should upload a file into individual directory of user's spaces", async () => {
+        expect(space_1.imagesUrl.length).toBeLessThanOrEqual(1);
+
+        await request(app)
+            .post(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage);
+
+        const pathToSpaceImagesDir = createPathToSpaceImagesDir(space_1.id);
+        const checkIfSpaceImagesDirExists = await UtilFunctions.checkIfExists(pathToSpaceImagesDir);
+
+        expect(checkIfSpaceImagesDirExists).toBe(true);
+
+        const userImagesDirFiles = await UtilFunctions.readDirectory(pathToSpaceImagesDir);
+
+        expect(userImagesDirFiles.length).toBe(3);
+    });
+
+    it('POST /images/users should disallow not authorized users to upload images', async () => {
         const res = await request(app)
-            .post(`${ApiRoutes.IMAGES}/users/${user.id}`)
+            .post(`${ApiRoutes.IMAGES}/users`)
             .attach('userAvatar', pathToTestImage, { filename: 'userAvatar' });
 
         expect(res.status).toBe(HttpStatus.UNAUTHORIZED);
+    });
+
+    it("GET /images/users/:userId should get user's avatar by filename provided", async () => {
+        await request(app)
+            .post(`${ApiRoutes.IMAGES}/users`)
+            .set('Authorization', `Bearer ${token}`)
+            .attach(StorageUploadFilenames.USER_AVATAR, pathToTestImage);
+
+        const freshUser: User = await userDao.findById(user.id);
+        const res = await request(app)
+            .get(`${ApiRoutes.IMAGES}/users/${user.id}`)
+            .send({ filename: freshUser.avatarUrl });
+
+        expect(res.body instanceof Buffer).toBe(true);
+    });
+
+    it("GET /images/spaces/:spaceId should get space's image by filename provided", async () => {
+        await request(app)
+            .post(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage);
+
+        const freshSpace: Space = await spaceDao.findById(space_1.id);
+        const res = await request(app)
+            .get(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
+            .send({ filename: freshSpace.imagesUrl[0] });
+
+        expect(res.body instanceof Buffer).toBe(true);
+    });
+
+    it("DELETE /images/users should remove image from user's individual directory", async () => {
+        await request(app)
+            .post(`${ApiRoutes.IMAGES}/users`)
+            .set('Authorization', `Bearer ${token}`)
+            .attach(StorageUploadFilenames.USER_AVATAR, pathToTestImage);
+
+        const freshUser: User = await userDao.findById(user.id);
+        const pathToUserAvatarIndividualDirectory = createPathToUserAvatarDir(user.id);
+        const pathToUserImage = path.join(pathToUserAvatarIndividualDirectory, freshUser.avatarUrl);
+
+        expect(await UtilFunctions.checkIfExists(pathToUserImage)).toBeTruthy();
+
+        await request(app)
+            .delete(`${ApiRoutes.IMAGES}/users`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({ userAvatarToRemove: freshUser.avatarUrl });
+
+        expect(await UtilFunctions.checkIfExists(pathToUserImage)).toBeFalsy();
+    });
+
+    it("DELETE /images/spaces/:spaceId should remove image from individual directory of user's space", async () => {
+        await request(app)
+            .post(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage);
+
+        const freshSpace: Space = await spaceDao.findById(space_1.id);
+        const pathToSpaceImagesIndividualDirectory = createPathToSpaceImagesDir(space_1.id);
+        const pathToSpaceImage = path.join(pathToSpaceImagesIndividualDirectory, freshSpace.imagesUrl[0]);
+
+        expect(await UtilFunctions.checkIfExists(pathToSpaceImage)).toBeTruthy();
+
+        await request(app)
+            .delete(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({ spaceImageToRemove: freshSpace.imagesUrl[0] });
+
+        expect(await UtilFunctions.checkIfExists(pathToSpaceImage)).toBeFalsy();
     });
 });

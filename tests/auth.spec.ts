@@ -64,7 +64,7 @@ describe('Auth (e2e)', () => {
         expect(res.status).toBe(201);
 
         const user = await userModel.findOne({ where: { email: userData.email } });
-        expect(user).not.toBeNull();
+        expect(user).toBeDefined();
     });
 
     it('POST /auth/signup should put jwt into cookies', async () => {
@@ -148,8 +148,6 @@ describe('Auth (e2e)', () => {
             password: userData.password,
             passwordConfirmation: userData.passwordConfirmation,
         });
-
-        // console.log(res, 'ressssssss');
     });
 
     it('/auth/signup passwords should containt at least 1 capital letter and 1 number', async () => {});

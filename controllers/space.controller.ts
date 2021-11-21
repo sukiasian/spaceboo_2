@@ -36,22 +36,24 @@ export class SpaceController extends Singleton {
         // const space = await this.dao.editSpaceById(req.params.id, req.body);
         const space = await this.dao.editSpaceById(req.params.spaceId, req.user.id, req.body);
 
-        this.utilFunctions.sendResponse(res)(HttpStatus.OK, null);
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK);
     });
 
     public deleteSpaceById = UtilFunctions.catchAsync(async (req, res, next) => {});
 
-    public uploadSpaceImages = UtilFunctions.catchAsync(async (req, res, next) => {
-        // NOTE What if no file is uploaded? Will ther ebe an error?
+    public updateSpaceImages = UtilFunctions.catchAsync(async (req, res, next) => {
+        // NOTE What if no file is uploaded? Will there be an error?
         const { id: spaceId } = req.space;
         const uploadedFiles = req.files as Express.Multer.File[];
         const uploadedFilesFilenames = uploadedFiles.map((file: Express.Multer.File) => {
             return file.filename;
         });
-        const spaceImagesRemaining = req.body.spaceImagesRemaining as string[];
-        const spaceNewImagesFilenames = [...spaceImagesRemaining, ...uploadedFilesFilenames];
+        const spaceImagesRemaining = req.body.spaceImagesRemaining || [];
+        const spaceNewImagesFilenames = [...uploadedFilesFilenames, ...spaceImagesRemaining];
 
-        await this.dao.updateSpaceImages(spaceId, spaceNewImagesFilenames);
+        await this.dao.updateSpaceImages(spaceId, spaceNewImagesFilenames as string[]);
+
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK);
     });
 
     public removeImages = UtilFunctions.catchAsync(async (req, res, next) => {});

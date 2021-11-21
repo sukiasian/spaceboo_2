@@ -24,7 +24,7 @@ class ImageRouter extends Singleton implements IRouter {
         // FIXME если в req есть и space, и user (req.space by spaceOwnerProtector, req.user by passport.authenticate('JWT'))
         // то нет необходимости передавать req.params
         this.router
-            .route('/users/:userId')
+            .route('/users')
             .post(
                 this.passport.authenticate(PassportStrategies.JWT, { session: false }),
                 this.imageController.multerUploadHandler(
@@ -32,8 +32,12 @@ class ImageRouter extends Singleton implements IRouter {
                 ),
                 this.userController.updateUserAvatar
             )
-            .get(this.imageController.getUserAvatarByFileName)
-            .delete(this.passport.authenticate(PassportStrategies.JWT), this.imageController.destroyOutdatedUserAvatar);
+            .delete(
+                this.passport.authenticate(PassportStrategies.JWT, { session: false }),
+                this.imageController.destroyOutdatedUserAvatar
+            );
+
+        this.router.route('/users/:userId').get(this.imageController.getUserAvatarByFilename);
 
         this.router
             .route('/spaces/:spaceId')
@@ -43,9 +47,9 @@ class ImageRouter extends Singleton implements IRouter {
                 this.imageController.multerUploadHandler(
                     this.spaceImageUpload.array(StorageUploadFilenames.SPACE_IMAGE)
                 ),
-                this.spaceController.uploadSpaceImages
+                this.spaceController.updateSpaceImages
             )
-            .get(this.imageController.getSpacesImageByFileName)
+            .get(this.imageController.getSpacesImageByFilename)
             .delete(
                 this.passport.authenticate(PassportStrategies.JWT, { session: false }),
                 this.routeProtector.spaceOwnerProtector,

@@ -1,6 +1,3 @@
-import { Includeable } from 'sequelize';
-import { FindOptions, Op } from 'sequelize';
-import * as sequelize from 'sequelize';
 import { Dao } from '../configurations/dao.config';
 import { Appointment } from '../models/appointment.model';
 import { City } from '../models/city.model';
@@ -10,7 +7,6 @@ import { SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
 import { citySequelizeDao, CitySequelizeDao } from './city.sequelize.dao';
 import { applicationInstance } from '../App';
-import { Sequelize } from 'sequelize-typescript';
 
 interface IQueryString {
     page?: string | number;
@@ -33,9 +29,6 @@ enum SpaceSortFields {
 
 export class SpaceSequelizeDao extends Dao {
     private readonly spaceModel: typeof Space = Space;
-    private readonly cityModel: typeof City = City;
-    private readonly appointmentModel: typeof Appointment = Appointment;
-    private readonly cityDao: CitySequelizeDao = citySequelizeDao;
     private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
 
     get model(): typeof Space {
@@ -94,21 +87,25 @@ export class SpaceSequelizeDao extends Dao {
 
     // NOTE аутентификация
     public editSpaceById = async (spaceId: string, userId: string, data: ISpaceEdit) => {
-        const space = (await this.findById(spaceId, true)) as Space;
+        const space: Space = await this.findById(spaceId, true);
         await space.update(data);
+        // FIXME space.update won't work - use raw quer instead
     };
 
     // NOTE аутентификация и проверка на то что
     public deleteSpaceById = async () => {};
 
     public updateSpaceImages = async (spaceId: string, spaceImagesUrl: string[]): Promise<void> => {
-        // NOTE if this doesnt work then try to use method .update and then .save instead of assigning directly
+        const spaceImagesUrlJoined: string = spaceImagesUrl.join(', ');
+        const updateRawQuery = `UPDATE "Spaces" SET "imagesUrl" = '{${spaceImagesUrlJoined}}' WHERE id = '${spaceId}'`;
 
-        const space: Space = await this.findById(spaceId);
+        await this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, updateRawQuery);
+    };
 
-        space.imagesUrl = spaceImagesUrl;
+    public cleanSpaceImageData = async (spaceId: string, spaceImageToDelete: string) => {
+        const annualizeRawQuery = `UPDATE "Spaces" SET "imagesUrl" = '{}' WHERE id = '${spaceId}'`;
 
-        await space.save();
+        await this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, annualizeRawQuery);
     };
 
     private defineSortOrder = (sortBy: SpaceQuerySortFields): string => {

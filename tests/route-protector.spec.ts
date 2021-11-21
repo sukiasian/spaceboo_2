@@ -79,7 +79,7 @@ describe('Route Protector (e2e)', () => {
         await closeTestEnv(db, server);
     });
 
-    it('DELETE /images/users/:spaceId should not allow non-space owners to delete space images', async () => {
+    it('DELETE /images/users/:spaceId should disallow non-space owners to delete space images', async () => {
         // создать другого юзера user_2 и обратиться к space_1
         const res = await request(app)
             .delete(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)

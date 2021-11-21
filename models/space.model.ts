@@ -76,7 +76,7 @@ export class Space extends Model<ISpaceAttributes, ISpaceCreationAttributes> imp
 
     @Column({
         type: DataType.ARRAY(DataType.STRING),
-        allowNull: false,
+        allowNull: true,
         validate: {
             isSpecificLength(value) {
                 if (value.length > 10) {

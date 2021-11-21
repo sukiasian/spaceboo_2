@@ -4,15 +4,25 @@ import * as uuid from 'uuid';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
 
-export enum StorageEntityReference {
+export enum RequestSerializedObjects {
+    USER = 'user',
+    SPACE = 'space',
+}
+export enum StorageEntityReferences {
     USER_ID = 'userId',
     SPACE_ID = 'spaceId',
 }
-
 export enum StorageUploadFilenames {
     USER_AVATAR = 'userAvatar',
     SPACE_IMAGE = 'spaceImage',
 }
+
+// FIXME probably this is to delete
+export enum RequestBodyImageFilename {
+    SPACE_IMAGE_TO_REMOVE = 'spaceImageToRemove',
+    USER_AVATAR_TO_REMOVE = 'userAvatarToRemove',
+}
+
 export class StorageConfig extends Singleton {
     private readonly multer = multer;
     private readonly UtilFunctions = UtilFunctions;
@@ -20,12 +30,12 @@ export class StorageConfig extends Singleton {
     public readonly spaceImagesRelativeDir = 'assets/images/spaces';
 
     private readonly diskStorageFactory = (
-        storageEntityName: StorageEntityReference,
+        requestSerializedObject: RequestSerializedObjects,
         entityDirPath: string
     ): multer.StorageEngine => {
         return this.multer.diskStorage({
             destination: async (req, file, cb) => {
-                const id = req.params[storageEntityName] as string;
+                const { id } = req[requestSerializedObject];
                 const individualDirPathForEntity = path.resolve(entityDirPath, id);
                 const dirExists = await this.UtilFunctions.checkIfExists(individualDirPathForEntity);
 
@@ -45,12 +55,12 @@ export class StorageConfig extends Singleton {
     };
 
     private readonly userAvatarStorage: multer.StorageEngine = this.diskStorageFactory(
-        StorageEntityReference.USER_ID,
+        RequestSerializedObjects.USER,
         this.userAvatarRelativeDir
     );
 
     private readonly spaceImageStorage: multer.StorageEngine = this.diskStorageFactory(
-        StorageEntityReference.SPACE_ID,
+        RequestSerializedObjects.SPACE,
         this.spaceImagesRelativeDir
     );
 

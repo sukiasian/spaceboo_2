@@ -82,9 +82,11 @@ export enum PassportStrategies {
 }
 
 export enum ResponseMessages {
+    // FIXME USER_IS_CREATED AND IMAGE_IS_DELETED or USER_CREATED AND IMAGE_DELETED -- keep same style
     USER_CREATED = 'Пользователь создан.',
     SPACE_CREATED = 'Потрясающе! Пространство создано.',
     APPOINTMENT_CREATED = 'Поздравляем! Вы забронировали.',
+    IMAGE_DELETED = 'Изображение удалено.',
 }
 
 export enum ErrorMessages {
@@ -103,8 +105,8 @@ export enum ErrorMessages {
     APPLICATION_ERROR = 'Application Error',
     UNKNOWN_ERROR = 'Произошла серьезная ошибка',
     NO_IMAGE_FOUND = 'Изображение не найдено.',
-    DIR_IS_NOT_FOUND = 'Директория не найдена.',
-    SPACE_IS_NOT_FOUND = 'Пространство не найдено.',
+    DIR_NOT_FOUND = 'Директория не найдена.',
+    SPACE_NOT_FOUND = 'Пространство не найдено.',
     MULTER_ERROR = 'Произошла ошибка при загрузке файла',
     NOT_ENOUGH_RIGHTS = 'Недостаточно прав.',
 }

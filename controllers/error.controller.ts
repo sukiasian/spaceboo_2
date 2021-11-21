@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
+import winston = require('winston');
 import logger from '../loggers/logger';
 import { Environment, ErrorMessages, HttpStatus, LoggerLevels } from '../types/enums';
 
 class ErrorController {
-    private static readonly logger = logger;
+    private static readonly logger: winston.Logger = logger;
     public static sendErrorDev = (err: any, res: Response): void => {
         console.log(err, ErrorMessages.APPLICATION_ERROR);
         res.status(err.statusCode).json({

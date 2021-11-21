@@ -11,7 +11,7 @@ class UserController extends Singleton {
     private readonly dao: UserSequelizeDao = userSequelizeDao;
 
     public updateUserAvatar = UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
-        await this.dao.updateUserImage(req.user.id, req.file.filename);
+        await this.dao.updateUserAvatar(req.user.id, req.file.filename);
 
         this.utilFunctions.sendResponse(res)(HttpStatus.OK);
     });

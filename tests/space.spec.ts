@@ -1,6 +1,7 @@
 import * as express from 'express';
 import * as request from 'supertest';
 import * as dotenv from 'dotenv';
+import * as path from 'path';
 import { Application } from '../App';
 import { IUserCreate, User } from '../models/user.model';
 import {
@@ -18,7 +19,8 @@ import { ISpaceCreate, Space } from '../models/space.model';
 import { Appointment, TIsoDatesReserved } from '../models/appointment.model';
 import { City } from '../models/city.model';
 import UtilFunctions from '../utils/UtilFunctions';
-import { SpaceQuerySortFields } from '../daos/space.sequelize.dao';
+import { SpaceQuerySortFields, spaceSequelizeDao, SpaceSequelizeDao } from '../daos/space.sequelize.dao';
+import { StorageUploadFilenames } from '../configurations/storage.config';
 
 describe('Space (e2e)', () => {
     let app: express.Express;
@@ -31,6 +33,7 @@ describe('Space (e2e)', () => {
     let spaceData: ISpaceCreate;
     let spaceData_2: ISpaceCreate;
     let spaceModel: typeof Space;
+    let spaceDao: SpaceSequelizeDao;
     let city: City;
     let city_2: City;
     let cityModel: typeof City;
@@ -41,6 +44,7 @@ describe('Space (e2e)', () => {
     let isoDatesToReserve_3: TIsoDatesReserved;
     let space_1: Space;
     let space_2: Space;
+    let pathToTestImage: string;
 
     beforeAll(async () => {
         dotenv.config({ path: '../test.env' });
@@ -65,8 +69,12 @@ describe('Space (e2e)', () => {
         );
         applicationInstance = createApplicationInstance();
 
+        pathToTestImage = path.resolve('tests', 'files', 'images', '1.png');
+
         app = applicationInstance.app;
         db = applicationInstance.sequelize;
+
+        spaceDao = spaceSequelizeDao;
 
         userModel = User;
         spaceModel = Space;
@@ -82,11 +90,7 @@ describe('Space (e2e)', () => {
         spaceData = createSpaceData(user.id, city.id, 1500);
         spaceData_2 = createSpaceData(user.id, city_2.id);
         token = await createTokenAndSign(user.id);
-        try {
-            space_1 = await spaceModel.create(spaceData);
-        } catch (err) {
-            console.log(err, 'errrrrr');
-        }
+        space_1 = await spaceModel.create(spaceData);
         space_1 = await spaceModel.findOne({
             where: { id: space_1.id },
             include: [cityModel, appointmentModel],
@@ -325,5 +329,42 @@ describe('Space (e2e)', () => {
 
         expect(spaceFresh[SequelizeModelProps.DATA_VALUES].appointments).toBeTruthy();
         expect(spaceFresh[SequelizeModelProps.DATA_VALUES].appointments.length).toBe(2);
+    });
+
+    it('POST /images/spaces/:spaceId should add imagesUrl to DB', async () => {
+        expect(space_1.imagesUrl.length).toBeLessThanOrEqual(1);
+
+        const res = await request(app)
+            .post(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage);
+        const freshSpace: Space = await spaceDao.findById(space_1.id);
+
+        expect(freshSpace.imagesUrl.length).toBe(3);
+    });
+
+    // TODO
+    it('DELETE /images/spaces/:spaceId should remove imagesUrl from DB', async () => {
+        expect(space_1.imagesUrl.length).toBe(1);
+
+        await request(app)
+            .post(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage);
+
+        const space: Space = await spaceDao.findById(space_1.id);
+
+        expect(space.imagesUrl.length).toBe(1);
+
+        await request(app)
+            .delete(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({ spaceImageToRemove: space.imagesUrl[0] });
+
+        const freshSpace: Space = await spaceDao.findById(space_1.id);
+
+        expect(freshSpace.imagesUrl.length).toBe(0);
     });
 });

@@ -5,7 +5,6 @@ import * as path from 'path';
 import { Application } from '../App';
 import { IUserCreate, User } from '../models/user.model';
 import {
-    clearDb,
     clearDbAndStorage,
     closeTestEnv,
     createApplicationInstance,
@@ -21,6 +20,7 @@ import { Appointment } from '../models/appointment.model';
 import { City } from '../models/city.model';
 import { StorageUploadFilenames } from '../configurations/storage.config';
 import { userSequelizeDao, UserSequelizeDao } from '../daos/user.sequelize.dao';
+import { spaceSequelizeDao, SpaceSequelizeDao } from '../daos/space.sequelize.dao';
 
 describe('User (e2e)', () => {
     let app: express.Express;
@@ -37,9 +37,10 @@ describe('User (e2e)', () => {
     let userModel: typeof User;
     let spaceData_1: ISpaceCreate;
     let spaceModel: typeof Space;
+    let spaceDao: SpaceSequelizeDao = spaceSequelizeDao;
+    let space_1: Space;
     let city: City;
     let cityModel: typeof City;
-    let space_1: Space;
     let appointmentModel: typeof Appointment;
     let pathToTestImage: string;
 
@@ -88,17 +89,37 @@ describe('User (e2e)', () => {
         await closeTestEnv(db, server);
     });
 
-    it('POST /images/users/:spaceId should add avatarUrl to DB', async () => {
+    it('POST /images/users should add avatarUrl to DB', async () => {
         expect(user_1.avatarUrl).toBeNull();
 
-        const res = await request(app)
-            .post(`${ApiRoutes.IMAGES}/users/${user_1.id}`)
+        await request(app)
+            .post(`${ApiRoutes.IMAGES}/users/`)
             .set('Authorization', `Bearer ${token_1}`)
             .attach(StorageUploadFilenames.USER_AVATAR, pathToTestImage);
 
-        expect(res.status).toBe(HttpStatus.OK);
+        const freshUser: User = await userDao.findById(user_1.id);
+        expect(freshUser.avatarUrl).toBeDefined();
+    });
+
+    it('DELETE /images/users/ should remove avatarUrl from DB', async () => {
+        expect(user_1.avatarUrl).toBeNull();
+
+        await request(app)
+            .post(`${ApiRoutes.IMAGES}/users/`)
+            .set('Authorization', `Bearer ${token_1}`)
+            .attach(StorageUploadFilenames.USER_AVATAR, pathToTestImage);
+
+        const user: User = await userDao.findById(user_1.id);
+        expect(user.avatarUrl).toBeDefined();
+        // expect(user.avatarUrl).not.toBeNull();
+
+        await request(app)
+            .delete(`${ApiRoutes.IMAGES}/users`)
+            .set('Authorization', `Bearer ${token_1}`)
+            .send({ userAvatarToRemove: user.avatarUrl });
 
         const freshUser: User = await userDao.findById(user_1.id);
-        expect(freshUser.avatarUrl).not.toBeNull();
+
+        expect(freshUser.avatarUrl).toBeNull();
     });
 });
