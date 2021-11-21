@@ -41,31 +41,6 @@ export class SpaceController extends Singleton {
 
     public deleteSpaceById = UtilFunctions.catchAsync(async (req, res, next) => {});
 
-    public updateSpaceImages = UtilFunctions.catchAsync(async (req, res, next) => {
-        // NOTE What if no file is uploaded? Will there be an error?
-        const { id: spaceId } = req.space;
-        const uploadedFiles = req.files as Express.Multer.File[];
-        const uploadedFilesFilenames = uploadedFiles.map((file: Express.Multer.File) => {
-            return file.filename;
-        });
-        const spaceImagesRemaining = req.body.spaceImagesRemaining || [];
-        const spaceNewImagesFilenames = [...uploadedFilesFilenames, ...spaceImagesRemaining];
-
-        await this.dao.updateSpaceImages(spaceId, spaceNewImagesFilenames as string[]);
-
-        this.utilFunctions.sendResponse(res)(HttpStatus.OK);
-    });
-
-    public removeImages = UtilFunctions.catchAsync(async (req, res, next) => {});
-
-    public getSpaceImages = UtilFunctions.catchAsync(async (req, res: express.Response, next): Promise<void> => {
-        const { imagesUrl } = req.body;
-
-        imagesUrl.forEach((imageUrl: string): void => {
-            res.sendFile(path.join(__dirname, imageUrl));
-        });
-    });
-
     // NOTE для удаления лишних изображений можно создать кронджоб который будет проходиться
     // по всем спейсам в базе данных и проверять - если к примеру avatarUrl === samvel_5,
     // а в папке изображений есть и нынешний samvel_5, и предыдущий samvel_4,

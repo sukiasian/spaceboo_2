@@ -22,12 +22,16 @@ export enum RequestBodyImageFilename {
     SPACE_IMAGE_TO_REMOVE = 'spaceImageToRemove',
     USER_AVATAR_TO_REMOVE = 'userAvatarToRemove',
 }
+export enum ReqLocalsImageAmountEntity {
+    SPACE_IMAGES_AMOUNT_LEFT = 'spaceImagesAmountLeft',
+}
 
 export class StorageConfig extends Singleton {
     private readonly multer = multer;
     private readonly UtilFunctions = UtilFunctions;
     public readonly userAvatarRelativeDir = 'assets/images/users';
     public readonly spaceImagesRelativeDir = 'assets/images/spaces';
+    public readonly spaceImagesTotalAmount = 10;
 
     private readonly diskStorageFactory = (
         requestSerializedObject: RequestSerializedObjects,
@@ -73,3 +77,4 @@ export const userAvatarUpload = storageConfig.userAvatarUpload;
 export const spaceImageUpload = storageConfig.spaceImageUpload;
 export const userAvatarRelativePath = storageConfig.userAvatarRelativeDir;
 export const spaceImagesRelativeDir = storageConfig.spaceImagesRelativeDir;
+export const spaceImagesTotalAmount = storageConfig.spaceImagesTotalAmount;

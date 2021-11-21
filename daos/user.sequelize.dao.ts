@@ -18,13 +18,13 @@ export class UserSequelizeDao extends Dao {
 
     public editUserById;
 
-    public updateUserAvatar = async (userId: string, avatarUrl: string): Promise<void> => {
+    public updateUserAvatarInDb = async (userId: string, avatarUrl: string): Promise<void> => {
         const updateRawQuery = `UPDATE "Users" SET "avatarUrl" = '${avatarUrl}' WHERE id = '${userId}'`;
 
         await this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, updateRawQuery);
     };
 
-    public cleanUserAvatarData = async (userId: string): Promise<void> => {
+    public removeUserAvatarFromDb = async (userId: string): Promise<void> => {
         const annualizeRawQuery = `UPDATE "Users" SET "avatarUrl" = NULL WHERE id = '${userId}'`;
 
         await this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, annualizeRawQuery);

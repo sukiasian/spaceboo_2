@@ -334,34 +334,34 @@ describe('Space (e2e)', () => {
     it('POST /images/spaces/:spaceId should add imagesUrl to DB', async () => {
         expect(space_1.imagesUrl.length).toBeLessThanOrEqual(1);
 
-        const res = await request(app)
+        await request(app)
             .post(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
             .set('Authorization', `Bearer ${token}`)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
             .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage);
-        const freshSpace: Space = await spaceDao.findById(space_1.id);
 
-        expect(freshSpace.imagesUrl.length).toBe(3);
+        const freshSpace: Space = await spaceDao.findById(space_1.id);
+        expect(freshSpace.imagesUrl.length).toBe(2);
     });
 
-    // TODO
     it('DELETE /images/spaces/:spaceId should remove imagesUrl from DB', async () => {
         expect(space_1.imagesUrl.length).toBe(1);
 
         await request(app)
             .post(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
             .set('Authorization', `Bearer ${token}`)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
             .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage);
 
         const space: Space = await spaceDao.findById(space_1.id);
 
-        expect(space.imagesUrl.length).toBe(1);
+        expect(space.imagesUrl.length).toBe(5);
 
         await request(app)
             .delete(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
             .set('Authorization', `Bearer ${token}`)
-            .send({ spaceImageToRemove: space.imagesUrl[0] });
+            .send({ spaceImagesToRemove: space.imagesUrl });
 
         const freshSpace: Space = await spaceDao.findById(space_1.id);
 

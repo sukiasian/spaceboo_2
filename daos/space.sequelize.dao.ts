@@ -95,17 +95,32 @@ export class SpaceSequelizeDao extends Dao {
     // NOTE аутентификация и проверка на то что
     public deleteSpaceById = async () => {};
 
-    public updateSpaceImages = async (spaceId: string, spaceImagesUrl: string[]): Promise<void> => {
+    public updateSpaceImagesInDb = async (spaceId: string, spaceImagesUrl: string[]): Promise<void> => {
         const spaceImagesUrlJoined: string = spaceImagesUrl.join(', ');
-        const updateRawQuery = `UPDATE "Spaces" SET "imagesUrl" = '{${spaceImagesUrlJoined}}' WHERE id = '${spaceId}'`;
+        // NOTE SELECT array_cat(ARRAY[1,2,3], ARRAY[4,5]);
+        const updateRawQuery = `UPDATE "Spaces" SET "imagesUrl" = ARRAY_CAT("imagesUrl", '{${spaceImagesUrlJoined}}') WHERE id = '${spaceId}';`;
 
         await this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, updateRawQuery);
     };
 
-    public cleanSpaceImageData = async (spaceId: string, spaceImageToDelete: string) => {
-        const annualizeRawQuery = `UPDATE "Spaces" SET "imagesUrl" = '{}' WHERE id = '${spaceId}'`;
+    public removeSpaceImagesFromDb = async (spaceId: string, spaceImagesToDelete: string[]) => {
+        // FIXME better add a custom postgres function
+        // await Promise.all(
+        //     spaceImagesToDelete.map(async (spaceImageToDelete: string) => {
+        //         await this.utilFunctions.createSequelizeRawQuery(
+        //             applicationInstance.sequelize,
+        //             `UPDATE "Spaces" SET "imagesUrl" = ARRAY_REMOVE("imagesUrl", '${spaceImageToDelete}') WHERE id = '${spaceId}';`
+        //         );
+        //     })
+        // );
 
-        await this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, annualizeRawQuery);
+        let rawRemoveQueries = '';
+
+        spaceImagesToDelete.forEach((spaceImageToDelete: string) => {
+            rawRemoveQueries += `UPDATE "Spaces" SET "imagesUrl" = ARRAY_REMOVE("imagesUrl", '${spaceImageToDelete}') WHERE id = '${spaceId}';`;
+        });
+
+        await this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, rawRemoveQueries);
     };
 
     private defineSortOrder = (sortBy: SpaceQuerySortFields): string => {

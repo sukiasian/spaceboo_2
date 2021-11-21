@@ -57,7 +57,7 @@ export const clearStorage = (): void => {
 
 export const clearDbAndStorage = async (sequelize: Sequelize): Promise<void> => {
     clearDb(sequelize);
-    await clearStorage();
+    clearStorage();
 };
 
 export const createApplicationInstance = (): Application => {

@@ -3,10 +3,12 @@ import { Sequelize } from 'sequelize-typescript';
 import { QueryTypes } from 'sequelize';
 import { promisify } from 'util';
 import * as fs from 'fs';
+import * as path from 'path';
 import logger from '../loggers/logger';
 import { applicationInstance } from '../App';
 import { TIsoDatesReserved } from '../models/appointment.model';
-import { HttpStatus, LoggerLevels } from '../types/enums';
+import { ErrorMessages, HttpStatus, LoggerLevels } from '../types/enums';
+import AppError from './AppError';
 
 enum DateFormat {
     NATIVE = 'native',
@@ -175,6 +177,30 @@ class UtilFunctions {
     public static removeDirectory = promisify(fs.rmdir);
 
     public static removeFile = promisify(fs.rm);
+
+    public static findAndRemoveImage = async (
+        id: string,
+        imageToRemoveFilename: string,
+        entityDirPath: string
+    ): Promise<void> => {
+        if (!imageToRemoveFilename || imageToRemoveFilename.length === 0) {
+            // FIXME возможно нужно выкинуть ошибку "Нет изображений для поиска"
+            throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.NO_IMAGE_FOUND);
+        }
+
+        const pathToEntityIndividualDir = path.resolve(entityDirPath, id);
+        const pathToImage = path.resolve(entityDirPath, id, imageToRemoveFilename);
+        const checkIfEntityIndividualDirExists = await UtilFunctions.checkIfExists(pathToEntityIndividualDir);
+        const checkIfFileExists = await UtilFunctions.checkIfExists(pathToImage);
+
+        if (!checkIfEntityIndividualDirExists) {
+            throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.DIR_NOT_FOUND);
+        } else if (!checkIfFileExists) {
+            throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.DIR_NOT_FOUND);
+        }
+
+        await UtilFunctions.removeFile(pathToImage);
+    };
 }
 
 export default UtilFunctions;

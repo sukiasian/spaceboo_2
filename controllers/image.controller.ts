@@ -10,31 +10,63 @@ import {
     spaceImagesRelativeDir,
     userAvatarRelativePath,
     StorageEntityReferences,
+    spaceImageUpload,
+    StorageUploadFilenames,
+    spaceImagesTotalAmount,
+    userAvatarUpload,
+    ReqLocalsImageAmountEntity,
 } from '../configurations/storage.config';
 import { spaceSequelizeDao, SpaceSequelizeDao } from '../daos/space.sequelize.dao';
 import { Dao } from '../configurations/dao.config';
 import { Model } from 'sequelize/types';
+import { Space } from '../models/space.model';
 
 dotenv.config();
 
 export class ImageController extends Singleton {
     private readonly userDao: UserSequelizeDao = userSequelizeDao;
     private readonly spaceDao: SpaceSequelizeDao = spaceSequelizeDao;
+    private readonly spaceImageUpload = spaceImageUpload;
+    private readonly userAvatarUpload = userAvatarUpload;
     private readonly userAvatarRelativePath = userAvatarRelativePath;
     private readonly spaceImagesRelativePath = spaceImagesRelativeDir;
+    private readonly spaceImagesTotalAmount = spaceImagesTotalAmount;
     private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
 
-    public multerUploadHandler = (uploader) => {
-        return (req, res, next) => {
-            uploader(req, res, (err) => {
-                if (err instanceof multer.MulterError) {
-                    next(new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.MULTER_ERROR));
-                } else {
-                    next(err);
-                }
-            });
+    private multerErrorHandler = (req, res, next): ((err) => void) => {
+        return (err) => {
+            if (err instanceof multer.MulterError) {
+                next(new AppError(HttpStatus.FORBIDDEN, err.message));
+            } else {
+                next(err);
+            }
         };
     };
+
+    private multerUploadForArrays = (entity: string, uploader: multer.Multer) => {
+        return (req, res, next) => {
+            const imagesAmountLeft = res.locals[entity];
+
+            uploader.array(StorageUploadFilenames.SPACE_IMAGE, imagesAmountLeft as number)(
+                req,
+                res,
+                this.multerErrorHandler(req, res, next)
+            );
+        };
+    };
+
+    public uploadUserAvatarToStorage = (req, res, next): void => {
+        this.userAvatarUpload.single(StorageUploadFilenames.USER_AVATAR)(
+            req,
+            res,
+            this.multerErrorHandler(req, res, next)
+        );
+    };
+
+    public uploadSpaceImageToStorage = this.multerUploadForArrays(
+        ReqLocalsImageAmountEntity.SPACE_IMAGES_AMOUNT_LEFT,
+        this.spaceImageUpload
+    );
 
     private getImageFunctionFactory = async (
         req,
@@ -84,39 +116,77 @@ export class ImageController extends Singleton {
         );
     });
 
-    public destroyOutdatedUserAvatar = this.utilFunctions.catchAsync(async (req, res, next) => {
+    public removeUserAvatarFromStorage = this.utilFunctions.catchAsync(async (req, res, next) => {
+        const { id: userId } = req.user;
         const { userAvatarToRemove } = req.body;
+
+        await this.utilFunctions.findAndRemoveImage(userId, userAvatarToRemove, this.userAvatarRelativePath);
+
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.IMAGE_DELETED);
+    });
+
+    public removeUserAvatarFromDb = this.utilFunctions.catchAsync(async (req, res, next) => {
         const { id: userId } = req.user;
 
-        await this.findAndRemoveImage(userId, userAvatarToRemove, this.userAvatarRelativePath);
-        await this.userDao.cleanUserAvatarData(userId);
+        await this.userDao.removeUserAvatarFromDb(userId);
 
-        this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.IMAGE_DELETED);
+        next();
     });
 
-    public destroyOutdatedSpaceImage = this.utilFunctions.catchAsync(async (req, res, next) => {
-        /* 
-        
-        Касаемо регистрации: чтобы пространство было добавлено в листинг нужно будет загрузить фото. Для этого нужно 
-        видимо нужно будет поменять логику и роуты:
+    public updateUserAvatarInDb = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        await this.userDao.updateUserAvatarInDb(req.user.id, req.file.filename);
 
-        - POST: uploadSpaceImages, где загружаются фото и сразу попадает в листинг 
-        - PUT: updateSpaceImages
-        - DELETE: findAndRemove - где если последнее фото удаляется,то спейс снимается с листинга 
-        -- и менять всю логику ))) 
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK);
+    });
 
-        */
+    public checkSpaceImagesAmount = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        const { id: spaceId } = req.space;
+        const space: Space = await this.spaceDao.findById(spaceId);
+        const spaceImagesAmountLeft = this.spaceImagesTotalAmount - space.imagesUrl.length;
 
-        const { spaceImageToRemove } = req.body;
+        if (spaceImagesAmountLeft === 0) {
+            throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.SPACE_IMAGES_AMOUNT_EXCEEDED);
+        }
+
+        res.locals.spaceImagesAmountLeft = spaceImagesAmountLeft;
+
+        next();
+    });
+
+    public removeSpaceImagesFromStorage = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        const { id: spaceId } = req.space;
+        const { spaceImagesToRemove } = req.body;
+
+        await Promise.all(
+            spaceImagesToRemove.map(async (spaceImage: string) => {
+                await this.utilFunctions.findAndRemoveImage(spaceId, spaceImage, this.spaceImagesRelativePath);
+            })
+        );
+
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.IMAGES_DELETED);
+    });
+
+    public removeSpaceImagesFromDb = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        const { spaceImagesToRemove } = req.body;
         const { id: spaceId } = req.space;
 
-        await this.findAndRemoveImage(spaceId, spaceImageToRemove, this.spaceImagesRelativePath);
-        await this.spaceDao.cleanSpaceImageData(spaceId, spaceImageToRemove);
+        await this.spaceDao.removeSpaceImagesFromDb(spaceId, spaceImagesToRemove);
 
-        this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.IMAGE_DELETED);
+        next();
     });
 
-    // NOTE admin access only
+    public updateSpaceImagesInDb = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        const { id: spaceId } = req.space;
+        const uploadedFiles = req.files as Express.Multer.File[];
+        const uploadedFilesNames = uploadedFiles.map((file: Express.Multer.File) => {
+            return file.filename;
+        }) as string[];
+
+        await this.spaceDao.updateSpaceImagesInDb(spaceId, uploadedFilesNames);
+
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK);
+    });
+
     public destroyAllUserImages = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const pathToUserImagesDir = path.resolve(userAvatarRelativePath, req.user.id);
         const checkIfUserImagesDirExists = await this.utilFunctions.checkIfExists(pathToUserImagesDir);
@@ -126,31 +196,9 @@ export class ImageController extends Singleton {
         }
 
         await this.utilFunctions.removeDirectory(pathToUserImagesDir, { recursive: true });
+
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK);
     });
-
-    private findAndRemoveImage = async (
-        id: string,
-        imageToRemoveFilename: string,
-        entityDirPath: string
-    ): Promise<void> => {
-        if (!imageToRemoveFilename || imageToRemoveFilename.length === 0) {
-            // FIXME возможно нужно выкинуть ошибку "Нет изображений для поиска"
-            throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.NO_IMAGE_FOUND);
-        }
-
-        const pathToEntityIndividualDir = path.resolve(entityDirPath, id);
-        const pathToImage = path.resolve(entityDirPath, id, imageToRemoveFilename);
-        const checkIfEntityIndividualDirExists = await this.utilFunctions.checkIfExists(pathToEntityIndividualDir);
-        const checkIfFileExists = await this.utilFunctions.checkIfExists(pathToImage);
-
-        if (!checkIfEntityIndividualDirExists) {
-            throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.DIR_NOT_FOUND);
-        } else if (!checkIfFileExists) {
-            throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.DIR_NOT_FOUND);
-        }
-
-        await this.utilFunctions.removeFile(pathToImage);
-    };
 }
 
 export const imageController = SingletonFactory.produce<ImageController>(ImageController);

@@ -14,13 +14,12 @@ import {
     openTestEnv,
 } from './lib';
 import { Sequelize } from 'sequelize-typescript';
-import { ApiRoutes, HttpStatus } from '../types/enums';
+import { ApiRoutes } from '../types/enums';
 import { ISpaceCreate, Space } from '../models/space.model';
 import { Appointment } from '../models/appointment.model';
 import { City } from '../models/city.model';
 import { StorageUploadFilenames } from '../configurations/storage.config';
 import { userSequelizeDao, UserSequelizeDao } from '../daos/user.sequelize.dao';
-import { spaceSequelizeDao, SpaceSequelizeDao } from '../daos/space.sequelize.dao';
 
 describe('User (e2e)', () => {
     let app: express.Express;
@@ -37,7 +36,6 @@ describe('User (e2e)', () => {
     let userModel: typeof User;
     let spaceData_1: ISpaceCreate;
     let spaceModel: typeof Space;
-    let spaceDao: SpaceSequelizeDao = spaceSequelizeDao;
     let space_1: Space;
     let city: City;
     let cityModel: typeof City;
@@ -111,7 +109,6 @@ describe('User (e2e)', () => {
 
         const user: User = await userDao.findById(user_1.id);
         expect(user.avatarUrl).toBeDefined();
-        // expect(user.avatarUrl).not.toBeNull();
 
         await request(app)
             .delete(`${ApiRoutes.IMAGES}/users`)

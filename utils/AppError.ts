@@ -5,7 +5,7 @@ export default class AppError extends Error {
     public isOperational: boolean;
     public status: string;
 
-    constructor(statusCode: HttpStatus, message: ErrorMessages) {
+    constructor(statusCode: HttpStatus, message: ErrorMessages | string) {
         super(message);
         this.statusCode = statusCode;
         this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';

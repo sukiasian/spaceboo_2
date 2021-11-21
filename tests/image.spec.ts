@@ -133,6 +133,33 @@ describe('Image (e2e)', () => {
         expect(userImagesDirFiles.length).toBe(3);
     });
 
+    it('POST /images/spaces should upload not allow to upload more than 10 files', async () => {
+        expect(space_1.imagesUrl.length).toBeLessThanOrEqual(1);
+
+        const res = await request(app)
+            .post(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage);
+
+        expect(res.status).toBe(HttpStatus.FORBIDDEN);
+
+        const space: Space = await spaceDao.findById(space_1.id);
+        const pathToSpaceImagesDir = createPathToSpaceImagesDir(space_1.id);
+        const spaceImagesDirFiles = await UtilFunctions.readDirectory(pathToSpaceImagesDir);
+
+        expect(spaceImagesDirFiles.length).toBe(0);
+    });
+
     it('POST /images/users should disallow not authorized users to upload images', async () => {
         const res = await request(app)
             .post(`${ApiRoutes.IMAGES}/users`)
@@ -164,7 +191,7 @@ describe('Image (e2e)', () => {
         const freshSpace: Space = await spaceDao.findById(space_1.id);
         const res = await request(app)
             .get(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
-            .send({ filename: freshSpace.imagesUrl[0] });
+            .send({ filename: freshSpace.imagesUrl[1] });
 
         expect(res.body instanceof Buffer).toBe(true);
     });
@@ -197,14 +224,15 @@ describe('Image (e2e)', () => {
 
         const freshSpace: Space = await spaceDao.findById(space_1.id);
         const pathToSpaceImagesIndividualDirectory = createPathToSpaceImagesDir(space_1.id);
-        const pathToSpaceImage = path.join(pathToSpaceImagesIndividualDirectory, freshSpace.imagesUrl[0]);
+        const pathToSpaceImage = path.join(pathToSpaceImagesIndividualDirectory, freshSpace.imagesUrl[1]);
+        console.log(await UtilFunctions.checkIfExists(pathToSpaceImage));
 
         expect(await UtilFunctions.checkIfExists(pathToSpaceImage)).toBeTruthy();
 
         await request(app)
             .delete(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
             .set('Authorization', `Bearer ${token}`)
-            .send({ spaceImageToRemove: freshSpace.imagesUrl[0] });
+            .send({ spaceImagesToRemove: [freshSpace.imagesUrl[1]] });
 
         expect(await UtilFunctions.checkIfExists(pathToSpaceImage)).toBeFalsy();
     });

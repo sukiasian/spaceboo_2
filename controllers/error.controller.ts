@@ -33,7 +33,6 @@ class ErrorController {
 
     public static sendErrorTest = (err: any, res: Response): void => {
         if (!err.isOperational) {
-            this.logger.log({ level: LoggerLevels.ERROR, message: err });
             res.status(err.statusCode).json({
                 status: err.status,
                 message: ErrorMessages.UNKNOWN_ERROR,
@@ -43,6 +42,7 @@ class ErrorController {
                 message: err.message,
             });
         }
+        this.logger.log({ level: LoggerLevels.ERROR, message: err });
     };
 
     public static globalErrorController: ErrorRequestHandler = (

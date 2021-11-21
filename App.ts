@@ -27,6 +27,9 @@ export class Application extends Singleton {
 
     public readonly sequelize: Sequelize = new Sequelize({
         dialect: 'postgres',
+        dialectOptions: {
+            multipleStatements: true,
+        },
         host: process.env.host || 'localhost',
         port: Number.parseInt(process.env.DATABASE_PORT, 10) || 5432,
         username: process.env.DATABASE_USERNAME || 'postgres',

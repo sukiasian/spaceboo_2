@@ -87,6 +87,7 @@ export enum ResponseMessages {
     SPACE_CREATED = 'Потрясающе! Пространство создано.',
     APPOINTMENT_CREATED = 'Поздравляем! Вы забронировали.',
     IMAGE_DELETED = 'Изображение удалено.',
+    IMAGES_DELETED = 'Все изображения удалены',
 }
 
 export enum ErrorMessages {
@@ -102,12 +103,13 @@ export enum ErrorMessages {
     SPACE_IS_UNAVAILABLE = 'К сожалению, пространство занято. Вы можете посмотреть другие даты.',
     // TODO while images are optional we dont need to use "minimal amount". If they aren't then we do
     SPACE_IMAGES_VALIDATE = 'Максимальное количество изображений для пространства — 10.',
+    SPACE_IMAGES_AMOUNT_EXCEEDED = 'Превышено допустимое количество изображений для пространства. Максимальное количество изображений - 10.',
     APPLICATION_ERROR = 'Application Error',
     UNKNOWN_ERROR = 'Произошла серьезная ошибка',
     NO_IMAGE_FOUND = 'Изображение не найдено.',
     DIR_NOT_FOUND = 'Директория не найдена.',
     SPACE_NOT_FOUND = 'Пространство не найдено.',
-    MULTER_ERROR = 'Произошла ошибка при загрузке файла',
+    MULTER_ERROR = 'Произошла ошибка при загрузке файла.',
     NOT_ENOUGH_RIGHTS = 'Недостаточно прав.',
 }
 
