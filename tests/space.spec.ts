@@ -2,6 +2,7 @@ import * as express from 'express';
 import * as request from 'supertest';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import * as faker from 'faker';
 import { Application } from '../App';
 import { IUserCreate, User } from '../models/user.model';
 import {
@@ -175,7 +176,6 @@ describe('Space (e2e)', () => {
         expect(res.body.data[0].cityId).toBe(space_2.cityId);
     });
 
-    ///// 2️⃣
     it('GET /spaces should get all spaces by dates to reserve', async () => {
         // FIXME if appointment already overlaps then we should be unable to create a new one
         await appointmentModel.create({
@@ -208,7 +208,6 @@ describe('Space (e2e)', () => {
         expect(res.body.data[0].id).toBe(space_2.id);
     });
 
-    ///// 3️⃣
     it('GET /spaces should get all spaces without query strings', async () => {
         await appointmentModel.create({
             userId: user.id,
@@ -230,7 +229,7 @@ describe('Space (e2e)', () => {
 
         expect(res.body.data.length).toBe(2);
     });
-    ///// 4️⃣
+
     it('GET /spaces should get all spaces with city and dates to reserve queries', async () => {
         await appointmentModel.create({
             userId: user.id,
@@ -269,7 +268,6 @@ describe('Space (e2e)', () => {
         expect(res_3.body.data.length).toBe(0);
     });
 
-    /// 5️⃣
     it('GET /spaces should get all spaces should be able to sort', async () => {
         // NOTE put everything in beforeEach ?
         await appointmentModel.create({
@@ -299,12 +297,6 @@ describe('Space (e2e)', () => {
         });
 
         expect(res_2.body.data[0].pricePerNight > res_2.body.data[1].pricePerNight);
-    });
-
-    it('PUT /spaces should edit space by id', async () => {
-        // get spaceId and check if the userId in space === req.user.id
-        // if yes, then accept changes (for images we need a separate route)
-        //
     });
 
     it('DELETE /spaces should delete space from database', async () => {});
@@ -366,5 +358,34 @@ describe('Space (e2e)', () => {
         const freshSpace: Space = await spaceDao.findById(space_1.id);
 
         expect(freshSpace.imagesUrl.length).toBe(0);
+    });
+
+    it('PUT /spaces/:spaceId should update space data', async () => {
+        const roomsNumber = faker.datatype.number(100);
+        const res = await request(app)
+            .put(`${ApiRoutes.SPACES}/${space_1.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                spaceEditData: {
+                    roomsNumber,
+                },
+            });
+
+        expect(res.status).toBe(HttpStatus.OK);
+
+        const space: Space = await spaceDao.findById(space_1.id);
+
+        expect(space.roomsNumber).toBe(roomsNumber);
+    });
+
+    it('DELETE /spaces/:spaceId should remove space from DB', async () => {
+        const space: Space = await spaceDao.findById(space_1.id);
+
+        expect(space).toBeDefined();
+
+        await request(app).delete(`${ApiRoutes.SPACES}/${space_1.id}`).set('Authorization', `Bearer ${token}`);
+
+        const freshSpace: Space = await spaceDao.findById(space_1.id);
+        console.log(freshSpace, 'spaceeeee');
     });
 });

@@ -11,6 +11,7 @@ export class AuthSequelizeDao extends Dao {
         return this.userModel;
     }
 
+    // FIXME fix data - use userData and pick a proper datatype
     public signUpLocal = async (data: any): Promise<User> => {
         // NOTE we do so because password and passwordConfirmation are required
         if (data.password && data.passwordConfirmation) {

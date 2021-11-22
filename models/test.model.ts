@@ -5,6 +5,7 @@ interface ITestModel {
     id: string;
     startDate: number;
     finishDate: number;
+    readonly text: string;
 }
 
 export interface ITestModelCreation extends Optional<ITestModel, 'id'> {}
@@ -22,4 +23,7 @@ export class Test extends Model<ITestModel, ITestModelCreation> implements ITest
 
     @Column({ type: DataType.BIGINT })
     public finishDate: number;
+
+    @Column({ defaultValue: 'user' })
+    public text: string;
 }

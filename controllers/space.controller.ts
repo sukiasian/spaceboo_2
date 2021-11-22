@@ -7,8 +7,6 @@ import { spaceSequelizeDao, SpaceSequelizeDao } from '../daos/space.sequelize.da
 import UtilFunctions from '../utils/UtilFunctions';
 import { HttpStatus, ResponseMessages } from '../types/enums';
 
-dotenv.config();
-
 export class SpaceController extends Singleton {
     private readonly dao: SpaceSequelizeDao = spaceSequelizeDao;
     private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
@@ -32,25 +30,20 @@ export class SpaceController extends Singleton {
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, spaces);
     });
 
-    public editSpaceById = UtilFunctions.catchAsync(async (req, res, next) => {
-        // const space = await this.dao.editSpaceById(req.params.id, req.body);
-        const space = await this.dao.editSpaceById(req.params.spaceId, req.user.id, req.body);
+    public editSpaceById = UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        const { spaceId } = req.params;
+        const { spaceEditData } = req.body;
 
-        this.utilFunctions.sendResponse(res)(HttpStatus.OK);
+        await this.dao.editSpaceById(spaceId, spaceEditData);
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.DATA_UPDATED);
     });
 
-    public deleteSpaceById = UtilFunctions.catchAsync(async (req, res, next) => {});
+    public deleteSpaceById = UtilFunctions.catchAsync(async (req, res, next) => {
+        const { spaceId } = req.params;
 
-    // NOTE для удаления лишних изображений можно создать кронджоб который будет проходиться
-    // по всем спейсам в базе данных и проверять - если к примеру avatarUrl === samvel_5,
-    // а в папке изображений есть и нынешний samvel_5, и предыдущий samvel_4,
-    // то тот удаляет samvel_4. Говоря иначе, заходим в папку. Берем фото. Проходим по
-    // всем записям в бд, если samvel_4 нет нигде, то удаляем.
-
-    // NOTE другой вариант это делать все "на месте" - обновил фотки - сразу обновил и
-    // uploads (т.е. при удалении мы формируем массив of filenames of removed files, передаем
-    // с фронта на бэк, на эндпоинт removeOutdatedImagesFromUploads). В таком случае
-    // возможно будет уместнее создать контроллер изображений.
+        await this.dao.deleteSpaceById(spaceId);
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.SPACE_DELETED);
+    });
 }
 
 // NOTE export keeping the same style - if we export const then we need to export const everywhere. If default - then default everywhere.

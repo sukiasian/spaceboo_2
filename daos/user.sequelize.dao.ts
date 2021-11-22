@@ -1,5 +1,5 @@
 import { Dao } from '../configurations/dao.config';
-import { User } from '../models/user.model';
+import { IUserEdit, User, userEditFields } from '../models/user.model';
 import { SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
 import { applicationInstance } from '../App';
@@ -16,7 +16,13 @@ export class UserSequelizeDao extends Dao {
         return this.model.create(userData);
     };
 
-    public editUserById;
+    public createAdmin = async () => {};
+
+    public editUser = async (userId: string, userEditData: IUserEdit): Promise<void> => {
+        const user = await this.model.findOne({ where: { id: userId } });
+
+        await user.update(userEditData, { fields: userEditFields });
+    };
 
     public updateUserAvatarInDb = async (userId: string, avatarUrl: string): Promise<void> => {
         const updateRawQuery = `UPDATE "Users" SET "avatarUrl" = '${avatarUrl}' WHERE id = '${userId}'`;

@@ -1,8 +1,6 @@
 import * as express from 'express';
 import { Sequelize } from 'sequelize-typescript';
 import * as dotenv from 'dotenv';
-import * as multer from 'multer';
-import * as path from 'path';
 import { router as userRouter } from './routes/user.router';
 import { router as spaceRouter } from './routes/space.router';
 import { router as authRouter } from './routes/auth.router';
@@ -17,9 +15,6 @@ import { passportConfig, PassportConfig } from './configurations/passport.config
 import { Test } from './models/test.model';
 import { City } from './models/city.model';
 import { Appointment } from './models/appointment.model';
-import UtilFunctions from './utils/UtilFunctions';
-
-dotenv.config();
 
 export class Application extends Singleton {
     public readonly app: express.Express = express();

@@ -7,8 +7,6 @@ import { Environment, HttpStatus, ResponseMessages } from '../types/enums';
 import { authSequelizeDao, AuthSequelizeDao } from '../daos/auth.sequelize.dao';
 import UtilFunctions from '../utils/UtilFunctions';
 
-dotenv.config();
-
 export class AuthController extends Singleton {
     private readonly dao: AuthSequelizeDao = authSequelizeDao;
 

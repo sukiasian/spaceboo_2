@@ -2,8 +2,9 @@ import * as express from 'express';
 import * as request from 'supertest';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import * as faker from 'faker';
 import { Application } from '../App';
-import { IUserCreate, User } from '../models/user.model';
+import { IUserCreate, User, UserRoles, UserScopes } from '../models/user.model';
 import {
     clearDbAndStorage,
     closeTestEnv,
@@ -14,12 +15,13 @@ import {
     openTestEnv,
 } from './lib';
 import { Sequelize } from 'sequelize-typescript';
-import { ApiRoutes } from '../types/enums';
+import { ApiRoutes, HttpStatus } from '../types/enums';
 import { ISpaceCreate, Space } from '../models/space.model';
 import { Appointment } from '../models/appointment.model';
 import { City } from '../models/city.model';
 import { StorageUploadFilenames } from '../configurations/storage.config';
 import { userSequelizeDao, UserSequelizeDao } from '../daos/user.sequelize.dao';
+import { fake } from 'faker';
 
 describe('User (e2e)', () => {
     let app: express.Express;
@@ -41,10 +43,10 @@ describe('User (e2e)', () => {
     let cityModel: typeof City;
     let appointmentModel: typeof Appointment;
     let pathToTestImage: string;
+    let fakePassword: string;
+    let fakeName: string;
 
     beforeAll(async () => {
-        dotenv.config({ path: '../test.env' });
-
         applicationInstance = createApplicationInstance();
 
         app = applicationInstance.app;
@@ -61,6 +63,9 @@ describe('User (e2e)', () => {
 
         userData_1 = createUserData();
         userData_2 = createUserData();
+
+        fakePassword = faker.random.word();
+        fakeName = faker.name.firstName();
 
         server = (await openTestEnv(applicationInstance)).server;
     });
@@ -118,5 +123,63 @@ describe('User (e2e)', () => {
         const freshUser: User = await userDao.findById(user_1.id);
 
         expect(freshUser.avatarUrl).toBeNull();
+    });
+
+    it('PUT /users should update user data', async () => {
+        const res = await request(app)
+            .put(`${ApiRoutes.USERS}`)
+            .set('Authorization', `Bearer ${token_1}`)
+            .send({
+                userEditData: {
+                    name: fakeName,
+                },
+            });
+
+        expect(res.status).toBe(HttpStatus.OK);
+
+        const freshUser = await userDao.findById(user_1.id);
+        expect(freshUser.name);
+    });
+
+    it("PUT /users should not update user's role", async () => {
+        const res = await request(app)
+            .put(`${ApiRoutes.USERS}`)
+            .set('Authorization', `Bearer ${token_1}`)
+            .send({
+                userEditData: {
+                    role: UserRoles.ADMIN,
+                },
+            });
+
+        const freshUser: User = await userModel.scope(UserScopes.WITH_PASSWORD).findOne({ where: { id: user_1.id } });
+
+        expect(freshUser.role).toBe(UserRoles.USER);
+    });
+
+    it('PUT /users passwords should match', async () => {
+        // FIXME works from time to times
+        const res_1 = await request(app)
+            .put(`${ApiRoutes.USERS}`)
+            .set('Authorization', `Bearer ${token_1}`)
+            .send({
+                userEditData: {
+                    password: fakePassword,
+                    passwordConfirmation: fakePassword.toUpperCase(),
+                },
+            });
+
+        expect(res_1.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        const res_2 = await request(app)
+            .put(`${ApiRoutes.USERS}`)
+            .set('Authorization', `Bearer ${token_1}`)
+            .send({
+                userEditData: {
+                    password: fakePassword,
+                    passwordConfirmation: fakePassword,
+                },
+            });
+
+        expect(res_2.status).toBe(HttpStatus.OK);
     });
 });

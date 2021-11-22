@@ -5,17 +5,13 @@ import { ErrorMessages, HttpStatus } from '../types/enums';
 import AppError from '../utils/AppError';
 import { Appointment } from './appointment.model';
 
-enum UserRoles {
-    ADMIN = 'admin',
-    USER = 'user',
-}
 export interface IUserAttributes {
     id: string;
     name: string;
     middleName: string;
     surname: string;
     email: string;
-    // role?: UserRoles;
+    role?: UserRoles;
     password?: string;
     passwordConfirmation?: string;
     facebookId?: string;
@@ -25,9 +21,20 @@ export interface IUserAttributes {
     verifyPassword?(instance: User): (password: string) => Promise<boolean>;
 }
 export interface IUserCreationAttributes extends Optional<IUserAttributes, 'id'> {}
-// export interface IUser extends IUserAttributes {}
 export interface IUserCreate extends IUserCreationAttributes {}
+export interface IUserEdit {
+    name?: string;
+    middleName?: string;
+    surname?: string;
+    // email: string;
+    password?: string;
+    passwordConfirmation?: string;
+}
 
+export enum UserRoles {
+    ADMIN = 'admin',
+    USER = 'user',
+}
 enum UserQueryExcludedAttributes {
     PASSWORD = 'password',
     PASSWORD_CONFIRMATION = 'passwordConfirmation',
@@ -36,10 +43,21 @@ enum UserQueryExcludedAttributes {
     ODNOKLASSNIKI_ID = 'odnoklassnikiId',
     CREATED_AT = 'createdAt',
     UPDATED_AT = 'updatedAt',
+    ROLE = 'role',
 }
 export enum UserScopes {
     WITH_PASSWORD = 'withPassword',
+    WITH_ROLE = 'withRole',
 }
+
+export const userEditFields: Partial<keyof IUserAttributes>[] = [
+    'name',
+    'middleName',
+    'surname',
+    'password',
+    'passwordConfirmation',
+    // 'email'
+];
 
 @Table({
     timestamps: true,
@@ -53,12 +71,16 @@ export enum UserScopes {
                 UserQueryExcludedAttributes.ODNOKLASSNIKI_ID,
                 UserQueryExcludedAttributes.CREATED_AT,
                 UserQueryExcludedAttributes.UPDATED_AT,
+                UserQueryExcludedAttributes.ROLE,
             ],
         },
     },
     scopes: {
         withPassword: {
             attributes: { exclude: [] },
+        },
+        withRole: {
+            attributes: { include: [UserQueryExcludedAttributes.ROLE] },
         },
     },
 })
@@ -123,14 +145,14 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
     })
     public email: string;
 
-    // @Column({ allowNull: false, defaultValue: UserRoles.USER })
-    // role: UserRoles;
+    @Column({ allowNull: false, defaultValue: UserRoles.USER })
+    role: UserRoles;
 
     @Column({
         validate: {
             len: { msg: ErrorMessages.PASSWORD_LENGTH_VALIDATE, args: [8, 25] },
             // FIXME comparePasswords, not checkAvailability
-            checkAvailability(this: User): void {
+            comparePasswordWithPasswordConfirmation(this: User): void {
                 if (this.password !== this.passwordConfirmation) {
                     throw new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.PASSWORDS_DO_NOT_MATCH_VALIDATE);
                 }
@@ -161,9 +183,21 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
     @BeforeCreate // === pre-hook
     static async hashPasswordAndRemovePasswordConfirmation(instance: User): Promise<void> {
         // NOTE probably here we need a check if password is provided or no - for example, for Facebook auth there's no password, but operations below still probably will be executed
-        instance.password = await bcrypt.hash(instance.password, 10);
-        instance.passwordConfirmation = undefined;
+        if (instance.password) {
+            instance.password = await bcrypt.hash(instance.password, 10);
+            instance.passwordConfirmation = undefined;
+        }
     }
+
+    // @BeforeUpdate
+    // @BeforeBulkUpdate
+    // static comparePasswords(instance: User): void {
+    //     if (instance.password) {
+    //         if (instance.password !== instance.passwordConfirmation) {
+    //             throw new Error('errorrrrrrrrr');
+    //         }
+    //     }
+    // }
 
     verifyPassword(instance: User): (password: string) => Promise<boolean> {
         return async (password: string): Promise<boolean> => {

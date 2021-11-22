@@ -39,8 +39,6 @@ describe('Route Protector (e2e)', () => {
     let appointmentModel: typeof Appointment;
 
     beforeAll(async () => {
-        dotenv.config({ path: '../test.env' });
-
         applicationInstance = createApplicationInstance();
 
         app = applicationInstance.app;

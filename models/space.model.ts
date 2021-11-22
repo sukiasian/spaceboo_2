@@ -26,7 +26,6 @@ export interface ISpaceEdit {
     type?: SpaceType;
     description?: string;
     roomsNumber?: number;
-    imagesUrl?: string[];
     cityId?: number;
     userId?: string;
     facilities?: string[];
@@ -37,7 +36,18 @@ export enum SpaceType {
     HOUSE = 'Жилой дом',
 }
 
-@Table({ timestamps: true })
+export const spaceEditFields: Partial<keyof ISpaceAttributes>[] = [
+    'address',
+    'type',
+    'description',
+    'roomsNumber',
+    'cityId',
+    'userId',
+    'facilities',
+];
+
+// TODO do we need paranoid or no? paranoid just 'mutes', hides
+@Table({ timestamps: true, paranoid: false })
 export class Space extends Model<ISpaceAttributes, ISpaceCreationAttributes> implements ISpaceAttributes {
     @PrimaryKey
     @Column({ type: DataType.UUID, defaultValue: DataType.UUIDV4 })

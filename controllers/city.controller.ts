@@ -4,8 +4,6 @@ import { ResponseMessages } from '../types/enums';
 import UtilFunctions from '../utils/UtilFunctions';
 import { citySequelizeDao, CitySequelizeDao } from '../daos/city.sequelize.dao';
 
-dotenv.config();
-
 export class CityController extends Singleton {
     private readonly dao: CitySequelizeDao = citySequelizeDao;
 

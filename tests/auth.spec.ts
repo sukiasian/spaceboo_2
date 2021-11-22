@@ -26,8 +26,6 @@ describe('Auth (e2e)', () => {
     let invalidUserData: any;
 
     beforeAll(async () => {
-        dotenv.config({ path: '../test.env' });
-
         applicationInstance = createApplicationInstance();
 
         app = applicationInstance.app;

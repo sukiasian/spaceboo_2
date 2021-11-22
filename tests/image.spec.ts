@@ -48,8 +48,6 @@ describe('Image (e2e)', () => {
     let pathToTestImage: string;
 
     beforeAll(async () => {
-        dotenv.config({ path: '../test.config.env' });
-
         applicationInstance = createApplicationInstance();
 
         app = applicationInstance.app;
@@ -225,7 +223,6 @@ describe('Image (e2e)', () => {
         const freshSpace: Space = await spaceDao.findById(space_1.id);
         const pathToSpaceImagesIndividualDirectory = createPathToSpaceImagesDir(space_1.id);
         const pathToSpaceImage = path.join(pathToSpaceImagesIndividualDirectory, freshSpace.imagesUrl[1]);
-        console.log(await UtilFunctions.checkIfExists(pathToSpaceImage));
 
         expect(await UtilFunctions.checkIfExists(pathToSpaceImage)).toBeTruthy();
 

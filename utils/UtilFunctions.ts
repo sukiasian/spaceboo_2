@@ -7,7 +7,7 @@ import * as path from 'path';
 import logger from '../loggers/logger';
 import { applicationInstance } from '../App';
 import { TIsoDatesReserved } from '../models/appointment.model';
-import { ErrorMessages, HttpStatus, LoggerLevels } from '../types/enums';
+import { ErrorMessages, HttpStatus, LoggerLevels, ResponseMessages } from '../types/enums';
 import AppError from './AppError';
 
 enum DateFormat {
@@ -16,7 +16,9 @@ enum DateFormat {
 }
 
 class UtilFunctions {
-    public static sendResponse = (res: Response): ((statusCode: HttpStatus, message?: string, data?: any) => void) => {
+    public static sendResponse = (
+        res: Response
+    ): ((statusCode: HttpStatus, message?: ResponseMessages | string, data?: any) => void) => {
         return (statusCode: number, message?: string, data?: any): void => {
             if (!message && data) {
                 res.status(statusCode).json({

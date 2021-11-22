@@ -1,7 +1,7 @@
 import { Dao } from '../configurations/dao.config';
 import { Appointment } from '../models/appointment.model';
 import { City } from '../models/city.model';
-import { ISpaceCreate, Space, ISpaceEdit } from '../models/space.model';
+import { ISpaceCreate, Space, ISpaceEdit, spaceEditFields } from '../models/space.model';
 import { QuerySortDirection } from '../types/enums';
 import { SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
@@ -85,15 +85,18 @@ export class SpaceSequelizeDao extends Dao {
         return spaces;
     };
 
-    // NOTE аутентификация
-    public editSpaceById = async (spaceId: string, userId: string, data: ISpaceEdit) => {
-        const space: Space = await this.findById(spaceId, true);
-        await space.update(data);
-        // FIXME space.update won't work - use raw quer instead
+    public editSpaceById = async (spaceId: string, spaceEditData: ISpaceEdit): Promise<void> => {
+        const space = await this.model.findOne({ where: { id: spaceId } });
+
+        await space.update(spaceEditData, { fields: spaceEditFields });
     };
 
     // NOTE аутентификация и проверка на то что
-    public deleteSpaceById = async () => {};
+    public deleteSpaceById = async (spaceId: string): Promise<void> => {
+        const space = await this.model.findOne({ where: { id: spaceId } });
+
+        await space.destroy();
+    };
 
     public updateSpaceImagesInDb = async (spaceId: string, spaceImagesUrl: string[]): Promise<void> => {
         const spaceImagesUrlJoined: string = spaceImagesUrl.join(', ');
@@ -105,15 +108,6 @@ export class SpaceSequelizeDao extends Dao {
 
     public removeSpaceImagesFromDb = async (spaceId: string, spaceImagesToDelete: string[]) => {
         // FIXME better add a custom postgres function
-        // await Promise.all(
-        //     spaceImagesToDelete.map(async (spaceImageToDelete: string) => {
-        //         await this.utilFunctions.createSequelizeRawQuery(
-        //             applicationInstance.sequelize,
-        //             `UPDATE "Spaces" SET "imagesUrl" = ARRAY_REMOVE("imagesUrl", '${spaceImageToDelete}') WHERE id = '${spaceId}';`
-        //         );
-        //     })
-        // );
-
         let rawRemoveQueries = '';
 
         spaceImagesToDelete.forEach((spaceImageToDelete: string) => {

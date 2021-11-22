@@ -4,8 +4,6 @@ import UtilFunctions from '../utils/UtilFunctions';
 import { HttpStatus, ResponseMessages } from '../types/enums';
 import { appointmentSequelizeDao, AppointmentSequelizeDao } from '../daos/appointment.sequelize.dao';
 
-dotenv.config();
-
 export class AppointmentController extends Singleton {
     private readonly dao: AppointmentSequelizeDao = appointmentSequelizeDao;
 
