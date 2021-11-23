@@ -1,16 +1,17 @@
 import * as nodemailer from 'nodemailer';
 import * as path from 'path';
-import { Singleton, SingletonFactory } from './Singleton';
+import * as pug from 'pug';
+import { Singleton, SingletonFactory } from '../utils/Singleton';
 
 interface IEmailOptions {
     from: string;
     to: string;
     subject: string;
-    text: string;
+    text?: string;
 }
 
 class Email extends Singleton {
-    sendMail = async (options: IEmailOptions) => {
+    sendMail = async <TLocals>(options: IEmailOptions, relativePathToTemplate?: string, locals?: TLocals) => {
         try {
             const transporter = nodemailer.createTransport({
                 host: process.env.EMAIL_HOST,
@@ -21,16 +22,24 @@ class Email extends Singleton {
                 },
             } as nodemailer.TransportOptions);
 
+            let html: string;
+
+            if (relativePathToTemplate) {
+                const pugTemplate = pug.compileFile(path.resolve('emails', 'templates', relativePathToTemplate));
+                html = pugTemplate(locals);
+            }
+
             const mailOptions = {
                 from: options.from,
                 to: options.to,
                 subject: options.subject,
+                html,
                 text: options.text, // FIXME dont need it since we need html template
             };
 
             await transporter.sendMail(mailOptions);
         } catch (err) {
-            throw err;
+            throw new Error(err.message);
         }
     };
 }
