@@ -7,8 +7,8 @@ import { Singleton, SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
 
 class UserController extends Singleton {
-    private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
     private readonly dao: UserSequelizeDao = userSequelizeDao;
+    private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
 
     public editUser = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const { id: userId } = req.user;

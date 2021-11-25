@@ -32,7 +32,9 @@ export class AuthController extends Singleton {
         // выдать временный токен
         // сохранить пароль в бд
         // аннулировать токен через 15 минут либо
-        jwt.sign({});
+        // создать новую запись
+        // отправить email
+        // аннулировать эту запись
     });
 
     public changePassword;
