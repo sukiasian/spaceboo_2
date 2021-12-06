@@ -200,6 +200,33 @@ describe('Auth (e2e)', () => {
         expect(res.status).toBe(HttpStatus.BAD_REQUEST);
     });
 
-    it("PUT 'auth/passwordRecovery should check if the token is recovery one", async () => {});
+    it("PUT 'auth/passwordRecovery should check if the token is recovery one", async () => {
+        const user = await userModel.create(userData);
+        const tokenWithRecovery = await createTokenAndSign({ id: user.id, recovery: true });
+        const tokenWithoutRecovery = await createTokenAndSign({ id: user.id });
+        const res_1 = await request(app)
+            .put(`${ApiRoutes.AUTH}/passwordRecovery`)
+            .send({
+                passwordData: {
+                    password: userData.password,
+                    passwordConfirmation: userData.passwordConfirmation,
+                },
+            })
+            .set('Cookie', [`jwt=${tokenWithRecovery}`]);
+
+        expect(res_1.status).toBe(HttpStatus.OK);
+
+        const res_2 = await request(app)
+            .put(`${ApiRoutes.AUTH}/passwordRecovery`)
+            .send({
+                passwordData: {
+                    password: userData.password,
+                    passwordConfirmation: userData.passwordConfirmation,
+                },
+            })
+            .set('Cookie', [`jwt=${tokenWithoutRecovery}`]);
+
+        expect(res_2.status).toBe(HttpStatus.FORBIDDEN);
+    });
     // check route protectors ?
 });

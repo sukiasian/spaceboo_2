@@ -43,9 +43,7 @@ export class RouteProtector {
     });
 
     public static passwordRecoveryProtector = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
-        // FIXME строка ниже работать не будет - это regex для res.headers['set-cookie']
-        // здесь нужно изъять часть после Bearer 'token'
-        const token = req.headers.authorization.match(/(?<=jwt=)[A-Za-z0-9-_=\.]+/)[0];
+        const token = req.cookies['jwt'];
 
         if (!jwt.verify(token, process.env.JWT_SECRET_KEY)) {
             throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.NOT_ENOUGH_RIGHTS);
