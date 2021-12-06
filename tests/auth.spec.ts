@@ -1,6 +1,5 @@
 import * as express from 'express';
 import * as request from 'supertest';
-import * as dotenv from 'dotenv';
 import { Application } from '../App';
 import { IUserCreate, User } from '../models/user.model';
 import {
@@ -22,7 +21,6 @@ describe('Auth (e2e)', () => {
     let applicationInstance: Application;
     let db: Sequelize;
     let userData: IUserCreate;
-    let user: User;
     let userModel: typeof User;
     let invalidUserData: any;
 
@@ -34,7 +32,6 @@ describe('Auth (e2e)', () => {
         invalidUserData = createInvalidUserData();
         userModel = User;
         userData = createUserData();
-        // await connectToDb(applicationInstance.sequelize);
 
         server = (await openTestEnv(applicationInstance)).server;
     });
