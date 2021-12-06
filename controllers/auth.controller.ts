@@ -33,11 +33,8 @@ export class AuthController extends Singleton {
     // NOTE for recovery
     public editUserPassword = this.utilFunctions.catchAsync(async (req, res: express.Response, next): Promise<void> => {
         const { id: userId } = req.user;
-        console.log(req.user, 'userrrrr');
-
         const recovery = req.user.recovery || false;
         const passwordData = req.body.passwordData;
-        console.log(recovery);
 
         await this.authSequelizeDao.editUserPassword(userId, passwordData, recovery);
 
