@@ -1,59 +1,69 @@
-import { CookieOptions } from 'express';
-import { promisify } from 'util';
-import * as jwt from 'jsonwebtoken';
+import * as express from 'express';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
-import { Environment, HttpStatus, ResponseMessages } from '../types/enums';
+import { HttpStatus, ResponseMessages } from '../types/enums';
 import { authSequelizeDao, AuthSequelizeDao } from '../daos/auth.sequelize.dao';
 import UtilFunctions from '../utils/UtilFunctions';
+import { emailVerificationSequelizeDao, EmailVerificationSequelizeDao } from '../daos/email-verification.dao';
+import { sendMail } from '../emails/Email';
 
 export class AuthController extends Singleton {
-    private readonly dao: AuthSequelizeDao = authSequelizeDao;
+    private readonly authSequelizeDao: AuthSequelizeDao = authSequelizeDao;
     private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
+    private readonly sendEmail = sendMail;
 
     public signUpLocal = this.utilFunctions.catchAsync(async (req, res, next) => {
-        const user = await this.dao.signUpLocal(req.body);
+        const user = await this.authSequelizeDao.signUpLocal(req.body);
 
-        await this.signTokenAndStoreInCookies(user.id, res);
+        await this.utilFunctions.signTokenAndStoreInCookies(res, { id: user.id });
+
         this.utilFunctions.sendResponse(res)(201, ResponseMessages.USER_CREATED, user);
         // NOTE not sure if we need to return the user here - need to check one more time.
     });
 
     public signInLocal = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
-        const user = await this.dao.findById(req.user.id);
+        const user = await this.authSequelizeDao.findById(req.user.id);
+        // NOTE
+        await this.utilFunctions.signTokenAndStoreInCookies(res, { id: user.id });
 
-        await this.signTokenAndStoreInCookies(user.id, res);
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, 'Добро пожаловать на Spaceboo!', user);
     });
 
-    public signOut = () => {}; // NOTE NOTE NOTE this should be done on the client side
+    // NOTE NOTE NOTE  signout should be done on the client side
 
-    public recoverPassword = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
-        // отправить письмо на указанный адрес
-        // выдать временный токен
-        // сохранить пароль в бд
-        // аннулировать токен через 15 минут либо
-        // создать новую запись
-        // отправить email
-        // аннулировать эту запись
+    // NOTE for recovery
+    public editUserPassword = this.utilFunctions.catchAsync(async (req, res: express.Response, next): Promise<void> => {
+        const { id: userId } = req.user;
+        const recovery = req.user.recovery || false;
+        const passwordData = req.body.passwordData;
+
+        await this.authSequelizeDao.editUserPassword(userId, passwordData, recovery);
+
+        recovery
+            ? this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.PASSWORD_RECOVERED)
+            : this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.PASSWORD_EDITED);
     });
 
-    public changePassword;
+    // public recoverPassword = this.utilFunctions.catchAsync(async (req, res: express.Response, next): Promise<void> => {
+    //     const { id: userId } = req.user;
+    //     const recovery = req.user.recovery || false;
+    //     const passwordData = req.body.passwordData;
 
-    private signTokenAndStoreInCookies = async (userId: string, res): Promise<void> => {
-        const signToken = promisify(jwt.sign);
-        const token = await signToken(userId, process.env.JWT_SECRET_KEY);
-        const cookieOptions: CookieOptions = {
-            httpOnly: true,
-            expires: new Date(Date.now() + 90 * 24 * 3600000),
-            secure: false,
-        };
+    //     await this.authSequelizeDao.changeUserPassword(userId, passwordData, true);
 
-        if (process.env.NODE_ENV === Environment.PRODUCTION) {
-            cookieOptions.secure = true;
-        }
+    //     this.utilFunctions.sendResponse(res)(HttpStatus.OK);
+    // });
 
-        res.cookie('jwt', token, cookieOptions);
-    };
+    // // NOTE for authorized
+    // public editPassword = this.utilFunctions.catchAsync(async (req, res: express.Response, next): Promise<void> => {
+    //     const { userId } = req.body;
+    //     const code = await this.emailVerificationDao.createAndStoreVerificationCodeInDb(userId);
+
+    //     const passwordData = req.body.passwordData;
+
+    //     await this.authSequelizeDao.changeUserPassword(userId, passwordData, true);
+
+    //     this.utilFunctions.sendResponse(res)(HttpStatus.OK);
+    // });
 }
 
 export const authController = SingletonFactory.produce<AuthController>(AuthController);

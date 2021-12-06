@@ -4,7 +4,7 @@ import { Strategy as FacebookStrategy } from 'passport-facebook';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as VkontakteStrategy } from 'passport-vkontakte';
 import { Strategy as OdnoklassnikiStrategy } from 'passport-odnoklassniki';
-import { Strategy as JwtStrategy } from 'passport-jwt';
+import { JwtFromRequestFunction, Strategy as JwtStrategy } from 'passport-jwt';
 import { ExtractJwt } from 'passport-jwt';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
 import { UserScopes, User } from '../models/user.model';
@@ -23,6 +23,16 @@ export class PassportConfig extends Singleton {
     }
 
     public configurePassport(): void {
+        const tokenExtractorFromCookie: JwtFromRequestFunction = (req) => {
+            let token: string;
+
+            if (req && req.cookies) {
+                token = req.cookies['jwt'];
+            }
+
+            return token;
+        };
+
         this.passport.use(
             new LocalStrategy(
                 { usernameField: 'email', passwordField: 'password', session: false },
@@ -104,14 +114,17 @@ export class PassportConfig extends Singleton {
         this.passport.use(
             new JwtStrategy(
                 {
-                    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+                    jwtFromRequest: ExtractJwt.fromExtractors([
+                        tokenExtractorFromCookie,
+                        ExtractJwt.fromAuthHeaderAsBearerToken(),
+                    ]),
                     secretOrKey: process.env.JWT_SECRET_KEY,
                     // issuer: 'spaceboo',
                     // audience: 'www.spaceboo.com',
                 },
                 async (jwt_payload, done) => {
                     try {
-                        const user = await this.userModel.findOne({ where: { id: jwt_payload }, raw: true });
+                        const user = await this.userModel.findOne({ where: { id: jwt_payload.id }, raw: true });
 
                         return user ? done(null, { id: user.id }) : done(null, false);
                     } catch (err) {

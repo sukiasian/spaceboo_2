@@ -39,7 +39,7 @@ describe('Space (e2e)', () => {
     let city_2: City;
     let cityModel: typeof City;
     let appointmentModel: typeof Appointment;
-    let token: string;
+    let token: unknown;
     let isoDatesToReserve_1: TIsoDatesReserved;
     let isoDatesToReserve_2: TIsoDatesReserved;
     let isoDatesToReserve_3: TIsoDatesReserved;
@@ -90,7 +90,7 @@ describe('Space (e2e)', () => {
         user = await userModel.create(userData);
         spaceData = createSpaceData(user.id, city.id, 1500);
         spaceData_2 = createSpaceData(user.id, city_2.id);
-        token = await createTokenAndSign(user.id);
+        token = await createTokenAndSign<object>({ id: user.id });
         space_1 = await spaceModel.create(spaceData);
         space_1 = await spaceModel.findOne({
             where: { id: space_1.id },
@@ -386,6 +386,5 @@ describe('Space (e2e)', () => {
         await request(app).delete(`${ApiRoutes.SPACES}/${space_1.id}`).set('Authorization', `Bearer ${token}`);
 
         const freshSpace: Space = await spaceDao.findById(space_1.id);
-        console.log(freshSpace, 'spaceeeee');
     });
 });

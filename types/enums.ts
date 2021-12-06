@@ -66,6 +66,7 @@ export enum SequelizeModelProps {
 // NOTE do not use v1 hardcoded
 export enum ApiRoutes {
     AUTH = '/api/v1/auth',
+    EMAIL_VERIFICATION = '/api/v1/emailVerification',
     USERS = '/api/v1/users',
     SPACES = '/api/v1/spaces',
     APPOINTMENTS = '/api/v1/appointments',
@@ -90,19 +91,24 @@ export enum ResponseMessages {
     APPOINTMENT_CREATED = 'Поздравляем! Вы забронировали.',
     IMAGE_DELETED = 'Изображение удалено.',
     IMAGES_DELETED = 'Все изображения удалены',
+    EMAIL_SENT = 'Письмо с кодом выслано на вашу эл. почту.',
+    VERIFICATION_CODE_VALID = 'Введенный код верен.',
+    PASSWORD_EDITED = 'Пароль успешно обновлен!',
+    PASSWORD_RECOVERED = 'Пароль успешно сброшен',
 }
 
 export enum ErrorMessages {
     USER_NOT_FOUND = 'Пользователь не найден',
-    PASSWORDS_DO_NOT_MATCH_VALIDATE = 'Пароли должны совпадать.',
+    PASSWORDS_DO_NOT_MATCH = 'Пароли должны совпадать.',
     PASSWORD_LENGTH_VALIDATE = 'Пароль должен состоять от 8 до 25 символов.',
-    PASSPORT_IS_NOT_VALID = 'Пожалуйста, введите действительный пароль',
+    PASSWORD_IS_NOT_VALID = 'Пожалуйста, введите действительный пароль',
+    PASSWORD_INCORRECT = 'Неверный пароль. Попробуйте еще раз.',
     NAME_LENGTH_VALIDATE = 'Имя должно состоять от 2 до 25 символов.',
     MIDDLE_NAME_LENGTH_VALIDATE = 'Отчество должно состоять от 2 до 25 символов.',
     IS_EMAIL_VALIDATE = 'Пожалуйста, введите действительный эл. адрес.',
     EMAIL_UNIQUE_VALIDATE = 'Пользователь с таким эл. адресом уже существует.',
     REQUIRED_FIELDS_VALIDATE = 'Пожалуйста, заполните все обязательные поля.',
-    SPACE_IS_UNAVAILABLE = 'К сожалению, пространство занято. Вы можете посмотреть другие даты.',
+    SPACE_IS_UNAVAILABLE = 'К сожалению, пространство занято. Вы можете посмотреть на другие даты.',
     // TODO while images are optional we dont need to use "minimal amount". If they aren't then we do
     SPACE_IMAGES_VALIDATE = 'Максимальное количество изображений для пространства — 10.',
     SPACE_IMAGES_AMOUNT_EXCEEDED = 'Превышено допустимое количество изображений для пространства. Максимальное количество изображений - 10.',
@@ -113,6 +119,7 @@ export enum ErrorMessages {
     SPACE_NOT_FOUND = 'Пространство не найдено.',
     MULTER_ERROR = 'Произошла ошибка при загрузке файла.',
     NOT_ENOUGH_RIGHTS = 'Недостаточно прав.',
+    VERIFICATION_CODE_NOT_VALID = 'Неверный код.',
 }
 
 export enum Environment {

@@ -1,7 +1,6 @@
 import * as express from 'express';
 import * as request from 'supertest';
 import * as path from 'path';
-import * as dotenv from 'dotenv';
 import { Application } from '../App';
 import { IUserCreate, User } from '../models/user.model';
 import {
@@ -42,7 +41,7 @@ describe('Image (e2e)', () => {
     let city_2: City;
     let cityModel: typeof City;
     let appointmentModel: typeof Appointment;
-    let token: string;
+    let token: unknown;
     let space_1: Space;
     let space_2: Space;
     let pathToTestImage: string;
@@ -71,7 +70,7 @@ describe('Image (e2e)', () => {
         user = await userModel.create(userData);
         spaceData = createSpaceData(user.id, city.id, 1500);
         spaceData_2 = createSpaceData(user.id, city_2.id);
-        token = await createTokenAndSign(user.id);
+        token = await createTokenAndSign<object>({ id: user.id });
         space_1 = await spaceModel.create(spaceData);
         space_1 = await spaceModel.findOne({
             where: { id: space_1.id },

@@ -12,7 +12,7 @@ class SpaceRouter extends Singleton implements IRouter {
     private readonly routeProtector = RouteProtector;
     public readonly router = Router();
 
-    public prepareRouter = function (this: SpaceRouter): void {
+    public prepareRouter = (): void => {
         this.router
             .route('/')
             .post(

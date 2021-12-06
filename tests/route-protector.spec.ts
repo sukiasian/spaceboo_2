@@ -28,10 +28,11 @@ describe('Route Protector (e2e)', () => {
     let user_2: User;
     let userData_1: IUserCreate;
     let userData_2: IUserCreate;
-    let token_1: string;
-    let token_2: string;
+    let token_1: unknown;
+    let token_2: unknown;
     let userModel: typeof User;
     let spaceData_1: ISpaceCreate;
+    let spaceData_2: ISpaceCreate;
     let spaceModel: typeof Space;
     let city: City;
     let cityModel: typeof City;
@@ -60,13 +61,14 @@ describe('Route Protector (e2e)', () => {
         user_1 = await userModel.create(userData_1);
         user_2 = await userModel.create(userData_2);
         spaceData_1 = createSpaceData(user_1.id, city.id);
+        spaceData_2 = createSpaceData(user_2.id, city.id);
         space_1 = await spaceModel.create(spaceData_1, { include: [City] });
         space_1 = await spaceModel.findOne({
             where: { id: space_1.id },
             include: [City, Appointment],
         });
-        token_1 = await createTokenAndSign(user_1.id);
-        token_2 = await createTokenAndSign(user_2.id);
+        token_1 = await createTokenAndSign<object>({ id: user_1.id });
+        token_2 = await createTokenAndSign<object>({ id: user_2.id });
     });
 
     afterEach(async () => {
@@ -84,5 +86,14 @@ describe('Route Protector (e2e)', () => {
             .set('Authorization', `Bearer ${token_2}`);
 
         expect(res.status).toBe(HttpStatus.FORBIDDEN);
+    });
+
+    it('POST /spaces should extract token from cookies', async () => {
+        const res = await request(app)
+            .post(`${ApiRoutes.SPACES}/`)
+            .send(spaceData_2)
+            .set('Cookie', [`jwt=${token_2}`]);
+
+        expect(res.status).toBe(HttpStatus.CREATED);
     });
 });

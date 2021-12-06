@@ -26,7 +26,7 @@ describe('Appointment (e2e)', () => {
     let db: Sequelize;
     let userData: IUserCreate;
     let user: User;
-    let token: string;
+    let token: unknown;
     let userModel: typeof User;
     let spaceData: ISpaceCreate;
     let spaceModel: typeof Space;
@@ -82,7 +82,7 @@ describe('Appointment (e2e)', () => {
             where: { id: space.id },
             include: [City, Appointment],
         });
-        token = await createTokenAndSign(user.id);
+        token = await createTokenAndSign<object>({ id: user.id });
     });
 
     afterEach(async () => {

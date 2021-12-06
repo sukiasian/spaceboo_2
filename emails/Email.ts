@@ -2,16 +2,19 @@ import * as nodemailer from 'nodemailer';
 import * as path from 'path';
 import * as pug from 'pug';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
+import { IEmailOptions } from './EmailOptions';
 
-interface IEmailOptions {
-    from: string;
-    to: string;
-    subject: string;
-    text?: string;
+export enum RelativePathsToTemplates {
+    CONFIRM_EMAIL = 'users/confirm-email.pug',
+    RECOVER_PASSWORD = 'users/password-recovery.pug',
 }
 
 class Email extends Singleton {
-    sendMail = async <TLocals>(options: IEmailOptions, relativePathToTemplate?: string, locals?: TLocals) => {
+    sendMail = async <TLocals>(
+        options: IEmailOptions,
+        relativePathToTemplate?: string,
+        locals?: TLocals
+    ): Promise<void> => {
         try {
             const transporter = nodemailer.createTransport({
                 host: process.env.EMAIL_HOST,

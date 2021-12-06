@@ -8,6 +8,7 @@ import {
     closeTestEnv,
     createApplicationInstance,
     createInvalidUserData,
+    createTokenAndSign,
     createUserData,
     openTestEnv,
     testUserValidationByMessages,
@@ -33,7 +34,6 @@ describe('Auth (e2e)', () => {
         invalidUserData = createInvalidUserData();
         userModel = User;
         userData = createUserData();
-
         // await connectToDb(applicationInstance.sequelize);
 
         server = (await openTestEnv(applicationInstance)).server;
@@ -71,6 +71,7 @@ describe('Auth (e2e)', () => {
 
         const jwtCookie = res.headers['set-cookie'].find((cookie) => cookie.includes('jwt'));
         // const jwt = jwtCookie.match(/(?<=jwt=)[A-Za-z0-9-_=\.]+/)[0]; // NOTE эта строка на вес золота
+
         expect(jwtCookie).toBeDefined();
     });
 
@@ -107,7 +108,7 @@ describe('Auth (e2e)', () => {
     // NOTE tests for middleName
     it('/auth/signup passwords should match', () => {
         userData.passwordConfirmation = `${userData.passwordConfirmation}1`;
-        testUserValidationByMessages(userModel, userData, ErrorMessages.PASSWORDS_DO_NOT_MATCH_VALIDATE, expect);
+        testUserValidationByMessages(userModel, userData, ErrorMessages.PASSWORDS_DO_NOT_MATCH, expect);
     });
 
     it('/auth/signup name should be in a range of 2 and 25', () => {
@@ -150,5 +151,55 @@ describe('Auth (e2e)', () => {
 
     it('/auth/signup passwords should containt at least 1 capital letter and 1 number', async () => {});
 
+    it('/auth/signup passwords should containt at least 1 capital letter and 1 number', async () => {});
+
+    it("PUT 'auth/passwordChange should check if old password is correct", async () => {
+        const user = await userModel.create(userData);
+        const token = await createTokenAndSign({ id: user.id });
+        const res_1 = await request(app)
+            .put(`${ApiRoutes.AUTH}/passwordChange`)
+            .send({
+                passwordData: {
+                    password: userData.password,
+                    passwordConfirmation: userData.passwordConfirmation,
+                    oldPassword: userData.password,
+                },
+            })
+            .set('Cookie', [`jwt=${token}`]);
+
+        expect(res_1.status).toBe(HttpStatus.OK);
+
+        const res_2 = await request(app)
+            .put(`${ApiRoutes.AUTH}/passwordChange`)
+            .send({
+                passwordData: {
+                    password: userData.password,
+                    passwordConfirmation: userData.passwordConfirmation,
+                    oldPassword: '1',
+                },
+            })
+            .set('Cookie', [`jwt=${token}`]);
+
+        expect(res_2.status).toBe(HttpStatus.FORBIDDEN);
+    });
+
+    it("PUT 'auth/passwordChange should check if old password is not undefined", async () => {
+        const user = await userModel.create(userData);
+        const token = await createTokenAndSign({ id: user.id });
+        const res = await request(app)
+            .put(`${ApiRoutes.AUTH}/passwordChange`)
+            .send({
+                passwordData: {
+                    password: userData.password,
+                    passwordConfirmation: userData.passwordConfirmation,
+                    oldPassword: undefined,
+                },
+            })
+            .set('Cookie', [`jwt=${token}`]);
+
+        expect(res.status).toBe(HttpStatus.BAD_REQUEST);
+    });
+
+    it("PUT 'auth/passwordRecovery should check if the token is recovery one", async () => {});
     // check route protectors ?
 });

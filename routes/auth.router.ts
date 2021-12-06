@@ -3,16 +3,17 @@ import * as passport from 'passport';
 import { authController } from '../controllers/auth.controller';
 import logger from '../loggers/logger';
 import { LoggerLevels, PassportStrategies } from '../types/enums';
+import { RouteProtector } from '../utils/RouteProtector';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
 import { IRouter } from './router';
 
 class AuthRouter extends Singleton implements IRouter {
     private readonly authController = authController;
+    private readonly routeProtector = RouteProtector;
     private readonly passport = passport;
     public readonly router = Router();
 
-    // FIXME this as argument
-    public prepareRouter = function (this: AuthRouter): void {
+    public prepareRouter = (): void => {
         this.router
             .route('/login')
             .post(
@@ -20,6 +21,27 @@ class AuthRouter extends Singleton implements IRouter {
                 this.authController.signInLocal
             );
         this.router.route('/signup').post(this.authController.signUpLocal);
+
+        this.router
+            .route('/passwordRecovery')
+            .put(this.routeProtector.passwordRecoveryProtector, this.authController.editUserPassword);
+
+        this.router
+            .route('/passwordChange')
+            .put(
+                this.passport.authenticate(PassportStrategies.JWT, { session: false }),
+                this.authController.editUserPassword
+            );
+
+        // нужно три разных роута - один отправлет письмо на имейл, другой должен проверить совпадает ли введенное значение, и если да - то позволить изменить пароль.
+        /* 
+            - Если вышел с сайта, то все заново. 
+
+            При проверке key, если проверка проходит, то выдадим 15 минутный токен. При выходе токен можно  будет не  аннулировать, так как  это не противоречит безопасности. 
+            По этому токену будет происходить смена пароля - если токен действительный то пароль можно будет менять, если нет то нет.
+
+            При отправке не нужно удалять из бд ничего - нам нужно это делать через крон джоб, очищать бд email-verifications.
+        */
         this.router
             .route('/facebook')
             .get(this.passport.authenticate(PassportStrategies.FACEBOOK), () =>

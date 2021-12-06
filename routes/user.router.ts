@@ -10,7 +10,7 @@ class UserRouter extends Singleton implements IRouter {
     private readonly passport = passport;
     private readonly userController = userController;
 
-    public prepareRouter = function (this: UserRouter): void {
+    public prepareRouter = (): void => {
         this.router
             .route('/')
             .put(this.passport.authenticate(PassportStrategies.JWT, { session: false }), this.userController.editUser);

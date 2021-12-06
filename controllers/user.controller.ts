@@ -14,6 +14,8 @@ class UserController extends Singleton {
         const { id: userId } = req.user;
         const { userEditData } = req.body;
 
+        // TODO чтобы решить проблему раздвоения методов (пароль можно изменить и с помощью даного метода и с помощью )
+        // кстати при смене пароля нужно учитывать старый пароль
         await this.dao.editUser(userId, userEditData);
 
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.DATA_UPDATED);

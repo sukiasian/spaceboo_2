@@ -1,13 +1,15 @@
-import { Response } from 'express';
+import { CookieOptions, Response } from 'express';
+import * as express from 'express';
 import { Sequelize } from 'sequelize-typescript';
 import { QueryTypes } from 'sequelize';
 import { promisify } from 'util';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as jwt from 'jsonwebtoken';
 import logger from '../loggers/logger';
 import { applicationInstance } from '../App';
 import { TIsoDatesReserved } from '../models/appointment.model';
-import { ErrorMessages, HttpStatus, LoggerLevels, ResponseMessages } from '../types/enums';
+import { Environment, ErrorMessages, HttpStatus, LoggerLevels, ResponseMessages } from '../types/enums';
 import AppError from './AppError';
 
 enum DateFormat {
@@ -16,6 +18,8 @@ enum DateFormat {
 }
 
 class UtilFunctions {
+    private static readonly signToken = jwt.sign;
+
     public static sendResponse = (
         res: Response
     ): ((statusCode: HttpStatus, message?: ResponseMessages | string, data?: any) => void) => {
@@ -202,6 +206,21 @@ class UtilFunctions {
         }
 
         await UtilFunctions.removeFile(pathToImage);
+    };
+
+    public static signTokenAndStoreInCookies = async (res: express.Response, jwtPayload: object): Promise<void> => {
+        const token = this.signToken(jwtPayload, process.env.JWT_SECRET_KEY);
+        const cookieOptions: CookieOptions = {
+            httpOnly: true,
+            expires: new Date(Date.now() + 90 * 24 * 3600000),
+            secure: false,
+        };
+
+        if (process.env.NODE_ENV === Environment.PRODUCTION) {
+            cookieOptions.secure = true;
+        }
+
+        res.cookie('jwt', token, cookieOptions);
     };
 }
 

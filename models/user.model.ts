@@ -5,6 +5,25 @@ import { ErrorMessages, HttpStatus } from '../types/enums';
 import AppError from '../utils/AppError';
 import { Appointment } from './appointment.model';
 
+export enum UserRoles {
+    ADMIN = 'admin',
+    USER = 'user',
+}
+enum UserQueryExcludedAttributes {
+    PASSWORD = 'password',
+    PASSWORD_CONFIRMATION = 'passwordConfirmation',
+    FACEBOOK_ID = 'facebookId',
+    VKONTAKTE_ID = 'vkontakteId',
+    ODNOKLASSNIKI_ID = 'odnoklassnikiId',
+    CREATED_AT = 'createdAt',
+    UPDATED_AT = 'updatedAt',
+    ROLE = 'role',
+}
+export enum UserScopes {
+    WITH_PASSWORD = 'withPassword',
+    WITH_ROLE = 'withRole',
+}
+
 export interface IUserAttributes {
     id: string;
     name: string;
@@ -26,38 +45,35 @@ export interface IUserEdit {
     name?: string;
     middleName?: string;
     surname?: string;
-    // email: string;
-    password?: string;
-    passwordConfirmation?: string;
 }
+// FIXME use OMIT instead to avoid duplication
+export interface IUserPasswordChange {
+    password: string;
+    passwordConfirmation: string;
+    oldPassword?: string;
+}
+// export interface IUserPasswordRecovery extends IUserPassword {}
+// export interface IUserPasswordEdit extends IUserPassword {
+//     oldPassword: string;
+// }
 
-export enum UserRoles {
-    ADMIN = 'admin',
-    USER = 'user',
-}
-enum UserQueryExcludedAttributes {
-    PASSWORD = 'password',
-    PASSWORD_CONFIRMATION = 'passwordConfirmation',
-    FACEBOOK_ID = 'facebookId',
-    VKONTAKTE_ID = 'vkontakteId',
-    ODNOKLASSNIKI_ID = 'odnoklassnikiId',
-    CREATED_AT = 'createdAt',
-    UPDATED_AT = 'updatedAt',
-    ROLE = 'role',
-}
-export enum UserScopes {
-    WITH_PASSWORD = 'withPassword',
-    WITH_ROLE = 'withRole',
-}
-
-export const userEditFields: Partial<keyof IUserAttributes>[] = [
+export const userCreateFields: Partial<keyof IUserAttributes>[] = [
     'name',
     'middleName',
     'surname',
     'password',
     'passwordConfirmation',
-    // 'email'
+    'email',
 ];
+export const userEditFields: Partial<keyof IUserAttributes>[] = [
+    'name',
+    'middleName',
+    'surname',
+    // 'password',
+    // 'passwordConfirmation',
+    // 'email' -- TODO this should be approved by email the same way - with 6 digit code
+];
+export const changeUserPasswordFields: Partial<keyof IUserAttributes>[] = ['password', 'passwordConfirmation'];
 
 @Table({
     timestamps: true,
@@ -154,7 +170,7 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
             // FIXME comparePasswords, not checkAvailability
             comparePasswordWithPasswordConfirmation(this: User): void {
                 if (this.password !== this.passwordConfirmation) {
-                    throw new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.PASSWORDS_DO_NOT_MATCH_VALIDATE);
+                    throw new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.PASSWORDS_DO_NOT_MATCH);
                 }
             },
         },
@@ -188,16 +204,6 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
             instance.passwordConfirmation = undefined;
         }
     }
-
-    // @BeforeUpdate
-    // @BeforeBulkUpdate
-    // static comparePasswords(instance: User): void {
-    //     if (instance.password) {
-    //         if (instance.password !== instance.passwordConfirmation) {
-    //             throw new Error('errorrrrrrrrr');
-    //         }
-    //     }
-    // }
 
     verifyPassword(instance: User): (password: string) => Promise<boolean> {
         return async (password: string): Promise<boolean> => {

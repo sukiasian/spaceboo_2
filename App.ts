@@ -6,6 +6,7 @@ import { router as spaceRouter } from './routes/space.router';
 import { router as authRouter } from './routes/auth.router';
 import { router as appointmentRouter } from './routes/appointment.router';
 import { router as imageRouter } from './routes/image.router';
+import { router as emailVerificationRouter } from './routes/email-verification.router';
 import { ApiRoutes } from './types/enums';
 import globalErrorController from './controllers/error.controller';
 import { Singleton, SingletonFactory } from './utils/Singleton';
@@ -15,6 +16,8 @@ import { passportConfig, PassportConfig } from './configurations/passport.config
 import { Test } from './models/test.model';
 import { City } from './models/city.model';
 import { Appointment } from './models/appointment.model';
+import { EmailVerification } from './models/email-verification.model';
+import cookieParser = require('cookie-parser');
 
 export class Application extends Singleton {
     public readonly app: express.Express = express();
@@ -30,17 +33,18 @@ export class Application extends Singleton {
         username: process.env.DATABASE_USERNAME || 'postgres',
         password: process.env.DATABASE_PASSWORD || 'postgres',
         database: process.env.DATABASE_NAME || 'postgres',
-        models: [City, User, Space, Test, Appointment],
+        models: [City, User, Space, Test, Appointment, EmailVerification],
         logging: false,
     });
 
     public configureApp(): void {
-        // this.app.use(express.cookieParser());
         this.app.use(express.json({ limit: '10Kb' })); // NOTE
         this.app.use(express.static('public'));
+        this.app.use(cookieParser());
         this.app.use(this.passportConfig.initializePassport());
         this.app.use(ApiRoutes.USERS, userRouter);
         this.app.use(ApiRoutes.AUTH, authRouter);
+        this.app.use(ApiRoutes.EMAIL_VERIFICATION, emailVerificationRouter);
         this.app.use(ApiRoutes.SPACES, spaceRouter);
         this.app.use(ApiRoutes.APPOINTMENTS, appointmentRouter);
         this.app.use(ApiRoutes.IMAGES, imageRouter);

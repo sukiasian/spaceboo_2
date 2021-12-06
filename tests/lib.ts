@@ -141,16 +141,9 @@ export const createAppoinmentData = (
     };
 };
 
-export const createTokenAndSign = async (payload: string | object): Promise<string> => {
-    const signToken = promisify(jwt.sign);
-
-    switch (typeof payload) {
-        case 'string':
-            return signToken(payload, process.env.JWT_SECRET_KEY) as Promise<string>;
-
-        case 'object':
-            return signToken(payload as object, process.env.JWT_SECRET_KEY) as Promise<string>;
-    }
+export const createTokenAndSign = async <T extends object | string>(payload: T): Promise<unknown> => {
+    // FIXME its not a promise
+    return jwt.sign(payload, process.env.JWT_SECRET_KEY);
 };
 
 export const openTestEnv = async (applicationInstance: Application): Promise<{ server: object }> => {
