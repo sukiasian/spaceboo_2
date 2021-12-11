@@ -1,0 +1,8 @@
+.page-title-box {
+    background-color: rgb(249, 249, 249);
+    padding: 3rem 0;
+
+    @include respond(phone) {
+        font-size: 0.9rem;
+    }
+}

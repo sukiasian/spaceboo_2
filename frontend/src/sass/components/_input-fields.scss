@@ -1,0 +1,14 @@
+.input {
+    &-red {
+        border: 1px solid $color-home-red !important;
+        border-left: 3px solid $color-home-red !important;
+
+        &::placeholder {
+            color: $color-home-red;
+        }
+    }
+    &-green {
+        border: 1px solid $color-home-green-dark !important;
+        border-left: 3px solid $color-home-green-dark !important;
+    }
+}

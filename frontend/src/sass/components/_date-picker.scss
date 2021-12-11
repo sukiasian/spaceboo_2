@@ -1,0 +1,113 @@
+.date-picker {
+    &__year-box {
+        text-align: center;
+        padding: 0.5rem;
+    }
+
+    &__month {
+        display: flex;
+        justify-content: space-between;
+        border-top: 1px solid rgba($color-grey-light-1, 0.4);
+        padding: 0.5rem;
+    }
+
+    &__cells {
+        display: flex;
+        justify-content: center;
+        border-top: 1px solid rgba($color-grey-light-1, 0.4);
+        border-radius: 0 0 8px 8px;
+        padding: 1rem 1rem;
+    }
+}
+
+.section-date-picker {
+    width: 18rem;
+    border: 1px solid rgba($color-grey-light-1, 0.4);
+    border-radius: 10px;
+    box-shadow: 2px 1px 1px rgba(black, 0.05);
+    user-select: none;
+}
+
+.date-table {
+    text-align: center;
+    // &__days {
+    //     text-align: center;
+    // }
+    // from last or next month
+    &__weekdays {
+        .date-table__cell {
+            font-weight: bold;
+            padding-bottom: 0.7rem;
+        }
+    }
+
+    // available cell
+
+    // any cell
+    &__cell {
+        font-weight: 500;
+        width: 3.5rem;
+        height: 2rem;
+        border-radius: 5px;
+
+        &--inactive {
+            color: rgba($color-grey-light-1, 0.4) !important;
+        }
+
+        &--unavailable {
+            color: red;
+        }
+        &--past {
+            color: $color-grey-light-1;
+        }
+
+        &--today {
+            border: 1px solid $color-primary-1;
+
+            &:hover:not([class*='date-table__cell--active']) {
+                background-color: rgba($color-primary-1, 0.5);
+                color: $color-white;
+                border: none;
+            }
+        }
+
+        &--current-month {
+            &:not([class*='date-table__cell--unavailable']):not([class*='date-table__cell--active']):not([class*='date-table__cell--past']) {
+                color: green;
+
+                // all current month days besides unavailables and active
+                // will have text color of green
+
+                // on hover they will have background color of blured blue and color white
+                &:hover {
+                    background-color: rgba($color-primary-1, 0.5);
+                    color: $color-white;
+                }
+            }
+        }
+
+        &--active:not([class*='--past']) {
+            background-color: $color-primary-1;
+            color: white;
+        }
+    }
+    // NOTE
+    // FIXME
+
+    // &__unavailable-cell {
+    //     color: red;
+    // }
+
+    // &__past-cell {
+    //     color: rgba($color-grey-light-1, 0.3);
+    // }
+
+    // &__today-cell {
+    //     border: 1px solid pink;
+    // }
+}
+
+// date-table === tr с клетками
+// table-container === table
+// td weekdays - MO TU WE ... SN
+// td

@@ -1,0 +1,29 @@
+@import './abstracts/mixins';
+@import './abstracts/variables';
+
+@import './base/base';
+@import './base/typography';
+
+@import './components/navigation';
+@import './components/footer';
+@import './components/page-title';
+@import './components/card';
+@import './components/service-details';
+@import './components/buttons';
+@import './components/component-handlers';
+@import './components/alerts';
+@import './components/price-box';
+@import './components/input-fields';
+@import './components/date-picker';
+@import './components/time-picker';
+@import './components/drop-down-menu';
+
+@import './layout/flex';
+
+@import './utilities/utilities';
+@import './utilities/font-awesome-customize';
+
+@import './pages/home';
+@import './pages/form';
+@import './pages/appointment';
+@import './pages/not-found';

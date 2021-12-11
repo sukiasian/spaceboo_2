@@ -1,0 +1,27 @@
+.section-not-found {
+    background-color: $color-grey-light-2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+}
+
+.not-found {
+}
+
+.not-found__item {
+    &-1 {
+        grid-area: image;
+        justify-self: start;
+        align-self: center;
+    }
+    &-2 {
+        grid-area: box-1;
+
+        align-self: center;
+    }
+    &-3 {
+        grid-area: box-2;
+        align-self: center;
+    }
+}

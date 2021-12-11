@@ -1,0 +1,13 @@
+.footer-box {
+    padding: 1rem;
+    background-color: rgb(27, 28, 31);
+    transition: 0.2s;
+
+    @include respond(phone) {
+        font-size: 0.7rem;
+    }
+
+    &:hover {
+        font-weight: bolder;
+    }
+}

@@ -1,0 +1,17 @@
+.fas-angle {
+    margin-top: 6px;
+    color: $color-grey-dark-2;
+    transform: scale(1.4);
+    &:hover:not([class*='--inactive']) {
+        color: rgba($color-primary-1, 0.5);
+        cursor: pointer;
+    }
+
+    &:active:not([class*='--inactive']) {
+        color: $color-primary-1;
+    }
+
+    &--inactive {
+        color: $color-grey-light-1;
+    }
+}
