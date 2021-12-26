@@ -1,4 +1,6 @@
 import * as express from 'express';
+import { promisify } from 'util';
+import * as jwt from 'jsonwebtoken';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
 import { HttpStatus, ResponseMessages } from '../types/enums';
 import { authSequelizeDao, AuthSequelizeDao } from '../daos/auth.sequelize.dao';
@@ -36,6 +38,33 @@ export class AuthController extends Singleton {
         recovery
             ? this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.PASSWORD_RECOVERED)
             : this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.PASSWORD_EDITED);
+    });
+
+    public userIsLoggedIn = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        // NOTE нужно ли проверять пользователь существует или нет ?
+
+        const token = req.cookies['jwt'] as string;
+
+        if (token) {
+            const verifyToken: (
+                arg1: string,
+                arg2: jwt.Secret,
+                arg3?: jwt.VerifyOptions & { complete: true }
+            ) => Promise<string | jwt.Jwt> = promisify<
+                string,
+                jwt.Secret,
+                jwt.VerifyOptions & { complete: true },
+                string | jwt.Jwt
+            >(jwt.verify);
+
+            await verifyToken(token, process.env.JWT_SECRET_KEY);
+
+            this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.USER_IS_NOT_LOGGED_IN, false);
+        }
+
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.USER_IS_NOT_LOGGED_IN, false);
+
+        // FIXME нужно при ошибке отправлять еще один запрос на проверку - делаться должно это в саге
     });
 }
 

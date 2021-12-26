@@ -1,8 +1,10 @@
-export function HomePage(props: any) {
-    // how to know if a user is logged in or no? make a request to see if the user is authorized. If he is authorized then redirect
+import Filters from '../components/Filters';
 
-    // header
-    // filters
-    // footer
-    return <> </>;
+export function HomePage(props: any) {
+    return (
+        <section className="section-homepage">
+            <div className="slider"></div>
+            <Filters />
+        </section>
+    );
 }

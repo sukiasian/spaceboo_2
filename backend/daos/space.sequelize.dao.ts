@@ -80,9 +80,7 @@ export class SpaceSequelizeDao extends Dao {
                 AND a."isoDatesReserved" && '${isoDatesRange}') ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
         }
 
-        const spaces = await this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, spacesRawQuery);
-
-        return spaces;
+        return this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, spacesRawQuery);
     };
 
     public editSpaceById = async (spaceId: string, spaceEditData: ISpaceEdit): Promise<void> => {

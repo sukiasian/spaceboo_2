@@ -1,12 +1,12 @@
 import * as express from 'express';
 import { Sequelize } from 'sequelize-typescript';
-import * as dotenv from 'dotenv';
 import { router as userRouter } from './routes/user.router';
 import { router as spaceRouter } from './routes/space.router';
 import { router as authRouter } from './routes/auth.router';
 import { router as appointmentRouter } from './routes/appointment.router';
 import { router as imageRouter } from './routes/image.router';
 import { router as emailVerificationRouter } from './routes/email-verification.router';
+import { router as cityRouter } from './routes/city.router';
 import { ApiRoutes } from './types/enums';
 import globalErrorController from './controllers/error.controller';
 import { Singleton, SingletonFactory } from './utils/Singleton';
@@ -48,6 +48,7 @@ export class Application extends Singleton {
         this.app.use(ApiRoutes.SPACES, spaceRouter);
         this.app.use(ApiRoutes.APPOINTMENTS, appointmentRouter);
         this.app.use(ApiRoutes.IMAGES, imageRouter);
+        this.app.use(ApiRoutes.CITIES, cityRouter);
         this.app.use(globalErrorController);
     }
 

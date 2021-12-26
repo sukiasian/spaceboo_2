@@ -71,6 +71,7 @@ export enum ApiRoutes {
     SPACES = '/api/v1/spaces',
     APPOINTMENTS = '/api/v1/appointments',
     IMAGES = '/api/v1/images',
+    CITIES = '/api/v1/cities',
 }
 
 export enum PassportStrategies {
@@ -94,7 +95,9 @@ export enum ResponseMessages {
     EMAIL_SENT = 'Письмо с кодом выслано на вашу эл. почту.',
     VERIFICATION_CODE_VALID = 'Введенный код верен.',
     PASSWORD_EDITED = 'Пароль успешно обновлен!',
-    PASSWORD_RECOVERED = 'Пароль успешно сброшен',
+    PASSWORD_RECOVERED = 'Пароль успешно сброшен.',
+    USER_IS_LOGGED_IN = 'Пользователь авторизован.',
+    USER_IS_NOT_LOGGED_IN = 'Пользователь не авторизован.',
 }
 
 export enum ErrorMessages {

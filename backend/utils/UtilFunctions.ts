@@ -29,16 +29,16 @@ class UtilFunctions {
                     statusCode,
                     data,
                 });
-            } else if (message && !data) {
-                res.status(statusCode).json({
-                    statusCode,
-                    message,
-                });
-            } else if (message && data) {
+            } else if (message && data !== undefined) {
                 res.status(statusCode).json({
                     statusCode,
                     message,
                     data,
+                });
+            } else if (message && data === undefined) {
+                res.status(statusCode).json({
+                    statusCode,
+                    message,
                 });
             } else {
                 res.status(statusCode).json({

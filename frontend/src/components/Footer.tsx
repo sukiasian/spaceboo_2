@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 
 export default function Footer() {
     return (
-        <div className="footer">
+        <footer className="footer">
             <div className="footer__main">
                 <div className="footer__main__description">
                     <h2> SPACEBOO </h2>
@@ -25,6 +25,6 @@ export default function Footer() {
             </div>
             <div className="footer__spaces"></div>
             <div className="footer__social-media"> </div>
-        </div>
+        </footer>
     );
 }

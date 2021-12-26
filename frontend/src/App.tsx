@@ -1,20 +1,38 @@
-import React from 'react';
+import { ReactElement, useCallback, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { Dispatch } from 'redux';
 import Footer from './components/Footer';
 import Navbar from './components/Navbar';
+import { IAction } from './redux/actions/ActionTypes';
+import { requestUserIsLoggedInAction } from './redux/actions/authActions';
+import { requestCitiesAction } from './redux/actions/cityActions';
+import { requestSpacesAction } from './redux/actions/spaceActions';
 import Routes from './routes/Routes';
 
-function App() {
+// FIXME any, any - types for props
+function App(): ReactElement<any, any> {
+    const dispatch: Dispatch<IAction> = useDispatch();
+    const requestAppData = useCallback(() => {
+        dispatch(requestUserIsLoggedInAction());
+        dispatch(requestSpacesAction());
+        dispatch(requestCitiesAction());
+    }, [dispatch]);
+    const applyEffectsOnInit = (): void => {
+        requestAppData();
+    };
+
+    useEffect(applyEffectsOnInit, [requestAppData]);
+
     return (
         <div className="App">
-            <header className="navbar-container">
+            <section className="section-navbar">
                 <Navbar />
-            </header>
-
+            </section>
+            <div onClick={() => dispatch({ type: 'ADD' })}> add </div>
             <Routes />
-
-            <footer className="footer-container">
+            <section className="section-footer">
                 <Footer />
-            </footer>
+            </section>
         </div>
     );
 }
