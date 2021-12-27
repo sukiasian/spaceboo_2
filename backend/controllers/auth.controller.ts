@@ -6,6 +6,7 @@ import { HttpStatus, ResponseMessages } from '../types/enums';
 import { authSequelizeDao, AuthSequelizeDao } from '../daos/auth.sequelize.dao';
 import UtilFunctions from '../utils/UtilFunctions';
 import { sendMail } from '../emails/Email';
+import AppError from '../utils/AppError';
 
 export class AuthController extends Singleton {
     private readonly authSequelizeDao: AuthSequelizeDao = authSequelizeDao;
@@ -59,7 +60,7 @@ export class AuthController extends Singleton {
 
             await verifyToken(token, process.env.JWT_SECRET_KEY);
 
-            this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.USER_IS_NOT_LOGGED_IN, false);
+            this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.USER_IS_NOT_LOGGED_IN, true);
         }
 
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.USER_IS_NOT_LOGGED_IN, false);

@@ -1,6 +1,6 @@
 import { call, put, takeEvery, StrictEffect, PutEffect, ForkEffect } from '@redux-saga/core/effects';
 import { httpRequester } from '../../utils/HttpRequest';
-import { ApiUrls, ReduxSpaceActions, SagaTasks } from '../../utils/types';
+import { ApiUrls, ReduxSpaceActions, SagaTasks } from '../../types/types';
 
 // TODO разобраться с типами ответов с бэкенда
 

@@ -1,6 +1,6 @@
 import { call, put, takeEvery, StrictEffect, PutEffect, ForkEffect, takeLatest } from '@redux-saga/core/effects';
 import { httpRequester } from '../../utils/HttpRequest';
-import { ApiUrls, ReduxCitiesActions, SagaTasks } from '../../utils/types';
+import { ApiUrls, ReduxCitiesActions, SagaTasks } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 import { fetchCitiesAction } from '../actions/cityActions';
 
@@ -23,11 +23,11 @@ const fetchCitiesBySearchPattern = async (findCitySearchPattern: string): Promis
     }
 };
 
-function* findCitiesBySearchPattern(action: IAction): Generator<StrictEffect, void, PutEffect> {
+function* findCitiesBySearchPatternWorker(action: IAction): Generator<StrictEffect, void, PutEffect> {
     const payload = yield call(fetchCitiesBySearchPattern, action.payload);
 
     yield put(fetchCitiesAction(payload));
 }
 export function* watchFindCitiesBySearchPattern(): Generator<ForkEffect, void, void> {
-    yield takeLatest(SagaTasks.REQUEST_CITIES_BY_SEARCH_PATTERN, findCitiesBySearchPattern);
+    yield takeLatest(SagaTasks.REQUEST_CITIES_BY_SEARCH_PATTERN, findCitiesBySearchPatternWorker);
 }

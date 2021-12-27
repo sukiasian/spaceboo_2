@@ -1,7 +1,6 @@
-import { Op } from 'sequelize';
 import { applicationInstance } from '../App';
 import { Dao } from '../configurations/dao.config';
-import { IResIsoDatesReserved } from '../../frontend/src/types/resTypes';
+import { IResIsoDatesReserved } from '../../frontend/src/types/types';
 import { Appointment } from '../models/appointment.model';
 import { ErrorMessages, HttpStatus } from '../types/enums';
 import AppError from '../utils/AppError';

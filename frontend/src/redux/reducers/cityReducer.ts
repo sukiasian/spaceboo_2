@@ -1,4 +1,4 @@
-import { ReduxCitiesActions } from '../../utils/types';
+import { ReduxCitiesActions } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 
 export interface ICityState {
@@ -19,12 +19,17 @@ export const cityReducer = (state = initialState, action: IAction): ICityState =
                 cities: action.payload,
             };
 
-        case ReduxCitiesActions.FETCH_CITIES_BY_SEARCH_PATTERN: {
+        case ReduxCitiesActions.FETCH_CITIES_BY_SEARCH_PATTERN:
             return {
                 ...state,
                 foundBySearchPatternCities: action.payload,
             };
-        }
+
+        case ReduxCitiesActions.ANNUALIZE_FOUND_BY_SEARCH_PATTERN_CITIES:
+            return {
+                ...state,
+                foundBySearchPatternCities: [],
+            };
 
         default: {
             return {

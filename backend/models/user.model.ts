@@ -52,10 +52,6 @@ export interface IUserPasswordChange {
     passwordConfirmation: string;
     oldPassword?: string;
 }
-// export interface IUserPasswordRecovery extends IUserPassword {}
-// export interface IUserPasswordEdit extends IUserPassword {
-//     oldPassword: string;
-// }
 
 export const userCreateFields: Partial<keyof IUserAttributes>[] = [
     'name',
@@ -75,6 +71,7 @@ export const userEditFields: Partial<keyof IUserAttributes>[] = [
 ];
 export const changeUserPasswordFields: Partial<keyof IUserAttributes>[] = ['password', 'passwordConfirmation'];
 
+// TODO add date of birth
 @Table({
     timestamps: true,
     defaultScope: {

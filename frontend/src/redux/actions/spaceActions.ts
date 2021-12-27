@@ -1,5 +1,5 @@
 import { Action } from 'redux';
-import { SagaTasks } from '../../utils/types';
+import { SagaTasks } from '../../types/types';
 
 export const requestSpacesAction = (): Action<SagaTasks> => {
     return {

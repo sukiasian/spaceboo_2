@@ -6,6 +6,7 @@ import { Environment, ErrorMessages, HttpStatus, LoggerLevels } from '../types/e
 class ErrorController {
     private static readonly logger: winston.Logger = logger;
     public static sendErrorDev = (err: any, res: Response): void => {
+        // FIXME use logger instead
         console.log(err, ErrorMessages.APPLICATION_ERROR);
         res.status(err.statusCode).json({
             status: err.status,

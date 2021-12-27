@@ -1,4 +1,4 @@
-import { ReduxSpaceActions } from '../../utils/types';
+import { ReduxSpaceActions } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 
 export interface ISpaceState {
@@ -12,7 +12,7 @@ const initialState: ISpaceState = {
     spaces: [],
 };
 
-export const spaceReducer = (state: ISpaceState = initialState, action: IAction): ISpaceState => {
+export const spaceReducer = (state = initialState, action: IAction): ISpaceState => {
     switch (action.type) {
         case ReduxSpaceActions.FETCH_SPACES: {
             return {

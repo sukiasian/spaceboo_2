@@ -1,15 +1,16 @@
-import { ChangeEvent, ReactElement, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { IReduxStorage } from '../redux/reducers/rootReducer';
-import { IComponentDivProps, SagaTasks } from '../utils/types';
+import { annualizeFoundBySearchPatternCitiesAction } from '../redux/actions/cityActions';
+import { IReduxState } from '../redux/reducers/rootReducer';
+import { IComponentDivProps, ReduxCitiesActions, SagaTasks } from '../types/types';
 
 interface ICityPickerProps extends IComponentDivProps {}
 
 // TODO localstorage (persist) plus majorcities
-export default function CityPicker(props: ICityPickerProps): ReactElement<ICityPickerProps> {
+export default function CityPicker(props: ICityPickerProps): JSX.Element {
     const [currentCity, setCurrentCity] = useState('Город');
     const [cityPickerBoxIsOpen, setCityPickerBoxIsOpen] = useState(false);
-    const { foundBySearchPatternCities } = useSelector((state: IReduxStorage) => state.cityStorage);
+    const { foundBySearchPatternCities } = useSelector((state: IReduxState) => state.cityStorage);
     const majorCities = ['Москва', 'Краснодар', 'Сочи', 'Новосибирск', 'Санкт-Петербург', 'Красноярск'];
     const dispatch = useDispatch();
     const getCurrentCityFromLocalStorage = (): void => {
@@ -28,10 +29,14 @@ export default function CityPicker(props: ICityPickerProps): ReactElement<ICityP
     const handleFindCityInput = (e: ChangeEvent<{ value: string }>): void => {
         dispatch({ type: SagaTasks.REQUEST_CITIES_BY_SEARCH_PATTERN, payload: e.target.value });
     };
+    const annualizeFoundBySearchPatternCities = (): void => {
+        dispatch(annualizeFoundBySearchPatternCitiesAction());
+    };
     const pickCurrentCity = (value: string): (() => void) => {
         return (): void => {
             setCityPickerBoxIsOpen(false);
             setCurrentCity(value);
+            annualizeFoundBySearchPatternCities();
             localStorage.setItem('currentCity', value);
         };
     };

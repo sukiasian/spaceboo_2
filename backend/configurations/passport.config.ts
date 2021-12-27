@@ -8,10 +8,11 @@ import { JwtFromRequestFunction, Strategy as JwtStrategy } from 'passport-jwt';
 import { ExtractJwt } from 'passport-jwt';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
 import { UserScopes, User } from '../models/user.model';
-import { LoggerLevels } from '../types/enums';
+import { ErrorMessages, HttpStatus, LoggerLevels } from '../types/enums';
 import logger from '../loggers/logger';
 import { userSequelizeDao, UserSequelizeDao } from '../daos/user.sequelize.dao';
 import * as express from 'express';
+import AppError from '../utils/AppError';
 
 export class PassportConfig extends Singleton {
     private readonly userDao: UserSequelizeDao = userSequelizeDao;
@@ -42,11 +43,16 @@ export class PassportConfig extends Singleton {
                         user = await this.userModel.scope(UserScopes.WITH_PASSWORD).findOne({ where: { email } });
 
                         if (!user) {
-                            return done(null, false);
+                            return done(
+                                new AppError(HttpStatus.UNAUTHORIZED, ErrorMessages.USERNAME_OR_PASSWORD_INCORRECT),
+                                false
+                            );
                         }
 
                         if (!(await user.verifyPassword(user)(password))) {
-                            return done(null);
+                            return done(
+                                new AppError(HttpStatus.UNAUTHORIZED, ErrorMessages.USERNAME_OR_PASSWORD_INCORRECT)
+                            );
                         }
 
                         user = await this.userModel.findOne({ raw: true, where: { email } });
