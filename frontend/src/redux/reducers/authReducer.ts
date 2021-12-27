@@ -5,6 +5,7 @@ export interface IAuthState {
     userIsLoggedIn: boolean;
     loginResponse?: any;
     signupResponse?: any;
+    logoutResponse?: any;
 }
 
 const initialState: IAuthState = {
@@ -41,6 +42,12 @@ export const authReducer = (state = initialState, action: IAction<ReduxAuthActio
             return {
                 ...state,
                 signupResponse: undefined,
+            };
+
+        case ReduxAuthActions.LOGOUT_USER:
+            return {
+                ...state,
+                logoutResponse: action.payload,
             };
 
         default: {

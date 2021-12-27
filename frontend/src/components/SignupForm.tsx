@@ -26,7 +26,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
         },
         surname: {
             mainDivClassName: 'surname',
-            inputLabel: 'Фамилия...',
+            inputLabel: 'Фамилия',
             inputName: 'surname',
             inputPlaceholder: 'Ваша фамилия...',
             inputClassName: 'surname',
@@ -44,6 +44,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
             inputName: 'email',
             inputPlaceholder: 'Имя пользователя/Эл. почта...',
             inputClassName: 'email',
+            inputType: 'email',
         },
         password: {
             mainDivClassName: 'password',
@@ -51,6 +52,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
             inputName: 'password',
             inputPlaceholder: 'Пароль...',
             inputClassName: 'password',
+            inputType: 'password',
         },
         passwordConfirmation: {
             mainDivClassName: 'password-confirmation',
@@ -58,15 +60,16 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
             inputName: 'passwordConfirmation',
             inputPlaceholder: 'Подтверждение пароля...',
             inputClassName: 'password',
+            inputType: 'password',
         },
     });
     const { signupResponse } = useSelector((state: IReduxState) => state.authStorage);
-    useEffect(() => {
+    const dispatch = useDispatch();
+    const handleAfterSignup = (): void => {
         if (signupResponse && !signupResponse.error) {
             props.handleAfterSignup();
         }
-    }, [signupResponse, props]);
-    const dispatch = useDispatch();
+    };
     const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
     };
@@ -84,6 +87,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
         Object.keys(formInputs).forEach((inputName: string) => {
             signupData[inputName] = formInputs[inputName].value;
         });
+
         dispatch(postSignupAction(signupData));
     };
     const renderInputs = (): JSX.Element[] => {
@@ -102,10 +106,11 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
             );
         });
     };
+    // FIXME create a component for this - repetitive!
     const renderSignupAlerts = (): JSX.Element | void => {
-        if (signupResponse) {
+        if (signupResponse && signupResponse.error) {
             switch (signupResponse.error.statusCode) {
-                case HttpStatus.UNAUTHORIZED:
+                case HttpStatus.BAD_REQUEST:
                     return <Alert alertType={AlertType.FAILURE} alertMessage={signupResponse.message} />;
 
                 default:
@@ -113,6 +118,8 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
             }
         }
     };
+
+    useEffect(handleAfterSignup, [signupResponse, props]);
 
     // TODO validators!
     return (

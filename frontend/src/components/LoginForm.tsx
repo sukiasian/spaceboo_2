@@ -33,12 +33,12 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
         },
     });
     const { loginResponse } = useSelector((state: IReduxState) => state.authStorage);
-    useEffect(() => {
+    const dispatch = useDispatch();
+    const handleAfterLogin = (): void => {
         if (loginResponse && !loginResponse.error) {
             props.handleAfterLogin();
         }
-    }, [loginResponse, props]);
-    const dispatch = useDispatch();
+    };
     const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
     };
@@ -85,6 +85,8 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
             }
         }
     };
+
+    useEffect(handleAfterLogin, [loginResponse, props]);
 
     // TODO validators!
     return (

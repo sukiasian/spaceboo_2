@@ -1,14 +1,31 @@
-import { ReactElement } from 'react';
-import { useSelector } from 'react-redux';
+import { ReactElement, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import LoginModal from '../modals/LoginModal';
 import SignupModal from '../modals/SignupModal';
+import { requestUserIsLoggedInAction, requestUserLogoutAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
+import { AlertType } from '../types/types';
+import Alert from './Alert';
 import CityPicker from './CityPicker';
 
 // FIXME нам нужно разделить логику так чтобы Город был отдельным элементом со всем вытекающим (<City />)
 export default function Navbar(): ReactElement {
-    const { userIsLoggedIn } = useSelector((state: IReduxState) => state.authStorage);
+    const { userIsLoggedIn, logoutResponse } = useSelector((state: IReduxState) => state.authStorage);
+    const dispatch = useDispatch();
+    const handleLogout = (): void => {
+        dispatch(requestUserLogoutAction());
+    };
+    const refreshUserLoggedInAfterLogout = (): void => {
+        dispatch(requestUserIsLoggedInAction());
+    };
+    const renderLogoutError = (): JSX.Element | void => {
+        if (logoutResponse && logoutResponse.error) {
+            return <Alert alertType={AlertType.FAILURE} alertMessage={logoutResponse.error.message} />;
+        }
+    };
+
+    useEffect(refreshUserLoggedInAfterLogout, [logoutResponse, dispatch]);
 
     return (
         <nav className="navbar">
@@ -32,7 +49,8 @@ export default function Navbar(): ReactElement {
             {userIsLoggedIn ? (
                 <div className="navbar__user navbar-elem--4">
                     <img className="navbar__user-avatar" src="" alt="" />
-                    hello
+                    <div onClick={handleLogout}> logout </div>
+                    {renderLogoutError()}
                 </div>
             ) : (
                 <>

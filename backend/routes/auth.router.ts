@@ -34,6 +34,12 @@ class AuthRouter extends Singleton implements IRouter {
             );
 
         this.router.get('/userIsLoggedIn', this.authController.userIsLoggedIn);
+
+        this.router.get(
+            '/logout',
+            this.passport.authenticate(PassportStrategies.JWT, { session: false }),
+            this.authController.logout
+        );
         // нужно три разных роута - один отправлет письмо на имейл, другой должен проверить совпадает ли введенное значение, и если да - то позволить изменить пароль.
         /* 
             - Если вышел с сайта, то все заново. 
@@ -55,7 +61,6 @@ class AuthRouter extends Singleton implements IRouter {
     };
 }
 
-// export const router = AuthRouter.getInstance<AuthRouter>(AuthRouter).prepareRouter();
 const authRouter = SingletonFactory.produce<AuthRouter>(AuthRouter);
 
 authRouter.prepareRouter();

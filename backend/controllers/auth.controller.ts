@@ -42,8 +42,6 @@ export class AuthController extends Singleton {
     });
 
     public userIsLoggedIn = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
-        // NOTE нужно ли проверять пользователь существует или нет ?
-
         const token = req.cookies['jwt'] as string;
 
         if (token) {
@@ -58,15 +56,40 @@ export class AuthController extends Singleton {
                 string | jwt.Jwt
             >(jwt.verify);
 
-            await verifyToken(token, process.env.JWT_SECRET_KEY);
+            const payload: string | jwt.JwtPayload = jwt.decode(token);
+            const user = await this.authSequelizeDao.findById((payload as jwt.JwtPayload).id);
 
-            this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.USER_IS_NOT_LOGGED_IN, true);
+            if (!user) {
+                return this.utilFunctions.sendResponse(res)(
+                    HttpStatus.OK,
+                    ResponseMessages.USER_IS_NOT_LOGGED_IN,
+                    false
+                );
+            }
+
+            const verifiedToken = await verifyToken(token, process.env.JWT_SECRET_KEY);
+
+            if (verifiedToken) {
+                return this.utilFunctions.sendResponse(res)(
+                    HttpStatus.OK,
+                    ResponseMessages.USER_IS_NOT_LOGGED_IN,
+                    true
+                );
+            }
         }
 
-        this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.USER_IS_NOT_LOGGED_IN, false);
+        return this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.USER_IS_NOT_LOGGED_IN, false);
 
         // FIXME нужно при ошибке отправлять еще один запрос на проверку - делаться должно это в саге
     });
+
+    public logout = this.utilFunctions.catchAsync(
+        async (req: express.Request, res: express.Response, next): Promise<void> => {
+            res.clearCookie('jwt');
+
+            this.utilFunctions.sendResponse(res)(HttpStatus.OK, 'Logged out');
+        }
+    );
 }
 
 export const authController = SingletonFactory.produce<AuthController>(AuthController);
