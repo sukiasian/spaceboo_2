@@ -2,10 +2,8 @@ import { ChangeEventHandler, FormEventHandler, useEffect, useState } from 'react
 import { useDispatch, useSelector } from 'react-redux';
 import { postSignupAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import InputWithLabel, { IFormInputs } from './InputWithLabel';
-
-import Alert from './Alert';
-import { AlertType, CustomResponseMessages, HttpStatus } from '../types/types';
+import InputWithLabel, { IFormInputs, InputAutoCompleteOptions, InputTypes } from '../components/InputWithLabel';
+import AlertFirstDbValidationError from '../components/AlertFirstDbValidationError';
 
 export interface ISignupData {
     [key: keyof IFormInputs]: string | undefined;
@@ -17,19 +15,21 @@ interface ISignupFormProps {
 
 export default function SignupForm(props: ISignupFormProps): JSX.Element {
     const [formInputs, setFormInputs] = useState<IFormInputs>({
-        name: {
-            mainDivClassName: 'name',
-            inputLabel: 'Имя',
-            inputName: 'name',
-            inputPlaceholder: 'Ваше имя...',
-            inputClassName: 'name',
-        },
         surname: {
             mainDivClassName: 'surname',
             inputLabel: 'Фамилия',
             inputName: 'surname',
             inputPlaceholder: 'Ваша фамилия...',
             inputClassName: 'surname',
+            isRequiredField: true,
+        },
+        name: {
+            mainDivClassName: 'name',
+            inputLabel: 'Имя',
+            inputName: 'name',
+            inputPlaceholder: 'Ваше имя...',
+            inputClassName: 'name',
+            isRequiredField: true,
         },
         middleName: {
             mainDivClassName: 'middle-name',
@@ -37,6 +37,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
             inputName: 'middleName',
             inputPlaceholder: 'Ваше отчество...',
             inputClassName: 'middle-name',
+            isRequiredField: true,
         },
         email: {
             mainDivClassName: 'email',
@@ -44,7 +45,8 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
             inputName: 'email',
             inputPlaceholder: 'Имя пользователя/Эл. почта...',
             inputClassName: 'email',
-            inputType: 'email',
+            inputType: InputTypes.EMAIL,
+            isRequiredField: true,
         },
         password: {
             mainDivClassName: 'password',
@@ -52,7 +54,9 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
             inputName: 'password',
             inputPlaceholder: 'Пароль...',
             inputClassName: 'password',
-            inputType: 'password',
+            inputType: InputTypes.PASSWORD,
+            inputAutoComplete: InputAutoCompleteOptions.NEW_PASSWORD,
+            isRequiredField: true,
         },
         passwordConfirmation: {
             mainDivClassName: 'password-confirmation',
@@ -60,7 +64,8 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
             inputName: 'passwordConfirmation',
             inputPlaceholder: 'Подтверждение пароля...',
             inputClassName: 'password',
-            inputType: 'password',
+            inputType: InputTypes.PASSWORD,
+            isRequiredField: true,
         },
     });
     const { signupResponse } = useSelector((state: IReduxState) => state.authStorage);
@@ -93,6 +98,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
     const renderInputs = (): JSX.Element[] => {
         return Object.keys(formInputs).map((inputName: string, i: number) => {
             const field = formInputs[inputName];
+
             return (
                 <InputWithLabel
                     mainDivClassName={field.mainDivClassName}
@@ -100,23 +106,14 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
                     inputName={field.inputName}
                     inputPlaceholder={field.inputPlaceholder}
                     inputClassName={field.inputClassName}
+                    inputType={field.inputType}
+                    isRequiredField={field.isRequiredField}
+                    inputAutoComplete={field.inputAutoComplete}
                     onChange={handleInputChange(inputName)}
                     key={i}
                 />
             );
         });
-    };
-    // FIXME create a component for this - repetitive!
-    const renderSignupAlerts = (): JSX.Element | void => {
-        if (signupResponse && signupResponse.error) {
-            switch (signupResponse.error.statusCode) {
-                case HttpStatus.BAD_REQUEST:
-                    return <Alert alertType={AlertType.FAILURE} alertMessage={signupResponse.message} />;
-
-                default:
-                    return <Alert alertType={AlertType.FAILURE} alertMessage={CustomResponseMessages.UNKNOWN_ERROR} />;
-            }
-        }
     };
 
     useEffect(handleAfterSignup, [signupResponse, props]);
@@ -129,8 +126,8 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
                 <button className="button--primary" onClick={handleSignupButton}>
                     Зарегистрироваться
                 </button>
+                <AlertFirstDbValidationError response={signupResponse} />
             </form>
-            {renderSignupAlerts()}
         </div>
     );
 }

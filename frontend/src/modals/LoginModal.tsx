@@ -3,20 +3,23 @@ import { useDispatch, useSelector } from 'react-redux';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { toggleLoginModalAction, toggleSignupModalAction } from '../redux/actions/modalActions';
 import { IComponentDivProps } from '../types/types';
-import { toggleLoginOrSignupModal } from '../utils/utilFunctions';
 import ModalsTitle from '../components/ModalsTitle';
-import LoginForm from '../components/LoginForm';
-import { annualizeLoginResponseAction } from '../redux/actions/authActions';
+import LoginForm from '../forms/LoginForm';
+import { annualizeLoginResponseAction, requestUserIsLoggedInAction } from '../redux/actions/authActions';
 import SwitchTypeOfAuth, { SwitchModalFor } from '../components/SwitchAuthModal';
 
 interface ILoginModal extends IComponentDivProps {}
 
 export default function LoginModal(props: ILoginModal) {
-    const { loginModalIsOpen, signupModalIsOpen } = useSelector((state: IReduxState) => state.modalStorage);
+    const { loginModalIsOpen } = useSelector((state: IReduxState) => state.modalStorage);
     const dispatch = useDispatch();
+    const openLoginModal = (): void => {
+        dispatch(toggleLoginModalAction());
+    };
     const handleAfterLogin = () => {
         dispatch(toggleLoginModalAction());
         dispatch(annualizeLoginResponseAction());
+        dispatch(requestUserIsLoggedInAction());
     };
     const renderLoginModalBox = (): JSX.Element | void => {
         if (loginModalIsOpen) {
@@ -44,16 +47,7 @@ export default function LoginModal(props: ILoginModal) {
     // WHEN you navigate to another url the modal should be closed - even if we make user be unable to move through the interface he still may navigate through url
     return (
         <div className={props.mainDivClassName}>
-            <div
-                className="heading heading--tertiary"
-                onClick={toggleLoginOrSignupModal(
-                    toggleLoginModalAction,
-                    toggleSignupModalAction,
-                    dispatch,
-                    loginModalIsOpen,
-                    signupModalIsOpen
-                )}
-            >
+            <div className="heading heading--tertiary" onClick={openLoginModal}>
                 Войти
             </div>
             {renderLoginModalBox()}

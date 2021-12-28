@@ -3,8 +3,8 @@ import { httpRequester } from '../../utils/HttpRequest';
 import { ApiUrls, ReduxAuthActions, SagaTasks } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 import { loginUserAction, logoutUserAction, signupUserAction } from '../actions/authActions';
-import { ILoginData } from '../../components/LoginForm';
-import { ISignupData } from '../../components/SignupForm';
+import { ILoginData } from '../../forms/LoginForm';
+import { ISignupData } from '../../forms/SignupForm';
 
 const fetchIsLoggedIn = async (): Promise<object> => {
     return (await httpRequester.get(`${ApiUrls.AUTH}/userIsLoggedIn`)).data;

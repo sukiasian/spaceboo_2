@@ -60,6 +60,7 @@ export class EmailVerificationController extends Singleton {
 
     public checkVerificationCode = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         // NOTE возможно нам нужно брать email из sessionStorage
+
         const { currentCode, email } = req.body;
         const verificationCode = await this.emailVerificationDao.getVerificationCodeFromDb(email, currentCode);
 
@@ -72,8 +73,12 @@ export class EmailVerificationController extends Singleton {
         if (!user) {
             throw new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.USER_NOT_FOUND);
         }
-
-        await this.utilFunctions.signTokenAndStoreInCookies(res, { id: user.id });
+        // next() -- means that code is correct. then we use account is confirmed
+        await this.utilFunctions.signTokenAndStoreInCookies(
+            res,
+            { id: user.id, temporary: true },
+            { expiresIn: '15m' }
+        );
 
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.VERIFICATION_CODE_VALID);
     });

@@ -2,9 +2,9 @@ import { ChangeEventHandler, FormEventHandler, useEffect, useState } from 'react
 import { useDispatch, useSelector } from 'react-redux';
 import { postLoginAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import InputWithLabel, { IFormInputs } from './InputWithLabel';
+import InputWithLabel, { InputAutoCompleteOptions, IFormInputs, InputTypes } from '../components/InputWithLabel';
 
-import Alert from './Alert';
+import Alert from '../components/Alert';
 import { AlertType, CustomResponseMessages, HttpStatus } from '../types/types';
 
 export interface ILoginData {
@@ -23,6 +23,9 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
             inputName: 'email',
             inputPlaceholder: 'Имя пользователя/Эл. почта...',
             inputClassName: 'email',
+            inputType: InputTypes.EMAIL,
+            inputAutoComplete: InputAutoCompleteOptions.ON,
+            isRequiredField: true,
         },
         password: {
             mainDivClassName: 'password',
@@ -30,6 +33,9 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
             inputName: 'password',
             inputPlaceholder: 'Пароль...',
             inputClassName: 'password',
+            inputType: InputTypes.PASSWORD,
+            inputAutoComplete: InputAutoCompleteOptions.ON,
+            isRequiredField: true,
         },
     });
     const { loginResponse } = useSelector((state: IReduxState) => state.authStorage);
@@ -68,6 +74,9 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
                     inputName={field.inputName}
                     inputPlaceholder={field.inputPlaceholder}
                     inputClassName={field.inputClassName}
+                    inputAutoComplete={field.inputAutoComplete}
+                    inputType={field.inputType}
+                    isRequiredField={field.isRequiredField}
                     onChange={handleInputChange(inputName)}
                     key={i}
                 />
@@ -75,7 +84,7 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
         });
     };
     const renderLoginAlerts = (): JSX.Element | void => {
-        if (loginResponse) {
+        if (loginResponse && loginResponse.error) {
             switch (loginResponse.error.statusCode) {
                 case HttpStatus.UNAUTHORIZED:
                     return <Alert alertType={AlertType.FAILURE} alertMessage={loginResponse.message} />;

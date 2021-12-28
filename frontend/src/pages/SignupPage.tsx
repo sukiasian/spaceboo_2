@@ -1,3 +1,3 @@
-export default function SignupPage() {
+export default function SignupPage(): JSX.Element {
     return <></>;
 }

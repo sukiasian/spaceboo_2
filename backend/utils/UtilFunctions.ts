@@ -208,8 +208,12 @@ class UtilFunctions {
         await UtilFunctions.removeFile(pathToImage);
     };
 
-    public static signTokenAndStoreInCookies = async (res: express.Response, jwtPayload: object): Promise<void> => {
-        const token = this.signToken(jwtPayload, process.env.JWT_SECRET_KEY);
+    public static signTokenAndStoreInCookies = async (
+        res: express.Response,
+        jwtPayload: object,
+        signOptions: jwt.SignOptions = {}
+    ): Promise<void> => {
+        const token = this.signToken(jwtPayload, process.env.JWT_SECRET_KEY, signOptions);
         const cookieOptions: CookieOptions = {
             httpOnly: true,
             expires: new Date(Date.now() + 90 * 24 * 3600000),

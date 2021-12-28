@@ -51,15 +51,19 @@ export class RouteProtector {
 
         const payload = this.jwt.decode(token) as jwt.JwtPayload;
 
-        if (!payload.recovery) {
+        if (!payload.temporary) {
             throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.NOT_ENOUGH_RIGHTS);
         }
 
         const user = await this.userModel.findOne({ where: { id: payload.id } });
 
+        if (!user) {
+            throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+        }
+
         req.user = {
             id: user.id,
-            recovery: true,
+            temporary: true,
         };
 
         next();

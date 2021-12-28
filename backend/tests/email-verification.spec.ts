@@ -93,7 +93,8 @@ describe('Email Verification (e2e)', () => {
             },
         });
         const code = emailVerification.code;
-        const res_2 = await request(app).get(`${ApiRoutes.EMAIL_VERIFICATION}`).send({
+        // FIXME POST!!! NOT GET!!!
+        const res_2 = await request(app).post(`${ApiRoutes.EMAIL_VERIFICATION}`).send({
             currentCode: code,
             email: user.email,
         });

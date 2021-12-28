@@ -98,6 +98,7 @@ export enum ResponseMessages {
     PASSWORD_RECOVERED = 'Пароль успешно сброшен.',
     USER_IS_LOGGED_IN = 'Пользователь авторизован.',
     USER_IS_NOT_LOGGED_IN = 'Пользователь не авторизован.',
+    LOGGED_OUT = 'Будем скучать!',
 }
 
 export enum ErrorMessages {
@@ -124,6 +125,9 @@ export enum ErrorMessages {
     MULTER_ERROR = 'Произошла ошибка при загрузке файла.',
     NOT_ENOUGH_RIGHTS = 'Недостаточно прав.',
     VERIFICATION_CODE_NOT_VALID = 'Неверный код.',
+    EMAIL_IS_EMPTY = 'Пожалуйста, укажите Вашу эл. почту',
+    NAME_SHOULD_BE_LITERAL_AND_CYRILLIC_ONLY = "Имя пользователя может состоять только из символов А-Я, а также '-'.",
+    USER_ALREADY_CONFIRMED = 'Пользователь уже подтвержден.',
 }
 
 export enum Environment {

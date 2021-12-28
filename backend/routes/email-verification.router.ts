@@ -17,7 +17,7 @@ class EmailVerificationRouter extends Singleton implements IRouter {
     public readonly router = Router();
 
     public prepareRouter = (): void => {
-        this.router.route('/').get(this.emailVerificationController.checkVerificationCode);
+        this.router.route('/').post(this.emailVerificationController.checkVerificationCode);
 
         this.router.route('/:purpose').post(this.emailVerificationController.sendVerificationCodeByPurpose);
     };

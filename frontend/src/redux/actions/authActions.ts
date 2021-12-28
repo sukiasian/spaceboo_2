@@ -1,6 +1,6 @@
 import { Action } from 'redux';
-import { ILoginData } from '../../components/LoginForm';
-import { ISignupData } from '../../components/SignupForm';
+import { ILoginData } from '../../forms/LoginForm';
+import { ISignupData } from '../../forms/SignupForm';
 import { ReduxAuthActions, SagaTasks } from '../../types/types';
 import { IAction } from './ActionTypes';
 

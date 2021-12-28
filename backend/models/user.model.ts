@@ -18,10 +18,12 @@ enum UserQueryExcludedAttributes {
     CREATED_AT = 'createdAt',
     UPDATED_AT = 'updatedAt',
     ROLE = 'role',
+    CONFIRMED = 'confirmed',
 }
 export enum UserScopes {
     WITH_PASSWORD = 'withPassword',
     WITH_ROLE = 'withRole',
+    WITH_CONFIRMED = 'withConfirmed',
 }
 
 export interface IUserAttributes {
@@ -33,6 +35,7 @@ export interface IUserAttributes {
     role?: UserRoles;
     password?: string;
     passwordConfirmation?: string;
+    confirmed: boolean;
     facebookId?: string;
     vkontakteId?: string;
     odnoklassnikiId?: string;
@@ -69,6 +72,15 @@ export const userEditFields: Partial<keyof IUserAttributes>[] = [
     // 'passwordConfirmation',
     // 'email' -- TODO this should be approved by email the same way - with 6 digit code
 ];
+
+const isCyrillicLiteralsOnly = (value: string) => {
+    const symbols = value.match(/[^а-я^-]/gi);
+
+    if (symbols) {
+        throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.NAME_SHOULD_BE_LITERAL_AND_CYRILLIC_ONLY);
+    }
+};
+
 export const changeUserPasswordFields: Partial<keyof IUserAttributes>[] = ['password', 'passwordConfirmation'];
 
 // TODO add date of birth
@@ -85,6 +97,7 @@ export const changeUserPasswordFields: Partial<keyof IUserAttributes>[] = ['pass
                 UserQueryExcludedAttributes.CREATED_AT,
                 UserQueryExcludedAttributes.UPDATED_AT,
                 UserQueryExcludedAttributes.ROLE,
+                UserQueryExcludedAttributes.CONFIRMED,
             ],
         },
     },
@@ -94,6 +107,9 @@ export const changeUserPasswordFields: Partial<keyof IUserAttributes>[] = ['pass
         },
         withRole: {
             attributes: { include: [UserQueryExcludedAttributes.ROLE] },
+        },
+        withConfirmed: {
+            attributes: { include: [UserQueryExcludedAttributes.CONFIRMED] },
         },
     },
 })
@@ -112,6 +128,7 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
             notNull: {
                 msg: ErrorMessages.REQUIRED_FIELDS_VALIDATE,
             },
+            isCyrillicLiteralsOnly,
         },
     })
     public name: string;
@@ -126,6 +143,7 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
             notNull: {
                 msg: ErrorMessages.REQUIRED_FIELDS_VALIDATE,
             },
+            isCyrillicLiteralsOnly,
         },
     })
     public surname: string;
@@ -140,6 +158,7 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
             notNull: {
                 msg: ErrorMessages.REQUIRED_FIELDS_VALIDATE,
             },
+            isCyrillicLiteralsOnly,
         },
     })
     public middleName: string;
@@ -147,6 +166,9 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
     @Column({
         allowNull: false,
         validate: {
+            notNull: {
+                msg: ErrorMessages.REQUIRED_FIELDS_VALIDATE,
+            },
             isEmail: {
                 msg: ErrorMessages.IS_EMAIL_VALIDATE,
             },
@@ -176,6 +198,9 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
 
     @Column
     public passwordConfirmation: string;
+
+    @Column({ allowNull: false, defaultValue: false })
+    public confirmed: boolean;
 
     @Column
     public facebookId: string;

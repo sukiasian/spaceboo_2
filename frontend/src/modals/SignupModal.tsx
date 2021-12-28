@@ -5,7 +5,7 @@ import { toggleLoginModalAction, toggleSignupModalAction } from '../redux/action
 import { IComponentDivProps } from '../types/types';
 import ModalsTitle from '../components/ModalsTitle';
 import { annualizeSignupResponseAction, requestUserIsLoggedInAction } from '../redux/actions/authActions';
-import SignupForm from '../components/SignupForm';
+import SignupForm from '../forms/SignupForm';
 import SwitchTypeOfAuth, { SwitchModalFor } from '../components/SwitchAuthModal';
 
 interface ISignupModal extends IComponentDivProps {}

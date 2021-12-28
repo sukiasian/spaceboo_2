@@ -11,6 +11,7 @@ export default class ErrorBoundary extends Component {
 
     componentDidCatch(error: Error, errorInfo: ErrorInfo) {
         // TODO Sentry
+        console.log(error);
     }
 
     render() {

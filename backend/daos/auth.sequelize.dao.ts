@@ -31,11 +31,11 @@ export class AuthSequelizeDao extends Dao {
     public editUserPassword = async (
         userId: string,
         passwordResetData: IUserPasswordChange,
-        recovery: boolean = false
+        temporary: boolean = false
     ) => {
         const user = await this.model.scope(UserScopes.WITH_PASSWORD).findOne({ where: { id: userId } });
 
-        if (!recovery) {
+        if (!temporary) {
             if (passwordResetData.oldPassword && !(await user.verifyPassword(user)(passwordResetData.oldPassword))) {
                 throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.PASSWORD_INCORRECT);
             } else if (!passwordResetData.oldPassword) {
@@ -50,6 +50,12 @@ export class AuthSequelizeDao extends Dao {
             },
             { fields: changeUserPasswordFields }
         );
+    };
+
+    public confirmAccount = async (userId: string) => {
+        const user = await this.model.scope(UserScopes.WITH_CONFIRMED).findOne({ where: { id: userId } });
+
+        user.update({ confirmed: true });
     };
 }
 

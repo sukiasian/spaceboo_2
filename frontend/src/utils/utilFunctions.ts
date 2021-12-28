@@ -19,3 +19,7 @@ export const toggleLoginOrSignupModal = (
         }
     };
 };
+
+export const updateDocumentTitle = (title: string): void => {
+    document.title = title;
+};

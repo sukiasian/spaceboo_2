@@ -2,7 +2,7 @@ import * as express from 'express';
 import { promisify } from 'util';
 import * as jwt from 'jsonwebtoken';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
-import { HttpStatus, ResponseMessages } from '../types/enums';
+import { ErrorMessages, HttpStatus, ResponseMessages } from '../types/enums';
 import { authSequelizeDao, AuthSequelizeDao } from '../daos/auth.sequelize.dao';
 import UtilFunctions from '../utils/UtilFunctions';
 import { sendMail } from '../emails/Email';
@@ -14,6 +14,7 @@ export class AuthController extends Singleton {
     private readonly sendEmail = sendMail;
 
     public signUpLocal = this.utilFunctions.catchAsync(async (req, res, next) => {
+        // NOTE why we dont use scopes here?
         const user = await this.authSequelizeDao.signUpLocal(req.body);
 
         await this.utilFunctions.signTokenAndStoreInCookies(res, { id: user.id });
@@ -31,12 +32,12 @@ export class AuthController extends Singleton {
 
     public editUserPassword = this.utilFunctions.catchAsync(async (req, res: express.Response, next): Promise<void> => {
         const { id: userId } = req.user;
-        const recovery = req.user.recovery || false;
+        const temporary = req.user.temporary || false;
         const passwordData = req.body.passwordData;
 
-        await this.authSequelizeDao.editUserPassword(userId, passwordData, recovery);
+        await this.authSequelizeDao.editUserPassword(userId, passwordData, temporary);
 
-        recovery
+        temporary
             ? this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.PASSWORD_RECOVERED)
             : this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.PASSWORD_EDITED);
     });
@@ -90,6 +91,12 @@ export class AuthController extends Singleton {
             this.utilFunctions.sendResponse(res)(HttpStatus.OK, 'Logged out');
         }
     );
+
+    public confirmAccount = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        await this.authSequelizeDao.confirmAccount(req.user.id);
+
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, 'Logged out');
+    });
 }
 
 export const authController = SingletonFactory.produce<AuthController>(AuthController);

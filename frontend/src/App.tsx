@@ -1,4 +1,4 @@
-import { ReactElement, useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Dispatch } from 'redux';
 import Footer from './components/Footer';
@@ -10,7 +10,7 @@ import { requestSpacesAction } from './redux/actions/spaceActions';
 import Routes from './routes/Routes';
 
 // FIXME any, any - types for props
-function App(): ReactElement<any, any> {
+function App(): JSX.Element {
     const dispatch: Dispatch<IAction> = useDispatch();
     const requestAppData = useCallback(() => {
         dispatch(requestUserIsLoggedInAction());
@@ -28,7 +28,6 @@ function App(): ReactElement<any, any> {
             <section className="section-navbar">
                 <Navbar />
             </section>
-            <div onClick={() => dispatch({ type: 'ADD' })}> add </div>
             <Routes />
             <section className="section-footer">
                 <Footer />
