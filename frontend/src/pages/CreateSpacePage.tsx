@@ -5,14 +5,14 @@ import { IReduxState } from '../redux/reducers/rootReducer';
 import { updateDocumentTitle } from '../utils/utilFunctions';
 
 export default function CreateSpacePage(): JSX.Element {
-    const { userIsLoggedIn } = useSelector((state: IReduxState) => state.authStorage);
+    const { userLoginState } = useSelector((state: IReduxState) => state.authStorage);
     const handleDocumentTitle = (): void => {
         updateDocumentTitle('Spaceboo | Предоставить пространство');
     };
 
-    useEffect(handleDocumentTitle);
+    useEffect(handleDocumentTitle, []);
 
-    if (!userIsLoggedIn) {
+    if (!userLoginState.loggedIn) {
         return <Navigate to="/login" />;
     }
     return <> Предоставить пространство </>;

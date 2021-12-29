@@ -63,8 +63,8 @@ describe('User (e2e)', () => {
         userData_1 = createUserData();
         userData_2 = createUserData();
 
-        fakePassword = faker.random.word();
-        fakeName = faker.name.firstName();
+        fakePassword = 'fakepassword';
+        fakeName = 'Петр';
 
         server = (await openTestEnv(applicationInstance)).server;
     });
@@ -140,7 +140,7 @@ describe('User (e2e)', () => {
         expect(freshUser.name);
     });
 
-    it("PUT /users should not update user's role", async () => {
+    it("PUT /users should not be able to update user's role", async () => {
         const res = await request(app)
             .put(`${ApiRoutes.USERS}`)
             .set('Authorization', `Bearer ${token_1}`)
@@ -155,30 +155,30 @@ describe('User (e2e)', () => {
         expect(freshUser.role).toBe(UserRoles.USER);
     });
 
-    // it('PUT /users passwords should match', async () => {
-    //     // FIXME works from time to times
-    //     const res_1 = await request(app)
-    //         .put(`${ApiRoutes.USERS}`)
-    //         .set('Authorization', `Bearer ${token_1}`)
-    //         .send({
-    //             userEditData: {
-    //                 password: fakePassword,
-    //                 passwordConfirmation: fakePassword.toUpperCase(),
-    //             },
-    //         });
+    it('PUT /auth/passwordChange passwords should match', async () => {
+        // FIXME works from time to times
+        const res_1 = await request(app)
+            .put(`${ApiRoutes.AUTH}/passwordChange`)
+            .set('Authorization', `Bearer ${token_1}`)
+            .send({
+                userEditData: {
+                    password: fakePassword,
+                    passwordConfirmation: fakePassword.toUpperCase(),
+                },
+            });
 
-    //     expect(res_1.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+        expect(res_1.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
 
-    //     const res_2 = await request(app)
-    //         .put(`${ApiRoutes.USERS}`)
-    //         .set('Authorization', `Bearer ${token_1}`)
-    //         .send({
-    //             userEditData: {
-    //                 password: fakePassword,
-    //                 passwordConfirmation: fakePassword,
-    //             },
-    //         });
+        const res_2 = await request(app)
+            .put(`${ApiRoutes.USERS}/passwordChange`)
+            .set('Authorization', `Bearer ${token_1}`)
+            .send({
+                userEditData: {
+                    password: fakePassword,
+                    passwordConfirmation: fakePassword,
+                },
+            });
 
-    //     expect(res_2.status).toBe(HttpStatus.OK);
-    // });
+        expect(res_2.status).toBe(HttpStatus.OK);
+    });
 });

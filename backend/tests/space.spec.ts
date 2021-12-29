@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as faker from 'faker';
 import { Application } from '../App';
-import { IUserCreate, User } from '../models/user.model';
+import { IUserCreate, User, userEditFields } from '../models/user.model';
 import {
     clearDb,
     closeTestEnv,

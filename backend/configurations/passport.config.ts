@@ -130,9 +130,17 @@ export class PassportConfig extends Singleton {
                 },
                 async (jwt_payload, done) => {
                     try {
-                        const user = await this.userModel.findOne({ where: { id: jwt_payload.id }, raw: true });
+                        const user = await this.userModel
+                            .scope(UserScopes.WITH_CONFIRMED)
+                            .findOne({ where: { id: jwt_payload.id }, raw: true });
 
-                        return user ? done(null, { id: user.id }) : done(null, false);
+                        if (!user) {
+                            return done(new AppError(HttpStatus.FORBIDDEN, ErrorMessages.USER_NOT_FOUND), false);
+                        } else if (!user.confirmed) {
+                            return done(new AppError(HttpStatus.FORBIDDEN, ErrorMessages.USER_NOT_CONFIRMED), false);
+                        }
+
+                        return done(null, { id: user.id });
                     } catch (err) {
                         return done(err, false);
                     }

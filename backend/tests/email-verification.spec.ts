@@ -72,7 +72,7 @@ describe('Email Verification (e2e)', () => {
             },
         });
         const code = emailVerification.code;
-        const res_2 = await request(app).get(`${ApiRoutes.EMAIL_VERIFICATION}`).send({
+        const res_2 = await request(app).post(`${ApiRoutes.EMAIL_VERIFICATION}`).send({
             currentCode: code,
             email: user.email,
         });
@@ -93,14 +93,23 @@ describe('Email Verification (e2e)', () => {
             },
         });
         const code = emailVerification.code;
-        // FIXME POST!!! NOT GET!!!
+
         const res_2 = await request(app).post(`${ApiRoutes.EMAIL_VERIFICATION}`).send({
             currentCode: code,
             email: user.email,
+            recovery: true,
         });
         const token = res_2.headers['set-cookie'][0].match(/(?<=jwt=)[A-Za-z0-9-_=\.]+/)[0];
         const payload = jwt.decode(token) as jwt.JwtPayload;
 
         expect(payload.id).toBe(user.id);
     });
+
+    it("POST /emailVerification should modify user's lastVerificationRequest if it doesn't exist and reject if the interval didn't expire", async () => {});
+
+    // 1. пользователь с токеном получит письмо
+    // 2. пользователь с req.body.email (восстанавливающий) получит письмо
+    // 3. Пользователь без email не получит письмо (вылетит ошибка что email-а нету; токен в данном случае как раз не нужен)
+    // 4. Если время истекло пользователь
+    // 5. если пользователь
 });

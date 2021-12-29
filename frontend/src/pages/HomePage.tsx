@@ -5,17 +5,18 @@ import { IReduxState } from '../redux/reducers/rootReducer';
 import { updateDocumentTitle } from '../utils/utilFunctions';
 
 export function HomePage() {
-    const { userIsLoggedIn } = useSelector((state: IReduxState) => state.authStorage);
+    const { userLoginState } = useSelector((state: IReduxState) => state.authStorage);
+
     const handleDocumentTitle = () => {
         let documentTitle: string;
-        userIsLoggedIn
+        userLoginState
             ? (documentTitle = 'Spaceboo | Пространства бесконтактно')
             : (documentTitle = 'Spaceboo | Добро пожаловать');
 
         updateDocumentTitle(documentTitle);
     };
 
-    useEffect(handleDocumentTitle, [userIsLoggedIn]);
+    useEffect(handleDocumentTitle, [userLoginState]);
 
     return (
         <section className="section-homepage">

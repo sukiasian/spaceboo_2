@@ -2,23 +2,23 @@ import * as express from 'express';
 import * as faker from 'faker';
 import * as jwt from 'jsonwebtoken';
 import * as path from 'path';
-import { promisify } from 'util';
 import { Sequelize } from 'sequelize-typescript';
 import { Application } from '../App';
 import { IUserCreate } from '../models/user.model';
 import connectToDb from '../database/connectToDb';
 import { SingletonFactory } from '../utils/Singleton';
 import * as dotenv from 'dotenv';
-import { ErrorMessages, ModelNames } from '../types/enums';
+import { ErrorMessages, LoggerLevels, ModelNames } from '../types/enums';
 import { ISpaceCreate, SpaceType } from '../models/space.model';
 import { IAppointmentCreate, TIsoDatesReserved } from '../models/appointment.model';
 import UtilFunctions from '../utils/UtilFunctions';
+import logger from '../loggers/logger';
 
 dotenv.config({ path: '../test.env' });
 
 export const startServer = (app: express.Express): object => {
     return app.listen(process.env.PORT, () => {
-        console.log('Test server is listening');
+        logger.info('Test server is listening');
     });
 };
 
@@ -32,7 +32,8 @@ export const closeServer = async (server: any): Promise<void> => {
 
 export const closeDb = async (sequelize: Sequelize): Promise<void> => {
     await sequelize.close();
-    console.log('Database connection is closed');
+
+    logger.info('Database connection is closed');
 };
 
 export const clearDb = (sequelize: Sequelize): void => {
@@ -66,27 +67,27 @@ export const createApplicationInstance = (): Application => {
 
 export const createUserData = (): IUserCreate => {
     return {
-        name: faker.name.firstName(),
-        middleName: faker.name.firstName(),
-        surname: faker.name.lastName(),
-        // email: 'testuser@gmail.com',
+        name: 'Иван',
+        middleName: 'Иванов',
+        surname: 'Иванович',
         email: faker.internet.email(),
         password: 'TestUser123',
         passwordConfirmation: 'TestUser123',
+        confirmed: true,
     };
 };
 
 export const createInvalidUserData = (): object => {
     return {
-        nameShort: 'a', // NOTE should not include numbers!
-        nameExceeding: 'hugenameconsistingofmorethantwentyfive',
-        nameWithDigits: 'testName7',
-        middleNameShort: 'a',
-        middleNameExceeding: 'hugenameconsistingofmorethantwentyfive',
-        middleNameWithDigits: 'testMiddleName7',
-        surnameShort: 'a', // NOTE should not include numbers!
-        surnameExceeding: 'hugenameconsistingofmorethantwentyfive',
-        surnnameWithDigits: 'testSurname7',
+        nameShort: 'а',
+        nameExceeding: 'Ааааааааааааааааааааааааааааааааааааа',
+        nameWithDigits: 'Иван1',
+        middleNameShort: 'а',
+        middleNameExceeding: 'Петровиииииииииииииииииииииииич',
+        middleNameWithDigits: 'Петрович1',
+        surnameShort: 'а',
+        surnameExceeding: 'Иванооооооооооооооооооооов',
+        surnnameWithDigits: 'Иванов1',
         email: 'invalid email',
         passwordShort: '6digit',
         passwordExceeding: 'twentyfivedigitpassword25passcode',

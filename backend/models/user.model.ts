@@ -35,11 +35,12 @@ export interface IUserAttributes {
     role?: UserRoles;
     password?: string;
     passwordConfirmation?: string;
-    confirmed: boolean;
+    confirmed?: boolean;
     facebookId?: string;
     vkontakteId?: string;
     odnoklassnikiId?: string;
     avatarUrl?: string;
+    lastVerificationRequested?: number;
     verifyPassword?(instance: User): (password: string) => Promise<boolean>;
 }
 export interface IUserCreationAttributes extends Optional<IUserAttributes, 'id'> {}
@@ -72,6 +73,8 @@ export const userEditFields: Partial<keyof IUserAttributes>[] = [
     // 'passwordConfirmation',
     // 'email' -- TODO this should be approved by email the same way - with 6 digit code
 ];
+export const userRoleField: Partial<keyof IUserAttributes>[] = ['role'];
+export const userConfirmedField: Partial<keyof IUserAttributes>[] = ['confirmed'];
 
 const isCyrillicLiteralsOnly = (value: string) => {
     const symbols = value.match(/[^а-я^-]/gi);
@@ -102,14 +105,19 @@ export const changeUserPasswordFields: Partial<keyof IUserAttributes>[] = ['pass
         },
     },
     scopes: {
+        // TODO create withSensitive (not the best name, try a more semantic one) instead of 3 below
+        // TODO for all other models we will probably need it - if we hide created_at here then we need to do it in other places
         withPassword: {
-            attributes: { exclude: [] },
+            attributes: { include: [UserQueryExcludedAttributes.PASSWORD] },
         },
         withRole: {
             attributes: { include: [UserQueryExcludedAttributes.ROLE] },
         },
         withConfirmed: {
             attributes: { include: [UserQueryExcludedAttributes.CONFIRMED] },
+        },
+        withAll: {
+            attributes: { exclude: [] },
         },
     },
 })
@@ -213,6 +221,9 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
 
     @Column({ allowNull: true })
     public avatarUrl: string;
+
+    @Column({ type: DataType.BIGINT })
+    public lastVerificationRequested: number;
 
     @HasMany(() => Appointment)
     public appointments?: Appointment[];

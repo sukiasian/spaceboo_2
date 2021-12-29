@@ -17,7 +17,6 @@ import { ApiRoutes, HttpStatus } from '../types/enums';
 import { ISpaceCreate, Space } from '../models/space.model';
 import { Appointment } from '../models/appointment.model';
 import { City } from '../models/city.model';
-import { IResIsoDatesReserved } from '../../frontend/src/types/resTypes';
 
 describe('Route Protector (e2e)', () => {
     let app: express.Express;

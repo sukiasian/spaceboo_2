@@ -11,7 +11,7 @@ import CityPicker from './CityPicker';
 
 // FIXME нам нужно разделить логику так чтобы Город был отдельным элементом со всем вытекающим (<City />)
 export default function Navbar(): ReactElement {
-    const { userIsLoggedIn, logoutResponse } = useSelector((state: IReduxState) => state.authStorage);
+    const { userLoginState, logoutResponse } = useSelector((state: IReduxState) => state.authStorage);
     const dispatch = useDispatch();
     const handleLogout = (): void => {
         dispatch(requestUserLogoutAction());
@@ -26,6 +26,7 @@ export default function Navbar(): ReactElement {
     };
 
     useEffect(refreshUserLoggedInAfterLogout, [logoutResponse, dispatch]);
+    console.log(userLoginState);
 
     return (
         <nav className="navbar">
@@ -46,7 +47,7 @@ export default function Navbar(): ReactElement {
                 </NavLink>
             </div>
 
-            {userIsLoggedIn ? (
+            {userLoginState.loggedIn ? (
                 <div className="navbar__user navbar-elem--4">
                     <img className="navbar__user-avatar" src="" alt="" />
                     <div onClick={handleLogout}> logout </div>

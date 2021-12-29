@@ -1,4 +1,6 @@
+import * as express from 'express';
 import { emailVerificationSequelizeDao, EmailVerificationSequelizeDao } from '../daos/email-verification.dao';
+import { userSequelizeDao, UserSequelizeDao } from '../daos/user.sequelize.dao';
 import { RelativePathsToTemplates, sendMail } from '../emails/Email';
 import { ConfirmEmailOptions, EmailOptions, PasswordRecoveryEmailOptions } from '../emails/EmailOptions';
 import { IConfirmEmailLocals, IRecoverPasswordLocals } from '../emails/locals';
@@ -11,77 +13,86 @@ import UtilFunctions from '../utils/UtilFunctions';
 
 export class EmailVerificationController extends Singleton {
     private readonly emailVerificationDao: EmailVerificationSequelizeDao = emailVerificationSequelizeDao;
-    private readonly userModel: typeof User = User;
+    private readonly userSequelizeDao: UserSequelizeDao = userSequelizeDao;
     private readonly sendMail = sendMail;
     private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
 
-    public sendVerificationCodeByPurpose = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
-        const { purpose: emailPurpose } = req.params;
-        const { email } = req.body;
-        const user = await this.userModel.findOne({
-            where: {
-                email,
-            },
-        });
+    public sendVerificationCodeByPurpose = this.utilFunctions.catchAsync(
+        async (req, res: express.Response, next): Promise<void> => {
+            const { purpose: emailPurpose } = req.params;
+            const user: User = res.locals.user;
+            let code: number;
 
-        if (!user) {
-            throw new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.USER_NOT_FOUND);
-        }
+            if (user.lastVerificationRequested) {
+                const interval = 2 * 60 * 1000;
 
-        const code = await this.emailVerificationDao.createAndStoreVerificationCodeInDb(email);
-        let emailOptions: EmailOptions;
-
-        switch (emailPurpose) {
-            case EmailPurpose[10]: {
-                emailOptions = new ConfirmEmailOptions(email);
-
-                await this.sendMail<IConfirmEmailLocals>(emailOptions, RelativePathsToTemplates.CONFIRM_EMAIL, {
-                    name: user.name,
-                    code,
-                });
-
-                break;
+                if (Date.now() - user.lastVerificationRequested < interval) {
+                    throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.WAIT_BEFORE_GETTING_EMAIL);
+                }
             }
 
-            case EmailPurpose[11]: {
-                emailOptions = new PasswordRecoveryEmailOptions(email);
+            code = await this.emailVerificationDao.createAndStoreVerificationCodeInDb(user.email);
 
-                await this.sendMail<IRecoverPasswordLocals>(emailOptions, RelativePathsToTemplates.CONFIRM_EMAIL, {
-                    name: user.name,
-                    code,
-                });
+            let emailOptions: EmailOptions;
 
-                break;
+            switch (emailPurpose) {
+                case EmailPurpose[10]: {
+                    emailOptions = new ConfirmEmailOptions(user.email);
+
+                    // FIXME ConfirmEmail or ConfirmAccount? Should finally be defined!
+                    await this.sendMail<IConfirmEmailLocals>(emailOptions, RelativePathsToTemplates.CONFIRM_EMAIL, {
+                        name: user.name,
+                        code,
+                    });
+
+                    break;
+                }
+
+                case EmailPurpose[11]: {
+                    emailOptions = new PasswordRecoveryEmailOptions(user.email);
+
+                    await this.sendMail<IRecoverPasswordLocals>(emailOptions, RelativePathsToTemplates.CONFIRM_EMAIL, {
+                        name: user.name,
+                        code,
+                    });
+
+                    break;
+                }
             }
+
+            await this.userSequelizeDao.updateUserLastVerificationRequest(user);
+
+            this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.EMAIL_SENT);
         }
+    );
 
-        this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.EMAIL_SENT);
-    });
+    public checkVerificationCode = this.utilFunctions.catchAsync(
+        async (req, res: express.Response, next): Promise<void> => {
+            const { currentCode, recovery } = req.body;
+            const user: User = res.locals.user;
+            const verificationCode = await this.emailVerificationDao.getVerificationCodeFromDb(user.email, currentCode);
+            const interval = 15 * 60 * 1000;
+            const codeCreatedAt = new Date(verificationCode.createdAt).getTime();
 
-    public checkVerificationCode = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
-        // NOTE возможно нам нужно брать email из sessionStorage
+            if (Date.now() - codeCreatedAt > interval) {
+                throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.EXPIRED_REQUEST);
+            }
 
-        const { currentCode, email } = req.body;
-        const verificationCode = await this.emailVerificationDao.getVerificationCodeFromDb(email, currentCode);
+            if (!verificationCode || currentCode !== verificationCode.code) {
+                throw new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.VERIFICATION_CODE_NOT_VALID);
+            }
 
-        if (!verificationCode || currentCode !== verificationCode.code) {
-            throw new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.VERIFICATION_CODE_NOT_VALID);
+            if (recovery) {
+                await this.utilFunctions.signTokenAndStoreInCookies(
+                    res,
+                    { id: user.id, recovery: true },
+                    { expiresIn: '15m' }
+                );
+            }
+
+            this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.VERIFICATION_CODE_VALID);
         }
-
-        const user = await this.userModel.findOne({ where: { email } });
-
-        if (!user) {
-            throw new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.USER_NOT_FOUND);
-        }
-        // next() -- means that code is correct. then we use account is confirmed
-        await this.utilFunctions.signTokenAndStoreInCookies(
-            res,
-            { id: user.id, temporary: true },
-            { expiresIn: '15m' }
-        );
-
-        this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.VERIFICATION_CODE_VALID);
-    });
+    );
 }
 
 export const emailVerificationController =

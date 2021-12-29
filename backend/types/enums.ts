@@ -99,6 +99,8 @@ export enum ResponseMessages {
     USER_IS_LOGGED_IN = 'Пользователь авторизован.',
     USER_IS_NOT_LOGGED_IN = 'Пользователь не авторизован.',
     LOGGED_OUT = 'Будем скучать!',
+    USER_NOT_FOUND = 'Пользователь не найден',
+    USER_IS_CONFIRMED = 'Пользователь подтвержден.',
 }
 
 export enum ErrorMessages {
@@ -125,9 +127,13 @@ export enum ErrorMessages {
     MULTER_ERROR = 'Произошла ошибка при загрузке файла.',
     NOT_ENOUGH_RIGHTS = 'Недостаточно прав.',
     VERIFICATION_CODE_NOT_VALID = 'Неверный код.',
-    EMAIL_IS_EMPTY = 'Пожалуйста, укажите Вашу эл. почту',
+    EMAIL_IS_EMPTY = 'Пожалуйста, укажите Вашу эл. почту.',
     NAME_SHOULD_BE_LITERAL_AND_CYRILLIC_ONLY = "Имя пользователя может состоять только из символов А-Я, а также '-'.",
-    USER_ALREADY_CONFIRMED = 'Пользователь уже подтвержден.',
+    USER_ALREADY_CONFIRMED = 'Аккаунт уже подтвержден.',
+    USER_NOT_CONFIRMED = 'Подтвердите аккаунт.',
+    NOT_AUTHORIZED = 'Авторизуйтесь.',
+    WAIT_BEFORE_GETTING_EMAIL = 'Получить код повторно можно только по истечении 2 минут.',
+    EXPIRED_REQUEST = 'Срок действия кода истек. Повторите попытку.',
 }
 
 export enum Environment {

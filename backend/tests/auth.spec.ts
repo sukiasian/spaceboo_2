@@ -1,12 +1,15 @@
 import * as express from 'express';
 import * as request from 'supertest';
+import * as faker from 'faker';
+import * as jwt from 'jsonwebtoken';
 import { Application } from '../App';
-import { IUserCreate, User } from '../models/user.model';
+import { IUserCreate, User, userCreateFields } from '../models/user.model';
 import {
     clearDb,
     closeTestEnv,
     createApplicationInstance,
     createInvalidUserData,
+    createSpaceData,
     createTokenAndSign,
     createUserData,
     openTestEnv,
@@ -14,6 +17,7 @@ import {
 } from './lib';
 import { Sequelize } from 'sequelize-typescript';
 import { ApiRoutes, ErrorMessages, HttpStatus } from '../types/enums';
+import { ISpaceCreate } from '../models/space.model';
 
 describe('Auth (e2e)', () => {
     let app: express.Express;
@@ -220,5 +224,52 @@ describe('Auth (e2e)', () => {
 
         expect(res_2.status).toBe(HttpStatus.FORBIDDEN);
     });
-    // check route protectors ?
+
+    it("POST '/signup' should not allow to manually set confirmed field", async () => {
+        userData.confirmed = true;
+        const user = await userModel.create(userData, { fields: userCreateFields });
+
+        expect(user.confirmed).toBeFalsy();
+    });
+
+    it("POST '/signup' should not allow to register with non cyrillic name", async () => {
+        userData.name = faker.name.firstName();
+        const res = await request(app).post(`${ApiRoutes.AUTH}/signup`).send(userData);
+
+        expect(res.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    });
+
+    it("POST '/signup' should not allow to register with any symbol except '-'", async () => {
+        userData.name = faker.name.firstName() + '_';
+        const res = await request(app).post(`${ApiRoutes.AUTH}/signup`).send(userData);
+
+        expect(res.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    });
+
+    it('Unconfirmed user should be unable to access protected routes', async () => {
+        let user: User;
+        let token: string;
+
+        user = await userModel.create(userData);
+        token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY);
+        const spaceData = createSpaceData(user.id, 1);
+        const res_1 = await request(app)
+            .post(`${ApiRoutes.SPACES}`)
+            .send(spaceData)
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res_1.status).toBe(HttpStatus.CREATED);
+
+        userData.confirmed = false;
+        userData.email = faker.internet.email();
+        user = await userModel.create(userData);
+        token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY);
+
+        const res_2 = await request(app)
+            .post(`${ApiRoutes.SPACES}`)
+            .send(spaceData)
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res_2.status).toBe(HttpStatus.FORBIDDEN);
+    });
 });

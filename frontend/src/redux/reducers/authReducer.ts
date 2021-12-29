@@ -1,15 +1,23 @@
 import { ReduxAuthActions } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 
+interface IUserLoginState {
+    loggedIn: boolean;
+    confirmed: boolean;
+}
+
 export interface IAuthState {
-    userIsLoggedIn: boolean;
+    userLoginState: IUserLoginState;
     loginResponse?: any;
     signupResponse?: any;
     logoutResponse?: any;
 }
 
 const initialState: IAuthState = {
-    userIsLoggedIn: false,
+    userLoginState: {
+        loggedIn: false,
+        confirmed: false,
+    },
 };
 
 export const authReducer = (state = initialState, action: IAction<ReduxAuthActions>): IAuthState => {
@@ -17,7 +25,7 @@ export const authReducer = (state = initialState, action: IAction<ReduxAuthActio
         case ReduxAuthActions.FETCH_USER_IS_LOGGED_IN:
             return {
                 ...state,
-                userIsLoggedIn: action.payload,
+                userLoginState: action.payload,
             };
 
         case ReduxAuthActions.LOGIN_USER:

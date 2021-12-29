@@ -39,6 +39,8 @@ export default function LoginModal(props: ILoginModal) {
                         openingModalAction={toggleSignupModalAction}
                         closingModalAction={toggleLoginModalAction}
                     />
+
+                    <p className="login-modal__forgot-password">Забыли пароль?</p>
                 </div>
             );
         }

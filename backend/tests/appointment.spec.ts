@@ -17,7 +17,6 @@ import { ApiRoutes, HttpStatus } from '../types/enums';
 import { ISpaceCreate, Space } from '../models/space.model';
 import { Appointment } from '../models/appointment.model';
 import { City } from '../models/city.model';
-import { IResIsoDatesReserved } from '../../frontend/src/types/resTypes';
 
 describe('Appointment (e2e)', () => {
     let app: express.Express;
@@ -34,9 +33,9 @@ describe('Appointment (e2e)', () => {
     let cityModel: typeof City;
     let space: Space;
     let appointmentModel: typeof Appointment;
-    let resIsoDatesToReserve: IResIsoDatesReserved;
-    let resIsoDatesToReserveNarrow: IResIsoDatesReserved;
-    let resIsoDatesToReserveWide: IResIsoDatesReserved;
+    let resIsoDatesToReserve: any;
+    let resIsoDatesToReserveNarrow: any;
+    let resIsoDatesToReserveWide: any;
 
     beforeAll(async () => {
         dotenv.config({ path: '../test.env' });

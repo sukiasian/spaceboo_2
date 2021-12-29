@@ -35,6 +35,10 @@ export class UserSequelizeDao extends Dao {
 
         await this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, annualizeRawQuery);
     };
+
+    public updateUserLastVerificationRequest = async (user: User): Promise<void> => {
+        await user.update({ lastVerificationRequested: Date.now() });
+    };
 }
 
 export const userSequelizeDao = SingletonFactory.produce<UserSequelizeDao>(UserSequelizeDao);

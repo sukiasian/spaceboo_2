@@ -51,7 +51,7 @@ export class RouteProtector {
 
         const payload = this.jwt.decode(token) as jwt.JwtPayload;
 
-        if (!payload.temporary) {
+        if (!payload.recovery) {
             throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.NOT_ENOUGH_RIGHTS);
         }
 
@@ -63,7 +63,7 @@ export class RouteProtector {
 
         req.user = {
             id: user.id,
-            temporary: true,
+            recovery: true,
         };
 
         next();

@@ -3,6 +3,7 @@ import {
     changeUserPasswordFields,
     IUserPasswordChange,
     User,
+    userConfirmedField,
     userCreateFields,
     UserScopes,
 } from '../models/user.model';
@@ -19,8 +20,6 @@ export class AuthSequelizeDao extends Dao {
 
     // FIXME fix data - use userData and pick a proper datatype
     public signUpLocal = async (userData: any): Promise<User> => {
-        // NOTE we do so because password and passwordConfirmation are required
-        // NOTE probably ✅       !!! user should be unable to specify role - only admin should do
         if (userData.password && userData.passwordConfirmation) {
             return this.model.create(userData, { fields: userCreateFields });
         } else {
@@ -31,11 +30,11 @@ export class AuthSequelizeDao extends Dao {
     public editUserPassword = async (
         userId: string,
         passwordResetData: IUserPasswordChange,
-        temporary: boolean = false
+        recovery: boolean = false
     ) => {
         const user = await this.model.scope(UserScopes.WITH_PASSWORD).findOne({ where: { id: userId } });
 
-        if (!temporary) {
+        if (!recovery) {
             if (passwordResetData.oldPassword && !(await user.verifyPassword(user)(passwordResetData.oldPassword))) {
                 throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.PASSWORD_INCORRECT);
             } else if (!passwordResetData.oldPassword) {
@@ -55,7 +54,7 @@ export class AuthSequelizeDao extends Dao {
     public confirmAccount = async (userId: string) => {
         const user = await this.model.scope(UserScopes.WITH_CONFIRMED).findOne({ where: { id: userId } });
 
-        user.update({ confirmed: true });
+        await user.update({ confirmed: true }, { fields: userConfirmedField });
     };
 }
 

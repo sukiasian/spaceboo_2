@@ -1,9 +1,6 @@
 import { Router } from 'express';
-import * as passport from 'passport';
-import { authController } from '../controllers/auth.controller';
 import { EmailVerificationController, emailVerificationController } from '../controllers/email-verification.controller';
-import logger from '../loggers/logger';
-import { LoggerLevels, PassportStrategies } from '../types/enums';
+import { Middleware } from '../utils/Middleware';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
 import { IRouter } from './router';
 
@@ -14,12 +11,20 @@ export enum EmailPurpose {
 
 class EmailVerificationRouter extends Singleton implements IRouter {
     private readonly emailVerificationController: EmailVerificationController = emailVerificationController;
+    private readonly middleware: typeof Middleware = Middleware;
     public readonly router = Router();
 
     public prepareRouter = (): void => {
-        this.router.route('/').post(this.emailVerificationController.checkVerificationCode);
+        this.router
+            .route('/')
+            .post(this.middleware.retrieveEmailFromRequest, this.emailVerificationController.checkVerificationCode);
 
-        this.router.route('/:purpose').post(this.emailVerificationController.sendVerificationCodeByPurpose);
+        this.router
+            .route('/:purpose')
+            .post(
+                this.middleware.retrieveEmailFromRequest,
+                this.emailVerificationController.sendVerificationCodeByPurpose
+            );
     };
 }
 

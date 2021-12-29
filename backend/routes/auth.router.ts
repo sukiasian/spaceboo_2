@@ -33,11 +33,11 @@ class AuthRouter extends Singleton implements IRouter {
                 this.authController.editUserPassword
             );
 
-        this.router.get('/userIsLoggedIn', this.authController.userIsLoggedIn);
+        this.router.get('/userIsLoggedIn', this.authController.getUserLoginState);
 
         this.router.get(
             '/logout',
-            this.passport.authenticate(PassportStrategies.JWT, { session: false }),
+            // this.passport.authenticate(PassportStrategies.JWT, { session: false }),
             this.authController.logout
         );
         // нужно три разных роута - один отправлет письмо на имейл, другой должен проверить совпадает ли введенное значение, и если да - то позволить изменить пароль.

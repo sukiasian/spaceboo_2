@@ -6,7 +6,13 @@ import { ErrorMessages, HttpStatus, ResponseMessages } from '../types/enums';
 import { authSequelizeDao, AuthSequelizeDao } from '../daos/auth.sequelize.dao';
 import UtilFunctions from '../utils/UtilFunctions';
 import { sendMail } from '../emails/Email';
+import { UserScopes } from '../models/user.model';
 import AppError from '../utils/AppError';
+
+interface IUserLoginState {
+    loggedIn: boolean;
+    confirmed: boolean;
+}
 
 export class AuthController extends Singleton {
     private readonly authSequelizeDao: AuthSequelizeDao = authSequelizeDao;
@@ -32,18 +38,22 @@ export class AuthController extends Singleton {
 
     public editUserPassword = this.utilFunctions.catchAsync(async (req, res: express.Response, next): Promise<void> => {
         const { id: userId } = req.user;
-        const temporary = req.user.temporary || false;
+        const recovery = req.user.recovery || false;
         const passwordData = req.body.passwordData;
 
-        await this.authSequelizeDao.editUserPassword(userId, passwordData, temporary);
+        await this.authSequelizeDao.editUserPassword(userId, passwordData, recovery);
 
-        temporary
+        recovery
             ? this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.PASSWORD_RECOVERED)
             : this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.PASSWORD_EDITED);
     });
 
-    public userIsLoggedIn = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+    public getUserLoginState = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const token = req.cookies['jwt'] as string;
+        let userLoginState: IUserLoginState = {
+            loggedIn: false,
+            confirmed: false,
+        };
 
         if (token) {
             const verifyToken: (
@@ -58,44 +68,81 @@ export class AuthController extends Singleton {
             >(jwt.verify);
 
             const payload: string | jwt.JwtPayload = jwt.decode(token);
-            const user = await this.authSequelizeDao.findById((payload as jwt.JwtPayload).id);
+            const user = await this.authSequelizeDao.model.scope(UserScopes.WITH_CONFIRMED).findOne({
+                where: {
+                    id: (payload as jwt.JwtPayload).id,
+                },
+            });
 
             if (!user) {
+                userLoginState = {
+                    loggedIn: false,
+                    confirmed: false,
+                };
+
                 return this.utilFunctions.sendResponse(res)(
                     HttpStatus.OK,
-                    ResponseMessages.USER_IS_NOT_LOGGED_IN,
-                    false
+                    ResponseMessages.USER_NOT_FOUND,
+                    userLoginState
                 );
             }
 
             const verifiedToken = await verifyToken(token, process.env.JWT_SECRET_KEY);
 
             if (verifiedToken) {
-                return this.utilFunctions.sendResponse(res)(
-                    HttpStatus.OK,
-                    ResponseMessages.USER_IS_NOT_LOGGED_IN,
-                    true
-                );
+                if (user.confirmed) {
+                    userLoginState = {
+                        loggedIn: true,
+                        confirmed: true,
+                    };
+
+                    return this.utilFunctions.sendResponse(res)(
+                        HttpStatus.OK,
+                        ResponseMessages.USER_IS_CONFIRMED,
+                        userLoginState
+                    );
+                } else {
+                    userLoginState = {
+                        loggedIn: true,
+                        confirmed: false,
+                    };
+
+                    return this.utilFunctions.sendResponse(res)(
+                        HttpStatus.OK,
+                        ResponseMessages.USER_IS_LOGGED_IN,
+                        userLoginState
+                    );
+                }
             }
         }
 
-        return this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.USER_IS_NOT_LOGGED_IN, false);
+        return this.utilFunctions.sendResponse(res)(
+            HttpStatus.OK,
+            ResponseMessages.USER_IS_NOT_LOGGED_IN,
+            userLoginState
+        );
 
         // FIXME нужно при ошибке отправлять еще один запрос на проверку - делаться должно это в саге
     });
 
     public logout = this.utilFunctions.catchAsync(
         async (req: express.Request, res: express.Response, next): Promise<void> => {
-            res.clearCookie('jwt');
+            const cookie = req.cookies['jwt'];
 
-            this.utilFunctions.sendResponse(res)(HttpStatus.OK, 'Logged out');
+            if (cookie) {
+                res.clearCookie('jwt');
+
+                return this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.LOGGED_OUT);
+            }
+
+            throw new AppError(HttpStatus.UNAUTHORIZED, ErrorMessages.NOT_AUTHORIZED);
         }
     );
 
     public confirmAccount = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         await this.authSequelizeDao.confirmAccount(req.user.id);
 
-        this.utilFunctions.sendResponse(res)(HttpStatus.OK, 'Logged out');
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.LOGGED_OUT);
     });
 }
 
