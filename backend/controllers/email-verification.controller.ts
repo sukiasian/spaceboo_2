@@ -1,4 +1,6 @@
 import * as express from 'express';
+import * as jwt from 'jsonwebtoken';
+import { authSequelizeDao, AuthSequelizeDao } from '../daos/auth.sequelize.dao';
 import { emailVerificationSequelizeDao, EmailVerificationSequelizeDao } from '../daos/email-verification.dao';
 import { userSequelizeDao, UserSequelizeDao } from '../daos/user.sequelize.dao';
 import { RelativePathsToTemplates, sendMail } from '../emails/Email';
@@ -14,6 +16,7 @@ import UtilFunctions from '../utils/UtilFunctions';
 export class EmailVerificationController extends Singleton {
     private readonly emailVerificationDao: EmailVerificationSequelizeDao = emailVerificationSequelizeDao;
     private readonly userSequelizeDao: UserSequelizeDao = userSequelizeDao;
+    private readonly authSequelizeDao: AuthSequelizeDao = authSequelizeDao;
     private readonly sendMail = sendMail;
     private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
 
@@ -62,15 +65,22 @@ export class EmailVerificationController extends Singleton {
 
             await this.userSequelizeDao.updateUserLastVerificationRequest(user);
 
-            this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.EMAIL_SENT);
+            this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.EMAIL_SENT, {
+                lastVerificationRequested: user.lastVerificationRequested,
+            });
         }
     );
 
-    public checkVerificationCode = this.utilFunctions.catchAsync(
+    public checkVerificationCodeAndProcessRequest = this.utilFunctions.catchAsync(
         async (req, res: express.Response, next): Promise<void> => {
-            const { currentCode, recovery } = req.body;
+            const { currentCode, recovery, confirmation } = req.body;
             const user: User = res.locals.user;
             const verificationCode = await this.emailVerificationDao.getVerificationCodeFromDb(user.email, currentCode);
+
+            if (!verificationCode || currentCode !== verificationCode.code) {
+                throw new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.VERIFICATION_CODE_NOT_VALID);
+            }
+
             const interval = 15 * 60 * 1000;
             const codeCreatedAt = new Date(verificationCode.createdAt).getTime();
 
@@ -78,21 +88,33 @@ export class EmailVerificationController extends Singleton {
                 throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.EXPIRED_REQUEST);
             }
 
-            if (!verificationCode || currentCode !== verificationCode.code) {
-                throw new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.VERIFICATION_CODE_NOT_VALID);
-            }
-
+            // TODO use private functions instead, and the implementation will become pretty good.
             if (recovery) {
-                await this.utilFunctions.signTokenAndStoreInCookies(
-                    res,
-                    { id: user.id, recovery: true },
-                    { expiresIn: '15m' }
-                );
+                await this.processRecovery(res, { id: user.id, recovery: true }, { expiresIn: '15m' });
+            } else if (confirmation) {
+                await this.processConfirmation(user.id);
             }
 
             this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.VERIFICATION_CODE_VALID);
+
+            await verificationCode.destroy();
+            await user.update({ lastVerificationRequested: undefined });
         }
     );
+
+    private processRecovery = async (
+        res: express.Response,
+        jwtPayload: object,
+        signOptions: jwt.SignOptions = {}
+    ): Promise<void> => {
+        await this.utilFunctions.signTokenAndStoreInCookies(res, jwtPayload, signOptions);
+    };
+
+    private processConfirmation = async (userId: string): Promise<void> => {
+        await this.authSequelizeDao.confirmAccount(userId);
+    };
+
+    public getLastVerificationRequired;
 }
 
 export const emailVerificationController =

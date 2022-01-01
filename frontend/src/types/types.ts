@@ -1,3 +1,32 @@
+export interface IResIsoDatesReserved {
+    beginningDate: string;
+    beginningTime: string;
+    endingDate: string;
+    endingTime: string;
+}
+
+export interface IServerRes {
+    status: HttpStatus;
+    message: string;
+    data: any;
+}
+
+// TODO
+export interface IServerErr {}
+
+export interface IComponentDivProps {
+    mainDivClassName: string;
+}
+
+export interface ITimeUnits {
+    year?: number;
+    month?: number | string;
+    days?: number;
+    hours?: number;
+    minutes?: number;
+    seconds?: number;
+}
+
 export enum HttpStatus {
     CONTINUE = 100,
     SWITCHING_PROTOCOLS = 101,
@@ -49,26 +78,6 @@ export enum HttpStatus {
     HTTP_VERSION_NOT_SUPPORTED = 505,
 }
 
-export interface IResIsoDatesReserved {
-    beginningDate: string;
-    beginningTime: string;
-    endingDate: string;
-    endingTime: string;
-}
-
-export interface IServerRes {
-    status: HttpStatus;
-    message: string;
-    data: any;
-}
-
-// TODO
-export interface IServerErr {}
-
-export interface IComponentDivProps {
-    mainDivClassName: string;
-}
-
 export enum ReduxSpaceActions {
     FETCH_SPACES = 'FETCH_SPACES',
 }
@@ -80,6 +89,7 @@ export enum ReduxAuthActions {
     ANNUALIZE_LOGIN_RESPONSE = 'ANNUALIZE_LOGIN_RESPONSE',
     SIGNUP_USER = 'SIGNUP_USER',
     ANNUALIZE_SIGNUP_RESPONSE = 'ANNUALIZE_SIGNUP_RESPONSE',
+    ANNUALIZE_LOGOUT_RESPONSE = 'ANNUALIZE_LOGOUT_RESPONSE',
 }
 
 export enum ReduxCitiesActions {
@@ -97,14 +107,22 @@ export enum ReduxUserActions {
     FETCH_USER = 'FETCH_USER',
 }
 
+export enum ReduxEmailVerificationActions {
+    SEND_VERIFICATION_CODE = 'SEND_VERIFICATION_CODE',
+    CHECK_VERIFICATION_CODE = 'CHECK_VERIFICATION_CODE',
+    ANNUALIZE_SEND_VERIFICATION_CODE_RESPONSE = 'ANNUALIZE_SEND_VERIFICATION_CODE_RESPONSE',
+}
+
 export enum SagaTasks {
     REQUEST_SPACES = 'REQUEST_SPACES',
-    REQUEST_USER_IS_LOGGED_IN = 'REQUEST_LOGGED_IN',
+    REQUEST_USER_LOGIN_STATE = 'REQUEST_USER_LOGIN_STATE',
     REQUEST_CITIES = 'REQUEST_CITIES',
     REQUEST_CITIES_BY_SEARCH_PATTERN = 'REQUEST_CITIES_BY_SEARCH_PATTERN',
     REQUEST_USER_LOGOUT = 'REQUEST_USER_LOGOUT',
     POST_LOGIN = 'POST_LOGIN',
     POST_SIGNUP = 'POST_SIGNUP',
+    POST_SEND_VERIFICATION_CODE = 'POST_SEND_VERIFICATION_CODE',
+    POST_CHECK_VERIFICATION_CODE = 'POST_CHECK_VERIFICATION_CODE',
 }
 
 export enum ApiUrls {
@@ -112,9 +130,10 @@ export enum ApiUrls {
     USERS = 'users',
     AUTH = 'auth',
     CITIES = 'cities',
+    EMAIL_VERIFICATION = 'emailVerification',
 }
 
-export enum AlertType {
+export enum AlertTypes {
     SUCCESS = 'success',
     FAILURE = 'failure',
     WARNING = 'warning',
@@ -122,4 +141,9 @@ export enum AlertType {
 
 export enum CustomResponseMessages {
     UNKNOWN_ERROR = 'Произошла ошибка. Попробуйте еще раз.',
+}
+
+// TODO
+export enum LocalStorageItems {
+    LAST_VERIFICATION_REQUESTED = 'lastVerificationRequested',
 }

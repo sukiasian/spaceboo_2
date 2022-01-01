@@ -4,7 +4,7 @@ import { Dispatch } from 'redux';
 import Footer from './components/Footer';
 import Navbar from './components/Navbar';
 import { IAction } from './redux/actions/ActionTypes';
-import { requestUserIsLoggedInAction } from './redux/actions/authActions';
+import { requestUserLoginState } from './redux/actions/authActions';
 import { requestCitiesAction } from './redux/actions/cityActions';
 import { requestSpacesAction } from './redux/actions/spaceActions';
 import Routes from './routes/Routes';
@@ -13,7 +13,7 @@ import Routes from './routes/Routes';
 function App(): JSX.Element {
     const dispatch: Dispatch<IAction> = useDispatch();
     const requestAppData = useCallback(() => {
-        dispatch(requestUserIsLoggedInAction());
+        dispatch(requestUserLoginState());
         dispatch(requestSpacesAction());
         dispatch(requestCitiesAction());
     }, [dispatch]);

@@ -5,7 +5,7 @@ import { toggleLoginModalAction, toggleSignupModalAction } from '../redux/action
 import { IComponentDivProps } from '../types/types';
 import ModalsTitle from '../components/ModalsTitle';
 import LoginForm from '../forms/LoginForm';
-import { annualizeLoginResponseAction, requestUserIsLoggedInAction } from '../redux/actions/authActions';
+import { annualizeLoginResponseAction, requestUserLoginState } from '../redux/actions/authActions';
 import SwitchTypeOfAuth, { SwitchModalFor } from '../components/SwitchAuthModal';
 
 interface ILoginModal extends IComponentDivProps {}
@@ -19,7 +19,7 @@ export default function LoginModal(props: ILoginModal) {
     const handleAfterLogin = () => {
         dispatch(toggleLoginModalAction());
         dispatch(annualizeLoginResponseAction());
-        dispatch(requestUserIsLoggedInAction());
+        dispatch(requestUserLoginState());
     };
     const renderLoginModalBox = (): JSX.Element | void => {
         if (loginModalIsOpen) {

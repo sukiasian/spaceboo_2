@@ -3,13 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import LoginModal from '../modals/LoginModal';
 import SignupModal from '../modals/SignupModal';
-import { requestUserIsLoggedInAction, requestUserLogoutAction } from '../redux/actions/authActions';
+import { requestUserLoginState, requestUserLogoutAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { AlertType } from '../types/types';
+import { AlertTypes, HttpStatus } from '../types/types';
 import Alert from './Alert';
 import CityPicker from './CityPicker';
 
-// FIXME нам нужно разделить логику так чтобы Город был отдельным элементом со всем вытекающим (<City />)
 export default function Navbar(): ReactElement {
     const { userLoginState, logoutResponse } = useSelector((state: IReduxState) => state.authStorage);
     const dispatch = useDispatch();
@@ -17,16 +16,18 @@ export default function Navbar(): ReactElement {
         dispatch(requestUserLogoutAction());
     };
     const refreshUserLoggedInAfterLogout = (): void => {
-        dispatch(requestUserIsLoggedInAction());
+        if (logoutResponse && logoutResponse.statusCode === HttpStatus.OK) {
+            dispatch(requestUserLoginState());
+            dispatch({ type: 'ANNUALIZE_LOGOUT_RESPONSE' });
+        }
     };
     const renderLogoutError = (): JSX.Element | void => {
         if (logoutResponse && logoutResponse.error) {
-            return <Alert alertType={AlertType.FAILURE} alertMessage={logoutResponse.error.message} />;
+            return <Alert alertType={AlertTypes.FAILURE} alertMessage={logoutResponse.error.message} />;
         }
     };
 
     useEffect(refreshUserLoggedInAfterLogout, [logoutResponse, dispatch]);
-    console.log(userLoginState);
 
     return (
         <nav className="navbar">

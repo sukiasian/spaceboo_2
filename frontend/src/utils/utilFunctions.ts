@@ -23,3 +23,7 @@ export const toggleLoginOrSignupModal = (
 export const updateDocumentTitle = (title: string): void => {
     document.title = title;
 };
+
+export const formatTimeUnitToTwoDigitString = (timeUnit: number): string => {
+    return timeUnit > 9 ? `${timeUnit}` : `0${timeUnit}`;
+};

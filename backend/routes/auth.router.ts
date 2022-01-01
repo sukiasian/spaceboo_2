@@ -33,7 +33,7 @@ class AuthRouter extends Singleton implements IRouter {
                 this.authController.editUserPassword
             );
 
-        this.router.get('/userIsLoggedIn', this.authController.getUserLoginState);
+        this.router.get('/userLoginState', this.authController.getUserLoginState);
 
         this.router.get(
             '/logout',

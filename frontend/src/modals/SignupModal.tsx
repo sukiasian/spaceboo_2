@@ -4,7 +4,7 @@ import { IReduxState } from '../redux/reducers/rootReducer';
 import { toggleLoginModalAction, toggleSignupModalAction } from '../redux/actions/modalActions';
 import { IComponentDivProps } from '../types/types';
 import ModalsTitle from '../components/ModalsTitle';
-import { annualizeSignupResponseAction, requestUserIsLoggedInAction } from '../redux/actions/authActions';
+import { annualizeSignupResponseAction, requestUserLoginState } from '../redux/actions/authActions';
 import SignupForm from '../forms/SignupForm';
 import SwitchTypeOfAuth, { SwitchModalFor } from '../components/SwitchAuthModal';
 
@@ -17,10 +17,11 @@ export default function SignupModal(props: ISignupModal): JSX.Element {
         dispatch(toggleSignupModalAction());
     };
     const handleAfterSignup = (): void => {
-        dispatch(toggleSignupModalAction());
+        dispatch(requestUserLoginState());
         dispatch(annualizeSignupResponseAction());
-        dispatch(requestUserIsLoggedInAction());
+        dispatch(toggleSignupModalAction());
     };
+
     const renderSingupModalBox = (): JSX.Element | void => {
         if (signupModalIsOpen) {
             return (

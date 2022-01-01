@@ -19,8 +19,6 @@ export class Middleware {
                 const payload = jwt.decode(token) as jwt.JwtPayload;
 
                 user = await this.userModel.findOne({ where: { id: payload.id as string } });
-
-                email = user.email;
             } else {
                 email = req.body.email;
 

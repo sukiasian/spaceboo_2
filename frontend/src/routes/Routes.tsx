@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux';
 import { Route, Routes as ReactRoutes } from 'react-router-dom';
 import AboutUsPage from '../pages/AboutUsPage';
+import ConfirmAccountPage from '../pages/ConfirmAccountPage';
 import ContactUsPage from '../pages/ContactUsPage';
 import CreateSpacePage from '../pages/CreateSpacePage';
 import ForInvestorsPage from '../pages/ForInvestorsPage';
@@ -19,7 +20,7 @@ export default function Routes(): JSX.Element {
     if (userLoginState.loggedIn && !userLoginState.confirmed) {
         return (
             <ReactRoutes>
-                <Route path="/" element={<HomePage />} />
+                <Route path="/" element={<ConfirmAccountPage />} />
                 {/*  NOTE on '/' element (or homepage should be) should be account-verification */}
                 <Route path="/for-inverstors" element={<ForInvestorsPage />} />
                 <Route path="/how-it-works" element={<HowItWorksPage />} />

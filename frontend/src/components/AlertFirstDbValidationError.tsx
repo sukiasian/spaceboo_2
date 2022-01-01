@@ -1,4 +1,4 @@
-import { AlertType, CustomResponseMessages, HttpStatus } from '../types/types';
+import { AlertTypes, CustomResponseMessages, HttpStatus } from '../types/types';
 import Alert from './Alert';
 
 export type TPostDbResponse = {
@@ -19,14 +19,14 @@ export default function AlertFirstDbValidationError(props: IAlertFirstDbValidati
 
     if (response && response.error) {
         if (response.error.errors) {
-            return <Alert alertType={AlertType.FAILURE} alertMessage={response.error.errors[0].message} />;
+            return <Alert alertType={AlertTypes.FAILURE} alertMessage={response.error.errors[0].message} />;
         } else {
             switch (response.statusCode) {
                 case HttpStatus.INTERNAL_SERVER_ERROR:
-                    return <Alert alertType={AlertType.FAILURE} alertMessage={CustomResponseMessages.UNKNOWN_ERROR} />;
+                    return <Alert alertType={AlertTypes.FAILURE} alertMessage={CustomResponseMessages.UNKNOWN_ERROR} />;
 
                 default:
-                    return <Alert alertType={AlertType.FAILURE} alertMessage={response.message} />;
+                    return <Alert alertType={AlertTypes.FAILURE} alertMessage={response.message} />;
             }
         }
     } else {

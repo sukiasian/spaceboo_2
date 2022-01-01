@@ -3,9 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { postLoginAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import InputWithLabel, { InputAutoCompleteOptions, IFormInputs, InputTypes } from '../components/InputWithLabel';
-
 import Alert from '../components/Alert';
-import { AlertType, CustomResponseMessages, HttpStatus } from '../types/types';
+import { AlertTypes, CustomResponseMessages, HttpStatus } from '../types/types';
 
 export interface ILoginData {
     [key: keyof IFormInputs]: string | undefined;
@@ -62,6 +61,7 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
         Object.keys(formInputs).forEach((inputName: string) => {
             loginData[inputName] = formInputs[inputName].value;
         });
+
         dispatch(postLoginAction(loginData));
     };
     const renderInputs = (): JSX.Element[] => {
@@ -83,14 +83,14 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
             );
         });
     };
-    const renderLoginAlerts = (): JSX.Element | void => {
+    const renderLoginErrorAlerts = (): JSX.Element | void => {
         if (loginResponse && loginResponse.error) {
             switch (loginResponse.error.statusCode) {
                 case HttpStatus.UNAUTHORIZED:
-                    return <Alert alertType={AlertType.FAILURE} alertMessage={loginResponse.message} />;
+                    return <Alert alertType={AlertTypes.FAILURE} alertMessage={loginResponse.message} />;
 
                 default:
-                    return <Alert alertType={AlertType.FAILURE} alertMessage={CustomResponseMessages.UNKNOWN_ERROR} />;
+                    return <Alert alertType={AlertTypes.FAILURE} alertMessage={CustomResponseMessages.UNKNOWN_ERROR} />;
             }
         }
     };
@@ -106,7 +106,7 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
                     Войти
                 </button>
             </form>
-            {renderLoginAlerts()}
+            {renderLoginErrorAlerts()}
         </div>
     );
 }

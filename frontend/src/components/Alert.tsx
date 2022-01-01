@@ -1,7 +1,7 @@
-import { AlertType } from '../types/types';
+import { AlertTypes } from '../types/types';
 
 interface IAlertProps {
-    alertType: AlertType;
+    alertType: AlertTypes;
     alertMessage: string;
 }
 

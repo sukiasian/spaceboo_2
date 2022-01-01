@@ -5,7 +5,6 @@ import * as dotenv from 'dotenv';
 import { Environment } from './types/enums';
 import UtilFunctions from './utils/UtilFunctions';
 import databaseConnection from './database/connectToDb';
-import { sendMail } from './emails/Email';
 
 const PORT = process.env.PORT || 8000;
 
@@ -31,5 +30,3 @@ if (process.env.NODE_ENV === Environment.DEVELOPMENT) {
 
     UtilFunctions.exitHandler(server);
 })();
-
-sendMail({ to: 'sukiasiansam@gmail.com', from: 'sam@spaceboo.com', text: 'hi', subject: 'hello' });

@@ -4,9 +4,9 @@ import { ISignupData } from '../../forms/SignupForm';
 import { ReduxAuthActions, SagaTasks } from '../../types/types';
 import { IAction } from './ActionTypes';
 
-export const requestUserIsLoggedInAction = (): Action<SagaTasks> => {
+export const requestUserLoginState = (): Action<SagaTasks> => {
     return {
-        type: SagaTasks.REQUEST_USER_IS_LOGGED_IN,
+        type: SagaTasks.REQUEST_USER_LOGIN_STATE,
     };
 };
 

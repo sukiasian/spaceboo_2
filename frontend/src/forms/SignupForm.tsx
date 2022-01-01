@@ -4,6 +4,9 @@ import { postSignupAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import InputWithLabel, { IFormInputs, InputAutoCompleteOptions, InputTypes } from '../components/InputWithLabel';
 import AlertFirstDbValidationError from '../components/AlertFirstDbValidationError';
+import { postSendVerificationCodeAction } from '../redux/actions/emailVerificationActions';
+import { EmailPurpose, IPostSendVerificationEmailPayload } from '../redux/reducers/emailVerificationReducer';
+import { HttpStatus, LocalStorageItems, ReduxEmailVerificationActions } from '../types/types';
 
 export interface ISignupData {
     [key: keyof IFormInputs]: string | undefined;
@@ -68,11 +71,33 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
             isRequiredField: true,
         },
     });
+    const [loading, setLoading] = useState<boolean>();
     const { signupResponse } = useSelector((state: IReduxState) => state.authStorage);
+    const { sendVerificationCodeResponse } = useSelector((state: IReduxState) => state.emailVerificationStorage);
     const dispatch = useDispatch();
+    const sendVerificationCodeOnSuccess = (): void => {
+        if (signupResponse && signupResponse.statusCode === HttpStatus.CREATED) {
+            const payload: IPostSendVerificationEmailPayload = {
+                purpose: EmailPurpose[10],
+            };
+
+            dispatch(postSendVerificationCodeAction(payload));
+            setLoading(true);
+        }
+    };
+    const storeLastVerificationRequestedAtLocalStorage = (): void => {
+        localStorage.setItem(
+            LocalStorageItems.LAST_VERIFICATION_REQUESTED,
+            sendVerificationCodeResponse.data.lastVerificationRequested
+        );
+    };
     const handleAfterSignup = (): void => {
-        if (signupResponse && !signupResponse.error) {
+        setLoading(false);
+
+        if (sendVerificationCodeResponse && sendVerificationCodeResponse.statusCode === HttpStatus.OK) {
+            storeLastVerificationRequestedAtLocalStorage();
             props.handleAfterSignup();
+            dispatch({ type: ReduxEmailVerificationActions.ANNUALIZE_SEND_VERIFICATION_CODE_RESPONSE });
         }
     };
     const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
@@ -116,7 +141,8 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
         });
     };
 
-    useEffect(handleAfterSignup, [signupResponse, props]);
+    useEffect(sendVerificationCodeOnSuccess, [signupResponse, dispatch]);
+    useEffect(handleAfterSignup, [sendVerificationCodeResponse, handleAfterSignup]);
 
     // TODO validators!
     return (
@@ -127,6 +153,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
                     Зарегистрироваться
                 </button>
                 <AlertFirstDbValidationError response={signupResponse} />
+                <div>{loading ? 'loading...' : 'loaded!'}</div>
             </form>
         </div>
     );

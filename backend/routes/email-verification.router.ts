@@ -17,7 +17,10 @@ class EmailVerificationRouter extends Singleton implements IRouter {
     public prepareRouter = (): void => {
         this.router
             .route('/')
-            .post(this.middleware.retrieveEmailFromRequest, this.emailVerificationController.checkVerificationCode);
+            .post(
+                this.middleware.retrieveEmailFromRequest,
+                this.emailVerificationController.checkVerificationCodeAndProcessRequest
+            );
 
         this.router
             .route('/:purpose')

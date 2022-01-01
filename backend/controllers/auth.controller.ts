@@ -138,12 +138,6 @@ export class AuthController extends Singleton {
             throw new AppError(HttpStatus.UNAUTHORIZED, ErrorMessages.NOT_AUTHORIZED);
         }
     );
-
-    public confirmAccount = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
-        await this.authSequelizeDao.confirmAccount(req.user.id);
-
-        this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.LOGGED_OUT);
-    });
 }
 
 export const authController = SingletonFactory.produce<AuthController>(AuthController);

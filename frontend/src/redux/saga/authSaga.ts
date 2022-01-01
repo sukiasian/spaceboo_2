@@ -7,7 +7,7 @@ import { ILoginData } from '../../forms/LoginForm';
 import { ISignupData } from '../../forms/SignupForm';
 
 const fetchIsLoggedIn = async (): Promise<object> => {
-    return (await httpRequester.get(`${ApiUrls.AUTH}/userIsLoggedIn`)).data;
+    return (await httpRequester.get(`${ApiUrls.AUTH}/userLoginState`)).data;
 };
 
 function* authWorker(): Generator<StrictEffect, void, PutEffect> {
@@ -17,7 +17,7 @@ function* authWorker(): Generator<StrictEffect, void, PutEffect> {
 }
 
 export function* watchAuth(): Generator<ForkEffect, void, void> {
-    yield takeEvery(SagaTasks.REQUEST_USER_IS_LOGGED_IN, authWorker); // слушает action-ы
+    yield takeEvery(SagaTasks.REQUEST_USER_LOGIN_STATE, authWorker); // слушает action-ы
 }
 
 const loginUser = async (loginData: ILoginData): Promise<object> => {
@@ -61,3 +61,17 @@ function* logoutWorker(): Generator<StrictEffect, void, PutEffect> {
 export function* watchLogoutUser(): Generator<ForkEffect, void, void> {
     yield takeLatest(SagaTasks.REQUEST_USER_LOGOUT, logoutWorker);
 }
+
+// const confirmAccount = async (): Promise<void> => {
+//     return httpRequester.post(`${ApiUrls.AUTH}/logout`, {});
+// };
+
+// function* confirmAccountWorker(): Generator<StrictEffect, void, PutEffect> {
+//     const payload = yield call(logoutUser);
+
+//     yield put(logoutUserAction(payload));
+// }
+
+// export function* watchConfirmAccount(): Generator<ForkEffect, void, void> {
+//     yield takeLatest(SagaTasks.REQUEST_USER_LOGOUT, logoutWorker);
+// }

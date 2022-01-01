@@ -58,6 +58,12 @@ export const authReducer = (state = initialState, action: IAction<ReduxAuthActio
                 logoutResponse: action.payload,
             };
 
+        case ReduxAuthActions.ANNUALIZE_LOGOUT_RESPONSE:
+            return {
+                ...state,
+                logoutResponse: undefined,
+            };
+
         default: {
             return { ...state };
         }

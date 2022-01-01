@@ -145,7 +145,7 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
         allowNull: false,
         validate: {
             len: {
-                msg: ErrorMessages.NAME_LENGTH_VALIDATE,
+                msg: ErrorMessages.SURNAME_LENGTH_VALIDATE,
                 args: [2, 25],
             },
             notNull: {
@@ -161,7 +161,7 @@ export class User extends Model<IUserAttributes, IUserCreationAttributes> implem
         validate: {
             len: {
                 msg: ErrorMessages.MIDDLE_NAME_LENGTH_VALIDATE,
-                args: [2, 25],
+                args: [5, 25],
             },
             notNull: {
                 msg: ErrorMessages.REQUIRED_FIELDS_VALIDATE,
