@@ -1,5 +1,5 @@
 import { ChangeEventHandler } from 'react';
-import { IComponentDivProps } from '../types/types';
+import { IComponentClassNameProps } from '../types/types';
 
 export enum InputTypes {
     PASSWORD = 'password',
@@ -12,7 +12,7 @@ export enum InputAutoCompleteOptions {
     NEW_PASSWORD = 'new-password',
 }
 
-interface IInputWithLableProps extends IComponentDivProps {
+interface IInputWithLableProps extends IComponentClassNameProps {
     inputLabel: string;
     inputName: string;
     inputPlaceholder: string;

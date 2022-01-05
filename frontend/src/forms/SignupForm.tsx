@@ -1,5 +1,6 @@
 import { ChangeEventHandler, FormEventHandler, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { postSignupAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import InputWithLabel, { IFormInputs, InputAutoCompleteOptions, InputTypes } from '../components/InputWithLabel';
@@ -75,6 +76,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
     const { signupResponse } = useSelector((state: IReduxState) => state.authStorage);
     const { sendVerificationCodeResponse } = useSelector((state: IReduxState) => state.emailVerificationStorage);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const sendVerificationCodeOnSuccess = (): void => {
         if (signupResponse && signupResponse.statusCode === HttpStatus.CREATED) {
             const payload: IPostSendVerificationEmailPayload = {
@@ -98,6 +100,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
             storeLastVerificationRequestedAtLocalStorage();
             props.handleAfterSignup();
             dispatch({ type: ReduxEmailVerificationActions.ANNUALIZE_SEND_VERIFICATION_CODE_RESPONSE });
+            navigate('/');
         }
     };
     const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {

@@ -1,3 +1,3 @@
 export default function LoginPage(): JSX.Element {
-    return <> </>;
+    return <div className="login-page-section"></div>;
 }

@@ -62,3 +62,9 @@ export const logoutUserAction = (payload: any): IAction<ReduxAuthActions> => {
         payload,
     };
 };
+
+export const annualizeLogoutResponse = (): IAction<ReduxAuthActions> => {
+    return {
+        type: ReduxAuthActions.ANNUALIZE_LOGOUT_RESPONSE,
+    };
+};

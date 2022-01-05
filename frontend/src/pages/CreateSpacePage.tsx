@@ -14,6 +14,8 @@ export default function CreateSpacePage(): JSX.Element {
 
     if (!userLoginState.loggedIn) {
         return <Navigate to="/login" />;
+    } else if (!userLoginState.confirmed) {
+        return <Navigate to="/" />;
     }
     return <> Предоставить пространство </>;
 }

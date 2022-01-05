@@ -1,35 +1,41 @@
+import { useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-// import { useNavigate } from 'react-router-dom'; // NOTE for signup
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { toggleLoginModalAction, toggleSignupModalAction } from '../redux/actions/modalActions';
-import { IComponentDivProps } from '../types/types';
-import ModalsTitle from '../components/ModalsTitle';
+import { IComponentClassNameProps, TActiveTab, UrlPathnames } from '../types/types';
+import Titles from '../components/Titles';
 import { annualizeSignupResponseAction, requestUserLoginState } from '../redux/actions/authActions';
 import SignupForm from '../forms/SignupForm';
 import SwitchTypeOfAuth, { SwitchModalFor } from '../components/SwitchAuthModal';
 
-interface ISignupModal extends IComponentDivProps {}
+type ISignupModalProps = IComponentClassNameProps & TActiveTab;
 
-export default function SignupModal(props: ISignupModal): JSX.Element {
+export default function SignupModal(props: ISignupModalProps): JSX.Element {
     const { signupModalIsOpen } = useSelector((state: IReduxState) => state.modalStorage);
     const dispatch = useDispatch();
+    const location = useLocation();
     const openSignupModal = (): void => {
-        dispatch(toggleSignupModalAction());
+        if (location.pathname !== UrlPathnames.SIGNUP) {
+            dispatch(toggleSignupModalAction());
+        }
+    };
+    const handleSignupButton = (): void => {
+        props.handleActiveTab('signup');
+        openSignupModal();
     };
     const handleAfterSignup = (): void => {
         dispatch(requestUserLoginState());
         dispatch(annualizeSignupResponseAction());
         dispatch(toggleSignupModalAction());
     };
-
     const renderSingupModalBox = (): JSX.Element | void => {
         if (signupModalIsOpen) {
             return (
                 <div className="signup-modal">
-                    <ModalsTitle
+                    <Titles
                         mainDivClassName="login-modal__title"
-                        modalsHeading="Приветствуем Вас!"
-                        modalsParagraph="Зарегистрируйтесь, чтобы продолжить."
+                        heading="Приветствуем Вас!"
+                        paragraph="Зарегистрируйтесь, чтобы продолжить."
                     />
                     <SignupForm handleAfterSignup={handleAfterSignup} />
                     <SwitchTypeOfAuth
@@ -47,8 +53,8 @@ export default function SignupModal(props: ISignupModal): JSX.Element {
 
     return (
         <div className={props.mainDivClassName}>
-            <div className="heading heading--tertiary" onClick={openSignupModal}>
-                Зарегистрируйтесь
+            <div className="heading heading--tertiary" onClick={handleSignupButton}>
+                Зарегистрироваться
             </div>
             {renderSingupModalBox()}
         </div>

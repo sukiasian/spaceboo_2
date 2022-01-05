@@ -2,9 +2,9 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { annualizeFoundBySearchPatternCitiesAction } from '../redux/actions/cityActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { IComponentDivProps, SagaTasks } from '../types/types';
+import { IComponentClassNameProps, SagaTasks, TActiveTab } from '../types/types';
 
-interface ICityPickerProps extends IComponentDivProps {}
+type ICityPickerProps = TActiveTab & IComponentClassNameProps;
 
 export default function CityPicker(props: ICityPickerProps): JSX.Element {
     const [currentCity, setCurrentCity] = useState('Город');
@@ -39,18 +39,25 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
             localStorage.setItem('currentCity', value);
         };
     };
+    const handlePickCity = (cityValue: string): (() => void) => {
+        return (): void => {
+            props.handleActiveTab('city');
+            pickCurrentCity(cityValue)();
+        };
+    };
+
     const renderFindCityResults = (): JSX.Element => {
         return (
             <>
                 {foundBySearchPatternCities && foundBySearchPatternCities.length !== 0
                     ? foundBySearchPatternCities.map((city: any, i: number) => (
-                          <div
+                          <p
                               className={`city-picker__search-results city-picker__search-results--${i}`}
                               key={i}
-                              onClick={pickCurrentCity(city.city || city.address)}
+                              onClick={handlePickCity(city.city || city.address)}
                           >
                               {city.address}
-                          </div>
+                          </p>
                       ))
                     : renderMajorCities}
             </>
@@ -64,6 +71,7 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
         );
     });
     const renderCityPickerBox = (): JSX.Element | void => {
+        console.log(cityPickerBoxIsOpen);
         if (cityPickerBoxIsOpen) {
             return (
                 <section className="city-picker">
@@ -73,6 +81,7 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
                             name="city-picker__input"
                             placeholder="Введите название города..."
                             onChange={handleFindCityInput}
+                            autoComplete="off"
                         />
                         {renderFindCityResults()}
                     </div>

@@ -1,20 +1,24 @@
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-// import { useNavigate } from 'react-router-dom'; // NOTE for signup
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { toggleLoginModalAction, toggleSignupModalAction } from '../redux/actions/modalActions';
-import { IComponentDivProps } from '../types/types';
-import ModalsTitle from '../components/ModalsTitle';
+import { IComponentClassNameProps, TActiveTab } from '../types/types';
+import Titles from '../components/Titles';
 import LoginForm from '../forms/LoginForm';
 import { annualizeLoginResponseAction, requestUserLoginState } from '../redux/actions/authActions';
 import SwitchTypeOfAuth, { SwitchModalFor } from '../components/SwitchAuthModal';
 
-interface ILoginModal extends IComponentDivProps {}
+type ILoginModalProps = IComponentClassNameProps & TActiveTab;
 
-export default function LoginModal(props: ILoginModal) {
+export default function LoginModal(props: ILoginModalProps) {
     const { loginModalIsOpen } = useSelector((state: IReduxState) => state.modalStorage);
     const dispatch = useDispatch();
     const openLoginModal = (): void => {
         dispatch(toggleLoginModalAction());
+    };
+    const handleLoginButton = (): void => {
+        openLoginModal();
+        props.handleActiveTab('login');
     };
     const handleAfterLogin = () => {
         dispatch(toggleLoginModalAction());
@@ -25,10 +29,10 @@ export default function LoginModal(props: ILoginModal) {
         if (loginModalIsOpen) {
             return (
                 <div className="login-modal">
-                    <ModalsTitle
+                    <Titles
                         mainDivClassName="login-modal__title"
-                        modalsHeading="Мы рады вас видеть!"
-                        modalsParagraph="Выполните вход, чтобы продолжить."
+                        heading="Мы рады вас видеть!"
+                        paragraph="Выполните вход, чтобы продолжить."
                     />
                     <LoginForm handleAfterLogin={handleAfterLogin} />
                     <SwitchTypeOfAuth
@@ -45,11 +49,11 @@ export default function LoginModal(props: ILoginModal) {
             );
         }
     };
-
-    // WHEN you navigate to another url the modal should be closed - even if we make user be unable to move through the interface he still may navigate through url
+    useEffect(() => {});
+    // NOTEe WHEN you navigate to another url the modal should be closed - even if we make user be unable to move through the interface he still may navigate through url
     return (
         <div className={props.mainDivClassName}>
-            <div className="heading heading--tertiary" onClick={openLoginModal}>
+            <div className="heading heading--tertiary" onClick={handleLoginButton}>
                 Войти
             </div>
             {renderLoginModalBox()}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ITimeUnits } from '../types/types';
 import { formatTimeUnitToTwoDigitString } from '../utils/utilFunctions';
 
@@ -8,16 +8,9 @@ interface ITimerProps {
 }
 // TODO поместить в redux
 export default function Timer(props: ITimerProps): JSX.Element {
-    // получить lastVerificationRequired. проверить есть ли он или нет его,
-    const [timeLeft, setTimeLeft] = useState<number>(0);
+    const [timeLeft, setTimeLeft] = useState<number>(props.timeLeft);
     const [timerIsOn, setTimerIsOn] = useState(false);
-    const { timerRef } = props;
-    const defineTimeLeft = (): void => {
-        setTimeLeft(props.timeLeft);
-    };
-    const applyEffectsOnInit = (): void => {
-        defineTimeLeft();
-    };
+    const timerRef = useRef<NodeJS.Timeout>();
     const handleInterval = (): void => {
         if (!timerIsOn && timeLeft > 0) {
             timerRef.current = setInterval(() => {
@@ -29,11 +22,19 @@ export default function Timer(props: ITimerProps): JSX.Element {
             setTimerIsOn(false);
         }
     };
+    const applyEffectsOnInit = (): (() => void) => {
+        handleInterval();
+
+        return () => {
+            clearInterval(timerRef.current!);
+        };
+    };
     const renderTimer = (): JSX.Element | void => {
         const timeUnits: ITimeUnits = {
             minutes: Math.floor(timeLeft / 60 / 1000),
             seconds: Math.floor((timeLeft / 1000) % 60),
         };
+
         if (timerIsOn) {
             return (
                 <div className="timer">
@@ -51,7 +52,6 @@ export default function Timer(props: ITimerProps): JSX.Element {
 
     /* eslint-disable-next-line */
     useEffect(applyEffectsOnInit, []);
-    useEffect(handleInterval, [timeLeft, timerIsOn, timerRef]);
 
     return <section className="timer-section"> {renderTimer()} </section>;
 }

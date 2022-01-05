@@ -8,6 +8,7 @@ import { requestUserLoginState } from './redux/actions/authActions';
 import { requestCitiesAction } from './redux/actions/cityActions';
 import { requestSpacesAction } from './redux/actions/spaceActions';
 import Routes from './routes/Routes';
+import './sass/main.scss';
 
 // FIXME any, any - types for props
 function App(): JSX.Element {
@@ -22,6 +23,10 @@ function App(): JSX.Element {
     };
 
     useEffect(applyEffectsOnInit, [requestAppData]);
+    // NOTE чтобы обратиться к данным клиента исп console.log(navigator.userAgent);
+    // чтобы обратиться к размеру экрана например для того чтобы код тупо не
+    // выполнялся (к примеру зачем инициализировать slider который не будет отображаться)
+    // использ windows.width (по моему)
 
     return (
         <div className="App">

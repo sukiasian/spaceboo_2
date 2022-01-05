@@ -1,5 +1,6 @@
 import { ChangeEventHandler, FormEventHandler, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { postLoginAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import InputWithLabel, { InputAutoCompleteOptions, IFormInputs, InputTypes } from '../components/InputWithLabel';
@@ -39,9 +40,11 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
     });
     const { loginResponse } = useSelector((state: IReduxState) => state.authStorage);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const handleAfterLogin = (): void => {
         if (loginResponse && !loginResponse.error) {
             props.handleAfterLogin();
+            navigate('/');
         }
     };
     const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
@@ -95,7 +98,7 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
         }
     };
 
-    useEffect(handleAfterLogin, [loginResponse, props]);
+    useEffect(handleAfterLogin, [loginResponse, props, navigate]);
 
     // TODO validators!
     return (

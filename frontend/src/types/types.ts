@@ -14,8 +14,9 @@ export interface IServerRes {
 // TODO
 export interface IServerErr {}
 
-export interface IComponentDivProps {
-    mainDivClassName: string;
+export interface IComponentClassNameProps {
+    mainDivClassName?: string;
+    additionalClassNames?: string;
 }
 
 export interface ITimeUnits {
@@ -113,6 +114,10 @@ export enum ReduxEmailVerificationActions {
     ANNUALIZE_SEND_VERIFICATION_CODE_RESPONSE = 'ANNUALIZE_SEND_VERIFICATION_CODE_RESPONSE',
 }
 
+export enum ReduxCommonActions {
+    TOGGLE_TIMER = 'TOGGLE_TIMER',
+}
+
 export enum SagaTasks {
     REQUEST_SPACES = 'REQUEST_SPACES',
     REQUEST_USER_LOGIN_STATE = 'REQUEST_USER_LOGIN_STATE',
@@ -147,3 +152,16 @@ export enum CustomResponseMessages {
 export enum LocalStorageItems {
     LAST_VERIFICATION_REQUESTED = 'lastVerificationRequested',
 }
+
+export enum UrlPathnames {
+    HOME = '/',
+    LOGIN = '/login',
+    SIGNUP = '/signup',
+    PROVIDE_SPACE = '/provide-space',
+    HOW_IT_WORKS = '/how-it-works',
+}
+
+export type TActiveTab = {
+    defineActiveClassName: (url: string) => string | undefined;
+    handleActiveTab: (url: string) => void;
+};

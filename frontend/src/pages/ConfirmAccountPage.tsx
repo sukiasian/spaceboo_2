@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Alert from '../components/Alert';
 import SixDigitVerification from '../components/SixDigitVerification';
 import Timer from '../components/Timer';
+import { toggleTimerAction } from '../redux/actions/commonActions';
 import { postSendVerificationCodeAction } from '../redux/actions/emailVerificationActions';
 import { EmailPurpose, IPostSendVerificationEmailPayload } from '../redux/reducers/emailVerificationReducer';
 import { IReduxState } from '../redux/reducers/rootReducer';
@@ -10,10 +11,10 @@ import { AlertTypes, CustomResponseMessages, HttpStatus, LocalStorageItems } fro
 import { updateDocumentTitle } from '../utils/utilFunctions';
 
 export default function ConfirmAccountPage(): JSX.Element {
+    const timerRef = useRef<NodeJS.Timeout>();
     const { checkVerificationCodeResponse, sendVerificationCodeResponse } = useSelector(
         (state: IReduxState) => state.emailVerificationStorage
     );
-    const timerRef = useRef<NodeJS.Timeout>();
     const dispatch = useDispatch();
     const handleDocumentTitle = (): void => {
         const documentTitle = 'Spaceboo | Последний шаг!';
@@ -23,12 +24,18 @@ export default function ConfirmAccountPage(): JSX.Element {
     const applyEffectsOnInit = (): void => {
         handleDocumentTitle();
     };
+    const clearTimerOnUnmount = (): (() => void) => {
+        const timer = timerRef.current!;
+
+        return (): void => {
+            clearTimeout(timer);
+        };
+    };
     const handleGetNewCodeToConfirmAccount = (): void => {
         const payload: IPostSendVerificationEmailPayload = {
             purpose: EmailPurpose[10],
         };
 
-        // dispatch(annualizePostSendVerification()); // если при изменении (когда придет новый ответ от сервера) происходит ререндер , стоит ли аннулировать? думаю, нет
         dispatch(postSendVerificationCodeAction(payload));
     };
     const renderSendCodeAgainAlert = (): JSX.Element | void => {
@@ -41,11 +48,6 @@ export default function ConfirmAccountPage(): JSX.Element {
         }
     };
     const renderSendCodeOptions = (): JSX.Element | void => {
-        /* 
-        Реализация: делать расчеты здесь, передавать их туда. тем самым решив должно отображаться или же нет 
-        
-        */
-
         let lastVerificationRequested: string | number | undefined = localStorage.getItem(
             LocalStorageItems.LAST_VERIFICATION_REQUESTED
         ) as string;
@@ -53,7 +55,7 @@ export default function ConfirmAccountPage(): JSX.Element {
         if (lastVerificationRequested) {
             lastVerificationRequested = parseInt(lastVerificationRequested, 10);
 
-            const interval = 0.1 * 60 * 1000;
+            const interval = 2 * 60 * 1000;
             const timeLeft = (lastVerificationRequested as number) + interval - Date.now();
 
             return timeLeft > 0 ? (
@@ -91,13 +93,7 @@ export default function ConfirmAccountPage(): JSX.Element {
     };
 
     useEffect(applyEffectsOnInit, []);
-    useEffect(() => {
-        const timer = timerRef.current!;
-
-        return () => {
-            clearTimeout(timer);
-        };
-    });
+    useEffect(clearTimerOnUnmount, []);
 
     return (
         <div className="account-confirmation">
@@ -111,14 +107,7 @@ export default function ConfirmAccountPage(): JSX.Element {
                 <SixDigitVerification />
                 <div className="send-code-options"> {renderSendCodeOptions()} </div>
                 {renderCheckCodeResultAlert()}
-                {/* нужна переменная в саге которая будет отражать можно ли получить код или нет. Если можно, то условный рендеринг {Получить код}. Если нет, 
-                        то "повторно код можно будет получить через". Так же, нужно решить, при логине неподтв польз отправлять или нет имейл автоматически,
-                        или же ждать когда он нажмет на кнопку
-                    */}
             </section>
         </div>
     );
-}
-function annualizePostSendVerification(): any {
-    throw new Error('Function not implemented.');
 }
