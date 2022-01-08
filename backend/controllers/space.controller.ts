@@ -35,6 +35,7 @@ export class SpaceController extends Singleton {
         const { spaceEditData } = req.body;
 
         await this.dao.editSpaceById(spaceId, spaceEditData);
+
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.DATA_UPDATED);
     });
 

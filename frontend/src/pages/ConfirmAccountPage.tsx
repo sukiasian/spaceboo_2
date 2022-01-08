@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import Alert from '../components/Alert';
 import SixDigitVerification from '../components/SixDigitVerification';
 import Timer from '../components/Timer';
-import { toggleTimerAction } from '../redux/actions/commonActions';
 import { postSendVerificationCodeAction } from '../redux/actions/emailVerificationActions';
 import { EmailPurpose, IPostSendVerificationEmailPayload } from '../redux/reducers/emailVerificationReducer';
 import { IReduxState } from '../redux/reducers/rootReducer';
@@ -11,6 +10,7 @@ import { AlertTypes, CustomResponseMessages, HttpStatus, LocalStorageItems } fro
 import { updateDocumentTitle } from '../utils/utilFunctions';
 
 export default function ConfirmAccountPage(): JSX.Element {
+    const { userLoginState } = useSelector((state: any) => state.authStorage);
     const timerRef = useRef<NodeJS.Timeout>();
     const { checkVerificationCodeResponse, sendVerificationCodeResponse } = useSelector(
         (state: IReduxState) => state.emailVerificationStorage
@@ -94,6 +94,7 @@ export default function ConfirmAccountPage(): JSX.Element {
 
     useEffect(applyEffectsOnInit, []);
     useEffect(clearTimerOnUnmount, []);
+    console.log(userLoginState);
 
     return (
         <div className="account-confirmation">

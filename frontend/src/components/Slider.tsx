@@ -73,7 +73,7 @@ export default function Slider(props: ISliderProps): JSX.Element {
     };
 
     const changeSliderImage = (): void => {
-        sliderImageRef.current!.style.backgroundImage = `url('/images/slider-images/${slides[indexOfActiveImage].imageUrl}')`;
+        sliderImageRef.current!.style.backgroundImage = `url('/images/slider/${slides[indexOfActiveImage].imageUrl}')`;
         sliderImageRef.current!.style.width = `${window.screen.width}px`;
         sliderImageRef.current!.style.height = '400px';
 
@@ -159,7 +159,9 @@ export default function Slider(props: ISliderProps): JSX.Element {
         );
     };
 
+    /* eslint-disable-next-line */
     useEffect(applyEffectsOnInit, []);
+    /* eslint-disable-next-line */
     useEffect(changeSliderImage, [indexOfActiveImage]);
 
     return (

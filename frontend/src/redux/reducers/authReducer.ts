@@ -1,9 +1,10 @@
 import { ReduxAuthActions } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 
-interface IUserLoginState {
+export interface IUserLoginState {
     loggedIn: boolean;
     confirmed: boolean;
+    isLoaded: boolean;
 }
 
 export interface IAuthState {
@@ -17,6 +18,7 @@ const initialState: IAuthState = {
     userLoginState: {
         loggedIn: false,
         confirmed: false,
+        isLoaded: false,
     },
 };
 

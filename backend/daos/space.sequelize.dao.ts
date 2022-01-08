@@ -1,17 +1,19 @@
 import { Dao } from '../configurations/dao.config';
-import { Appointment } from '../models/appointment.model';
-import { City } from '../models/city.model';
 import { ISpaceCreate, Space, ISpaceEdit, spaceEditFields } from '../models/space.model';
 import { QuerySortDirection } from '../types/enums';
 import { SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
-import { citySequelizeDao, CitySequelizeDao } from './city.sequelize.dao';
 import { applicationInstance } from '../App';
 
+interface IPriceRange {
+    from?: string | number;
+    to?: string | number;
+}
 interface IQueryString {
     page?: string | number;
     limit?: string | number;
     sortBy?: SpaceQuerySortFields;
+    priceRange?: IPriceRange;
     datesToReserveQuery?: string | string[]; // '2020-03-14, 2020-03-18'
     timesToReserveQuery?: string | string[];
     cityId?: string;
@@ -41,12 +43,12 @@ export class SpaceSequelizeDao extends Dao {
     };
 
     public getSpacesByQuery = async (queryStr: IQueryString): Promise<any> => {
-        let { page, limit, sortBy, datesToReserveQuery, timesToReserveQuery, cityId } = queryStr;
+        let { page, limit, sortBy, datesToReserveQuery, timesToReserveQuery, cityId, priceRange } = queryStr;
         let isoDatesRange: string;
 
         if (datesToReserveQuery) {
             datesToReserveQuery = (datesToReserveQuery as string).split(',');
-            timesToReserveQuery = (timesToReserveQuery as string).split(',');
+            timesToReserveQuery = timesToReserveQuery ? (timesToReserveQuery as string).split(',') : ['14:00', '12:00'];
 
             isoDatesRange = UtilFunctions.createIsoDatesRangeToFindAppointments(
                 datesToReserveQuery[0],
@@ -56,6 +58,13 @@ export class SpaceSequelizeDao extends Dao {
             );
         }
 
+        if (priceRange) {
+            priceRange.from = parseInt(priceRange.from as string, 10);
+            priceRange.to = parseInt(priceRange.to as string, 10);
+        } else {
+            priceRange = {};
+        }
+
         page = page ? (page as number) * 1 : 1;
         limit = limit ? (limit as number) * 1 : 20;
 
@@ -63,24 +72,33 @@ export class SpaceSequelizeDao extends Dao {
         const order = sortBy
             ? this.defineSortOrder(sortBy)
             : `"${SpaceSortFields.DATE_OF_CREATION}" ${QuerySortDirection.DESC}`;
-        let spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
 
-        // NOTE horrible architecture
-        if (datesToReserveQuery && !cityId) {
-            spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" WHERE NOT EXISTS
-                (SELECT 1 FROM "Appointments" a WHERE a."spaceId" = s."id"
-                AND a."isoDatesReserved" && '${isoDatesRange}') ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
-        }
-        if (cityId && !datesToReserveQuery) {
-            spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" AND c."cityId" = ${cityId} ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
-        }
-        if (datesToReserveQuery && cityId) {
-            spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" AND c."cityId" = ${cityId} WHERE NOT EXISTS
-                (SELECT 1 FROM "Appointments" a WHERE a."spaceId" = s."id"
-                AND a."isoDatesReserved" && '${isoDatesRange}') ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
-        }
+        // let spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
 
-        return this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, spacesRawQuery);
+        // // NOTE horrible architecture
+        // if (datesToReserveQuery && !cityId) {
+        //     spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" WHERE NOT EXISTS
+        //         (SELECT 1 FROM "Appointments" a WHERE a."spaceId" = s."id"
+        //         AND a."isoDatesReserved" && '${isoDatesRange}') ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
+        // }
+        // if (cityId && !datesToReserveQuery) {
+        //     spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" AND c."cityId" = ${cityId} ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
+        // }
+        // if (datesToReserveQuery && cityId) {
+        //     spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" AND c."cityId" = ${cityId} WHERE NOT EXISTS
+        //         (SELECT 1 FROM "Appointments" a WHERE a."spaceId" = s."id"
+        //         AND a."isoDatesReserved" && '${isoDatesRange}') ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
+        // }
+        const queryFromParts = this.spacesQueryGeneratorByParts(
+            order,
+            limit,
+            offset,
+            isoDatesRange,
+            cityId,
+            priceRange
+        );
+
+        return this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, queryFromParts);
     };
 
     public editSpaceById = async (spaceId: string, spaceEditData: ISpaceEdit): Promise<void> => {
@@ -89,7 +107,6 @@ export class SpaceSequelizeDao extends Dao {
         await space.update(spaceEditData, { fields: spaceEditFields });
     };
 
-    // NOTE аутентификация и проверка на то что
     public deleteSpaceById = async (spaceId: string): Promise<void> => {
         const space = await this.model.findOne({ where: { id: spaceId } });
 
@@ -129,6 +146,26 @@ export class SpaceSequelizeDao extends Dao {
             case SpaceQuerySortFields.OLDEST:
                 return `"${SpaceSortFields.DATE_OF_CREATION}" ${QuerySortDirection.DESC}`;
         }
+    };
+
+    private spacesQueryGeneratorByParts = (
+        order: string,
+        limit: number,
+        offset: number,
+        isoDatesRange?: string,
+        cityId?: string,
+        priceRange?: IPriceRange
+    ): string => {
+        const cityPartialQuery = cityId ? `AND c."cityId" = ${cityId}` : '';
+        const datesToReservePartialQuery = isoDatesRange
+            ? `WHERE NOT EXISTS
+        (SELECT 1 FROM "Appointments" a WHERE a."spaceId" = s."id"
+        AND a."isoDatesReserved" && '${isoDatesRange}')`
+            : '';
+        const priceRangeFromPartialQuery = priceRange.from ? `AND s."pricePerNight" >= ${priceRange.from}` : '';
+        const priceRangeToPartialQuery = priceRange.to ? `AND s."pricePerNight" <= ${priceRange.to}` : '';
+
+        return `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" ${cityPartialQuery} ${datesToReservePartialQuery} ${priceRangeFromPartialQuery} ${priceRangeToPartialQuery} ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
     };
 }
 

@@ -1,8 +1,11 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { annualizeFoundBySearchPatternCitiesAction } from '../redux/actions/cityActions';
+import {
+    annualizeFoundBySearchPatternCitiesAction,
+    requestCitiesBySearchPatternAction,
+} from '../redux/actions/cityActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { IComponentClassNameProps, SagaTasks, TActiveTab } from '../types/types';
+import { IComponentClassNameProps, TActiveTab } from '../types/types';
 
 type ICityPickerProps = TActiveTab & IComponentClassNameProps;
 
@@ -10,7 +13,7 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
     const [currentCity, setCurrentCity] = useState('Город');
     const [cityPickerBoxIsOpen, setCityPickerBoxIsOpen] = useState(false);
     const { foundBySearchPatternCities } = useSelector((state: IReduxState) => state.cityStorage);
-    const majorCities = ['Москва', 'Краснодар', 'Сочи', 'Новосибирск', 'Санкт-Петербург', 'Красноярск'];
+
     const dispatch = useDispatch();
     const getCurrentCityFromLocalStorage = (): void => {
         const currentCity = localStorage.getItem('currentCity');
@@ -26,23 +29,24 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
         setCityPickerBoxIsOpen(!cityPickerBoxIsOpen);
     };
     const handleFindCityInput = (e: ChangeEvent<{ value: string }>): void => {
-        dispatch({ type: SagaTasks.REQUEST_CITIES_BY_SEARCH_PATTERN, payload: e.target.value });
+        dispatch(requestCitiesBySearchPatternAction(e.target.value));
     };
     const annualizeFoundBySearchPatternCities = (): void => {
         dispatch(annualizeFoundBySearchPatternCitiesAction());
     };
-    const pickCurrentCity = (value: string): (() => void) => {
+    const pickCurrentCity = (value: string, cityId: number): (() => void) => {
         return (): void => {
             setCityPickerBoxIsOpen(false);
             setCurrentCity(value);
             annualizeFoundBySearchPatternCities();
             localStorage.setItem('currentCity', value);
+            localStorage.setItem('currentCityId', cityId.toString());
         };
     };
-    const handlePickCity = (cityValue: string): (() => void) => {
+    const handlePickCity = (cityValue: string, cityId: number): (() => void) => {
         return (): void => {
             props.handleActiveTab('city');
-            pickCurrentCity(cityValue)();
+            pickCurrentCity(cityValue, cityId)();
         };
     };
 
@@ -54,24 +58,16 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
                           <p
                               className={`city-picker__search-results city-picker__search-results--${i}`}
                               key={i}
-                              onClick={handlePickCity(city.city || city.address)}
+                              onClick={handlePickCity(city.city || city.address, city.id)}
                           >
                               {city.address}
                           </p>
                       ))
-                    : renderMajorCities}
+                    : null}
             </>
         );
     };
-    const renderMajorCities = majorCities.map((city: string, i: number) => {
-        return (
-            <div className={`major-cities major-cities--${i}`} onClick={pickCurrentCity(city)} key={i}>
-                {city}
-            </div>
-        );
-    });
     const renderCityPickerBox = (): JSX.Element | void => {
-        console.log(cityPickerBoxIsOpen);
         if (cityPickerBoxIsOpen) {
             return (
                 <section className="city-picker">

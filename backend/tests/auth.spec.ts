@@ -117,10 +117,10 @@ describe('Auth (e2e)', () => {
 
     it('/auth/signup surname should be in a range of 2 and 25', () => {
         userData.surname = invalidUserData.surnameShort;
-        testUserValidationByMessages(userModel, userData, ErrorMessages.NAME_LENGTH_VALIDATE, expect);
+        testUserValidationByMessages(userModel, userData, ErrorMessages.SURNAME_LENGTH_VALIDATE, expect);
 
         userData.surname = invalidUserData.surnameExceeding;
-        testUserValidationByMessages(userModel, userData, ErrorMessages.NAME_LENGTH_VALIDATE, expect);
+        testUserValidationByMessages(userModel, userData, ErrorMessages.SURNAME_LENGTH_VALIDATE, expect);
     });
 
     it('/auth/signup email should be in format of email', () => {

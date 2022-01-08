@@ -156,26 +156,27 @@ describe('User (e2e)', () => {
     });
 
     it('PUT /auth/passwordChange passwords should match', async () => {
-        // FIXME works from time to times
         const res_1 = await request(app)
             .put(`${ApiRoutes.AUTH}/passwordChange`)
             .set('Authorization', `Bearer ${token_1}`)
             .send({
-                userEditData: {
+                passwordData: {
                     password: fakePassword,
                     passwordConfirmation: fakePassword.toUpperCase(),
+                    oldPassword: userData_1.password,
                 },
             });
 
         expect(res_1.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
 
         const res_2 = await request(app)
-            .put(`${ApiRoutes.USERS}/passwordChange`)
+            .put(`${ApiRoutes.AUTH}/passwordChange`)
             .set('Authorization', `Bearer ${token_1}`)
             .send({
-                userEditData: {
+                passwordData: {
                     password: fakePassword,
                     passwordConfirmation: fakePassword,
+                    oldPassword: userData_1.password,
                 },
             });
 

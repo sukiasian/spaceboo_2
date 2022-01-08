@@ -36,9 +36,9 @@ export class AuthSequelizeDao extends Dao {
 
         if (!recovery) {
             if (passwordResetData.oldPassword && !(await user.verifyPassword(user)(passwordResetData.oldPassword))) {
-                throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.PASSWORD_INCORRECT);
+                throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.PASSWORDS_DO_NOT_MATCH);
             } else if (!passwordResetData.oldPassword) {
-                throw new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.PASSWORDS_DO_NOT_MATCH);
+                throw new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.PASSWORD_INCORRECT);
             }
         }
 

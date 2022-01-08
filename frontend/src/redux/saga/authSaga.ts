@@ -6,14 +6,14 @@ import { loginUserAction, logoutUserAction, signupUserAction } from '../actions/
 import { ILoginData } from '../../forms/LoginForm';
 import { ISignupData } from '../../forms/SignupForm';
 
-const fetchIsLoggedIn = async (): Promise<object> => {
+const fetchUserLoginState = async (): Promise<object> => {
     return (await httpRequester.get(`${ApiUrls.AUTH}/userLoginState`)).data;
 };
 
 function* authWorker(): Generator<StrictEffect, void, PutEffect> {
-    const payload = yield call(fetchIsLoggedIn);
+    const payload = yield call(fetchUserLoginState);
 
-    yield put({ type: ReduxAuthActions.FETCH_USER_IS_LOGGED_IN, payload }); // чтобы обратиться к reducer-у
+    yield put({ type: ReduxAuthActions.FETCH_USER_IS_LOGGED_IN, payload: { ...payload, isLoaded: true } }); // чтобы обратиться к reducer-у
 }
 
 export function* watchAuth(): Generator<ForkEffect, void, void> {

@@ -175,6 +175,52 @@ describe('Space (e2e)', () => {
         expect(res.body.data.length).toBe(1);
         expect(res.body.data[0].cityId).toBe(space_2.cityId);
     });
+    it('GET /spaces should get all spaces by price range', async () => {
+        await appointmentModel.create({
+            userId: user.id,
+            spaceId: space_1.id,
+            isoDatesReserved: isoDatesToReserve_1,
+        });
+        await appointmentModel.create({
+            userId: user.id,
+            spaceId: space_1.id,
+            isoDatesReserved: isoDatesToReserve_2,
+        });
+        await appointmentModel.create({
+            userId: user.id,
+            spaceId: space_2.id,
+            isoDatesReserved: isoDatesToReserve_2,
+        });
+
+        const res_1 = await request(app)
+            .get(`${ApiRoutes.SPACES}`)
+            .query({
+                priceRange: {
+                    from: 10000,
+                },
+            });
+
+        expect(res_1.body.data.length).toBe(0);
+
+        const res_2 = await request(app)
+            .get(`${ApiRoutes.SPACES}`)
+            .query({
+                priceRange: {
+                    from: 500,
+                },
+            });
+        expect(res_2.body.data.length).toBe(2);
+
+        const res_3 = await request(app)
+            .get(`${ApiRoutes.SPACES}`)
+            .query({
+                priceRange: {
+                    from: 500,
+                    to: 100,
+                },
+            });
+        expect(res_3.body.data.length).toBe(0);
+    });
 
     it('GET /spaces should get all spaces by dates to reserve', async () => {
         // FIXME if appointment already overlaps then we should be unable to create a new one

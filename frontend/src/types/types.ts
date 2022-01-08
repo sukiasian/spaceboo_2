@@ -15,6 +15,7 @@ export interface IServerRes {
 export interface IServerErr {}
 
 export interface IComponentClassNameProps {
+    index?: number;
     mainDivClassName?: string;
     additionalClassNames?: string;
 }
@@ -96,6 +97,7 @@ export enum ReduxAuthActions {
 export enum ReduxCitiesActions {
     FETCH_CITIES = 'FETCH_CITIES',
     FETCH_CITIES_BY_SEARCH_PATTERN = 'FETCH_CITIES_BY_SEARCH_PATTERN',
+    FETCH_MAJOR_CITIES = 'FETCH_MAJOR_CITIES',
     ANNUALIZE_FOUND_BY_SEARCH_PATTERN_CITIES = 'ANNUALIZE_FOUND_BY_SEARCH_PATTERN_CITIES',
 }
 
@@ -123,6 +125,7 @@ export enum SagaTasks {
     REQUEST_USER_LOGIN_STATE = 'REQUEST_USER_LOGIN_STATE',
     REQUEST_CITIES = 'REQUEST_CITIES',
     REQUEST_CITIES_BY_SEARCH_PATTERN = 'REQUEST_CITIES_BY_SEARCH_PATTERN',
+    REQUEST_MAJOR_CITIES = 'REQUEST_MAJOR_CITIES',
     REQUEST_USER_LOGOUT = 'REQUEST_USER_LOGOUT',
     POST_LOGIN = 'POST_LOGIN',
     POST_SIGNUP = 'POST_SIGNUP',

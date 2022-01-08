@@ -1,6 +1,6 @@
 import { all } from '@redux-saga/core/effects';
 import { watchSpaces } from './spaceSaga';
-import { watchCities, watchFindCitiesBySearchPattern } from './citySaga';
+import { watchCities, watchFindCitiesBySearchPattern, watchFindMajorCities } from './citySaga';
 import { watchAuth, watchLogoutUser, watchPostLogin, watchPostSignup } from './authSaga';
 import { watchCheckVerificationCode, watchSendVerificationCode } from './emailVerificationSaga';
 
@@ -16,5 +16,6 @@ export function* rootSaga() {
         watchLogoutUser(),
         watchSendVerificationCode(),
         watchCheckVerificationCode(),
+        watchFindMajorCities(),
     ]);
 }

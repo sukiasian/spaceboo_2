@@ -11,6 +11,10 @@ export class AppointmentController extends Singleton {
         // TODO check if the date is not in the past !!!
         const { resIsoDatesToReserve, spaceId } = req.body;
         const userId = req.user.id;
+
+        resIsoDatesToReserve.beginningTime = resIsoDatesToReserve.beginningTime ?? '14:00';
+        resIsoDatesToReserve.endingTime = resIsoDatesToReserve.endingTime ?? '12:00';
+
         const appointment = await this.dao.createAppointment(resIsoDatesToReserve, spaceId, userId);
 
         UtilFunctions.sendResponse(res)(HttpStatus.CREATED, ResponseMessages.APPOINTMENT_CREATED, appointment);

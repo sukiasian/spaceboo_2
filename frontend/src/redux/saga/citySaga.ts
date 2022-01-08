@@ -2,13 +2,13 @@ import { call, put, takeEvery, StrictEffect, PutEffect, ForkEffect, takeLatest }
 import { httpRequester } from '../../utils/HttpRequest';
 import { ApiUrls, ReduxCitiesActions, SagaTasks } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
-import { fetchCitiesAction } from '../actions/cityActions';
+import { fetchCitiesAction, fetchMajorCitiesAction } from '../actions/cityActions';
 
 const fetchCities = async (): Promise<object> => {
     return (await httpRequester.get(ApiUrls.CITIES)).data;
 };
 
-function* citiesWorker(): Generator<StrictEffect, void, PutEffect> {
+function* citiesWorker(action: IAction): Generator<StrictEffect, void, PutEffect> {
     const payload = yield call(fetchCities);
 
     yield put({ type: ReduxCitiesActions.FETCH_CITIES, payload });
@@ -30,4 +30,16 @@ function* findCitiesBySearchPatternWorker(action: IAction): Generator<StrictEffe
 }
 export function* watchFindCitiesBySearchPattern(): Generator<ForkEffect, void, void> {
     yield takeLatest(SagaTasks.REQUEST_CITIES_BY_SEARCH_PATTERN, findCitiesBySearchPatternWorker);
+}
+
+const fetchMajorCities = async (): Promise<object> => {
+    return (await httpRequester.get(`${ApiUrls.CITIES}/majors`)).data;
+};
+function* findMajorCities(): Generator<StrictEffect, void, PutEffect> {
+    const payload = yield call(fetchMajorCities);
+
+    yield put(fetchMajorCitiesAction(payload));
+}
+export function* watchFindMajorCities(): Generator<ForkEffect, void, void> {
+    yield takeLatest(SagaTasks.REQUEST_MAJOR_CITIES, findMajorCities);
 }

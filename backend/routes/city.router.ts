@@ -9,6 +9,7 @@ class CityRouter extends Singleton implements IRouter {
 
     public prepareRouter = (): void => {
         this.router.route('/').get(this.cityController.getCitiesByQuery);
+        this.router.route('/majors').get(this.cityController.getMajorCities);
     };
 }
 

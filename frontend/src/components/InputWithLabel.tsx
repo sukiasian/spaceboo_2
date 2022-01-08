@@ -5,6 +5,7 @@ export enum InputTypes {
     PASSWORD = 'password',
     EMAIL = 'email',
     TEXT = 'text',
+    TEL = 'tel',
 }
 export enum InputAutoCompleteOptions {
     ON = 'on',
@@ -12,24 +13,23 @@ export enum InputAutoCompleteOptions {
     NEW_PASSWORD = 'new-password',
 }
 
-interface IInputWithLableProps extends IComponentClassNameProps {
+export interface IInputWithLableProps extends IComponentClassNameProps {
     inputLabel: string;
     inputName: string;
-    inputPlaceholder: string;
     inputClassName: string;
-    onChange: ChangeEventHandler<HTMLInputElement>;
+    onChange?: ChangeEventHandler<HTMLInputElement>;
+    inputPlaceholder?: string;
     inputType?: InputTypes;
     inputAutoComplete?: InputAutoCompleteOptions;
     isRequiredField?: boolean;
 }
-
 export interface IFormInputs {
     [key: string]: {
         mainDivClassName: string;
         inputLabel: string;
         inputName: string;
-        inputPlaceholder: string;
         inputClassName: string;
+        inputPlaceholder?: string;
         value?: string;
         inputAutoComplete?: InputAutoCompleteOptions;
         inputType?: InputTypes;
@@ -45,6 +45,7 @@ export default function InputWithLabel(props: IInputWithLableProps) {
             return <span className="required-field">*</span>;
         }
     };
+
     return (
         <div className={`${props.mainDivClassName}-input-container`}>
             <label>
@@ -52,7 +53,7 @@ export default function InputWithLabel(props: IInputWithLableProps) {
                 {renderRequiredField()}
             </label>
             <input
-                className={`label label-${props.inputClassName}`}
+                className={`label label--${props.inputClassName}`}
                 type={inputType}
                 name={props.inputName}
                 placeholder={props.inputPlaceholder}

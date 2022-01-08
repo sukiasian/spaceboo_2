@@ -7,7 +7,7 @@ import InputWithLabel, { IFormInputs, InputAutoCompleteOptions, InputTypes } fro
 import AlertFirstDbValidationError from '../components/AlertFirstDbValidationError';
 import { postSendVerificationCodeAction } from '../redux/actions/emailVerificationActions';
 import { EmailPurpose, IPostSendVerificationEmailPayload } from '../redux/reducers/emailVerificationReducer';
-import { HttpStatus, LocalStorageItems, ReduxEmailVerificationActions } from '../types/types';
+import { HttpStatus, LocalStorageItems } from '../types/types';
 
 export interface ISignupData {
     [key: keyof IFormInputs]: string | undefined;
@@ -99,7 +99,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
         if (sendVerificationCodeResponse && sendVerificationCodeResponse.statusCode === HttpStatus.OK) {
             storeLastVerificationRequestedAtLocalStorage();
             props.handleAfterSignup();
-            dispatch({ type: ReduxEmailVerificationActions.ANNUALIZE_SEND_VERIFICATION_CODE_RESPONSE });
+
             navigate('/');
         }
     };
