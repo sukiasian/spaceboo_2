@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ITimeUnits } from '../types/types';
-import { formatTimeUnitToTwoDigitString } from '../utils/utilFunctions';
+import { formatSingleDigitUnitToTwoDigitString } from '../utils/utilFunctions';
 
 interface ITimerProps {
     timerRef: React.MutableRefObject<NodeJS.Timeout>;
@@ -39,11 +39,11 @@ export default function Timer(props: ITimerProps): JSX.Element {
             return (
                 <div className="timer">
                     <div className="timer__units timer__units--minute">
-                        {formatTimeUnitToTwoDigitString(timeUnits.minutes!)}
+                        {formatSingleDigitUnitToTwoDigitString(timeUnits.minutes!)}
                     </div>
                     <div className="timer__units-separator">:</div>
                     <div className="timer__units timer__units--seconds">
-                        {formatTimeUnitToTwoDigitString(timeUnits.seconds!)}
+                        {formatSingleDigitUnitToTwoDigitString(timeUnits.seconds!)}
                     </div>
                 </div>
             );

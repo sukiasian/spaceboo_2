@@ -118,6 +118,7 @@ export enum ReduxEmailVerificationActions {
 
 export enum ReduxCommonActions {
     TOGGLE_TIMER = 'TOGGLE_TIMER',
+    SET_DATE_PICKER_DATE = 'SET_DATE_PICKER_DATE',
 }
 
 export enum SagaTasks {

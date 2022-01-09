@@ -24,6 +24,6 @@ export const updateDocumentTitle = (title: string): void => {
     document.title = title;
 };
 
-export const formatTimeUnitToTwoDigitString = (timeUnit: number): string => {
-    return timeUnit > 9 ? `${timeUnit}` : `0${timeUnit}`;
+export const formatSingleDigitUnitToTwoDigitString = (unit: number): string => {
+    return unit > 9 ? `${unit}` : `0${unit}`;
 };

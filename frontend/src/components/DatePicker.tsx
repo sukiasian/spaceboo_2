@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { monthStrings } from '../types/constants';
-import { IQueryString } from './Filters';
+import { useDispatch, useSelector } from 'react-redux';
+import { setDatePickerDateAction } from '../redux/actions/commonActions';
+import { IReduxState } from '../redux/reducers/rootReducer';
 
 interface IDatePickerDate {
     year: number;
@@ -10,29 +14,26 @@ interface ICurrentDate extends IDatePickerDate {
     day: number;
 }
 interface IDatePickerProps {
-    queryString: IQueryString;
-    setQueryString: React.Dispatch<React.SetStateAction<IQueryString>>;
+    handlePickDate: (...props: any) => any;
 }
 
 export default function DatePicker(props: IDatePickerProps): JSX.Element {
-    const { queryString, setQueryString }: IDatePickerProps = props;
+    const { handlePickDate } = props;
     const [currentDate, setCurrentDate] = useState<ICurrentDate>({
         year: 0,
         month: 0,
         day: 0,
-    });
-    const [datePickerDate, setDatePickerDate] = useState<IDatePickerDate>({
-        year: 0,
-        month: 0,
     });
     const [datePickerData, setDatePickerData] = useState({
         weekDayStartsFrom: 0,
         lastDayOfCurrentMonth: 0,
         lastDayOfPreviousMonth: 0,
     });
+    const { datePickerDate } = useSelector((state: IReduxState) => state.commonStorage);
     const [monthsWithYearsDropDownMenuIsOpen, setMonthsWithYearsDropDownMenuIsOpen] = useState(false);
+    const dispatch = useDispatch();
     const amountOfMonthsAvailableToLookUp = 12;
-    const getDatePickerDateFromDate = (date: Date): IDatePickerDate => {
+    const getDatePickerDateFromTodayDate = (date: Date): IDatePickerDate => {
         const year = date.getFullYear();
         const month = date.getMonth();
 
@@ -43,9 +44,9 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
     };
     const defineCurrentDateAndPickOnInit = (): void => {
         const now = new Date();
-        const newDatePickerDate = getDatePickerDateFromDate(now);
+        const newDatePickerDate = getDatePickerDateFromTodayDate(now);
 
-        setDatePickerDate(newDatePickerDate);
+        dispatch(setDatePickerDateAction(newDatePickerDate));
 
         const newCurrentDate: ICurrentDate = { ...newDatePickerDate, day: now.getDate() };
 
@@ -73,12 +74,13 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
     const updateDatePickerDateFromDropDownMenu = (month: number, year = currentDate.year): (() => void) => {
         return (): void => {
             const dateOfMonthBeginning = new Date(year, month, 1);
-            const date = getDatePickerDateFromDate(dateOfMonthBeginning);
+            const date = getDatePickerDateFromTodayDate(dateOfMonthBeginning);
 
-            setDatePickerDate(date);
+            dispatch(setDatePickerDateAction(date));
             setMonthsWithYearsDropDownMenuIsOpen(false);
         };
     };
+
     const decreaseDatePickerMonth = (): void => {
         const newDatePickerDate: IDatePickerDate = { ...datePickerDate };
 
@@ -91,7 +93,7 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
             }
         }
 
-        setDatePickerDate(newDatePickerDate);
+        dispatch(setDatePickerDateAction(newDatePickerDate));
     };
     const increaseDatePickerMonth = (): void => {
         const newDatePickerDate: IDatePickerDate = { ...datePickerDate };
@@ -105,10 +107,33 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
             }
         }
 
-        setDatePickerDate(newDatePickerDate);
+        dispatch(setDatePickerDateAction(newDatePickerDate));
     };
-    const pickBeginningDate = (): void => {};
-    const pickEndingDate = (): void => {};
+    const handleOutOfCalendarDaysClick = (day: number) => {
+        increaseDatePickerMonth();
+        // change beginningDate
+    };
+
+    // FIXME TODO это должна быть функция переданная извне - чтобы компонент был реюзабл.
+
+    const defineActiveDayClassName = (day: number): string => {
+        if (
+            datePickerDate.month === currentDate.month &&
+            datePickerDate.year === currentDate.year &&
+            day === currentDate.day
+        ) {
+            return 'date-picker__table__cell--active';
+        }
+
+        return '';
+    };
+    const definePastDaysClassName = (day: number): string => {
+        if (datePickerDate.month === currentDate.month && day < currentDate.day) {
+            return 'date-picker__table__cell--past';
+        }
+
+        return '';
+    };
     const renderDayCells = (): JSX.Element[] => {
         let tableRows = [];
 
@@ -120,27 +145,43 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
 
                 if (i === 1 && j <= datePickerData.weekDayStartsFrom - 1) {
                     tableCells.push(
-                        <td className="date-table__cell--inactive prev-month-cell date-table__cell" key={i * j}>
+                        <td
+                            className={`date-picker__table__cell date-picker__table__cell--out-of-month date-picker__table__cell--${j}`}
+                            key={i * j}
+                        >
                             {datePickerData.lastDayOfPreviousMonth - (datePickerData.weekDayStartsFrom - 1) + j}
                         </td>
                     );
                 } else if (dayInCalendar > datePickerData.lastDayOfCurrentMonth) {
                     tableCells.push(
-                        <td className="date-table__cell--inactive next-month-cell date-table__cell" key={i * j}>
+                        <td
+                            className={`date-picker__table__cell date-picker__table__cell--out-of-month date-picker__table__cell--${j}`}
+                            key={i * j}
+                        >
                             {dayInCalendar - datePickerData.lastDayOfCurrentMonth}
                         </td>
                     );
                 } else {
+                    const day = (i - 1) * 7 + j - (datePickerData.weekDayStartsFrom - 1);
+
                     tableCells.push(
-                        <td onClick={() => {}} key={i * j}>
-                            {(i - 1) * 7 + j - (datePickerData.weekDayStartsFrom - 1)}
+                        <td
+                            className={`date-picker__table__cell date-picker__table__cell--${j} ${defineActiveDayClassName(
+                                day
+                            )} ${definePastDaysClassName(day)}`}
+                            onClick={() => {
+                                handlePickDate(day);
+                            }}
+                            key={i * j}
+                        >
+                            {day}
                         </td>
                     );
                 }
             }
 
             tableRows.push(
-                <tr className="date-table__days date-table__cells" key={i}>
+                <tr className={`date-picker__table__row date-picker__table__row--${i}`} key={i}>
                     {tableCells}
                 </tr>
             );
@@ -194,22 +235,12 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
     return (
         <div className="date-picker">
             <div className="date-picker__control">
-                <div
-                    className="date-picker__control__pick-month date-picker__control__pick-month--back"
-                    onClick={decreaseDatePickerMonth}
-                >
-                    {'<'}
-                </div>
+                <FontAwesomeIcon icon={faAngleLeft} onClick={decreaseDatePickerMonth} />
                 <div className="date-picker__control__picked-month" onClick={toggleMonthsWithYearsDropDownMenu}>
                     {monthStrings[datePickerDate.month]}, {datePickerDate.year}
                 </div>
                 {renderMonthsWithYearsDropDownMenu()}
-                <div
-                    className="date-picker__control__pick-month date-picker__control__pick-month--forward"
-                    onClick={increaseDatePickerMonth}
-                >
-                    {'>'}
-                </div>
+                <FontAwesomeIcon icon={faAngleRight} onClick={increaseDatePickerMonth} />
             </div>
             <table className="date-picker__table">
                 <tbody>
