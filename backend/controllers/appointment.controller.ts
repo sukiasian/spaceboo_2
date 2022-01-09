@@ -20,6 +20,7 @@ export class AppointmentController extends Singleton {
         UtilFunctions.sendResponse(res)(HttpStatus.CREATED, ResponseMessages.APPOINTMENT_CREATED, appointment);
     });
 
+    public getAppointmentBySpaceId;
     // PASS THE SPACE LITERALLY
     public stopAppointment = UtilFunctions.catchAsync(async (req, res, next) => {});
 }

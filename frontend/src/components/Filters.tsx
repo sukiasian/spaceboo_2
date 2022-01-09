@@ -1,11 +1,10 @@
 import { ChangeEventHandler, MouseEventHandler, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faTimes } from '@fortawesome/free-solid-svg-icons';
-import DatePicker from './DatePicker';
 import InputWithLabel, { IInputWithLableProps, InputTypes } from './InputWithLabel';
-import { formatSingleDigitUnitToTwoDigitString } from '../utils/utilFunctions';
 import { useSelector } from 'react-redux';
 import { IReduxState } from '../redux/reducers/rootReducer';
+import QueryDatePicker from './QueryDatePicker';
 
 interface IFilterRange<T> {
     from: T;
@@ -20,7 +19,7 @@ export interface IDatesRange {
     beginningDate?: string;
     endingDate?: string;
 }
-export interface IQueryString extends IDatesRange {
+export interface IQueryData extends IDatesRange {
     page?: string | number;
     limit?: string | number;
     sortBy?: SpaceQuerySortFields;
@@ -43,7 +42,7 @@ export enum SpaceQuerySortFields {
 }
 
 export default function Filters(): JSX.Element {
-    const [queryString, setQueryString] = useState<IQueryString>({
+    const [queryData, setQueryData] = useState<IQueryData>({
         sortBy: SpaceQuerySortFields.NEWEST,
         cityId: localStorage.getItem('currentCityId') || '',
     });
@@ -69,9 +68,7 @@ export default function Filters(): JSX.Element {
             text: 'Сначала новые',
         },
     ]);
-    const [numberOfDaysRequired, setNumberOfDaysRequired] = useState(0);
     const annualizeDatesIconRef = useRef<HTMLSpanElement>(null);
-    const { datePickerDate } = useSelector((state: IReduxState) => state.commonStorage);
     const priceRangeInputs: IPriceRangeInput[] = [
         {
             inputLabel: 'От',
@@ -88,91 +85,34 @@ export default function Filters(): JSX.Element {
     ];
     const toggleFilterBoxIsOpen = (filter: FilterNames): MouseEventHandler => {
         return (e): void => {
-            console.log(e.currentTarget);
+            switch (filter) {
+                case FilterNames.SORT_BY:
+                    setSortByDropDownBoxIsOpen((prev) => !prev);
+                    break;
 
-            if (e.currentTarget) {
-                switch (filter) {
-                    case FilterNames.SORT_BY:
-                        setSortByDropDownBoxIsOpen((prev) => !prev);
-                        break;
+                case FilterNames.PRICE:
+                    setPriceRangeDropDownBoxIsOpen((prev) => !prev);
+                    break;
 
-                    case FilterNames.PRICE:
-                        setPriceRangeDropDownBoxIsOpen((prev) => !prev);
-                        break;
-
-                    case FilterNames.RESERVATION_DATE_PICKER:
-                        setRequiredReservationDatesPickerIsOpen((prev) => !prev);
-                        break;
-                }
+                case FilterNames.RESERVATION_DATE_PICKER:
+                    setRequiredReservationDatesPickerIsOpen((prev) => !prev);
+                    break;
             }
         };
     };
     const updateQueryStringRange: ChangeEventHandler<HTMLInputElement> = (e) => {
         const { value: payload } = e.currentTarget;
-        const newQueryString: any = { ...queryString };
-        newQueryString[e.currentTarget.name] = payload;
+        const newQueryData: any = { ...queryData };
+        newQueryData[e.currentTarget.name] = payload;
 
-        setQueryString(newQueryString);
+        setQueryData(newQueryData);
     };
-    const generateQueryDateString = (year: number, month: number, day: number): string => {
-        return `${year}-${formatSingleDigitUnitToTwoDigitString(month + 1)}-${formatSingleDigitUnitToTwoDigitString(
-            day
-        )}`;
-    };
-    const generateRenderDateString = (year: number, month: number, day: number): string => {
-        return `${formatSingleDigitUnitToTwoDigitString(day)}/${formatSingleDigitUnitToTwoDigitString(
-            month + 1
-        )}/${year}`;
-    };
-    const firstDateGreaterThanSecond = (d1: string, d2: string): boolean => {
-        return new Date(d1) > new Date(d2);
-    };
-    const pickDate = (day: number) => {
-        const newQueryString: IQueryString = { ...queryString };
-        const newDatesForRender: IDatesRange = { ...datesForRender };
-        const pickedDate = generateQueryDateString(datePickerDate.year, datePickerDate.month, day);
-        const pickedDateForRender = generateRenderDateString(datePickerDate.year, datePickerDate.month, day);
-
-        if (newQueryString.beginningDate && newQueryString.endingDate) {
-            // if you click on chosen one
-            if (newQueryString.beginningDate === pickedDate || newQueryString.endingDate === pickedDate) {
-                newQueryString.beginningDate = pickedDate;
-                newQueryString.endingDate = generateQueryDateString(datePickerDate.year, datePickerDate.month, day + 1);
-                newDatesForRender.beginningDate = pickedDateForRender;
-                newDatesForRender.endingDate = generateRenderDateString(
-                    datePickerDate.year,
-                    datePickerDate.month,
-                    day + 1
-                );
-            }
-            // if you first click on high value then on lower value
-            else if (firstDateGreaterThanSecond(newQueryString.beginningDate, pickedDate)) {
-                newQueryString.endingDate = newQueryString.beginningDate;
-                newQueryString.beginningDate = pickedDate;
-                newDatesForRender.endingDate = newDatesForRender.beginningDate;
-                newDatesForRender.beginningDate = pickedDateForRender;
-            } else {
-                newQueryString.endingDate = pickedDate;
-                newDatesForRender.endingDate = pickedDateForRender;
-            }
-        } else {
-            newQueryString.beginningDate = pickedDate;
-            newQueryString.endingDate = generateQueryDateString(datePickerDate.year, datePickerDate.month, day + 1);
-            newDatesForRender.beginningDate = pickedDateForRender;
-            newDatesForRender.endingDate = generateRenderDateString(datePickerDate.year, datePickerDate.month, day + 1);
-        }
-
-        setQueryString(newQueryString);
-        setDatesForRender({ beginningDate: newDatesForRender.beginningDate, endingDate: newDatesForRender.endingDate });
-    };
-    console.log(datesForRender);
-
     const defineFilterBoxArrowClassName = (filterBoxIsOpen: boolean): string => {
         return filterBoxIsOpen ? 'filters__arrow--rotated' : 'filters__arrow--straight';
     };
     const calculateNumberOfDaysRequired = (): number => {
-        const beginningDateInMs = new Date(queryString.beginningDate!).getTime();
-        const endingDateInMs = new Date(queryString.endingDate!).getTime();
+        const beginningDateInMs = new Date(queryData.beginningDate!).getTime();
+        const endingDateInMs = new Date(queryData.endingDate!).getTime();
 
         return (endingDateInMs - beginningDateInMs) / 1000 / 60 / 60 / 24;
     };
@@ -195,12 +135,12 @@ export default function Filters(): JSX.Element {
     const annualizeRequiredReservationDatesRangeFilter: MouseEventHandler = (e) => {
         e.stopPropagation();
 
-        const newQueryString = { ...queryString };
+        const newQueryData = { ...queryData };
 
-        newQueryString.beginningDate = '';
-        newQueryString.endingDate = '';
+        newQueryData.beginningDate = '';
+        newQueryData.endingDate = '';
 
-        setQueryString(newQueryString);
+        setQueryData(newQueryData);
         setDatesForRender(undefined);
     };
     const renderSortByFilterDropDown = (): JSX.Element | void => {
@@ -261,7 +201,14 @@ export default function Filters(): JSX.Element {
     };
     const renderDatePicker = (): JSX.Element | void => {
         if (requiredReservationDatesPickerIsOpen) {
-            return <DatePicker handlePickDate={pickDate} />;
+            return (
+                <QueryDatePicker
+                    queryData={queryData}
+                    setQueryData={setQueryData}
+                    datesForRender={datesForRender}
+                    setDatesForRender={setDatesForRender}
+                />
+            );
         }
     };
     const renderNumberOfDaysRequired = (): JSX.Element | void => {
@@ -295,7 +242,6 @@ export default function Filters(): JSX.Element {
                     className="filters__required-reservation-dates-picker__content--"
                     onClick={toggleFilterBoxIsOpen(FilterNames.RESERVATION_DATE_PICKER)}
                 >
-                    {/*  в renderRequiredReservationDatesRange есть иконка которая стирает datesForRender и queryString. Но при нажатии на нее проиходит также тоггл календаря, т.к. иконка является дочкой текущего дива */}
                     {renderRequiredReservationDatesRange()}
                     <FontAwesomeIcon icon={faCalendar} />
                 </div>

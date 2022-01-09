@@ -15,10 +15,12 @@ interface ICurrentDate extends IDatePickerDate {
 }
 interface IDatePickerProps {
     handlePickDate: (...props: any) => any;
+    presentMonthDaysClassNamesCombined?: (day: number) => string;
 }
 
 export default function DatePicker(props: IDatePickerProps): JSX.Element {
     const { handlePickDate } = props;
+    const { presentMonthDaysClassNamesCombined } = props;
     const [currentDate, setCurrentDate] = useState<ICurrentDate>({
         year: 0,
         month: 0,
@@ -29,8 +31,9 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
         lastDayOfCurrentMonth: 0,
         lastDayOfPreviousMonth: 0,
     });
-    const { datePickerDate } = useSelector((state: IReduxState) => state.commonStorage);
     const [monthsWithYearsDropDownMenuIsOpen, setMonthsWithYearsDropDownMenuIsOpen] = useState(false);
+    const { datePickerDate } = useSelector((state: IReduxState) => state.commonStorage);
+    const [outOfCurrentMonthDayPicked, setOutOfCurrentMonthDayPicked] = useState<number | undefined>();
     const dispatch = useDispatch();
     const amountOfMonthsAvailableToLookUp = 12;
     const getDatePickerDateFromTodayDate = (date: Date): IDatePickerDate => {
@@ -55,7 +58,7 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
     const applyEffectsOnInit = (): void => {
         defineCurrentDateAndPickOnInit();
     };
-    const updateDatePickerDate = (): void => {
+    const updateDatePickerData = (): void => {
         if (datePickerDate.year !== 0) {
             const date = new Date(datePickerDate.year, datePickerDate.month, 1);
             const year = date.getFullYear();
@@ -80,7 +83,6 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
             setMonthsWithYearsDropDownMenuIsOpen(false);
         };
     };
-
     const decreaseDatePickerMonth = (): void => {
         const newDatePickerDate: IDatePickerDate = { ...datePickerDate };
 
@@ -109,25 +111,31 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
 
         dispatch(setDatePickerDateAction(newDatePickerDate));
     };
-    const handleOutOfCalendarDaysClick = (day: number) => {
-        increaseDatePickerMonth();
-        // change beginningDate
+    const handleAfterCurrentMonthDaysClick = (day: number): (() => void) => {
+        return () => {
+            increaseDatePickerMonth();
+            setOutOfCurrentMonthDayPicked(day);
+        };
+    };
+    const handleBeforeCurrentMonthDaysClick = (day: number): (() => void) => {
+        return () => {
+            decreaseDatePickerMonth();
+            setOutOfCurrentMonthDayPicked(day);
+        };
     };
 
-    // FIXME TODO это должна быть функция переданная извне - чтобы компонент был реюзабл.
-
-    const defineActiveDayClassName = (day: number): string => {
+    const defineTodayClassName = (day: number): string => {
         if (
             datePickerDate.month === currentDate.month &&
             datePickerDate.year === currentDate.year &&
             day === currentDate.day
         ) {
-            return 'date-picker__table__cell--active';
+            return 'date-picker__table__cell--today';
         }
 
         return '';
     };
-    const definePastDaysClassName = (day: number): string => {
+    const defineCurrentMonthPastDaysClassName = (day: number): string => {
         if (datePickerDate.month === currentDate.month && day < currentDate.day) {
             return 'date-picker__table__cell--past';
         }
@@ -141,40 +149,48 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
             let tableCells = [];
 
             for (let j = 1; j <= 7; j++) {
-                const dayInCalendar = (i - 1) * 7 + j - (datePickerData.weekDayStartsFrom - 1);
+                const dayCorrespondingToCalendar = (i - 1) * 7 + j - (datePickerData.weekDayStartsFrom - 1);
 
                 if (i === 1 && j <= datePickerData.weekDayStartsFrom - 1) {
-                    tableCells.push(
-                        <td
-                            className={`date-picker__table__cell date-picker__table__cell--out-of-month date-picker__table__cell--${j}`}
-                            key={i * j}
-                        >
-                            {datePickerData.lastDayOfPreviousMonth - (datePickerData.weekDayStartsFrom - 1) + j}
-                        </td>
-                    );
-                } else if (dayInCalendar > datePickerData.lastDayOfCurrentMonth) {
-                    tableCells.push(
-                        <td
-                            className={`date-picker__table__cell date-picker__table__cell--out-of-month date-picker__table__cell--${j}`}
-                            key={i * j}
-                        >
-                            {dayInCalendar - datePickerData.lastDayOfCurrentMonth}
-                        </td>
-                    );
-                } else {
-                    const day = (i - 1) * 7 + j - (datePickerData.weekDayStartsFrom - 1);
+                    const day = datePickerData.lastDayOfPreviousMonth - (datePickerData.weekDayStartsFrom - 1) + j;
 
                     tableCells.push(
                         <td
-                            className={`date-picker__table__cell date-picker__table__cell--${j} ${defineActiveDayClassName(
-                                day
-                            )} ${definePastDaysClassName(day)}`}
-                            onClick={() => {
-                                handlePickDate(day);
-                            }}
+                            className={`date-picker__table__cell date-picker__table__cell--out-of-month date-picker__table__cell--${j} `}
+                            onClick={handleBeforeCurrentMonthDaysClick(day)}
                             key={i * j}
                         >
                             {day}
+                        </td>
+                    );
+                } else if (dayCorrespondingToCalendar > datePickerData.lastDayOfCurrentMonth) {
+                    const day = dayCorrespondingToCalendar - datePickerData.lastDayOfCurrentMonth;
+
+                    tableCells.push(
+                        <td
+                            className={`date-picker__table__cell date-picker__table__cell--out-of-month date-picker__table__cell--${j} `}
+                            onClick={handleAfterCurrentMonthDaysClick(day)}
+                            key={i * j}
+                        >
+                            {day}
+                        </td>
+                    );
+                } else {
+                    tableCells.push(
+                        <td
+                            className={`date-picker__table__cell date-picker__table__cell--${j} ${defineTodayClassName(
+                                dayCorrespondingToCalendar
+                            )} ${defineCurrentMonthPastDaysClassName(dayCorrespondingToCalendar)} ${
+                                presentMonthDaysClassNamesCombined
+                                    ? presentMonthDaysClassNamesCombined!(dayCorrespondingToCalendar)
+                                    : ''
+                            }`}
+                            onClick={() => {
+                                handlePickDate(dayCorrespondingToCalendar);
+                            }}
+                            key={i * j}
+                        >
+                            {dayCorrespondingToCalendar}
                         </td>
                     );
                 }
@@ -230,7 +246,14 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
     };
 
     useEffect(applyEffectsOnInit, []);
-    useEffect(updateDatePickerDate, [datePickerDate]);
+    useEffect(updateDatePickerData, [datePickerDate]);
+    // FIXME 1. преобразовать стрелочную функцию в функциональное выражение. 2. Адаптивно ли это? что если
+    useEffect(() => {
+        if (outOfCurrentMonthDayPicked) {
+            handlePickDate(outOfCurrentMonthDayPicked);
+            setOutOfCurrentMonthDayPicked(undefined);
+        }
+    }, [datePickerDate, handlePickDate, outOfCurrentMonthDayPicked]);
 
     return (
         <div className="date-picker">
