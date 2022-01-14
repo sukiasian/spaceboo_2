@@ -1,10 +1,11 @@
-import { ChangeEventHandler, MouseEventHandler, useRef, useState } from 'react';
+import { ChangeEventHandler, MouseEventHandler, useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faTimes } from '@fortawesome/free-solid-svg-icons';
 import InputWithLabel, { IInputWithLableProps, InputTypes } from './InputWithLabel';
-import { useSelector } from 'react-redux';
-import { IReduxState } from '../redux/reducers/rootReducer';
+import { useDispatch } from 'react-redux';
 import QueryDatePicker from './QueryDatePicker';
+import { requestSpacesAction } from '../redux/actions/spaceActions';
+import { allowNumericInputValueOnly } from '../utils/utilFunctions';
 
 interface IFilterRange<T> {
     from: T;
@@ -14,7 +15,9 @@ interface ISortByDropDownOptions {
     field: SpaceQuerySortFields;
     text: string;
 }
-interface IPriceRangeInput extends IInputWithLableProps {}
+interface IPriceRangeInput extends IInputWithLableProps {
+    priceRangeQueryDataReference: PriceRangeQueryDataReferences;
+}
 export interface IDatesRange {
     beginningDate?: string;
     endingDate?: string;
@@ -23,7 +26,8 @@ export interface IQueryData extends IDatesRange {
     page?: string | number;
     limit?: string | number;
     sortBy?: SpaceQuerySortFields;
-    priceRange?: IFilterRange<number>;
+    priceFrom?: string | number;
+    priceTo?: string | number;
     beginningTime?: string;
     endingTime?: string;
     cityId?: string;
@@ -39,6 +43,10 @@ export enum SpaceQuerySortFields {
     PRICEDOWN = 'pricedown',
     OLDEST = 'oldest',
     NEWEST = 'newest',
+}
+enum PriceRangeQueryDataReferences {
+    PRICE_FROM = 'priceFrom',
+    PRICE_TO = 'priceTo',
 }
 
 export default function Filters(): JSX.Element {
@@ -74,15 +82,21 @@ export default function Filters(): JSX.Element {
             inputLabel: 'От',
             mainDivClassName: 'price-range',
             inputClassName: 'price-range-from',
-            inputName: 'from',
+            inputName: 'price-range-from',
+            priceRangeQueryDataReference: PriceRangeQueryDataReferences.PRICE_FROM,
         },
         {
             inputLabel: 'До',
             mainDivClassName: 'price-range',
             inputClassName: 'price-range-to',
-            inputName: 'to',
+            inputName: 'price-range-to',
+            priceRangeQueryDataReference: PriceRangeQueryDataReferences.PRICE_TO,
         },
     ];
+    const dispatch = useDispatch();
+    const requestSpaces = (): void => {
+        dispatch(requestSpacesAction(queryData));
+    };
     const toggleFilterBoxIsOpen = (filter: FilterNames): MouseEventHandler => {
         return (e): void => {
             switch (filter) {
@@ -100,15 +114,32 @@ export default function Filters(): JSX.Element {
             }
         };
     };
-    const updateQueryStringRange: ChangeEventHandler<HTMLInputElement> = (e) => {
-        const { value: payload } = e.currentTarget;
-        const newQueryData: any = { ...queryData };
-        newQueryData[e.currentTarget.name] = payload;
+    const defineFilterBoxArrowClassName = (filterBoxIsOpen: boolean): string => {
+        return filterBoxIsOpen ? 'filters__arrow--rotated' : 'filters__arrow--straight';
+    };
+    const updateQueryDataSortBy = (sortByOption: SpaceQuerySortFields): void => {
+        const newQueryData: IQueryData = { ...queryData };
+
+        newQueryData.sortBy = sortByOption;
 
         setQueryData(newQueryData);
     };
-    const defineFilterBoxArrowClassName = (filterBoxIsOpen: boolean): string => {
-        return filterBoxIsOpen ? 'filters__arrow--rotated' : 'filters__arrow--straight';
+    const updateQueryDataPriceRange: ChangeEventHandler<HTMLInputElement> = (e) => {
+        const newQueryData: any = { ...queryData };
+        const { value } = e.currentTarget;
+        const priceRangeQueryDataReference = e.currentTarget.getAttribute('data-tag');
+
+        newQueryData[priceRangeQueryDataReference as string] = value;
+
+        if (value.length >= 1) {
+            if (!allowNumericInputValueOnly(e.target.value)) {
+                e.target.value = '';
+
+                return;
+            }
+
+            setQueryData(newQueryData);
+        }
     };
     const calculateNumberOfDaysRequired = (): number => {
         const beginningDateInMs = new Date(queryData.beginningDate!).getTime();
@@ -150,7 +181,10 @@ export default function Filters(): JSX.Element {
                     return (
                         <div
                             className={`filters__sort-by__drop-down-menu__${option.field}`}
-                            onClick={toggleFilterBoxIsOpen(FilterNames.SORT_BY)}
+                            onClick={(e) => {
+                                toggleFilterBoxIsOpen(FilterNames.SORT_BY);
+                                updateQueryDataSortBy(option.field);
+                            }}
                             key={i}
                         >
                             <p className={`paragraph paragraph--filters__sort-by__drop-down-menu__${option.field}`}>
@@ -174,7 +208,8 @@ export default function Filters(): JSX.Element {
                         inputLabel={priceRangeInput.inputLabel}
                         inputName={priceRangeInput.inputName}
                         inputType={InputTypes.TEL}
-                        onChange={updateQueryStringRange}
+                        onChange={updateQueryDataPriceRange}
+                        dataTag={priceRangeInput.priceRangeQueryDataReference}
                         key={i}
                     />
                 );
@@ -222,6 +257,8 @@ export default function Filters(): JSX.Element {
             );
         }
     };
+
+    useEffect(requestSpaces, [queryData, dispatch]);
 
     return (
         <section className="filters-section" style={{ display: 'flex', flexDirection: 'row' }}>

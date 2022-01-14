@@ -6,7 +6,7 @@ import { IComponentClassNameProps, TActiveTab, UrlPathnames } from '../types/typ
 import Titles from '../components/Titles';
 import { annualizeSignupResponseAction, requestUserLoginState } from '../redux/actions/authActions';
 import SignupForm from '../forms/SignupForm';
-import SwitchTypeOfAuth, { SwitchModalFor } from '../components/SwitchAuthModal';
+import { SwitchAuthForModal, SwitchModalFor } from '../components/SwitchAuthForModal';
 
 type ISignupModalProps = IComponentClassNameProps & TActiveTab;
 
@@ -38,7 +38,7 @@ export default function SignupModal(props: ISignupModalProps): JSX.Element {
                         paragraph="Зарегистрируйтесь, чтобы продолжить."
                     />
                     <SignupForm handleAfterSignup={handleAfterSignup} />
-                    <SwitchTypeOfAuth
+                    <SwitchAuthForModal
                         mainDivClassName="signin"
                         switchQuestion="Уже есть аккаунт?"
                         switchCallToAction="Войдите"

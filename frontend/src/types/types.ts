@@ -5,14 +5,19 @@ export interface IResIsoDatesReserved {
     endingTime: string;
 }
 
-export interface IServerRes {
-    status: HttpStatus;
+export interface IServerSuccessResponse {
+    statusCode: HttpStatus;
     message: string;
     data: any;
 }
 
-// TODO
-export interface IServerErr {}
+// FIXME all of this is for development environment
+export interface IServerFailureResponse {
+    status: HttpStatus;
+    error: Error;
+    message: string;
+    stack: any;
+}
 
 export interface IComponentClassNameProps {
     index?: number;
@@ -28,6 +33,8 @@ export interface ITimeUnits {
     minutes?: number;
     seconds?: number;
 }
+
+export type TServerResponse = IServerSuccessResponse & IServerFailureResponse;
 
 export enum HttpStatus {
     CONTINUE = 100,
@@ -82,6 +89,10 @@ export enum HttpStatus {
 
 export enum ReduxSpaceActions {
     FETCH_SPACES = 'FETCH_SPACES',
+    SET_FETCH_SPACES_SUCCESS_RESPONSE = 'FETCH_SPACES_SUCCESS_RESPONSE',
+    SET_FETCH_SPACES_FAILURE_RESPONSE = 'FETCH_SPACES_FAILURE_RESPONSE',
+    SET_PROVIDE_SPACE_DATA = 'SET_PROVIDE_SPACE_DATA',
+    SET_EDIT_SPACE_DATA = 'SET_EDIT_SPACE_DATA',
 }
 
 export enum ReduxAuthActions {
@@ -104,16 +115,23 @@ export enum ReduxCitiesActions {
 export enum ReduxModalActions {
     TOGGLE_LOGIN_MODAL = 'TOGGLE_LOGIN_MODAL',
     TOGGLE_SIGNUP_MODAL = 'TOGGLE_SIGNUP_MODAL',
+    TOGGLE_EDIT_USER_MODAL = 'TOGGLE_EDIT_USER_MODAL',
 }
 
 export enum ReduxUserActions {
     FETCH_USER = 'FETCH_USER',
+    // FIXME it should be fetch user response
 }
 
 export enum ReduxEmailVerificationActions {
     SEND_VERIFICATION_CODE = 'SEND_VERIFICATION_CODE',
     CHECK_VERIFICATION_CODE = 'CHECK_VERIFICATION_CODE',
     ANNUALIZE_SEND_VERIFICATION_CODE_RESPONSE = 'ANNUALIZE_SEND_VERIFICATION_CODE_RESPONSE',
+}
+
+export enum ReduxImageActions {
+    SET_UPLOAD_IMAGES_SUCCESS_RESPONSE = 'SET_UPLOAD_IMAGES_SUCCESS_RESPONSE',
+    SET_UPLOAD_IMAGES_FAILURE_RESPONSE = 'SET_UPLOAD_IMAGES_FAILURE_RESPONSE',
 }
 
 export enum ReduxCommonActions {
@@ -140,6 +158,7 @@ export enum ApiUrls {
     AUTH = 'auth',
     CITIES = 'cities',
     EMAIL_VERIFICATION = 'emailVerification',
+    IMAGES = 'images',
 }
 
 export enum AlertTypes {

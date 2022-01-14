@@ -94,7 +94,6 @@ export default function ConfirmAccountPage(): JSX.Element {
 
     useEffect(applyEffectsOnInit, []);
     useEffect(clearTimerOnUnmount, []);
-    console.log(userLoginState);
 
     return (
         <div className="account-confirmation">

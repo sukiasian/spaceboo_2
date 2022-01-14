@@ -1,4 +1,4 @@
-import { Dispatch } from 'react';
+import { Dispatch, FormEventHandler } from 'react';
 import { Action } from 'redux';
 import { IAction } from '../redux/actions/ActionTypes';
 import { ReduxModalActions } from '../types/types';
@@ -26,4 +26,18 @@ export const updateDocumentTitle = (title: string): void => {
 
 export const formatSingleDigitUnitToTwoDigitString = (unit: number): string => {
     return unit > 9 ? `${unit}` : `0${unit}`;
+};
+
+export const allowNumericInputValueOnly = (targetValue: string): boolean => {
+    const valueConsistsOfNotOnlyNumbers = targetValue.match(/[^0-9]/g);
+
+    if (valueConsistsOfNotOnlyNumbers) {
+        return false;
+    }
+
+    return true;
+};
+
+export const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
 };

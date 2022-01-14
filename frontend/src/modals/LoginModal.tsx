@@ -6,7 +6,7 @@ import { IComponentClassNameProps, TActiveTab } from '../types/types';
 import Titles from '../components/Titles';
 import LoginForm from '../forms/LoginForm';
 import { annualizeLoginResponseAction, requestUserLoginState } from '../redux/actions/authActions';
-import SwitchTypeOfAuth, { SwitchModalFor } from '../components/SwitchAuthModal';
+import { SwitchAuthForModal, SwitchModalFor } from '../components/SwitchAuthForModal';
 
 type ILoginModalProps = IComponentClassNameProps & TActiveTab;
 
@@ -35,7 +35,7 @@ export default function LoginModal(props: ILoginModalProps) {
                         paragraph="Выполните вход, чтобы продолжить."
                     />
                     <LoginForm handleAfterLogin={handleAfterLogin} />
-                    <SwitchTypeOfAuth
+                    <SwitchAuthForModal
                         mainDivClassName="login"
                         switchQuestion="Еще не зарегистрированы?"
                         switchCallToAction="Зарегистрируйтесь"

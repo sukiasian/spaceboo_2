@@ -58,6 +58,12 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
     const applyEffectsOnInit = (): void => {
         defineCurrentDateAndPickOnInit();
     };
+    const switchToCorrespondingMonthThroughOutOfCurrentMonthClickEffect = (): void => {
+        if (outOfCurrentMonthDayPicked) {
+            handlePickDate(outOfCurrentMonthDayPicked);
+            setOutOfCurrentMonthDayPicked(undefined);
+        }
+    };
     const updateDatePickerData = (): void => {
         if (datePickerDate.year !== 0) {
             const date = new Date(datePickerDate.year, datePickerDate.month, 1);
@@ -214,7 +220,7 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
                 if (datesCounter.month <= 11) {
                     monthsWithYearsDropDownOptions.push(
                         <div
-                            className=""
+                            className={`date-picker__control__change-date date-picker__control__change-date--${i}`}
                             onClick={updateDatePickerDateFromDropDownMenu(datesCounter.month, datesCounter.year)}
                             key={i}
                         >
@@ -247,13 +253,11 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
 
     useEffect(applyEffectsOnInit, []);
     useEffect(updateDatePickerData, [datePickerDate]);
-    // FIXME 1. преобразовать стрелочную функцию в функциональное выражение. 2. Адаптивно ли это? что если
-    useEffect(() => {
-        if (outOfCurrentMonthDayPicked) {
-            handlePickDate(outOfCurrentMonthDayPicked);
-            setOutOfCurrentMonthDayPicked(undefined);
-        }
-    }, [datePickerDate, handlePickDate, outOfCurrentMonthDayPicked]);
+    useEffect(switchToCorrespondingMonthThroughOutOfCurrentMonthClickEffect, [
+        datePickerDate,
+        handlePickDate,
+        outOfCurrentMonthDayPicked,
+    ]);
 
     return (
         <div className="date-picker">
@@ -265,7 +269,7 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
                 {renderMonthsWithYearsDropDownMenu()}
                 <FontAwesomeIcon icon={faAngleRight} onClick={increaseDatePickerMonth} />
             </div>
-            <table className="date-picker__table">
+            <table className="date-picker__table" cellSpacing={0}>
                 <tbody>
                     <tr>
                         <th className="date-picker__table__weekday date-picker__table__weekday--monday">Пн</th>

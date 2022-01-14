@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import SpaceInputFieldsForCreateAndEdit from '../components/SpaceInputFieldsForCreateAndEdit';
 import { requestUserLoginState } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { updateDocumentTitle } from '../utils/utilFunctions';
@@ -25,9 +26,31 @@ export default function ProvideSpacePage(): JSX.Element {
             }
         }
     };
+    const handleSubmitButton = (): void => {
+        // dispatch - send the redux store data (provideSpaceData) to create space endpoint through redux saga
+    };
+    const renderProvideForm = (): JSX.Element => {
+        return (
+            <form className="provide-space__form">
+                <SpaceInputFieldsForCreateAndEdit
+                    buttonClassName="button button--primary button--submit"
+                    buttonText="Предоставить пространство"
+                    componentIsFor={'provideSpaceData'}
+                    handleSubmitButton={handleSubmitButton}
+                />
+            </form>
+        );
+    };
 
     useEffect(applyEffectsOnInit, [dispatch]);
     useEffect(redirectByLoginStateCondition, [userLoginState, navigate]);
 
-    return <> Предоставить пространство </>;
+    return (
+        <section className="provide-space-section">
+            <div className="provide-space__title">
+                <h2 className="heading heading--secondary heading--provide-space__title">Предоставить пространство</h2>
+            </div>
+            <div className="provide-space__form-container">{renderProvideForm()}</div>
+        </section>
+    );
 }

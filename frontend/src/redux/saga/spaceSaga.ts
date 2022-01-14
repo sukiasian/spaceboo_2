@@ -1,19 +1,74 @@
-import { call, put, takeEvery, StrictEffect, PutEffect, ForkEffect } from '@redux-saga/core/effects';
+import { call, put, takeEvery, PutEffect, ForkEffect, CallEffect } from '@redux-saga/core/effects';
 import { httpRequester } from '../../utils/HttpRequest';
-import { ApiUrls, ReduxSpaceActions, SagaTasks } from '../../types/types';
+import { ApiUrls, IServerSuccessResponse, IServerFailureResponse, SagaTasks } from '../../types/types';
+import { IAction } from '../actions/ActionTypes';
+import { IQueryData } from '../../components/Filters';
+import { AnyAction } from 'redux';
+import { fetchSpacesFailureAction, fetchSpacesSuccessAction } from '../actions/spaceActions';
 
 // TODO разобраться с типами ответов с бэкенда
 
-const fetchSpaces = async (): Promise<Array<object>> => {
-    return (await httpRequester.get(ApiUrls.SPACES)).data;
-};
-
-function* spaceWorker(): Generator<StrictEffect, void, PutEffect> {
-    const payload = yield call(fetchSpaces);
-
-    yield put({ type: ReduxSpaceActions.FETCH_SPACES, payload }); // чтобы обратиться к reducer-у
+interface IPriceRangeQueryString {
+    priceFrom?: string;
+    priceTo?: string;
+}
+interface IDatesToReserveRangeQueryString {
+    beginningDate?: string;
+    endingDate?: string;
 }
 
+const generatePriceRangeQueryString = (queryString: IPriceRangeQueryString): string => {
+    if (queryString.priceFrom && !queryString.priceTo) {
+        return `${queryString.priceFrom}`;
+    } else if (queryString.priceFrom && queryString.priceTo) {
+        return `${queryString.priceFrom},${queryString.priceTo}`;
+    } else if (!queryString.priceFrom && queryString.priceTo) {
+        return `0,${queryString.priceTo}`;
+    }
+
+    return '';
+};
+const generateDatesToReserveRangeQueryString = (queryString: IDatesToReserveRangeQueryString): string => {
+    return queryString.beginningDate ? `${queryString.beginningDate},${queryString.endingDate}` : '';
+};
+
+const fetchSpaces = async (queryData?: IQueryData): Promise<IServerFailureResponse> => {
+    const priceRangeQueryString = generatePriceRangeQueryString({
+        priceFrom: queryData?.priceFrom as string,
+        priceTo: queryData?.priceTo as string,
+    });
+    // FIXME на бэке поменять название с datesToReserve на requestedDatesToLookUp (или ...ToReserve)
+    const datesToReserveQueryString = generateDatesToReserveRangeQueryString({
+        beginningDate: queryData?.beginningDate,
+        endingDate: queryData?.endingDate,
+    });
+
+    return await httpRequester.get(
+        `${ApiUrls.SPACES}/?cityId=${
+            queryData?.cityId || ''
+        }&priceRange=${priceRangeQueryString}&datesToReserveQuery=${datesToReserveQueryString}&page=${
+            queryData?.page || ''
+        }&sortBy=${queryData?.sortBy || ''}&limit=${queryData?.limit || ''}&offset=12`
+    );
+};
+function* spaceWorker(
+    action: IAction
+): Generator<CallEffect<IServerSuccessResponse | IServerFailureResponse> | PutEffect<AnyAction>, void> {
+    try {
+        const response = yield call(fetchSpaces, action.payload);
+
+        if (
+            (response as IServerSuccessResponse).statusCode >= 200 &&
+            (response as IServerSuccessResponse).statusCode < 300
+        ) {
+            yield put(fetchSpacesSuccessAction(response as IServerSuccessResponse));
+        } else {
+            throw response;
+        }
+    } catch (err) {
+        yield put(fetchSpacesFailureAction(err as IServerFailureResponse));
+    }
+}
 export function* watchSpaces(): Generator<ForkEffect, void, void> {
-    yield takeEvery(SagaTasks.REQUEST_SPACES, spaceWorker); // слушает action-ы
+    yield takeEvery(SagaTasks.REQUEST_SPACES, spaceWorker);
 }

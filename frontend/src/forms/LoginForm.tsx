@@ -6,6 +6,7 @@ import { IReduxState } from '../redux/reducers/rootReducer';
 import InputWithLabel, { InputAutoCompleteOptions, IFormInputs, InputTypes } from '../components/InputWithLabel';
 import Alert from '../components/Alert';
 import { AlertTypes, CustomResponseMessages, HttpStatus } from '../types/types';
+import { handleSubmit } from '../utils/utilFunctions';
 
 export interface ILoginData {
     [key: keyof IFormInputs]: string | undefined;
@@ -46,9 +47,6 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
             props.handleAfterLogin();
             navigate('/');
         }
-    };
-    const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
-        e.preventDefault();
     };
     const handleInputChange = (fieldName: string): ChangeEventHandler<HTMLInputElement> => {
         return (e) => {

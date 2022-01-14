@@ -5,18 +5,18 @@ import { SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
 import { applicationInstance } from '../App';
 
-interface IPriceRange {
-    from?: string | number;
-    to?: string | number;
-}
 interface IQueryString {
     page?: string | number;
     limit?: string | number;
     sortBy?: SpaceQuerySortFields;
-    priceRange?: IPriceRange;
+    priceRange?: string | string[] | number[];
     datesToReserveQuery?: string | string[]; // '2020-03-14, 2020-03-18'
     timesToReserveQuery?: string | string[];
     cityId?: string;
+}
+interface IPriceRange {
+    from: number;
+    to?: number;
 }
 export enum SpaceQuerySortFields {
     PRICEUP = 'priceup',
@@ -45,6 +45,7 @@ export class SpaceSequelizeDao extends Dao {
     public getSpacesByQuery = async (queryStr: IQueryString): Promise<any> => {
         let { page, limit, sortBy, datesToReserveQuery, timesToReserveQuery, cityId, priceRange } = queryStr;
         let isoDatesRange: string;
+        let pricesFromAndTo: IPriceRange;
 
         if (datesToReserveQuery) {
             datesToReserveQuery = (datesToReserveQuery as string).split(',');
@@ -58,11 +59,27 @@ export class SpaceSequelizeDao extends Dao {
             );
         }
 
+        /* 
+        
+        priceRange - если нет, то from должно быть от 0 - либо его вообще может не быть.
+        но также может не быть to - как тогда быть ?
+        
+        */
+
         if (priceRange) {
-            priceRange.from = parseInt(priceRange.from as string, 10);
-            priceRange.to = parseInt(priceRange.to as string, 10);
-        } else {
-            priceRange = {};
+            priceRange = (priceRange as string).split(',');
+            priceRange = priceRange.map((price: string) => parseInt(price, 10)) as number[];
+
+            if (priceRange.length === 2) {
+                pricesFromAndTo = {
+                    from: priceRange[0],
+                    to: priceRange[1],
+                };
+            } else {
+                pricesFromAndTo = {
+                    from: priceRange[0],
+                };
+            }
         }
 
         page = page ? (page as number) * 1 : 1;
@@ -95,7 +112,7 @@ export class SpaceSequelizeDao extends Dao {
             offset,
             isoDatesRange,
             cityId,
-            priceRange
+            pricesFromAndTo
         );
 
         return this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, queryFromParts);
@@ -156,14 +173,17 @@ export class SpaceSequelizeDao extends Dao {
         cityId?: string,
         priceRange?: IPriceRange
     ): string => {
+        // NOTE 1. we can use separate functions  2. при отсутствии datesToReservePartialQuery возможна ошибка т.к. будет отсутствовать WHERE constraint. хотя тест проходит
         const cityPartialQuery = cityId ? `AND c."cityId" = ${cityId}` : '';
         const datesToReservePartialQuery = isoDatesRange
             ? `WHERE NOT EXISTS
         (SELECT 1 FROM "Appointments" a WHERE a."spaceId" = s."id"
         AND a."isoDatesReserved" && '${isoDatesRange}')`
             : '';
-        const priceRangeFromPartialQuery = priceRange.from ? `AND s."pricePerNight" >= ${priceRange.from}` : '';
-        const priceRangeToPartialQuery = priceRange.to ? `AND s."pricePerNight" <= ${priceRange.to}` : '';
+        const priceRangeFromPartialQuery =
+            priceRange && priceRange.from !== undefined ? `AND s."pricePerNight" >= ${priceRange.from}` : '';
+        const priceRangeToPartialQuery =
+            priceRange && priceRange.to !== undefined ? `AND s."pricePerNight" <= ${priceRange.to}` : '';
 
         return `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" ${cityPartialQuery} ${datesToReservePartialQuery} ${priceRangeFromPartialQuery} ${priceRangeToPartialQuery} ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
     };

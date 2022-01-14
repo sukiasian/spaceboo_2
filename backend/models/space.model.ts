@@ -12,10 +12,11 @@ interface ISpaceAttributes {
     type: SpaceType;
     description: string;
     roomsNumber: number;
+    bedsNumber: number;
     lockerConnected: boolean;
-    imagesUrl?: string[];
     cityId: number;
     userId: string;
+    imagesUrl?: string[];
     facilities?: string[];
 }
 export interface ISpaceCreationAttributes extends Optional<ISpaceAttributes, 'id'> {}
@@ -41,6 +42,7 @@ export const spaceEditFields: Partial<keyof ISpaceAttributes>[] = [
     'type',
     'description',
     'roomsNumber',
+    'bedsNumber',
     'cityId',
     'userId',
     'facilities',
@@ -64,6 +66,10 @@ export class Space extends Model<ISpaceAttributes, ISpaceCreationAttributes> imp
 
     @Column({ allowNull: false, type: DataType.SMALLINT })
     public roomsNumber: number;
+
+    @Column({ allowNull: false, type: DataType.SMALLINT })
+    public bedsNumber: number;
+
     // TODO Should be array of PREDEFINED values - TV, A/C and other stuff
     // @IsIn([Object.values(Facilities)])
 

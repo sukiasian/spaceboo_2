@@ -528,6 +528,25 @@ a {
       background-color: #00c1ff;
       color: white; }
 
+.date-picker__table__cell--at-border--left {
+  background-color: green;
+  border-radius: 10px 0 0 10px; }
+
+.date-picker__table__cell--at-border--right {
+  background-color: green;
+  border-radius: 0 10px 10px 0; }
+
+.date-picker__table__cell--picked {
+  background-color: green; }
+
+.checkbox {
+  width: 10px;
+  height: 10px;
+  border: 1px solid green;
+  background-color: transparent; }
+  .checkbox--checked {
+    background-color: green; }
+
 .time-picker {
   user-select: none; }
   .time-picker__period {

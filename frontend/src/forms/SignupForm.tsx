@@ -8,6 +8,7 @@ import AlertFirstDbValidationError from '../components/AlertFirstDbValidationErr
 import { postSendVerificationCodeAction } from '../redux/actions/emailVerificationActions';
 import { EmailPurpose, IPostSendVerificationEmailPayload } from '../redux/reducers/emailVerificationReducer';
 import { HttpStatus, LocalStorageItems } from '../types/types';
+import { handleSubmit } from '../utils/utilFunctions';
 
 export interface ISignupData {
     [key: keyof IFormInputs]: string | undefined;
@@ -102,9 +103,6 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
 
             navigate('/');
         }
-    };
-    const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
-        e.preventDefault();
     };
     const handleInputChange = (fieldName: string): ChangeEventHandler<HTMLInputElement> => {
         return (e) => {

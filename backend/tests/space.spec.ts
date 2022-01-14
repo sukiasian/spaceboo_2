@@ -192,33 +192,22 @@ describe('Space (e2e)', () => {
             isoDatesReserved: isoDatesToReserve_2,
         });
 
-        const res_1 = await request(app)
-            .get(`${ApiRoutes.SPACES}`)
-            .query({
-                priceRange: {
-                    from: 10000,
-                },
-            });
+        const res_1 = await request(app).get(`${ApiRoutes.SPACES}`).query({
+            priceRange: '10000',
+        });
 
         expect(res_1.body.data.length).toBe(0);
 
-        const res_2 = await request(app)
-            .get(`${ApiRoutes.SPACES}`)
-            .query({
-                priceRange: {
-                    from: 500,
-                },
-            });
+        const res_2 = await request(app).get(`${ApiRoutes.SPACES}`).query({
+            priceRange: '500',
+        });
+
         expect(res_2.body.data.length).toBe(2);
 
-        const res_3 = await request(app)
-            .get(`${ApiRoutes.SPACES}`)
-            .query({
-                priceRange: {
-                    from: 500,
-                    to: 100,
-                },
-            });
+        const res_3 = await request(app).get(`${ApiRoutes.SPACES}`).query({
+            priceRange: '500,0',
+        });
+
         expect(res_3.body.data.length).toBe(0);
     });
 
@@ -315,7 +304,6 @@ describe('Space (e2e)', () => {
     });
 
     it('GET /spaces should get all spaces should be able to sort', async () => {
-        // NOTE put everything in beforeEach ?
         await appointmentModel.create({
             userId: user.id,
             spaceId: space_1.id,

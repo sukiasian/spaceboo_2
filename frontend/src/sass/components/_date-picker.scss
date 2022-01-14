@@ -107,7 +107,32 @@
     // }
 }
 
+.date-picker__table__cell--at-border {
+    &--left {
+        background-color: green;
+        border-radius: 10px 0 0 10px;
+    }
+    &--right {
+        background-color: green;
+        border-radius: 0 10px 10px 0;
+    }
+}
+
+.date-picker__table__cell--picked {
+    background-color: green;
+}
 // date-table === tr с клетками
 // table-container === table
 // td weekdays - MO TU WE ... SN
 // td
+
+.checkbox {
+    width: 10px;
+    height: 10px;
+    border: 1px solid green;
+    background-color: transparent;
+
+    &--checked {
+        background-color: green;
+    }
+}

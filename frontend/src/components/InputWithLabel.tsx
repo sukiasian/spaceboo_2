@@ -22,6 +22,7 @@ export interface IInputWithLableProps extends IComponentClassNameProps {
     inputType?: InputTypes;
     inputAutoComplete?: InputAutoCompleteOptions;
     isRequiredField?: boolean;
+    dataTag?: string;
 }
 export interface IFormInputs {
     [key: string]: {
@@ -45,7 +46,6 @@ export default function InputWithLabel(props: IInputWithLableProps) {
             return <span className="required-field">*</span>;
         }
     };
-
     return (
         <div className={`${props.mainDivClassName}-input-container`}>
             <label>
@@ -59,6 +59,7 @@ export default function InputWithLabel(props: IInputWithLableProps) {
                 placeholder={props.inputPlaceholder}
                 autoComplete={autoComplete as string}
                 onChange={props.onChange}
+                data-tag={props.dataTag}
             />
         </div>
     );

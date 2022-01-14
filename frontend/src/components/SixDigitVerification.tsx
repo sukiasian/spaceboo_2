@@ -5,6 +5,7 @@ import { postCheckVerificationCodeAction } from '../redux/actions/emailVerificat
 import { IPostCheckVerificationEmailCodePayload } from '../redux/reducers/emailVerificationReducer';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { HttpStatus } from '../types/types';
+import { allowNumericInputValueOnly } from '../utils/utilFunctions';
 
 type TDigitInput = { value?: string; ref: React.RefObject<HTMLInputElement> };
 type TSixDigitInputs = [TDigitInput, TDigitInput, TDigitInput, TDigitInput, TDigitInput, TDigitInput];
@@ -47,15 +48,16 @@ export default function SixDigitVerification(): JSX.Element {
             if (e.target.value.length === 1) {
                 const valueRegExp = value.match(/[^0-9]/gm);
 
-                if (valueRegExp) {
+                if (!allowNumericInputValueOnly(e.target.value)) {
                     e.target.value = '';
+
                     return;
                 }
 
                 if (i < digitInputs.length - 1) {
                     inputRefs[i + 1].current!.focus();
                 } else if (i === digitInputs.length - 1) {
-                    // inputRefs[i].current!.blur();
+                    inputRefs[i].current!.blur();
                 }
             }
 

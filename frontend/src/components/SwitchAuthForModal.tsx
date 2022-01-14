@@ -9,6 +9,8 @@ export enum SwitchModalFor {
     LOGIN = 'LOGIN',
 }
 
+// TODO чтобы использовать как компонент нам нужно создать 2 отдельных компонента - SwitchTypeOfAuth для модального окна и для страницы. Для модального использовать
+// свои пропсы (которые включают openingModalAction, closingModalAction). А вообще стоит ли ? может лучше использовать в
 interface ISwitchTypeOfAuthProps extends IComponentClassNameProps {
     switchQuestion: string;
     switchCallToAction: string;
@@ -17,7 +19,7 @@ interface ISwitchTypeOfAuthProps extends IComponentClassNameProps {
     closingModalAction: () => Action<ReduxModalActions>;
 }
 
-export default function SwitchTypeOfAuth(props: ISwitchTypeOfAuthProps): JSX.Element {
+export function SwitchAuthForModal(props: ISwitchTypeOfAuthProps): JSX.Element {
     const dispatch = useDispatch();
     const { loginModalIsOpen, signupModalIsOpen } = useSelector((state: IReduxState) => state.modalStorage);
 

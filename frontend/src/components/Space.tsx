@@ -1,9 +1,7 @@
-import { useState } from 'react';
 import { IComponentClassNameProps } from '../types/types';
 
 interface ISpaceProps extends IComponentClassNameProps {
     mainImageUrl: string;
-    facilities: string[];
     price: number;
     roomsNumber: number;
     city: string;
@@ -11,12 +9,7 @@ interface ISpaceProps extends IComponentClassNameProps {
 }
 
 export default function Space(props: ISpaceProps): JSX.Element {
-    const { index, mainImageUrl, facilities, price, roomsNumber, city, address } = props;
-    // TODO NOTE how to handle spaces without images?
-    const renderFacilities = (): JSX.Element[] | JSX.Element => {
-        // Если больше 4 удобств то используем 4 и плюс еще +количество удобств - 4 (=== остаток)
-        return <></>;
-    };
+    const { index, mainImageUrl, price, roomsNumber, city, address } = props;
     const renderPrice = (): JSX.Element => {
         return (
             <div className={`space-card__price space-card--${index}`}>
@@ -29,10 +22,7 @@ export default function Space(props: ISpaceProps): JSX.Element {
         <div className={`space-card space-card--${index}`}>
             <div className={`space-card__content space-card--${index}`}>
                 <img className="space-card__image" src={mainImageUrl || '/no-image.src'} alt="Пространство" />
-                <div className="facilities-bar">
-                    {renderFacilities()}
-                    {renderPrice()}
-                </div>
+                {renderPrice()}
             </div>
             <div className={`space-card__under-image space-card__under-image--${index}`}>
                 <div className="space-card__under-image__row space-card__under-image__row--1">

@@ -26,7 +26,7 @@ export default function QueryDatePicker(props: IQueryDatePicker): JSX.Element {
             month + 1
         )}/${year}`;
     };
-    const firstDateGreaterThanSecond = (d1: string, d2: string): boolean => {
+    const firstDateIsGreaterThanSecond = (d1: string, d2: string): boolean => {
         return new Date(d1) > new Date(d2);
     };
     const pickDate = (day: number) => {
@@ -48,7 +48,7 @@ export default function QueryDatePicker(props: IQueryDatePicker): JSX.Element {
                 );
             }
             // if you first click on high value then on lower value
-            else if (firstDateGreaterThanSecond(newQueryData.beginningDate, pickedDate)) {
+            else if (firstDateIsGreaterThanSecond(newQueryData.beginningDate, pickedDate)) {
                 newQueryData.endingDate = newQueryData.beginningDate;
                 newQueryData.beginningDate = pickedDate;
                 newDatesForRender.endingDate = newDatesForRender.beginningDate;
@@ -71,13 +71,27 @@ export default function QueryDatePicker(props: IQueryDatePicker): JSX.Element {
         });
     };
     const definePickedDaysClassName = (day: number): string => {
+        if (queryData.beginningDate && queryData.endingDate) {
+            const dateForCurrentDay = new Date(generateQueryDateString(datePickerDate.year, datePickerDate.month, day));
+            const beginningDate = new Date(queryData.beginningDate as string);
+            const endingDate = new Date(queryData.endingDate as string);
+
+            if (dateForCurrentDay >= beginningDate && beginningDate >= dateForCurrentDay) {
+                return 'date-picker__table__cell--at-border--left';
+            } else if (dateForCurrentDay >= endingDate && endingDate >= dateForCurrentDay) {
+                return 'date-picker__table__cell--at-border--right';
+            } else if (dateForCurrentDay > beginningDate && dateForCurrentDay < endingDate) {
+                return 'date-picker__table__cell--picked';
+            }
+        }
+
         return '';
     };
-    const combinePresendMonthDaysClassNames = (day: number): string => {
-        return `${definePickedDaysClassName(day)} ${'call(day)'}`;
+    const combinePresentMonthDaysClassNames = (day: number): string => {
+        return `${definePickedDaysClassName(day)}`;
     };
 
     return (
-        <DatePicker handlePickDate={pickDate} presentMonthDaysClassNamesCombined={combinePresendMonthDaysClassNames} />
+        <DatePicker handlePickDate={pickDate} presentMonthDaysClassNamesCombined={combinePresentMonthDaysClassNames} />
     );
 }

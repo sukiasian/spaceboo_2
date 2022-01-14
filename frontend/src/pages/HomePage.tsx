@@ -1,13 +1,17 @@
 import { MutableRefObject, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Filters from '../components/Filters';
 import Slider from '../components/Slider';
+import Space from '../components/Space';
+import { requestSpacesAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { updateDocumentTitle } from '../utils/utilFunctions';
 
 export function HomePage() {
     const sliderIntervalRef = useRef<NodeJS.Timeout>();
     const { userLoginState } = useSelector((state: IReduxState) => state.authStorage);
+    const { fetchSpacesSuccessResponse } = useSelector((state: IReduxState) => state.spaceStorage);
+    const dispatch = useDispatch();
     const handleDocumentTitle = () => {
         let documentTitle: string;
         userLoginState
@@ -16,17 +20,39 @@ export function HomePage() {
 
         updateDocumentTitle(documentTitle);
     };
-    const render = (): JSX.Element => {
+    const applyEffectsOnInit = (): (() => void) => {
+        return () => {
+            dispatch(requestSpacesAction());
+        };
+    };
+    const renderSlider = (): JSX.Element => {
         return <Slider sliderIntervalRef={sliderIntervalRef as MutableRefObject<NodeJS.Timeout>} />;
     };
+    const renderSpaces = (): JSX.Element => {
+        if (fetchSpacesSuccessResponse) {
+            return fetchSpacesSuccessResponse.data.map((space: any) => {
+                return (
+                    <Space
+                        mainImageUrl={space.imagesUrl[0]}
+                        price={space.pricePerNight}
+                        roomsNumber={space.roomsNumber}
+                        city={space.city.city || space.city.address}
+                        address={space.address}
+                    />
+                );
+            });
+        }
+        return <></>;
+    };
 
+    useEffect(applyEffectsOnInit, []);
     useEffect(handleDocumentTitle, [userLoginState]);
 
     return (
         <section className="homepage-section">
-            {render()}
-            <div className="slider"></div>
+            {renderSlider()}
             <Filters />
+            <section className="spaces-section"> {renderSpaces()}</section>
         </section>
     );
 }
