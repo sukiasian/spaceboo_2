@@ -20,10 +20,14 @@ enum DateFormat {
 class UtilFunctions {
     private static readonly signToken = jwt.sign;
 
-    private static defineResponseStatus = (httpStatus: number): ResponseStatus => {
-        return httpStatus >= HttpStatus.OK && httpStatus < HttpStatus.FORBIDDEN
-            ? ResponseStatus.SUCCESS
-            : ResponseStatus.FAILURE;
+    public static defineResponseStatus = (httpStatus: number): ResponseStatus => {
+        if (httpStatus >= HttpStatus.OK && httpStatus < HttpStatus.FORBIDDEN) {
+            return ResponseStatus.SUCCESS;
+        } else if (httpStatus >= HttpStatus.INTERNAL_SERVER_ERROR) {
+            return ResponseStatus.ERROR;
+        }
+
+        return ResponseStatus.FAILURE;
     };
 
     public static sendResponse = (

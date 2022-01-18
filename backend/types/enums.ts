@@ -52,6 +52,7 @@ export enum HttpStatus {
 export enum ResponseStatus {
     SUCCESS = 'Выполнено',
     FAILURE = 'Не выполнено',
+    ERROR = 'Ошибка',
 }
 
 export enum LoggerLevels {
