@@ -19,6 +19,12 @@ export interface IServerFailureResponse {
     stack: any;
 }
 
+export interface IServerResponse {
+    statusCode: number;
+    message?: string;
+    data?: unknown;
+}
+
 export interface IComponentClassNameProps {
     index?: number;
     mainDivClassName?: string;

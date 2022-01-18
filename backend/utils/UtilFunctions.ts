@@ -9,7 +9,7 @@ import * as jwt from 'jsonwebtoken';
 import logger from '../loggers/logger';
 import { applicationInstance } from '../App';
 import { TIsoDatesReserved } from '../models/appointment.model';
-import { Environment, ErrorMessages, HttpStatus, LoggerLevels, ResponseMessages } from '../types/enums';
+import { Environment, ErrorMessages, HttpStatus, LoggerLevels, ResponseMessages, ResponseStatus } from '../types/enums';
 import AppError from './AppError';
 
 enum DateFormat {
@@ -20,29 +20,35 @@ enum DateFormat {
 class UtilFunctions {
     private static readonly signToken = jwt.sign;
 
+    private static defineResponseStatus = (httpStatus: number): ResponseStatus => {
+        return httpStatus >= HttpStatus.OK && httpStatus < HttpStatus.FORBIDDEN
+            ? ResponseStatus.SUCCESS
+            : ResponseStatus.FAILURE;
+    };
+
     public static sendResponse = (
         res: Response
     ): ((statusCode: HttpStatus, message?: ResponseMessages | string, data?: any) => void) => {
         return (statusCode: number, message?: string, data?: any): void => {
             if (!message && data) {
                 res.status(statusCode).json({
-                    statusCode,
+                    status: this.defineResponseStatus(statusCode),
                     data,
                 });
             } else if (message && data !== undefined) {
                 res.status(statusCode).json({
-                    statusCode,
+                    status: this.defineResponseStatus(statusCode),
                     message,
                     data,
                 });
             } else if (message && data === undefined) {
                 res.status(statusCode).json({
-                    statusCode,
+                    status: this.defineResponseStatus(statusCode),
                     message,
                 });
             } else {
                 res.status(statusCode).json({
-                    statusCode,
+                    status: this.defineResponseStatus(statusCode),
                 });
             }
         };

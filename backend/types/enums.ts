@@ -49,6 +49,11 @@ export enum HttpStatus {
     HTTP_VERSION_NOT_SUPPORTED = 505,
 }
 
+export enum ResponseStatus {
+    SUCCESS = 'Выполнено',
+    FAILURE = 'Не выполнено',
+}
+
 export enum LoggerLevels {
     ERROR = 'error',
     INFO = 'info',
