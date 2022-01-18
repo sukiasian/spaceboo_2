@@ -138,8 +138,8 @@ export enum ErrorMessages {
 }
 
 export enum Environment {
-    DEVELOPMENT = 'development',
     PRODUCTION = 'production',
+    DEVELOPMENT = 'development',
     TEST = 'test',
 }
 

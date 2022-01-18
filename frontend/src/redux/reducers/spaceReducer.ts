@@ -11,7 +11,6 @@ export interface IProvideSpaceData {
     lockerConnected?: boolean;
     cityId?: number;
     userId?: string;
-    // for images we should use images module
 }
 export interface IEditSpaceData {
     address?: string;
@@ -22,7 +21,7 @@ export interface IEditSpaceData {
     cityId?: number;
     userId?: string;
 }
-export interface ISpaceFormData { 
+export interface ISpaceFormData {
     provideSpaceData?: IProvideSpaceData;
     editSpaceData?: IEditSpaceData;
 }
@@ -32,6 +31,8 @@ export interface ISpaceState extends ISpaceFormData {
     spaces: any[];
     fetchSpacesSuccessResponse?: IServerSuccessResponse;
     fetchSpacesFailureResponse?: IServerFailureResponse;
+    provideSpaceSuccessResponse?: IServerSuccessResponse;
+    provideSpaceFailureResponse?: IServerFailureResponse;
 }
 
 export enum SpaceType {
@@ -51,9 +52,9 @@ const initialState: ISpaceState = {
         bedsNumber: 2,
         lockerConnected: false,
     },
-    editSpaceData: { 
-        address: ''
-    }
+    editSpaceData: {
+        address: '',
+    },
 };
 
 export const spaceReducer = (state = initialState, action: IAction): ISpaceState => {
@@ -64,13 +65,13 @@ export const spaceReducer = (state = initialState, action: IAction): ISpaceState
                 spaces: action.payload,
             };
 
-        case ReduxSpaceActions.FETCH_SPACES_SUCCESS:
+        case ReduxSpaceActions.SET_FETCH_SPACES_SUCCESS_RESPONSE:
             return {
                 ...state,
                 fetchSpacesSuccessResponse: action.payload,
             };
 
-        case ReduxSpaceActions.FETCH_SPACES_FAILURE:
+        case ReduxSpaceActions.SET_FETCH_SPACES_FAILURE_RESPONSE:
             return {
                 ...state,
                 fetchSpacesFailureResponse: action.payload,

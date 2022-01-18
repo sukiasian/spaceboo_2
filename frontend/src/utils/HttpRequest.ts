@@ -25,7 +25,10 @@ class HttpRequest implements IHttpRequest {
     async get(urlPath = '') {
         const res = await fetch(this.prepareUrlWithPath(urlPath));
 
-        return res.json();
+        return {
+            statusCode: res.status,
+            ...(await res.json()),
+        };
     }
 
     async post(urlPath: string = '', body: any, headers?: HeadersInit | undefined) {
@@ -35,7 +38,10 @@ class HttpRequest implements IHttpRequest {
             headers: { ...this.headers, ...headers },
         });
 
-        return res.json();
+        return {
+            statusCode: res.status,
+            ...(await res.json()),
+        };
     }
 
     // FIXME urlPath should be optional. Add headers
@@ -46,13 +52,19 @@ class HttpRequest implements IHttpRequest {
             body: JSON.stringify(body),
         });
 
-        return res.json();
+        return {
+            statusCode: res.status,
+            ...(await res.json()),
+        };
     }
 
     async delete(urlPath: string = '') {
         const res = await fetch(this.prepareUrlWithPath(urlPath), { method: HttpMethod.DELETE });
 
-        return res.json();
+        return {
+            statusCode: res.status,
+            ...(await res.json()),
+        };
     }
 }
 

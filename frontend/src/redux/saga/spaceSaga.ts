@@ -1,6 +1,6 @@
 import { call, put, takeEvery, PutEffect, ForkEffect, CallEffect } from '@redux-saga/core/effects';
 import { httpRequester } from '../../utils/HttpRequest';
-import { ApiUrls, IServerSuccessResponse, IServerFailureResponse, SagaTasks } from '../../types/types';
+import { ApiUrls, IServerSuccessResponse, IServerFailureResponse, SagaTasks, TServerResponse } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 import { IQueryData } from '../../components/Filters';
 import { AnyAction } from 'redux';
@@ -32,7 +32,7 @@ const generateDatesToReserveRangeQueryString = (queryString: IDatesToReserveRang
     return queryString.beginningDate ? `${queryString.beginningDate},${queryString.endingDate}` : '';
 };
 
-const fetchSpaces = async (queryData?: IQueryData): Promise<IServerFailureResponse> => {
+const fetchSpaces = async (queryData?: IQueryData): Promise<TServerResponse> => {
     const priceRangeQueryString = generatePriceRangeQueryString({
         priceFrom: queryData?.priceFrom as string,
         priceTo: queryData?.priceTo as string,
@@ -43,7 +43,7 @@ const fetchSpaces = async (queryData?: IQueryData): Promise<IServerFailureRespon
         endingDate: queryData?.endingDate,
     });
 
-    return await httpRequester.get(
+    return httpRequester.get(
         `${ApiUrls.SPACES}/?cityId=${
             queryData?.cityId || ''
         }&priceRange=${priceRangeQueryString}&datesToReserveQuery=${datesToReserveQueryString}&page=${
@@ -51,9 +51,7 @@ const fetchSpaces = async (queryData?: IQueryData): Promise<IServerFailureRespon
         }&sortBy=${queryData?.sortBy || ''}&limit=${queryData?.limit || ''}&offset=12`
     );
 };
-function* spaceWorker(
-    action: IAction
-): Generator<CallEffect<IServerSuccessResponse | IServerFailureResponse> | PutEffect<AnyAction>, void> {
+function* spaceWorker(action: IAction): Generator<CallEffect<TServerResponse> | PutEffect<AnyAction>, void> {
     try {
         const response = yield call(fetchSpaces, action.payload);
 

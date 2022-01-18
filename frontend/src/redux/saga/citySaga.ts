@@ -22,7 +22,6 @@ const fetchCitiesBySearchPattern = async (findCitySearchPattern: string): Promis
         return (await httpRequester.get(`${ApiUrls.CITIES}?searchPattern=%25${findCitySearchPattern}%25`)).data;
     }
 };
-
 function* findCitiesBySearchPatternWorker(action: IAction): Generator<StrictEffect, void, PutEffect> {
     const payload = yield call(fetchCitiesBySearchPattern, action.payload);
 

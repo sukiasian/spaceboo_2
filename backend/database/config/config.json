@@ -1,4 +1,11 @@
 {
+    "production": {
+        "username": "root",
+        "password": null,
+        "database": "database_production",
+        "host": "127.0.0.1",
+        "dialect": "postgres"
+    },
     "development": {
         "username": "samvelsukiasian",
         "password": "postgres929",
@@ -10,13 +17,6 @@
         "username": "samvelsukiasian",
         "password": "postgres929",
         "database": "spaceboo_test",
-        "host": "127.0.0.1",
-        "dialect": "postgres"
-    },
-    "production": {
-        "username": "root",
-        "password": null,
-        "database": "database_production",
         "host": "127.0.0.1",
         "dialect": "postgres"
     }

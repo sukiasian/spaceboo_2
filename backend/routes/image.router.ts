@@ -44,6 +44,15 @@ class ImageRouter extends Singleton implements IRouter {
                 this.imageController.removeSpaceImagesFromDb,
                 this.imageController.removeSpaceImagesFromStorage
             );
+
+        this.router.get('/hello', (req, res) => {
+            console.log('er');
+
+            res.status(200).json({
+                data: 'helloworld',
+                message: 'some message',
+            });
+        });
     };
 }
 

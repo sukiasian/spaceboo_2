@@ -8,10 +8,20 @@ import databaseConnection from './database/connectToDb';
 
 const PORT = process.env.PORT || 8000;
 
-if (process.env.NODE_ENV === Environment.DEVELOPMENT) {
-    dotenv.config({ path: './.env' });
-} else if (process.env.NODE_ENV === Environment.TEST) {
-    dotenv.config({ path: './test.config.env' });
+// if (process.env.NODE_ENV === Environment.DEVELOPMENT || process.env) {
+//     dotenv.config({ path: './.env' });
+// } else if (process.env.NODE_ENV === Environment.TEST) {
+//     dotenv.config({ path: './test.config.env' });
+// }
+
+switch (process.env.NODE_ENV) {
+    case Environment.DEVELOPMENT || Environment.PRODUCTION:
+        dotenv.config({ path: './.env' });
+        break;
+
+    case Environment.TEST:
+        dotenv.config({ path: './.test.config.env' });
+        break;
 }
 
 (async () => {

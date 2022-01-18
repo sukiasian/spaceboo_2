@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import SpaceInputFieldsForCreateAndEdit from '../components/SpaceInputFieldsForCreateAndEdit';
 import { requestUserLoginState } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
+import { SagaTasks } from '../types/types';
 import { updateDocumentTitle } from '../utils/utilFunctions';
 
 export default function ProvideSpacePage(): JSX.Element {
@@ -51,6 +52,7 @@ export default function ProvideSpacePage(): JSX.Element {
                 <h2 className="heading heading--secondary heading--provide-space__title">Предоставить пространство</h2>
             </div>
             <div className="provide-space__form-container">{renderProvideForm()}</div>
+            <div onClick={() => dispatch({ type: SagaTasks.POST_UPLOAD_SPACE_IMAGES })}> click here </div>
         </section>
     );
 }

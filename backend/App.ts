@@ -1,5 +1,6 @@
 import * as express from 'express';
 import { Sequelize } from 'sequelize-typescript';
+import * as cookieParser from 'cookie-parser';
 import { router as userRouter } from './routes/user.router';
 import { router as spaceRouter } from './routes/space.router';
 import { router as authRouter } from './routes/auth.router';
@@ -17,7 +18,6 @@ import { Test } from './models/test.model';
 import { City } from './models/city.model';
 import { Appointment } from './models/appointment.model';
 import { EmailVerification } from './models/email-verification.model';
-import cookieParser = require('cookie-parser');
 
 export class Application extends Singleton {
     public readonly app: express.Express = express();

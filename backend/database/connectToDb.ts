@@ -13,14 +13,6 @@ export default async (sequelize: Sequelize): Promise<void> => {
             );
         }
     } catch (err) {
-        switch (process.env.NODE_ENV) {
-            case Environment.DEVELOPMENT || Environment.TEST:
-                console.error(err);
-                break;
-
-            case Environment.PRODUCTION:
-                logger.log({ level: 'error', message: err });
-                break;
-        }
+        logger.log(err);
     }
 };
