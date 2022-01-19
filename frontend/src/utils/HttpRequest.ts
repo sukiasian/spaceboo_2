@@ -1,3 +1,5 @@
+import { IServerResponse } from '../types/types';
+
 enum HttpMethod {
     GET = 'GET',
     POST = 'POST',
@@ -31,7 +33,7 @@ class HttpRequest implements IHttpRequest {
         };
     }
 
-    async post(urlPath: string = '', body: any, headers?: HeadersInit | undefined) {
+    async post(urlPath: string = '', body: any, headers?: HeadersInit | undefined): Promise<IServerResponse> {
         const res = await fetch(this.prepareUrlWithPath(urlPath), {
             method: HttpMethod.POST,
             body: JSON.stringify(body),

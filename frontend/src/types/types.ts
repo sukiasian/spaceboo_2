@@ -5,24 +5,17 @@ export interface IResIsoDatesReserved {
     endingTime: string;
 }
 
-export interface IServerSuccessResponse {
-    statusCode: HttpStatus;
-    message: string;
-    data: any;
-}
-
-// FIXME all of this is for development environment
-export interface IServerFailureResponse {
-    status: HttpStatus;
-    error: Error;
-    message: string;
-    stack: any;
-}
-
 export interface IServerResponse {
-    statusCode: number;
+    statusCode: HttpStatus;
+    status: ResponseStatus;
     message?: string;
-    data?: unknown;
+    data?: any;
+}
+
+export enum ResponseStatus {
+    SUCCESS = 'Выполнено',
+    FAILURE = 'Не выполнено',
+    ERROR = 'Ошибка',
 }
 
 export interface IComponentClassNameProps {
@@ -39,8 +32,6 @@ export interface ITimeUnits {
     minutes?: number;
     seconds?: number;
 }
-
-export type TServerResponse = IServerSuccessResponse & IServerFailureResponse;
 
 export enum HttpStatus {
     CONTINUE = 100,
@@ -97,6 +88,8 @@ export enum ReduxSpaceActions {
     FETCH_SPACES = 'FETCH_SPACES',
     SET_FETCH_SPACES_SUCCESS_RESPONSE = 'FETCH_SPACES_SUCCESS_RESPONSE',
     SET_FETCH_SPACES_FAILURE_RESPONSE = 'FETCH_SPACES_FAILURE_RESPONSE',
+    SET_POST_PROVIDE_SPACE_SUCCESS_RESPONSE = 'SET_POST_PROVIDE_SPACE_SUCCESS_RESPONSE',
+    SET_POST_PROVIDE_SPACE_FAILURE_RESPONSE = 'SET_POST_PROVIDE_SPACE_FAILURE_RESPONSE',
     SET_PROVIDE_SPACE_DATA = 'SET_PROVIDE_SPACE_DATA',
     SET_EDIT_SPACE_DATA = 'SET_EDIT_SPACE_DATA',
 }
@@ -157,6 +150,7 @@ export enum SagaTasks {
     POST_SEND_VERIFICATION_CODE = 'POST_SEND_VERIFICATION_CODE',
     POST_CHECK_VERIFICATION_CODE = 'POST_CHECK_VERIFICATION_CODE',
     POST_UPLOAD_SPACE_IMAGES = 'POST_UPLOAD_SPACE_IMAGES',
+    POST_PROVIDE_SPACE = 'POST_PROVIDE_SPACE',
 }
 
 export enum ApiUrls {

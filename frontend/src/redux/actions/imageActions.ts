@@ -1,9 +1,9 @@
-import { IServerFailureResponse, IServerSuccessResponse, ReduxImageActions, SagaTasks } from '../../types/types';
+import { IServerResponse, ReduxImageActions, SagaTasks } from '../../types/types';
 import { IAction } from './ActionTypes';
 
 export interface TPostUploadSpaceImagesPayload {
     spaceId: string;
-    images: File[];
+    images: FileList;
 }
 
 export const postUploadSpaceImagesAction = (
@@ -15,14 +15,14 @@ export const postUploadSpaceImagesAction = (
     };
 };
 
-export const setUploadImageSuccessResponseAction = (payload: IServerSuccessResponse): IAction<ReduxImageActions> => {
+export const setUploadImageSuccessResponseAction = (payload: IServerResponse): IAction<ReduxImageActions> => {
     return {
         type: ReduxImageActions.SET_UPLOAD_IMAGES_SUCCESS_RESPONSE,
         payload,
     };
 };
 
-export const setUploadImageFailureResponseAction = (payload: IServerFailureResponse): IAction<ReduxImageActions> => {
+export const setUploadImageFailureResponseAction = (payload: IServerResponse): IAction<ReduxImageActions> => {
     return {
         type: ReduxImageActions.SET_UPLOAD_IMAGES_FAILURE_RESPONSE,
         payload,

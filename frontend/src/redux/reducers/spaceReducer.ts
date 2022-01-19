@@ -1,4 +1,4 @@
-import { IServerFailureResponse, IServerSuccessResponse, ReduxSpaceActions } from '../../types/types';
+import { IServerResponse, ReduxSpaceActions } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 
 export interface IProvideSpaceData {
@@ -9,6 +9,7 @@ export interface IProvideSpaceData {
     roomsNumber?: number;
     bedsNumber?: number;
     lockerConnected?: boolean;
+    spaceImages?: FileList;
     cityId?: number;
     userId?: string;
 }
@@ -18,6 +19,7 @@ export interface IEditSpaceData {
     description?: string;
     roomsNumber?: number;
     bedsNumber?: number;
+    spaceImages?: FileList;
     cityId?: number;
     userId?: string;
 }
@@ -29,10 +31,10 @@ export interface ISpaceState extends ISpaceFormData {
     // spaces: Space[];
     isLoaded: boolean;
     spaces: any[];
-    fetchSpacesSuccessResponse?: IServerSuccessResponse;
-    fetchSpacesFailureResponse?: IServerFailureResponse;
-    provideSpaceSuccessResponse?: IServerSuccessResponse;
-    provideSpaceFailureResponse?: IServerFailureResponse;
+    fetchSpacesSuccessResponse?: IServerResponse;
+    fetchSpacesFailureResponse?: IServerResponse;
+    provideSpaceSuccessResponse?: IServerResponse;
+    provideSpaceFailureResponse?: IServerResponse;
 }
 
 export enum SpaceType {
@@ -63,6 +65,18 @@ export const spaceReducer = (state = initialState, action: IAction): ISpaceState
             return {
                 ...state,
                 spaces: action.payload,
+            };
+
+        case ReduxSpaceActions.SET_POST_PROVIDE_SPACE_SUCCESS_RESPONSE:
+            return {
+                ...state,
+                provideSpaceSuccessResponse: action.payload,
+            };
+
+        case ReduxSpaceActions.SET_POST_PROVIDE_SPACE_FAILURE_RESPONSE:
+            return {
+                ...state,
+                provideSpaceFailureResponse: action.payload,
             };
 
         case ReduxSpaceActions.SET_FETCH_SPACES_SUCCESS_RESPONSE:

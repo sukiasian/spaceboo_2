@@ -1,11 +1,11 @@
-import { IServerFailureResponse, IServerSuccessResponse, ReduxImageActions, TServerResponse } from '../../types/types';
+import { ReduxImageActions, IServerResponse } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 
-type TImagePayloads = TServerResponse;
+type TImagePayloads = IServerResponse;
 
 interface IInitialState {
-    uploadImagesSuccessResponse?: IServerSuccessResponse;
-    uploadImagesFailureResponse?: IServerFailureResponse;
+    uploadImagesSuccessResponse?: IServerResponse;
+    uploadImagesFailureResponse?: IServerResponse;
 }
 
 const initialState: IInitialState = {};
@@ -18,13 +18,13 @@ export const imageReducer = (
         case ReduxImageActions.SET_UPLOAD_IMAGES_SUCCESS_RESPONSE:
             return {
                 ...state,
-                uploadImagesSuccessResponse: action.payload as IServerSuccessResponse,
+                uploadImagesSuccessResponse: action.payload as IServerResponse,
             };
 
         case ReduxImageActions.SET_UPLOAD_IMAGES_FAILURE_RESPONSE:
             return {
                 ...state,
-                uploadImagesFailureResponse: action.payload as IServerFailureResponse,
+                uploadImagesFailureResponse: action.payload as IServerResponse,
             };
 
         default:

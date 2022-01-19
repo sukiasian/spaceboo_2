@@ -3,12 +3,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import SpaceInputFieldsForCreateAndEdit from '../components/SpaceInputFieldsForCreateAndEdit';
 import { requestUserLoginState } from '../redux/actions/authActions';
+import { postUploadSpaceImagesAction } from '../redux/actions/imageActions';
+import { postProvideSpaceAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { SagaTasks } from '../types/types';
 import { updateDocumentTitle } from '../utils/utilFunctions';
 
 export default function ProvideSpacePage(): JSX.Element {
     const { userLoginState } = useSelector((state: IReduxState) => state.authStorage);
+    const { provideSpaceData, provideSpaceSuccessResponse, provideSpaceFailureResponse } = useSelector(
+        (state: IReduxState) => state.spaceStorage
+    );
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const handleDocumentTitleOnInit = (): void => {
@@ -28,7 +33,19 @@ export default function ProvideSpacePage(): JSX.Element {
         }
     };
     const handleSubmitButton = (): void => {
-        // dispatch - send the redux store data (provideSpaceData) to create space endpoint through redux saga
+        dispatch(postProvideSpaceAction());
+    };
+    const uploadPhotosAfterSpaceIsCreated = (): void => {
+        if (provideSpaceSuccessResponse) {
+            dispatch(
+                postUploadSpaceImagesAction({
+                    spaceId: provideSpaceSuccessResponse.data.id,
+                    images: provideSpaceData!.spaceImages!,
+                })
+            );
+        } else if (provideSpaceFailureResponse) {
+            // dispatch remove space
+        }
     };
     const renderProvideForm = (): JSX.Element => {
         return (
@@ -45,6 +62,7 @@ export default function ProvideSpacePage(): JSX.Element {
 
     useEffect(applyEffectsOnInit, [dispatch]);
     useEffect(redirectByLoginStateCondition, [userLoginState, navigate]);
+    useEffect(uploadPhotosAfterSpaceIsCreated, [provideSpaceSuccessResponse]);
 
     return (
         <section className="provide-space-section">

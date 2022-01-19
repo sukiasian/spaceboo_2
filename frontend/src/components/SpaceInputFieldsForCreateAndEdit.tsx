@@ -1,4 +1,4 @@
-import { ChangeEventHandler, useState } from 'react';
+import { ChangeEventHandler, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IAction } from '../redux/actions/ActionTypes';
 import { setEditSpaceDataAction, setProvideSpaceDataAction } from '../redux/actions/spaceActions';
@@ -15,23 +15,25 @@ interface ISpaceInputFieldsForCreateAndEditProps {
     buttonText: string;
     componentIsFor: keyof ISpaceFormData;
     handleSubmitButton: (...props: any) => any;
+    children?: JSX.Element;
 }
 interface ITypeOfSpaceInputData {
     spaceType: SpaceType;
 }
-interface IReduxActionsFor {
+interface IReduxSetFormDataActionsFor {
     provideSpaceData: (payload: IProvideSpaceData) => IAction<ReduxSpaceActions>;
     editSpaceData: (payload: IEditSpaceData) => IAction<ReduxSpaceActions>;
 }
 
 export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputFieldsForCreateAndEditProps): JSX.Element {
-    const [inapropriateFileDimensions, setInapropriateFileDimensions] = useState(false);
     const formData = useSelector((state: IReduxState) => state.spaceStorage[props.componentIsFor]);
     const dispatch = useDispatch();
-    const reduxActionsFor: IReduxActionsFor = {
+    const reduxSetFormDataActionsFor: IReduxSetFormDataActionsFor = {
         provideSpaceData: setProvideSpaceDataAction,
         editSpaceData: setEditSpaceDataAction,
     };
+    const initialRoomsNumber = 2;
+    const initialBedsNumber = 2;
     const roomsMaximumNumber = 11;
     const typeOfSpaceInputsData: ITypeOfSpaceInputData[] = [
         {
@@ -41,14 +43,25 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
             spaceType: SpaceType.HOUSE,
         },
     ];
-    const reduxActionForComponent = reduxActionsFor[props.componentIsFor];
+    const reduxSetFormDataActionForComponent = reduxSetFormDataActionsFor[props.componentIsFor];
+    const applyDropdownValuesToFormDataOnInit = (): void => {
+        const newFormData: TFormDataForComponent = { ...formData };
+
+        newFormData.roomsNumber = initialRoomsNumber;
+        newFormData.bedsNumber = initialBedsNumber;
+
+        dispatch(reduxSetFormDataActionForComponent(newFormData));
+    };
+    const applyEffectsOnInit = (): void => {
+        applyDropdownValuesToFormDataOnInit();
+    };
     const handleTypeOfSpaceBoxCheckingBySpaceType = (spaceType: SpaceType): (() => void) => {
         return () => {
             const newFormData: TFormDataForComponent = { ...formData };
 
             newFormData.type = spaceType;
 
-            dispatch(reduxActionForComponent(newFormData));
+            dispatch(reduxSetFormDataActionForComponent(newFormData));
         };
     };
     const handleRoomsNumberDropDownSelect: ChangeEventHandler<HTMLSelectElement> = (e) => {
@@ -56,7 +69,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
 
         newFormData.roomsNumber = parseInt(e.target.value, 10);
 
-        dispatch(reduxActionForComponent(newFormData));
+        dispatch(reduxSetFormDataActionForComponent(newFormData));
     };
     // FIXME type
     const handleDescriptionChange = (
@@ -68,31 +81,17 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
             // @ts-ignore happens beсause e.t.value === string and newFormData[formDataProp] can be not string but any other thing
             newFormData[formDataProp] = e.target.value as string;
 
-            dispatch(reduxActionForComponent(newFormData));
+            dispatch(reduxSetFormDataActionForComponent(newFormData));
         };
     };
-    const handleUploadFile: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const handleUploadSpaceImages: ChangeEventHandler<HTMLInputElement> = (e) => {
+        const newFormData: TFormDataForComponent = { ...formData };
+
         if (e.target.files) {
-            e.preventDefault();
-
-            const { files } = e.target;
-            const file = files.length > 0 ? files[files.length - 1] : files[0];
-            const img = new Image();
-
-            img.src = window.URL.createObjectURL(file);
-
-            const handleImageLoad = (): void => {
-                const width = img.naturalWidth;
-                const height = img.naturalHeight;
-
-                window.URL.revokeObjectURL(img.src);
-
-                if (width >= 800 && height >= 600) {
-                    const newFormData: TFormDataForComponent = { ...formData };
-                }
-            };
-            img.onload = (): void => {};
+            newFormData.spaceImages = e.target.files;
         }
+
+        dispatch(reduxSetFormDataActionForComponent(newFormData));
     };
     const renderTypeOfSpaceCheckboxes = (): JSX.Element[] => {
         return typeOfSpaceInputsData.map((typeOfSpaceInputData: ITypeOfSpaceInputData, i: number) => {
@@ -128,7 +127,13 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
     const renderUploadedFiles = () => {
         return <img src="" alt="Загруженное изображение" />;
     };
+    const renderChildren = (): JSX.Element | void => {
+        if (props.children) {
+            return props.children;
+        }
+    };
 
+    useEffect(applyEffectsOnInit, []);
     // NOTE неправильное использование BEM практически везде
     return (
         <>
@@ -149,7 +154,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
                     <select
                         className="rooms-number__dropdown"
                         onChange={handleRoomsNumberDropDownSelect}
-                        defaultValue={2}
+                        defaultValue={initialRoomsNumber}
                     >
                         {renderDropdownNumericalOptions()}
                     </select>
@@ -177,7 +182,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
                     <select
                         className="beds-number__dropdown"
                         onChange={handleRoomsNumberDropDownSelect}
-                        defaultValue={2}
+                        defaultValue={initialRoomsNumber}
                     >
                         {renderDropdownNumericalOptions()}
                     </select>
@@ -212,14 +217,14 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
                     <input
                         className="photos__input"
                         type="file"
-                        onChange={(e) => {
-                            console.log(e.target.value);
-                        }}
+                        accept=".jpeg,.jpg,.png,.svg"
+                        onChange={(e) => {}}
                         multiple
                     />
                     {renderUploadedFiles()}
                 </div>
             </div>
+            {renderChildren()}
             <button className={props.buttonClassName} onClick={props.handleSubmitButton}>
                 {props.buttonText}
             </button>

@@ -1,5 +1,5 @@
-import { CallEffect, PutEffect, ForkEffect, takeEvery, put, call } from '@redux-saga/core/effects';
-import { ApiUrls, IServerSuccessResponse, ReduxImageActions, SagaTasks, TServerResponse } from '../../types/types';
+import { ForkEffect, takeEvery, put, call } from '@redux-saga/core/effects';
+import { ApiUrls, IServerResponse, SagaTasks } from '../../types/types';
 import { httpRequester } from '../../utils/HttpRequest';
 import { IAction } from '../actions/ActionTypes';
 import {
@@ -8,35 +8,27 @@ import {
     TPostUploadSpaceImagesPayload,
 } from '../actions/imageActions';
 
-const postSpaceImages = ({ spaceId, images }: TPostUploadSpaceImagesPayload): Promise<TServerResponse> => {
+const postSpaceImages = ({ spaceId, images }: TPostUploadSpaceImagesPayload): Promise<IServerResponse> => {
     const headers: HeadersInit = {
         'Content-Type': 'multipart/form-data',
     };
 
-    // откуда нам брать spaceId ? нужно ответ createSpace и editSpace запихнуть в redux storage,
-    // и из него уже передавать в saga task.
-
-    // TODO нам нужно понять как будет называться массив изобр. и сделать наши images значением данного проперти
     return httpRequester.post(`${ApiUrls.IMAGES}/spaces/${spaceId}`, { body: images }, headers);
-};
-const abc = () => {
-    return httpRequester.get(`${ApiUrls.IMAGES}/hello`);
 };
 
 function* postSpaceImagesWorker(action: IAction<SagaTasks, TPostUploadSpaceImagesPayload>): Generator {
     try {
-        // const response = yield call(postSpaceImages, action.payload as TPostUploadSpaceImagesPayload);
-        const response = yield call(abc);
+        const response = yield call(postSpaceImages, action.payload as TPostUploadSpaceImagesPayload);
+
         console.log(response);
 
-        // FIXME эта ошибка возникает потому что в IServerSuccessResponse есть проперти statusCode а в IServerFailureResponse нету
-        // if (response.statusCode >= 200 && response.statusCode < 400) {
-        //     yield put(setUploadImageSuccessResponseAction(response as IServerSuccessResponse));
-        // } else {
-        //     throw response;
-        // }
+        if ((response as IServerResponse).statusCode >= 200 && (response as IServerResponse).statusCode < 400) {
+            yield put(setUploadImageSuccessResponseAction(response as IServerResponse));
+        } else {
+            throw response;
+        }
     } catch (err) {
-        // yield put(setUploadImageFailureResponseAction(err as IServerFailureResponse));
+        yield put(setUploadImageFailureResponseAction(err as IServerResponse));
     }
 }
 export function* watchPostUploadSpaceImages(): Generator<ForkEffect, void, void> {
