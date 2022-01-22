@@ -10,9 +10,10 @@ export const requestSpacesAction = (payload?: IQueryData): IAction<SagaTasks> =>
     };
 };
 
-export const postProvideSpaceAction = (): IAction<SagaTasks> => {
+export const postProvideSpaceAction = (payload: IProvideSpaceData): IAction<SagaTasks, IProvideSpaceData> => {
     return {
         type: SagaTasks.POST_PROVIDE_SPACE,
+        payload,
     };
 };
 

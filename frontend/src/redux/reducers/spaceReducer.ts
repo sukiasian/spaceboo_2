@@ -15,6 +15,7 @@ export interface IProvideSpaceData {
 }
 export interface IEditSpaceData {
     address?: string;
+    pricePerNight?: number;
     type?: SpaceType;
     description?: string;
     roomsNumber?: number;
@@ -46,17 +47,12 @@ const initialState: ISpaceState = {
     isLoaded: false,
     spaces: [],
     provideSpaceData: {
-        address: '',
-        pricePerNight: 0,
         type: SpaceType.FLAT,
-        description: '',
         roomsNumber: 2,
         bedsNumber: 2,
         lockerConnected: false,
     },
-    editSpaceData: {
-        address: '',
-    },
+    editSpaceData: {},
 };
 
 export const spaceReducer = (state = initialState, action: IAction): ISpaceState => {

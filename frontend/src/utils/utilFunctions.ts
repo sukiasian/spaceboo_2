@@ -28,14 +28,10 @@ export const formatSingleDigitUnitToTwoDigitString = (unit: number): string => {
     return unit > 9 ? `${unit}` : `0${unit}`;
 };
 
-export const allowNumericInputValueOnly = (targetValue: string): boolean => {
+export const valueIsNumeric = (targetValue: string): boolean => {
     const valueConsistsOfNotOnlyNumbers = targetValue.match(/[^0-9]/g);
 
-    if (valueConsistsOfNotOnlyNumbers) {
-        return false;
-    }
-
-    return true;
+    return valueConsistsOfNotOnlyNumbers || targetValue === '' ? false : true;
 };
 
 export const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {

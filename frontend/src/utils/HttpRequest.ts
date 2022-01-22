@@ -34,6 +34,8 @@ class HttpRequest implements IHttpRequest {
     }
 
     async post(urlPath: string = '', body: any, headers?: HeadersInit | undefined): Promise<IServerResponse> {
+        // FIXME this wont work if the content type is not application/json (but why ? if body is stringified)
+
         const res = await fetch(this.prepareUrlWithPath(urlPath), {
             method: HttpMethod.POST,
             body: JSON.stringify(body),

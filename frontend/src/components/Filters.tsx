@@ -5,7 +5,7 @@ import InputWithLabel, { IInputWithLableProps, InputTypes } from './InputWithLab
 import { useDispatch } from 'react-redux';
 import QueryDatePicker from './QueryDatePicker';
 import { requestSpacesAction } from '../redux/actions/spaceActions';
-import { allowNumericInputValueOnly } from '../utils/utilFunctions';
+import { valueIsNumeric } from '../utils/utilFunctions';
 
 interface IFilterRange<T> {
     from: T;
@@ -132,7 +132,7 @@ export default function Filters(): JSX.Element {
         newQueryData[priceRangeQueryDataReference as string] = value;
 
         if (value.length >= 1) {
-            if (!allowNumericInputValueOnly(e.target.value)) {
+            if (!valueIsNumeric(e.target.value)) {
                 e.target.value = '';
 
                 return;

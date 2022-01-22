@@ -26,6 +26,7 @@ dotenv.config();
 export class ImageController extends Singleton {
     private readonly userDao: UserSequelizeDao = userSequelizeDao;
     private readonly spaceDao: SpaceSequelizeDao = spaceSequelizeDao;
+    private readonly spaceModel: typeof Space = Space;
     private readonly spaceImageUpload = spaceImageUpload;
     private readonly userAvatarUpload = userAvatarUpload;
     private readonly userAvatarRelativePath = userAvatarRelativePath;
@@ -43,14 +44,46 @@ export class ImageController extends Singleton {
         };
     };
 
-    private multerUploadForArrays = (entity: string, uploader: multer.Multer) => {
+    private multerUploadSpaceImagesForProvideErrorHandler = (req, res, next): ((err) => void) => {
+        return async (err) => {
+            const { spaceId } = res.locals;
+
+            const space = await this.spaceModel.findOne({ where: { id: spaceId } });
+
+            if (!space) {
+                next(new AppError(HttpStatus.NOT_FOUND, ErrorMessages.SPACE_NOT_FOUND));
+            }
+
+            await space.destroy();
+
+            if (err instanceof multer.MulterError) {
+                next(new AppError(HttpStatus.FORBIDDEN, 'shit happened'));
+            } else {
+                next(err);
+            }
+        };
+    };
+
+    private multerGeneralUploadForArrays = (entity: string, uploader: multer.Multer) => {
         return (req, res, next) => {
             const imagesAmountLeft = res.locals[entity];
 
-            uploader.array(StorageUploadFilenames.SPACE_IMAGE, imagesAmountLeft as number)(
+            uploader.array(StorageUploadFilenames.SPACE_IMAGES, imagesAmountLeft as number)(
                 req,
                 res,
                 this.multerErrorHandler(req, res, next)
+            );
+        };
+    };
+
+    private multerUploadSpaceImagesForProvideSpace = (entity: string, uploader: multer.Multer) => {
+        return (req, res, next) => {
+            const imagesAmountLeft = res.locals[entity];
+
+            uploader.array(StorageUploadFilenames.SPACE_IMAGES, imagesAmountLeft as number)(
+                req,
+                res,
+                this.multerUploadSpaceImagesForProvideErrorHandler(req, res, next)
             );
         };
     };
@@ -63,7 +96,12 @@ export class ImageController extends Singleton {
         );
     };
 
-    public uploadSpaceImageToStorage = this.multerUploadForArrays(
+    public uploadSpaceImageToStorageForProvideSpace = this.multerUploadSpaceImagesForProvideSpace(
+        ReqLocalsImageAmountEntity.SPACE_IMAGES_AMOUNT_LEFT,
+        this.spaceImageUpload
+    );
+
+    public uploadSpaceImageToStorageGeneral = this.multerGeneralUploadForArrays(
         ReqLocalsImageAmountEntity.SPACE_IMAGES_AMOUNT_LEFT,
         this.spaceImageUpload
     );

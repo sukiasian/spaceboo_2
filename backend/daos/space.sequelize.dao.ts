@@ -38,7 +38,7 @@ export class SpaceSequelizeDao extends Dao {
     }
 
     // NOTE аутентификация - протекция роута (только для авторизованных пользователей)
-    public createSpace = async (data: ISpaceCreate): Promise<Space> => {
+    public provideSpace = async (data: ISpaceCreate): Promise<Space> => {
         return this.model.create(data);
     };
 

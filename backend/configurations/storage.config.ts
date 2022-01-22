@@ -14,7 +14,7 @@ export enum StorageEntityReferences {
 }
 export enum StorageUploadFilenames {
     USER_AVATAR = 'userAvatar',
-    SPACE_IMAGE = 'spaceImage',
+    SPACE_IMAGES = 'spaceImages',
 }
 
 // FIXME probably this is to delete
@@ -68,8 +68,8 @@ export class StorageConfig extends Singleton {
         this.spaceImagesRelativeDir
     );
 
-    public readonly userAvatarUpload: multer.Multer = multer({ storage: this.userAvatarStorage });
-    public readonly spaceImageUpload: multer.Multer = multer({ storage: this.spaceImageStorage });
+    public readonly userAvatarUpload = multer({ storage: this.userAvatarStorage });
+    public readonly spaceImageUpload = multer({ storage: this.spaceImageStorage });
 }
 
 export const storageConfig = SingletonFactory.produce<StorageConfig>(StorageConfig);

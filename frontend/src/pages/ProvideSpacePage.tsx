@@ -7,7 +7,7 @@ import { postUploadSpaceImagesAction } from '../redux/actions/imageActions';
 import { postProvideSpaceAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { SagaTasks } from '../types/types';
-import { updateDocumentTitle } from '../utils/utilFunctions';
+import { handleSubmit, updateDocumentTitle } from '../utils/utilFunctions';
 
 export default function ProvideSpacePage(): JSX.Element {
     const { userLoginState } = useSelector((state: IReduxState) => state.authStorage);
@@ -33,7 +33,7 @@ export default function ProvideSpacePage(): JSX.Element {
         }
     };
     const handleSubmitButton = (): void => {
-        dispatch(postProvideSpaceAction());
+        dispatch(postProvideSpaceAction(provideSpaceData!));
     };
     const uploadPhotosAfterSpaceIsCreated = (): void => {
         if (provideSpaceSuccessResponse) {
@@ -49,7 +49,7 @@ export default function ProvideSpacePage(): JSX.Element {
     };
     const renderProvideForm = (): JSX.Element => {
         return (
-            <form className="provide-space__form">
+            <form className="provide-space__form" onSubmit={handleSubmit}>
                 <SpaceInputFieldsForCreateAndEdit
                     buttonClassName="button button--primary button--submit"
                     buttonText="Предоставить пространство"

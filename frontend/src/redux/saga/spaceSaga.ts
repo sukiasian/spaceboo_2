@@ -10,7 +10,7 @@ import {
     setProvideSpaceFailureResponseAction,
     setProvideSpaceSuccessResponseAction,
 } from '../actions/spaceActions';
-import { ISpaceFormData } from '../reducers/spaceReducer';
+import { IProvideSpaceData } from '../reducers/spaceReducer';
 
 interface IPriceRangeQueryString {
     priceFrom?: string;
@@ -72,17 +72,30 @@ export function* watchFetchSpaces(): Generator<ForkEffect, void, void> {
     yield takeEvery(SagaTasks.REQUEST_SPACES, fetchSpacesWorker);
 }
 
-const postProvideSpace = (formData: ISpaceFormData): Promise<IServerResponse> => {
+const postProvideSpace = (formData: IProvideSpaceData) => {
+    //  связать файлы с json и передать на сервер где они будут обработаны одним запросом
+    //  FIXME NOTE locker connected should not be sent through client (guess it has default value and cannot be set manually)
     const headers: HeadersInit = {
         'Content-Type': 'multipart/form-data',
     };
 
-    return httpRequester.post('/spaces', { body: { ...formData } }, headers);
+    formData.cityId = 1;
+
+    const fd = new FormData();
+    console.log(formData.spaceImages);
+
+    fd.append('spaceImageees', 'hello world');
+
+    return fetch('/api/v1/spaces', {
+        method: 'POST',
+        headers,
+        // @ts-ignore
+        body: JSON.stringify({ ...formData, ...fd }),
+    });
 };
-function* postProvideSpaceWorker(action: IAction): Generator<CallEffect<IServerResponse> | PutEffect<AnyAction>, void> {
+function* postProvideSpaceWorker(action: IAction): Generator<CallEffect<any> | PutEffect<AnyAction>, void> {
     try {
         const response = yield call(postProvideSpace, action.payload);
-        console.log(response);
 
         if ((response as IServerResponse).statusCode >= 200 && (response as IServerResponse).statusCode < 300) {
             yield put(setProvideSpaceSuccessResponseAction(response as IServerResponse));

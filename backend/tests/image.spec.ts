@@ -116,9 +116,9 @@ describe('Image (e2e)', () => {
         await request(app)
             .post(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
             .set('Authorization', `Bearer ${token}`)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage);
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage);
 
         const pathToSpaceImagesDir = createPathToSpaceImagesDir(space_1.id);
         const checkIfSpaceImagesDirExists = await UtilFunctions.checkIfExists(pathToSpaceImagesDir);
@@ -136,17 +136,17 @@ describe('Image (e2e)', () => {
         const res = await request(app)
             .post(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
             .set('Authorization', `Bearer ${token}`)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage);
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage);
 
         expect(res.status).toBe(HttpStatus.FORBIDDEN);
 
@@ -183,7 +183,7 @@ describe('Image (e2e)', () => {
         await request(app)
             .post(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
             .set('Authorization', `Bearer ${token}`)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage);
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage);
 
         const freshSpace: Space = await spaceDao.findById(space_1.id);
         const res = await request(app)
@@ -217,7 +217,7 @@ describe('Image (e2e)', () => {
         await request(app)
             .post(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
             .set('Authorization', `Bearer ${token}`)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage);
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage);
 
         const freshSpace: Space = await spaceDao.findById(space_1.id);
         const pathToSpaceImagesIndividualDirectory = createPathToSpaceImagesDir(space_1.id);

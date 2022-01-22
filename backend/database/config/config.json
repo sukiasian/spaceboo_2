@@ -8,7 +8,7 @@
     },
     "development": {
         "username": "samvelsukiasian",
-        "password": "postgres929",
+        "password": "postgres123",
         "database": "spaceboo",
         "host": "127.0.0.1",
         "dialect": "postgres"

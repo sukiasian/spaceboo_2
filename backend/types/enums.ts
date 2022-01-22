@@ -93,7 +93,7 @@ export enum ResponseMessages {
     // FIXME USER_IS_CREATED AND IMAGE_IS_DELETED or USER_CREATED AND IMAGE_DELETED -- keep same style
     USER_CREATED = 'Пользователь создан.',
     DATA_UPDATED = 'Данные успешно обновлены!',
-    SPACE_CREATED = 'Потрясающе! Пространство создано.',
+    SPACE_PROVIDED = 'Потрясающе! Пространство создано.',
     SPACE_DELETED = 'Пространство успешно удалено.',
     APPOINTMENT_CREATED = 'Поздравляем! Вы забронировали.',
     IMAGE_DELETED = 'Изображение удалено.',

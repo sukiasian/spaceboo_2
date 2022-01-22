@@ -1,7 +1,3 @@
-import * as express from 'express';
-import * as path from 'path';
-import * as fs from 'fs';
-import * as dotenv from 'dotenv';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
 import { spaceSequelizeDao, SpaceSequelizeDao } from '../daos/space.sequelize.dao';
 import UtilFunctions from '../utils/UtilFunctions';
@@ -11,10 +7,26 @@ export class SpaceController extends Singleton {
     private readonly dao: SpaceSequelizeDao = spaceSequelizeDao;
     private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
 
-    public createSpace = UtilFunctions.catchAsync(async (req, res, next) => {
-        const space = await this.dao.createSpace(req.body);
+    public provideSpace = UtilFunctions.catchAsync(async (req, res, next) => {
+        const { id: userId } = req.user;
+        const space = await this.dao.provideSpace({ ...req.body, userId });
+        console.log(req.body);
 
-        this.utilFunctions.sendResponse(res)(HttpStatus.CREATED, ResponseMessages.SPACE_CREATED, space);
+        res.locals = {
+            spaceId: space.id,
+        };
+
+        next();
+    });
+
+    public sendProvideSpaceResponse = this.utilFunctions.catchAsync(async (req, res, next) => {
+        const { spaceId } = res.locals;
+        const space = await this.dao.findById(spaceId);
+        console.log(space);
+
+        console.log(444444);
+
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.SPACE_PROVIDED, space);
     });
 
     public getSpaceById = UtilFunctions.catchAsync(async (req, res, next) => {

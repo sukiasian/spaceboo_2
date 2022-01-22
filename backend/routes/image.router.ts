@@ -34,7 +34,7 @@ class ImageRouter extends Singleton implements IRouter {
                 this.passport.authenticate(PassportStrategies.JWT, { session: false }),
                 this.routeProtector.spaceOwnerProtector,
                 this.imageController.checkSpaceImagesAmount,
-                this.imageController.uploadSpaceImageToStorage,
+                this.imageController.uploadSpaceImageToStorageGeneral,
                 this.imageController.updateSpaceImagesInDb
             )
             .get(this.imageController.getSpacesImageByFilename)
@@ -46,8 +46,6 @@ class ImageRouter extends Singleton implements IRouter {
             );
 
         this.router.get('/hello', (req, res) => {
-            console.log('er');
-
             res.status(200).json({
                 data: 'helloworld',
                 message: 'some message',

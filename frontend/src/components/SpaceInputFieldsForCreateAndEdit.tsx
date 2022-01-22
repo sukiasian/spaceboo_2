@@ -5,6 +5,7 @@ import { setEditSpaceDataAction, setProvideSpaceDataAction } from '../redux/acti
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { IProvideSpaceData, IEditSpaceData, SpaceType, ISpaceFormData } from '../redux/reducers/spaceReducer';
 import { ReduxSpaceActions } from '../types/types';
+import { valueIsNumeric } from '../utils/utilFunctions';
 import Checkbox from './Checkbox';
 import RequiredField from './RequiredField';
 
@@ -72,7 +73,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
         dispatch(reduxSetFormDataActionForComponent(newFormData));
     };
     // FIXME type
-    const handleDescriptionChange = (
+    const handleInputChangeByFormDataProperty = (
         formDataProp: keyof TFormDataForComponent
     ): ChangeEventHandler<HTMLInputElement> => {
         return (e) => {
@@ -83,6 +84,22 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
 
             dispatch(reduxSetFormDataActionForComponent(newFormData));
         };
+    };
+    const handlePriceInput: ChangeEventHandler<HTMLInputElement> = (e) => {
+        const newFormData: TFormDataForComponent = { ...formData };
+        const value = e.target.value;
+
+        if (valueIsNumeric(value)) {
+            newFormData.pricePerNight = parseInt(value, 10);
+        } else if (e.target.value.length !== 0) {
+            e.target.value = newFormData.pricePerNight?.toString() || '';
+        } else {
+            newFormData.pricePerNight = undefined;
+
+            e.target.value = '';
+        }
+
+        dispatch(reduxSetFormDataActionForComponent(newFormData));
     };
     const handleUploadSpaceImages: ChangeEventHandler<HTMLInputElement> = (e) => {
         const newFormData: TFormDataForComponent = { ...formData };
@@ -134,7 +151,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
     };
 
     useEffect(applyEffectsOnInit, []);
-    // NOTE неправильное использование BEM практически везде
+
     return (
         <>
             <div className="space-input-fields--type-of-space">
@@ -169,7 +186,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
                         className="description__input"
                         type="text"
                         placeholder="Добавьте описание..."
-                        onChange={handleDescriptionChange('description')}
+                        onChange={handleInputChangeByFormDataProperty('description')}
                     />
                 </div>
             </div>
@@ -199,7 +216,21 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
                         className="address__input"
                         type="text"
                         placeholder="Введите адрес..."
-                        onChange={handleDescriptionChange('address')}
+                        onChange={handleInputChangeByFormDataProperty('address')}
+                    />
+                </div>
+            </div>
+            <div className="space-input-fields--price-per-night">
+                <div className="label-container">
+                    <label className="label label--price-per-night">Цена за 1 ночь</label>
+                    <RequiredField />
+                </div>
+                <div className="price-per-night__input-container">
+                    <input
+                        className="price-per-night__input"
+                        type="tel"
+                        placeholder="Укажите цену за 1 ночь..."
+                        onChange={handlePriceInput}
                     />
                 </div>
             </div>
@@ -218,7 +249,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
                         className="photos__input"
                         type="file"
                         accept=".jpeg,.jpg,.png,.svg"
-                        onChange={(e) => {}}
+                        onChange={handleUploadSpaceImages}
                         multiple
                     />
                     {renderUploadedFiles()}

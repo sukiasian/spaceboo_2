@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import * as passport from 'passport';
+import { spaceImageUpload } from '../configurations/storage.config';
+import { ImageController, imageController } from '../controllers/image.controller';
 import { SpaceController, spaceController } from '../controllers/space.controller';
 import { PassportStrategies } from '../types/enums';
 import { RouteProtector } from '../utils/RouteProtector';
@@ -8,6 +10,7 @@ import { IRouter } from './router';
 
 class SpaceRouter extends Singleton implements IRouter {
     private readonly spaceController: SpaceController = spaceController;
+    private readonly imageController: ImageController = imageController;
     private readonly passport = passport;
     private readonly routeProtector = RouteProtector;
     public readonly router = Router();
@@ -17,7 +20,9 @@ class SpaceRouter extends Singleton implements IRouter {
             .route('/')
             .post(
                 this.passport.authenticate(PassportStrategies.JWT, { session: false }),
-                this.spaceController.createSpace
+                this.spaceController.provideSpace,
+                this.imageController.uploadSpaceImageToStorageForProvideSpace,
+                this.spaceController.sendProvideSpaceResponse
             )
             .get(this.spaceController.getSpacesByQuery);
 
