@@ -10,23 +10,14 @@ export class SpaceController extends Singleton {
     public provideSpace = UtilFunctions.catchAsync(async (req, res, next) => {
         const { id: userId } = req.user;
         const space = await this.dao.provideSpace({ ...req.body, userId });
-        console.log(req.body);
 
-        res.locals = {
-            spaceId: space.id,
-        };
+        req.space = space;
 
         next();
     });
 
     public sendProvideSpaceResponse = this.utilFunctions.catchAsync(async (req, res, next) => {
-        const { spaceId } = res.locals;
-        const space = await this.dao.findById(spaceId);
-        console.log(space);
-
-        console.log(444444);
-
-        this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.SPACE_PROVIDED, space);
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.SPACE_PROVIDED, req.space);
     });
 
     public getSpaceById = UtilFunctions.catchAsync(async (req, res, next) => {

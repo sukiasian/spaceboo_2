@@ -246,6 +246,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
                 </div>
                 <div className="address__input-container">
                     <input
+                        name="spaceImages"
                         className="photos__input"
                         type="file"
                         accept=".jpeg,.jpg,.png,.svg"

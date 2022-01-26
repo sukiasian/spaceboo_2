@@ -10,11 +10,11 @@ import {
     spaceImagesRelativeDir,
     userAvatarRelativePath,
     StorageEntityReferences,
-    spaceImageUpload,
+    spaceImagesUpload,
     StorageUploadFilenames,
     spaceImagesTotalAmount,
     userAvatarUpload,
-    ReqLocalsImageAmountEntity,
+    ResLocalsImageAmountEntity,
 } from '../configurations/storage.config';
 import { spaceSequelizeDao, SpaceSequelizeDao } from '../daos/space.sequelize.dao';
 import { Dao } from '../configurations/dao.config';
@@ -27,7 +27,7 @@ export class ImageController extends Singleton {
     private readonly userDao: UserSequelizeDao = userSequelizeDao;
     private readonly spaceDao: SpaceSequelizeDao = spaceSequelizeDao;
     private readonly spaceModel: typeof Space = Space;
-    private readonly spaceImageUpload = spaceImageUpload;
+    private readonly spaceImagesUpload = spaceImagesUpload;
     private readonly userAvatarUpload = userAvatarUpload;
     private readonly userAvatarRelativePath = userAvatarRelativePath;
     private readonly spaceImagesRelativePath = spaceImagesRelativeDir;
@@ -39,16 +39,19 @@ export class ImageController extends Singleton {
             if (err instanceof multer.MulterError) {
                 next(new AppError(HttpStatus.FORBIDDEN, err.message));
             } else {
-                next(err);
+                next(new Error(err));
             }
         };
     };
 
     private multerUploadSpaceImagesForProvideErrorHandler = (req, res, next): ((err) => void) => {
         return async (err) => {
-            const { spaceId } = res.locals;
-
-            const space = await this.spaceModel.findOne({ where: { id: spaceId } });
+            const { id } = req.space;
+            const space = await this.spaceModel.findOne({
+                where: {
+                    id,
+                },
+            });
 
             if (!space) {
                 next(new AppError(HttpStatus.NOT_FOUND, ErrorMessages.SPACE_NOT_FOUND));
@@ -56,10 +59,11 @@ export class ImageController extends Singleton {
 
             await space.destroy();
 
+            // FIXME при отсутствии фото нужно указать что нужно загрузить фото
             if (err instanceof multer.MulterError) {
-                next(new AppError(HttpStatus.FORBIDDEN, 'shit happened'));
+                next(new AppError(HttpStatus.FORBIDDEN, err.message));
             } else {
-                next(err);
+                next(new Error(err));
             }
         };
     };
@@ -76,9 +80,9 @@ export class ImageController extends Singleton {
         };
     };
 
-    private multerUploadSpaceImagesForProvideSpace = (entity: string, uploader: multer.Multer) => {
+    private multerUploadSpaceImagesForProvideSpace = (entityForImagesAmountLeft: string, uploader: multer.Multer) => {
         return (req, res, next) => {
-            const imagesAmountLeft = res.locals[entity];
+            const imagesAmountLeft = res.locals[entityForImagesAmountLeft];
 
             uploader.array(StorageUploadFilenames.SPACE_IMAGES, imagesAmountLeft as number)(
                 req,
@@ -97,13 +101,13 @@ export class ImageController extends Singleton {
     };
 
     public uploadSpaceImageToStorageForProvideSpace = this.multerUploadSpaceImagesForProvideSpace(
-        ReqLocalsImageAmountEntity.SPACE_IMAGES_AMOUNT_LEFT,
-        this.spaceImageUpload
+        ResLocalsImageAmountEntity.SPACE_IMAGES_AMOUNT_LEFT,
+        this.spaceImagesUpload
     );
 
-    public uploadSpaceImageToStorageGeneral = this.multerGeneralUploadForArrays(
-        ReqLocalsImageAmountEntity.SPACE_IMAGES_AMOUNT_LEFT,
-        this.spaceImageUpload
+    public uploadSpaceImagesToStorageGeneral = this.multerGeneralUploadForArrays(
+        ResLocalsImageAmountEntity.SPACE_IMAGES_AMOUNT_LEFT,
+        this.spaceImagesUpload
     );
 
     private getImageFunctionFactory = async (
@@ -180,7 +184,12 @@ export class ImageController extends Singleton {
     public checkSpaceImagesAmount = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const { id: spaceId } = req.space;
         const space: Space = await this.spaceDao.findById(spaceId);
-        const spaceImagesAmountLeft = this.spaceImagesTotalAmount - space.imagesUrl.length;
+
+        let spaceImagesAmountLeft = 10;
+
+        if (space.imagesUrl) {
+            spaceImagesAmountLeft = this.spaceImagesTotalAmount - space.imagesUrl.length;
+        }
 
         if (spaceImagesAmountLeft === 0) {
             throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.SPACE_IMAGES_AMOUNT_EXCEEDED);

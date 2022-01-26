@@ -22,7 +22,7 @@ export enum RequestBodyImageFilename {
     SPACE_IMAGE_TO_REMOVE = 'spaceImageToRemove',
     USER_AVATAR_TO_REMOVE = 'userAvatarToRemove',
 }
-export enum ReqLocalsImageAmountEntity {
+export enum ResLocalsImageAmountEntity {
     SPACE_IMAGES_AMOUNT_LEFT = 'spaceImagesAmountLeft',
 }
 
@@ -69,12 +69,14 @@ export class StorageConfig extends Singleton {
     );
 
     public readonly userAvatarUpload = multer({ storage: this.userAvatarStorage });
-    public readonly spaceImageUpload = multer({ storage: this.spaceImageStorage });
+    public readonly spaceImagesUpload = multer({ storage: this.spaceImageStorage });
+    public readonly multerFormDataParser = multer();
 }
 
 export const storageConfig = SingletonFactory.produce<StorageConfig>(StorageConfig);
 export const userAvatarUpload = storageConfig.userAvatarUpload;
-export const spaceImageUpload = storageConfig.spaceImageUpload;
+export const spaceImagesUpload = storageConfig.spaceImagesUpload;
+export const multerFormDataParser = storageConfig.multerFormDataParser;
 export const userAvatarRelativePath = storageConfig.userAvatarRelativeDir;
 export const spaceImagesRelativeDir = storageConfig.spaceImagesRelativeDir;
 export const spaceImagesTotalAmount = storageConfig.spaceImagesTotalAmount;

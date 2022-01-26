@@ -79,18 +79,36 @@ const postProvideSpace = (formData: IProvideSpaceData) => {
         'Content-Type': 'multipart/form-data',
     };
 
-    formData.cityId = 1;
+    // formData.cityId = 1;
 
     const fd = new FormData();
+
+    for (const field in formData) {
+        if (field !== 'spaceImages') {
+            // @ts-ignore
+            fd.append(field, formData[field]);
+        }
+    }
     console.log(formData.spaceImages);
 
-    fd.append('spaceImageees', 'hello world');
+    // for (const key in formData.spaceImages) {
+    //     // @ts-ignore
+    //     console.log(key, formData[key]);
+    //     // @ts-ignore
+    //     if (key !== 'length' && key !== 'item') {
+    //         // @ts-ignore
+    //         fd.append('spaceImages', formData[key]);
+    //     }
+    // }
+
+    // @ts-ignore
+    fd.append('spaceImages', formData.spaceImages[0]);
+    fd.append('cityId', '1');
 
     return fetch('/api/v1/spaces', {
         method: 'POST',
-        headers,
         // @ts-ignore
-        body: JSON.stringify({ ...formData, ...fd }),
+        body: fd,
     });
 };
 function* postProvideSpaceWorker(action: IAction): Generator<CallEffect<any> | PutEffect<AnyAction>, void> {

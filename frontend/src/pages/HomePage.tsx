@@ -10,7 +10,9 @@ import { updateDocumentTitle } from '../utils/utilFunctions';
 export function HomePage() {
     const sliderIntervalRef = useRef<NodeJS.Timeout>();
     const { userLoginState } = useSelector((state: IReduxState) => state.authStorage);
-    const { fetchSpacesSuccessResponse } = useSelector((state: IReduxState) => state.spaceStorage);
+    const { fetchSpacesSuccessResponse, fetchSpacesFailureResponse } = useSelector(
+        (state: IReduxState) => state.spaceStorage
+    );
     const dispatch = useDispatch();
     const handleDocumentTitle = () => {
         let documentTitle: string;
@@ -25,12 +27,15 @@ export function HomePage() {
             dispatch(requestSpacesAction());
         };
     };
+    const checkIfSpacesExistToRender = (): boolean => {
+        return fetchSpacesSuccessResponse && fetchSpacesSuccessResponse.data.length !== 0 ? true : false;
+    };
     const renderSlider = (): JSX.Element => {
         return <Slider sliderIntervalRef={sliderIntervalRef as MutableRefObject<NodeJS.Timeout>} />;
     };
     const renderSpaces = (): JSX.Element => {
-        if (fetchSpacesSuccessResponse) {
-            return fetchSpacesSuccessResponse.data.map((space: any) => {
+        if (checkIfSpacesExistToRender()) {
+            return fetchSpacesSuccessResponse!.data.map((space: any) => {
                 return (
                     <Space
                         mainImageUrl={space.imagesUrl[0]}

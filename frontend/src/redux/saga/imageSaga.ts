@@ -20,8 +20,6 @@ function* postSpaceImagesWorker(action: IAction<SagaTasks, TPostUploadSpaceImage
     try {
         const response = yield call(postSpaceImages, action.payload as TPostUploadSpaceImagesPayload);
 
-        console.log(response);
-
         if ((response as IServerResponse).statusCode >= 200 && (response as IServerResponse).statusCode < 400) {
             yield put(setUploadImageSuccessResponseAction(response as IServerResponse));
         } else {

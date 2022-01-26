@@ -1,6 +1,7 @@
 import { Router } from 'express';
+import multer = require('multer');
 import * as passport from 'passport';
-import { spaceImageUpload } from '../configurations/storage.config';
+import { multerFormDataParser, spaceImagesUpload, StorageUploadFilenames } from '../configurations/storage.config';
 import { ImageController, imageController } from '../controllers/image.controller';
 import { SpaceController, spaceController } from '../controllers/space.controller';
 import { PassportStrategies } from '../types/enums';
@@ -13,6 +14,7 @@ class SpaceRouter extends Singleton implements IRouter {
     private readonly imageController: ImageController = imageController;
     private readonly passport = passport;
     private readonly routeProtector = RouteProtector;
+    private readonly multerFormDataParser = multerFormDataParser;
     public readonly router = Router();
 
     public prepareRouter = (): void => {
@@ -20,7 +22,9 @@ class SpaceRouter extends Singleton implements IRouter {
             .route('/')
             .post(
                 this.passport.authenticate(PassportStrategies.JWT, { session: false }),
+                // this.multerFormDataParser.any(),
                 this.spaceController.provideSpace,
+                this.imageController.checkSpaceImagesAmount,
                 this.imageController.uploadSpaceImageToStorageForProvideSpace,
                 this.spaceController.sendProvideSpaceResponse
             )

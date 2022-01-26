@@ -49,7 +49,7 @@ export default function ProvideSpacePage(): JSX.Element {
     };
     const renderProvideForm = (): JSX.Element => {
         return (
-            <form className="provide-space__form" onSubmit={handleSubmit}>
+            <form className="provide-space__form" onSubmit={handleSubmit} encType="multipart/form-data">
                 <SpaceInputFieldsForCreateAndEdit
                     buttonClassName="button button--primary button--submit"
                     buttonText="Предоставить пространство"

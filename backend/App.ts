@@ -18,6 +18,7 @@ import { Test } from './models/test.model';
 import { City } from './models/city.model';
 import { Appointment } from './models/appointment.model';
 import { EmailVerification } from './models/email-verification.model';
+import multer = require('multer');
 
 export class Application extends Singleton {
     public readonly app: express.Express = express();
@@ -38,6 +39,7 @@ export class Application extends Singleton {
     });
 
     public configureApp(): void {
+        this.app.use(multer().any());
         this.app.use(express.json({ limit: '10Kb' })); // NOTE
         this.app.use(express.static('public'));
         this.app.use(cookieParser());
