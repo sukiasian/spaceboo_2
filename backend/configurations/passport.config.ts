@@ -8,7 +8,7 @@ import { JwtFromRequestFunction, Strategy as JwtStrategy } from 'passport-jwt';
 import { ExtractJwt } from 'passport-jwt';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
 import { UserScopes, User } from '../models/user.model';
-import { ErrorMessages, HttpStatus, LoggerLevels } from '../types/enums';
+import { ErrorMessages, HttpStatus } from '../types/enums';
 import logger from '../loggers/logger';
 import { userSequelizeDao, UserSequelizeDao } from '../daos/user.sequelize.dao';
 import * as express from 'express';
@@ -60,7 +60,7 @@ export class PassportConfig extends Singleton {
                         return done(null, { id: user.id });
                     } catch (err) {
                         done(err);
-                        logger.log({ level: LoggerLevels.ERROR, message: err });
+                        logger.error(err);
                     }
                 }
             )

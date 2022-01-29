@@ -9,7 +9,7 @@ import * as jwt from 'jsonwebtoken';
 import logger from '../loggers/logger';
 import { applicationInstance } from '../App';
 import { TIsoDatesReserved } from '../models/appointment.model';
-import { Environment, ErrorMessages, HttpStatus, LoggerLevels, ResponseMessages, ResponseStatus } from '../types/enums';
+import { Environment, ErrorMessages, HttpStatus, ResponseMessages, ResponseStatus } from '../types/enums';
 import AppError from './AppError';
 
 enum DateFormat {
@@ -64,24 +64,24 @@ class UtilFunctions {
                 console.error(reason, 'Unhandled Rejection at Promise', p);
                 server.close((err: any) => {
                     if (err) {
-                        logger.log({ level: LoggerLevels.ERROR, message: err });
+                        logger.error(err);
                         process.exit(1);
                     }
                     applicationInstance.sequelize.close().then(() => {
-                        logger.log({ level: LoggerLevels.INFO, message: 'Sequelize connection disconnected' });
+                        logger.error('Sequelize connection disconnected');
                         process.exit(0);
                     });
                 });
             })
             .on('uncaughtException', (err) => {
-                logger.log({ level: LoggerLevels.ERROR, message: 'Uncaught Exception thrown' });
+                logger.error('Uncaught Exception thrown');
                 server.close((err: any) => {
                     if (err) {
-                        logger.log({ level: LoggerLevels.ERROR, message: err });
+                        logger.error(err);
                         process.exit(1);
                     }
                     applicationInstance.sequelize.close().then(() => {
-                        logger.log({ level: LoggerLevels.INFO, message: 'Sequelize connection disconnected' });
+                        logger.info('Sequelize connection disconnected');
                         process.exit(0);
                     });
                 });
@@ -90,11 +90,11 @@ class UtilFunctions {
                 console.info('SIGTERM signal received.');
                 server.close((err: any) => {
                     if (err) {
-                        logger.log({ level: LoggerLevels.ERROR, message: err });
+                        logger.error(err);
                         process.exit(1);
                     }
                     applicationInstance.sequelize.close().then(() => {
-                        logger.log({ level: LoggerLevels.INFO, message: 'Sequelize connection disconnected' });
+                        logger.info('Sequelize connection disconnected');
                         process.exit(0);
                     });
                 });
@@ -103,11 +103,11 @@ class UtilFunctions {
                 console.info('SIGINT signal received.');
                 server.close((err: any) => {
                     if (err) {
-                        logger.log({ level: LoggerLevels.ERROR, message: err });
+                        logger.error(err);
                         process.exit(1);
                     }
                     applicationInstance.sequelize.close().then(() => {
-                        logger.log({ level: LoggerLevels.INFO, message: 'Sequelize connection disconnected' });
+                        logger.info('Sequelize connection disconnected');
                         process.exit(0);
                     });
                 });
@@ -194,26 +194,21 @@ class UtilFunctions {
 
     public static removeFile = promisify(fs.rm);
 
-    public static findAndRemoveImage = async (
-        id: string,
-        imageToRemoveFilename: string,
-        entityDirPath: string
-    ): Promise<void> => {
-        if (!imageToRemoveFilename || imageToRemoveFilename.length === 0) {
-            // FIXME возможно нужно выкинуть ошибку "Нет изображений для поиска"
-            throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.NO_IMAGE_FOUND);
-        }
+    public static findAndRemoveImage = async (userId: string, imageToRemoveFilename: string): Promise<void> => {
+        console.log(888888);
 
-        const pathToEntityIndividualDir = path.resolve(entityDirPath, id);
-        const pathToImage = path.resolve(entityDirPath, id, imageToRemoveFilename);
-        const checkIfEntityIndividualDirExists = await UtilFunctions.checkIfExists(pathToEntityIndividualDir);
+        const pathToImageParentDir = path.resolve('assets/images', userId);
+        const pathToImage = path.join(pathToImageParentDir, imageToRemoveFilename);
+        const checkIfImageParentDivExists = await UtilFunctions.checkIfExists(pathToImageParentDir);
         const checkIfFileExists = await UtilFunctions.checkIfExists(pathToImage);
+        console.log(44444444);
 
-        if (!checkIfEntityIndividualDirExists) {
+        if (!checkIfImageParentDivExists) {
             throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.DIR_NOT_FOUND);
         } else if (!checkIfFileExists) {
-            throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.DIR_NOT_FOUND);
+            throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.NO_IMAGE_FOUND);
         }
+        console.log(55555555);
 
         await UtilFunctions.removeFile(pathToImage);
     };

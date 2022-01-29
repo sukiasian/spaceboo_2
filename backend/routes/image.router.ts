@@ -26,31 +26,21 @@ class ImageRouter extends Singleton implements IRouter {
                 this.imageController.removeUserAvatarFromStorage
             );
 
-        this.router.route('/users/:userId').get(this.imageController.getUserAvatarByFilename);
-
         this.router
             .route('/spaces/:spaceId')
             .post(
                 this.passport.authenticate(PassportStrategies.JWT, { session: false }),
                 this.routeProtector.spaceOwnerProtector,
-                this.imageController.checkSpaceImagesAmount,
-                this.imageController.uploadSpaceImagesToStorageGeneral,
+                this.imageController.checkSpaceImagesAvailableAmount,
+                this.imageController.uploadSpaceImagesToStorage,
                 this.imageController.updateSpaceImagesInDb
             )
-            .get(this.imageController.getSpacesImageByFilename)
             .delete(
                 this.passport.authenticate(PassportStrategies.JWT, { session: false }),
                 this.routeProtector.spaceOwnerProtector,
                 this.imageController.removeSpaceImagesFromDb,
                 this.imageController.removeSpaceImagesFromStorage
             );
-
-        this.router.get('/hello', (req, res) => {
-            res.status(200).json({
-                data: 'helloworld',
-                message: 'some message',
-            });
-        });
     };
 }
 

@@ -47,17 +47,13 @@ export enum HttpStatus {
     SERVICE_UNAVAILABLE = 503,
     GATEWAY_TIMEOUT = 504,
     HTTP_VERSION_NOT_SUPPORTED = 505,
+    errorMessage,
 }
 
 export enum ResponseStatus {
     SUCCESS = 'Выполнено',
     FAILURE = 'Не выполнено',
     ERROR = 'Ошибка',
-}
-
-export enum LoggerLevels {
-    ERROR = 'error',
-    INFO = 'info',
 }
 
 export enum ModelNames {
@@ -123,9 +119,9 @@ export enum ErrorMessages {
     EMAIL_UNIQUE_VALIDATE = 'Пользователь с таким эл. адресом уже существует.',
     REQUIRED_FIELDS_VALIDATE = 'Пожалуйста, заполните все обязательные поля.',
     SPACE_IS_UNAVAILABLE = 'К сожалению, пространство занято. Вы можете посмотреть на другие даты.',
-    // TODO while images are optional we dont need to use "minimal amount". If they aren't then we do
-    SPACE_IMAGES_VALIDATE = 'Максимальное количество изображений для пространства — 10.',
-    SPACE_IMAGES_AMOUNT_EXCEEDED = 'Превышено допустимое количество изображений для пространства. Максимальное количество изображений - 10.',
+    SPACE_IMAGES_ARE_NOT_PROVIDED = 'Пожалуйста, добавьте изображения. Максимальное количество изображений - 5',
+    SPACE_IMAGES_VALIDATE = 'Максимальное количество изображений для пространства — 5.',
+    SPACE_IMAGES_AMOUNT_EXCEEDED = 'Превышено допустимое количество изображений для пространства. Максимальное количество изображений - 5.',
     APPLICATION_ERROR = 'Application Error',
     UNKNOWN_ERROR = 'Произошла серьезная ошибка',
     NO_IMAGE_FOUND = 'Изображение не найдено.',

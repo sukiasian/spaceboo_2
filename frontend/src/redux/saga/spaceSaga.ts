@@ -73,43 +73,27 @@ export function* watchFetchSpaces(): Generator<ForkEffect, void, void> {
 }
 
 const postProvideSpace = (formData: IProvideSpaceData) => {
-    //  связать файлы с json и передать на сервер где они будут обработаны одним запросом
     //  FIXME NOTE locker connected should not be sent through client (guess it has default value and cannot be set manually)
-    const headers: HeadersInit = {
-        'Content-Type': 'multipart/form-data',
-    };
-
-    // formData.cityId = 1;
-
-    const fd = new FormData();
+    const formDataParsed = new FormData();
 
     for (const field in formData) {
         if (field !== 'spaceImages') {
-            // @ts-ignore
-            fd.append(field, formData[field]);
+            // @ts-ignore'
+            formDataParsed.append(field, formData[field]);
         }
     }
-    console.log(formData.spaceImages);
 
-    // for (const key in formData.spaceImages) {
-    //     // @ts-ignore
-    //     console.log(key, formData[key]);
-    //     // @ts-ignore
-    //     if (key !== 'length' && key !== 'item') {
-    //         // @ts-ignore
-    //         fd.append('spaceImages', formData[key]);
-    //     }
-    // }
+    for (const key in formData.spaceImages) {
+        if (key !== 'length' && key !== 'item') {
+            // @ts-ignore
+            formDataParsed.append('spaceImages', formData.spaceImages[key]);
+        }
+    }
 
-    // @ts-ignore
-    fd.append('spaceImages', formData.spaceImages[0]);
-    fd.append('cityId', '1');
+    // TODO CITY-PICKER
+    formDataParsed.append('cityId', '1');
 
-    return fetch('/api/v1/spaces', {
-        method: 'POST',
-        // @ts-ignore
-        body: fd,
-    });
+    return httpRequester.post(ApiUrls.SPACES, formDataParsed);
 };
 function* postProvideSpaceWorker(action: IAction): Generator<CallEffect<any> | PutEffect<AnyAction>, void> {
     try {

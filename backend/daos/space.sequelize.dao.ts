@@ -1,3 +1,4 @@
+import * as path from 'path';
 import { Dao } from '../configurations/dao.config';
 import { ISpaceCreate, Space, ISpaceEdit, spaceEditFields } from '../models/space.model';
 import { QuerySortDirection } from '../types/enums';
@@ -38,8 +39,26 @@ export class SpaceSequelizeDao extends Dao {
     }
 
     // NOTE аутентификация - протекция роута (только для авторизованных пользователей)
-    public provideSpace = async (data: ISpaceCreate): Promise<Space> => {
-        return this.model.create(data);
+    public provideSpace = async (data: ISpaceCreate, files: Express.Multer.File[]): Promise<Space> => {
+        try {
+            return await this.model.create(data);
+        } catch (err) {
+            console.log('123123123');
+            console.log(files);
+
+            await Promise.all(
+                files.map(async (file) => {
+                    await this.utilFunctions.findAndRemoveImage(data.userId, file.filename);
+                })
+            );
+            console.log(999999999);
+
+            // NOTE не  сработает ли дважды ? почему не сработает в next? если выкинется ошибка один раз в try (от метода .create),
+            // то зачем выкидывать еще одну ошибку здесь? может быть для того чтобы дополнить инструкции? А если internal имеет выше приоритет,
+            // то почему должен сработать external? возможно потому  что мы бросаем error.
+
+            throw err;
+        }
     };
 
     public getSpacesByQuery = async (queryStr: IQueryString): Promise<any> => {

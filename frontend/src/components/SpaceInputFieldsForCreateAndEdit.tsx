@@ -79,7 +79,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
         return (e) => {
             const newFormData: TFormDataForComponent = { ...formData };
 
-            // @ts-ignore happens beсause e.t.value === string and newFormData[formDataProp] can be not string but any other thing
+            // @ts-ignore
             newFormData[formDataProp] = e.target.value as string;
 
             dispatch(reduxSetFormDataActionForComponent(newFormData));

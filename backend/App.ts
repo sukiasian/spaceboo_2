@@ -14,11 +14,9 @@ import { Singleton, SingletonFactory } from './utils/Singleton';
 import { User } from './models/user.model';
 import { Space } from './models/space.model';
 import { passportConfig, PassportConfig } from './configurations/passport.config';
-import { Test } from './models/test.model';
 import { City } from './models/city.model';
 import { Appointment } from './models/appointment.model';
 import { EmailVerification } from './models/email-verification.model';
-import multer = require('multer');
 
 export class Application extends Singleton {
     public readonly app: express.Express = express();
@@ -34,12 +32,11 @@ export class Application extends Singleton {
         username: process.env.DATABASE_USERNAME || 'postgres',
         password: process.env.DATABASE_PASSWORD || 'postgres',
         database: process.env.DATABASE_NAME || 'postgres',
-        models: [City, User, Space, Test, Appointment, EmailVerification],
+        models: [City, User, Space, Appointment, EmailVerification],
         logging: false,
     });
 
     public configureApp(): void {
-        this.app.use(multer().any());
         this.app.use(express.json({ limit: '10Kb' })); // NOTE
         this.app.use(express.static('public'));
         this.app.use(cookieParser());

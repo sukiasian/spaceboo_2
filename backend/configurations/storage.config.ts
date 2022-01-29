@@ -17,7 +17,6 @@ export enum StorageUploadFilenames {
     SPACE_IMAGES = 'spaceImages',
 }
 
-// FIXME probably this is to delete
 export enum RequestBodyImageFilename {
     SPACE_IMAGE_TO_REMOVE = 'spaceImageToRemove',
     USER_AVATAR_TO_REMOVE = 'userAvatarToRemove',
@@ -29,54 +28,33 @@ export enum ResLocalsImageAmountEntity {
 export class StorageConfig extends Singleton {
     private readonly multer = multer;
     private readonly UtilFunctions = UtilFunctions;
-    public readonly userAvatarRelativeDir = 'assets/images/users';
-    public readonly spaceImagesRelativeDir = 'assets/images/spaces';
     public readonly spaceImagesTotalAmount = 10;
 
-    private readonly diskStorageFactory = (
-        requestSerializedObject: RequestSerializedObjects,
-        entityDirPath: string
-    ): multer.StorageEngine => {
+    private readonly diskStorageFactory = (): multer.StorageEngine => {
         return this.multer.diskStorage({
-            destination: async (req, file, cb) => {
-                const { id } = req[requestSerializedObject];
-                const individualDirPathForEntity = path.resolve(entityDirPath, id);
-                const dirExists = await this.UtilFunctions.checkIfExists(individualDirPathForEntity);
+            destination: async (req: any, file, cb) => {
+                const { id: userId } = req.user;
+                const individualDirPathForUser = path.resolve('assets/images', userId);
+                const dirExists = await this.UtilFunctions.checkIfExists(individualDirPathForUser);
 
                 if (!dirExists) {
-                    await this.UtilFunctions.makeDirectory(individualDirPathForEntity);
+                    await this.UtilFunctions.makeDirectory(individualDirPathForUser);
                 }
 
-                cb(null, individualDirPathForEntity);
+                cb(null, individualDirPathForUser);
             },
             filename: (req, file, cb) => {
                 const idx = file.mimetype.indexOf('/');
                 const extension = file.mimetype.substr(idx + 1, file.mimetype.length - idx);
 
-                cb(null, uuid.v4() + `.${extension}`);
+                cb(null, `${uuid.v4()}.${extension}`);
             },
         });
     };
 
-    private readonly userAvatarStorage: multer.StorageEngine = this.diskStorageFactory(
-        RequestSerializedObjects.USER,
-        this.userAvatarRelativeDir
-    );
-
-    private readonly spaceImageStorage: multer.StorageEngine = this.diskStorageFactory(
-        RequestSerializedObjects.SPACE,
-        this.spaceImagesRelativeDir
-    );
-
-    public readonly userAvatarUpload = multer({ storage: this.userAvatarStorage });
-    public readonly spaceImagesUpload = multer({ storage: this.spaceImageStorage });
-    public readonly multerFormDataParser = multer();
+    public readonly imageUpload = multer({ storage: this.diskStorageFactory() });
 }
 
 export const storageConfig = SingletonFactory.produce<StorageConfig>(StorageConfig);
-export const userAvatarUpload = storageConfig.userAvatarUpload;
-export const spaceImagesUpload = storageConfig.spaceImagesUpload;
-export const multerFormDataParser = storageConfig.multerFormDataParser;
-export const userAvatarRelativePath = storageConfig.userAvatarRelativeDir;
-export const spaceImagesRelativeDir = storageConfig.spaceImagesRelativeDir;
+export const imageUpload = storageConfig.imageUpload;
 export const spaceImagesTotalAmount = storageConfig.spaceImagesTotalAmount;

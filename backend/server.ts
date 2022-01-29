@@ -28,10 +28,7 @@ switch (process.env.NODE_ENV) {
     await databaseConnection(applicationInstance.sequelize);
 
     const server = app.listen(PORT, () => {
-        logger.log({
-            level: 'info',
-            message: `Server is listening on ${PORT}`,
-        });
+        logger.info(`Server is listening on ${PORT}`);
 
         if (process.env.NODE_ENV === Environment.PRODUCTION) {
             process.send('Server is ready');
