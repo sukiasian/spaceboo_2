@@ -6,7 +6,7 @@
         "emitDecoratorMetadata": true,
         "target": "es2017",
         "moduleResolution": "node",
-        "outDir": "backend/dist",
+        "outDir": "dist",
         "rootDir": "",
         "sourceMap": true,
         "incremental": true,

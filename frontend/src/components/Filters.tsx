@@ -1,11 +1,12 @@
-import { ChangeEventHandler, MouseEventHandler, useEffect, useRef, useState } from 'react';
+import { ChangeEventHandler, MouseEventHandler, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faTimes } from '@fortawesome/free-solid-svg-icons';
 import InputWithLabel, { IInputWithLableProps, InputTypes } from './InputWithLabel';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import QueryDatePicker from './QueryDatePicker';
-import { requestSpacesAction } from '../redux/actions/spaceActions';
+import { setFetchSpacesQueryData } from '../redux/actions/spaceActions';
 import { valueIsNumeric } from '../utils/utilFunctions';
+import { IReduxState } from '../redux/reducers/rootReducer';
 
 interface IFilterRange<T> {
     from: T;
@@ -50,10 +51,11 @@ enum PriceRangeQueryDataReferences {
 }
 
 export default function Filters(): JSX.Element {
-    const [queryData, setQueryData] = useState<IQueryData>({
-        sortBy: SpaceQuerySortFields.NEWEST,
-        cityId: localStorage.getItem('currentCityId') || '',
-    });
+    // const [queryData, setQueryData] = useState<IQueryData>({
+    //     sortBy: SpaceQuerySortFields.NEWEST,
+    //     cityId: localStorage.getItem('currentCityId') || '',
+    // });
+
     const [datesForRender, setDatesForRender] = useState<IDatesRange>();
     const [sortByDropDownBoxIsOpen, setSortByDropDownBoxIsOpen] = useState(false);
     const [priceRangeDropDownBoxIsOpen, setPriceRangeDropDownBoxIsOpen] = useState(false);
@@ -76,6 +78,7 @@ export default function Filters(): JSX.Element {
             text: 'Сначала новые',
         },
     ]);
+    const { fetchSpacesQueryData } = useSelector((state: IReduxState) => state.spaceStorage);
     const annualizeDatesIconRef = useRef<HTMLSpanElement>(null);
     const priceRangeInputs: IPriceRangeInput[] = [
         {
@@ -94,9 +97,6 @@ export default function Filters(): JSX.Element {
         },
     ];
     const dispatch = useDispatch();
-    const requestSpaces = (): void => {
-        dispatch(requestSpacesAction(queryData));
-    };
     const toggleFilterBoxIsOpen = (filter: FilterNames): MouseEventHandler => {
         return (e): void => {
             switch (filter) {
@@ -118,14 +118,14 @@ export default function Filters(): JSX.Element {
         return filterBoxIsOpen ? 'filters__arrow--rotated' : 'filters__arrow--straight';
     };
     const updateQueryDataSortBy = (sortByOption: SpaceQuerySortFields): void => {
-        const newQueryData: IQueryData = { ...queryData };
+        const newQueryData: IQueryData = { ...fetchSpacesQueryData };
 
         newQueryData.sortBy = sortByOption;
 
-        setQueryData(newQueryData);
+        dispatch(setFetchSpacesQueryData(newQueryData));
     };
     const updateQueryDataPriceRange: ChangeEventHandler<HTMLInputElement> = (e) => {
-        const newQueryData: any = { ...queryData };
+        const newQueryData: any = { ...fetchSpacesQueryData };
         const { value } = e.currentTarget;
         const priceRangeQueryDataReference = e.currentTarget.getAttribute('data-tag');
 
@@ -138,12 +138,12 @@ export default function Filters(): JSX.Element {
                 return;
             }
 
-            setQueryData(newQueryData);
+            dispatch(setFetchSpacesQueryData(newQueryData));
         }
     };
     const calculateNumberOfDaysRequired = (): number => {
-        const beginningDateInMs = new Date(queryData.beginningDate!).getTime();
-        const endingDateInMs = new Date(queryData.endingDate!).getTime();
+        const beginningDateInMs = new Date(fetchSpacesQueryData!.beginningDate!).getTime();
+        const endingDateInMs = new Date(fetchSpacesQueryData!.endingDate!).getTime();
 
         return (endingDateInMs - beginningDateInMs) / 1000 / 60 / 60 / 24;
     };
@@ -166,12 +166,12 @@ export default function Filters(): JSX.Element {
     const annualizeRequiredReservationDatesRangeFilter: MouseEventHandler = (e) => {
         e.stopPropagation();
 
-        const newQueryData = { ...queryData };
+        const newQueryData = { ...fetchSpacesQueryData };
 
         newQueryData.beginningDate = '';
         newQueryData.endingDate = '';
 
-        setQueryData(newQueryData);
+        dispatch(setFetchSpacesQueryData(newQueryData));
         setDatesForRender(undefined);
     };
     const renderSortByFilterDropDown = (): JSX.Element | void => {
@@ -236,14 +236,7 @@ export default function Filters(): JSX.Element {
     };
     const renderDatePicker = (): JSX.Element | void => {
         if (requiredReservationDatesPickerIsOpen) {
-            return (
-                <QueryDatePicker
-                    queryData={queryData}
-                    setQueryData={setQueryData}
-                    datesForRender={datesForRender}
-                    setDatesForRender={setDatesForRender}
-                />
-            );
+            return <QueryDatePicker datesForRender={datesForRender} setDatesForRender={setDatesForRender} />;
         }
     };
     const renderNumberOfDaysRequired = (): JSX.Element | void => {
@@ -257,8 +250,6 @@ export default function Filters(): JSX.Element {
             );
         }
     };
-
-    useEffect(requestSpaces, [queryData, dispatch]);
 
     return (
         <section className="filters-section" style={{ display: 'flex', flexDirection: 'row' }}>

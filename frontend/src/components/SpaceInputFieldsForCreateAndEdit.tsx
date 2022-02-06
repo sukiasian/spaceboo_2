@@ -1,6 +1,12 @@
-import { ChangeEventHandler, useEffect } from 'react';
+import { ChangeEvent, ChangeEventHandler, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { IAction } from '../redux/actions/ActionTypes';
+import {
+    annualizeFoundBySearchPatternCitiesAction,
+    requestCitiesBySearchPatternAction,
+} from '../redux/actions/cityActions';
 import { setEditSpaceDataAction, setProvideSpaceDataAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { IProvideSpaceData, IEditSpaceData, SpaceType, ISpaceFormData } from '../redux/reducers/spaceReducer';
@@ -27,7 +33,10 @@ interface IReduxSetFormDataActionsFor {
 }
 
 export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputFieldsForCreateAndEditProps): JSX.Element {
-    const formData = useSelector((state: IReduxState) => state.spaceStorage[props.componentIsFor]);
+    const { buttonClassName, buttonText, componentIsFor, handleSubmitButton, children } = props;
+    const findCityRef = useRef<HTMLInputElement>(null);
+    const formData = useSelector((state: IReduxState) => state.spaceStorage[componentIsFor]);
+    const { foundBySearchPatternCities } = useSelector((state: IReduxState) => state.cityStorage);
     const dispatch = useDispatch();
     const reduxSetFormDataActionsFor: IReduxSetFormDataActionsFor = {
         provideSpaceData: setProvideSpaceDataAction,
@@ -44,7 +53,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
             spaceType: SpaceType.HOUSE,
         },
     ];
-    const reduxSetFormDataActionForComponent = reduxSetFormDataActionsFor[props.componentIsFor];
+    const reduxSetFormDataActionForComponent = reduxSetFormDataActionsFor[componentIsFor];
     const applyDropdownValuesToFormDataOnInit = (): void => {
         const newFormData: TFormDataForComponent = { ...formData };
 
@@ -53,8 +62,12 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
 
         dispatch(reduxSetFormDataActionForComponent(newFormData));
     };
-    const applyEffectsOnInit = (): void => {
+    const applyEffectsOnInit = (): (() => void) => {
         applyDropdownValuesToFormDataOnInit();
+
+        return () => {
+            // TODO записывать все src в глобальную переменную, а удалять здесь revokeObjectUrl
+        };
     };
     const handleTypeOfSpaceBoxCheckingBySpaceType = (spaceType: SpaceType): (() => void) => {
         return () => {
@@ -72,7 +85,6 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
 
         dispatch(reduxSetFormDataActionForComponent(newFormData));
     };
-    // FIXME type
     const handleInputChangeByFormDataProperty = (
         formDataProp: keyof TFormDataForComponent
     ): ChangeEventHandler<HTMLInputElement> => {
@@ -101,14 +113,56 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
 
         dispatch(reduxSetFormDataActionForComponent(newFormData));
     };
+    const handleFindCityInput = (e: ChangeEvent<{ value: string }>): void => {
+        dispatch(requestCitiesBySearchPatternAction(e.target.value));
+    };
+    const annualizeFoundBySearchPatternCities = (): void => {
+        dispatch(annualizeFoundBySearchPatternCitiesAction());
+    };
+    const handlePickCity = (cityValue: string, cityId: number): (() => void) => {
+        return () => {
+            const newFormData: TFormDataForComponent = { ...formData };
+
+            newFormData.cityId = cityId;
+
+            dispatch(reduxSetFormDataActionForComponent(newFormData));
+
+            findCityRef.current!.value = cityValue;
+
+            annualizeFoundBySearchPatternCities();
+        };
+    };
     const handleUploadSpaceImages: ChangeEventHandler<HTMLInputElement> = (e) => {
         const newFormData: TFormDataForComponent = { ...formData };
 
         if (e.target.files) {
-            newFormData.spaceImages = e.target.files;
+            const spaceImages = transformSpaceImagesFileListIntoArray(e.target.files);
+
+            newFormData.spaceImages = [...(newFormData.spaceImages || []), ...spaceImages];
         }
 
         dispatch(reduxSetFormDataActionForComponent(newFormData));
+    };
+    const transformSpaceImagesFileListIntoArray = (spaceImagesFileList: FileList): Array<any> => {
+        let spaceImages: any[] = [];
+
+        for (const key in spaceImagesFileList) {
+            if (key !== 'length' && key !== 'item') {
+                spaceImages = [...spaceImages, spaceImagesFileList[key]];
+            }
+        }
+
+        return spaceImages;
+    };
+    const removeSpaceImageFromList = (imageToRemove: File): (() => void) => {
+        return () => {
+            const newSpaceImagesList = formData?.spaceImages!.filter((el: File) => el !== imageToRemove);
+            const newFormData: TFormDataForComponent = { ...formData };
+
+            newFormData.spaceImages = newSpaceImagesList;
+
+            dispatch(reduxSetFormDataActionForComponent(newFormData));
+        };
     };
     const renderTypeOfSpaceCheckboxes = (): JSX.Element[] => {
         return typeOfSpaceInputsData.map((typeOfSpaceInputData: ITypeOfSpaceInputData, i: number) => {
@@ -141,12 +195,46 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
 
         return dropdownOptions;
     };
-    const renderUploadedFiles = () => {
-        return <img src="" alt="Загруженное изображение" />;
+    const renderFindCityResults = (): JSX.Element => {
+        return (
+            <>
+                {foundBySearchPatternCities && foundBySearchPatternCities.length !== 0
+                    ? foundBySearchPatternCities.map((city: any, i: number) => (
+                          <p
+                              className={`city-picker__search-results city-picker__search-results--${i}`}
+                              key={i}
+                              onClick={handlePickCity(city.city || city.address, city.id)}
+                          >
+                              {city.address}
+                          </p>
+                      ))
+                    : null}
+            </>
+        );
+    };
+    const renderUploadedFiles = (): JSX.Element[] | void => {
+        const { spaceImages } = formData as TFormDataForComponent;
+
+        if (spaceImages) {
+            const spaces = spaceImages.map((file: File, i: number) => {
+                const src = URL.createObjectURL(file);
+
+                return (
+                    <div className="images-to-upload-container" key={i}>
+                        <img className="image-to-upload" src={src} alt="Загруженное изображение" onClick={() => {}} />
+                        <div className="remove-image-to-upload" onClick={removeSpaceImageFromList(file)}>
+                            <FontAwesomeIcon icon={faTimes} />
+                        </div>
+                    </div>
+                );
+            });
+
+            return spaces;
+        }
     };
     const renderChildren = (): JSX.Element | void => {
-        if (props.children) {
-            return props.children;
+        if (children) {
+            return children;
         }
     };
 
@@ -166,7 +254,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
                     <label className="label label--rooms-number">Количество комнат</label>
                     <RequiredField />
                 </div>
-                {/*  NOTE if here we use select tag then in dropdown menus we should also use that */}
+                {/*  NOTE if here we use select tag then in dropdown menus we should also use that in other places and vice versa*/}
                 <div className="rooms-number__dropdown-container">
                     <select
                         className="rooms-number__dropdown"
@@ -205,7 +293,6 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
                     </select>
                 </div>
             </div>
-            {/*  TODO здесь должен быть ситипикер но он выполнен только для хедера. Нужно его переделать так чтобы он подходил для всех  */}
             <div className="space-input-fields--address">
                 <div className="address__label-container">
                     <label className="label label--address">Адрес</label>
@@ -234,6 +321,17 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
                     />
                 </div>
             </div>
+            <div className="city-picker__search">
+                <input
+                    ref={findCityRef}
+                    className="city-picker__input"
+                    name="city-picker__input"
+                    placeholder="Введите название города..."
+                    onChange={handleFindCityInput}
+                    autoComplete="off"
+                />
+                {renderFindCityResults()}
+            </div>
             <div className="space-input-fields--photos">
                 <div className="photos__label-and-label-description-container">
                     <div className="label-container">
@@ -241,24 +339,38 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
                         <RequiredField />
                     </div>
                     <div className="label-description-container">
-                        <p className="paragraph paragraph--light paragraph--label-description">До 10 фотографий</p>
+                        <p className="paragraph paragraph--light paragraph--label-description">До 5 фотографий</p>
                     </div>
                 </div>
                 <div className="address__input-container">
-                    <input
-                        name="spaceImages"
-                        className="photos__input"
-                        type="file"
-                        accept=".jpeg,.jpg,.png,.svg"
-                        onChange={handleUploadSpaceImages}
-                        multiple
-                    />
                     {renderUploadedFiles()}
+                    <label
+                        // TODO this is a working  example to go with in css
+                        style={{
+                            display: 'block',
+                            width: '45px',
+                            height: '45px',
+                            background: 'url(/images/icons/icon-add.png)',
+                            backgroundSize: 'cover',
+                        }}
+                    >
+                        <input
+                            id="aaaa"
+                            style={{ display: 'none' }}
+                            name="spaceImages"
+                            className="photos__input"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleUploadSpaceImages}
+                            multiple
+                        />
+                    </label>
                 </div>
             </div>
             {renderChildren()}
-            <button className={props.buttonClassName} onClick={props.handleSubmitButton}>
-                {props.buttonText}
+
+            <button className={buttonClassName} onClick={handleSubmitButton}>
+                {buttonText}
             </button>
         </>
     );

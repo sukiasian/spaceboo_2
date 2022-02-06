@@ -14,7 +14,6 @@ export class SpaceController extends Singleton {
         if (req.files.length === 0) {
             throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.SPACE_IMAGES_ARE_NOT_PROVIDED);
         }
-        console.log('neeeeeext');
 
         const space = await this.dao.provideSpace({ ...req.body, userId }, req.files);
 
@@ -26,7 +25,11 @@ export class SpaceController extends Singleton {
     });
 
     public getSpaceById = this.utilFunctions.catchAsync(async (req, res, next) => {
-        const space = await this.dao.findById(req.params.id);
+        const space = await this.dao.findById(req.params.spaceId);
+
+        if (!space) {
+            throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.SPACE_NOT_FOUND);
+        }
 
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, space);
     });
@@ -34,6 +37,7 @@ export class SpaceController extends Singleton {
     // TODO pagination, limitation, sorting продумать логику как это будет работать
     public getSpacesByQuery = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const spaces = await this.dao.getSpacesByQuery(req.query);
+        console.log(req.query);
 
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, spaces);
     });

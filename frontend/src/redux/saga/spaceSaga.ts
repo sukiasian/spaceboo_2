@@ -5,10 +5,12 @@ import { IAction } from '../actions/ActionTypes';
 import { IQueryData } from '../../components/Filters';
 import { AnyAction } from 'redux';
 import {
-    fetchSpacesFailureAction,
-    fetchSpacesSuccessAction,
+    setFetchSpacesSuccessResponseAction,
+    setFetchSpacesFailureResponseAction,
     setProvideSpaceFailureResponseAction,
     setProvideSpaceSuccessResponseAction,
+    setFetchSpaceByIdSuccessResponse,
+    setFetchSpaceByIdFailureResponse,
 } from '../actions/spaceActions';
 import { IProvideSpaceData } from '../reducers/spaceReducer';
 
@@ -60,19 +62,19 @@ function* fetchSpacesWorker(action: IAction): Generator<CallEffect<IServerRespon
         const response = yield call(fetchSpaces, action.payload);
 
         if ((response as IServerResponse).statusCode >= 200 && (response as IServerResponse).statusCode < 300) {
-            yield put(fetchSpacesSuccessAction(response as IServerResponse));
+            yield put(setFetchSpacesSuccessResponseAction(response as IServerResponse));
         } else {
             throw response;
         }
     } catch (err) {
-        yield put(fetchSpacesFailureAction(err as IServerResponse));
+        yield put(setFetchSpacesFailureResponseAction(err as IServerResponse));
     }
 }
 export function* watchFetchSpaces(): Generator<ForkEffect, void, void> {
     yield takeEvery(SagaTasks.REQUEST_SPACES, fetchSpacesWorker);
 }
 
-const postProvideSpace = (formData: IProvideSpaceData) => {
+const postProvideSpace = (formData: IProvideSpaceData): Promise<IServerResponse> => {
     //  FIXME NOTE locker connected should not be sent through client (guess it has default value and cannot be set manually)
     const formDataParsed = new FormData();
 
@@ -83,17 +85,11 @@ const postProvideSpace = (formData: IProvideSpaceData) => {
         }
     }
 
-    for (const key in formData.spaceImages) {
-        if (key !== 'length' && key !== 'item') {
-            // @ts-ignore
-            formDataParsed.append('spaceImages', formData.spaceImages[key]);
-        }
-    }
+    formData.spaceImages!.forEach((image: any) => {
+        formDataParsed.append('spaceImages', image);
+    });
 
-    // TODO CITY-PICKER
-    formDataParsed.append('cityId', '1');
-
-    return httpRequester.post(ApiUrls.SPACES, formDataParsed);
+    return httpRequester.postMultipartFormData(`${ApiUrls.SPACES}`, formDataParsed);
 };
 function* postProvideSpaceWorker(action: IAction): Generator<CallEffect<any> | PutEffect<AnyAction>, void> {
     try {
@@ -110,4 +106,24 @@ function* postProvideSpaceWorker(action: IAction): Generator<CallEffect<any> | P
 }
 export function* watchPostProvideSpace(): Generator<ForkEffect, void, void> {
     yield takeLatest(SagaTasks.POST_PROVIDE_SPACE, postProvideSpaceWorker);
+}
+
+const requestSpaceById = (spaceId: string): Promise<IServerResponse> => {
+    return httpRequester.get(`${ApiUrls.SPACES}/${spaceId}`);
+};
+function* requestSpaceByIdWorker(action: IAction): Generator<CallEffect<any> | PutEffect<AnyAction>, void> {
+    try {
+        const response = yield call(requestSpaceById, action.payload);
+
+        if ((response as IServerResponse).statusCode >= 200 && (response as IServerResponse).statusCode < 300) {
+            yield put(setFetchSpaceByIdSuccessResponse(response as IServerResponse));
+        } else {
+            throw response;
+        }
+    } catch (err) {
+        yield put(setFetchSpaceByIdFailureResponse(err as IServerResponse));
+    }
+}
+export function* watchRequestSpaceById(): Generator<ForkEffect, void, void> {
+    yield takeEvery(SagaTasks.REQUEST_SPACE_BY_ID, requestSpaceByIdWorker);
 }

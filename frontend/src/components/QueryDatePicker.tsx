@@ -1,21 +1,22 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setFetchSpacesQueryData } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { formatSingleDigitUnitToTwoDigitString } from '../utils/utilFunctions';
 import DatePicker from './DatePicker';
 import { IDatesRange, IQueryData } from './Filters';
 
 interface IQueryDatePicker {
-    queryData: IQueryData;
-    setQueryData: React.Dispatch<React.SetStateAction<IQueryData>>;
     datesForRender: IDatesRange | undefined;
     setDatesForRender: React.Dispatch<React.SetStateAction<IDatesRange | undefined>>;
 }
 
 export default function QueryDatePicker(props: IQueryDatePicker): JSX.Element {
-    const { queryData, setQueryData } = props;
+    // const { queryData, setQueryData } = props;
     const { datesForRender, setDatesForRender } = props;
+    const { fetchSpacesQueryData } = useSelector((state: IReduxState) => state.spaceStorage);
     const { datePickerDate } = useSelector((state: IReduxState) => state.commonStorage);
+    const dispatch = useDispatch();
     const generateQueryDateString = (year: number, month: number, day: number): string => {
         return `${year}-${formatSingleDigitUnitToTwoDigitString(month + 1)}-${formatSingleDigitUnitToTwoDigitString(
             day
@@ -30,7 +31,7 @@ export default function QueryDatePicker(props: IQueryDatePicker): JSX.Element {
         return new Date(d1) > new Date(d2);
     };
     const pickDate = (day: number) => {
-        const newQueryData: IQueryData = { ...queryData };
+        const newQueryData: IQueryData = { ...fetchSpacesQueryData };
         const newDatesForRender: IDatesRange = { ...datesForRender };
         const pickedDate = generateQueryDateString(datePickerDate.year, datePickerDate.month, day);
         const pickedDateForRender = generateRenderDateString(datePickerDate.year, datePickerDate.month, day);
@@ -64,17 +65,17 @@ export default function QueryDatePicker(props: IQueryDatePicker): JSX.Element {
             newDatesForRender.endingDate = generateRenderDateString(datePickerDate.year, datePickerDate.month, day + 1);
         }
 
-        setQueryData(newQueryData);
+        dispatch(setFetchSpacesQueryData(newQueryData));
         setDatesForRender({
             beginningDate: newDatesForRender.beginningDate,
             endingDate: newDatesForRender.endingDate,
         });
     };
     const definePickedDaysClassName = (day: number): string => {
-        if (queryData.beginningDate && queryData.endingDate) {
+        if (fetchSpacesQueryData?.beginningDate && fetchSpacesQueryData?.endingDate) {
             const dateForCurrentDay = new Date(generateQueryDateString(datePickerDate.year, datePickerDate.month, day));
-            const beginningDate = new Date(queryData.beginningDate as string);
-            const endingDate = new Date(queryData.endingDate as string);
+            const beginningDate = new Date(fetchSpacesQueryData.beginningDate as string);
+            const endingDate = new Date(fetchSpacesQueryData.endingDate as string);
 
             if (dateForCurrentDay >= beginningDate && beginningDate >= dateForCurrentDay) {
                 return 'date-picker__table__cell--at-border--left';

@@ -21,6 +21,7 @@ class SpaceRouter extends Singleton implements IRouter {
             .post(
                 this.passport.authenticate(PassportStrategies.JWT, { session: false }),
                 this.imageController.uploadSpaceImagesToStorage,
+                // imageUpload.array('spaceImages', 5),
                 this.spaceController.provideSpace,
                 this.imageController.updateSpaceImagesInDb
             )

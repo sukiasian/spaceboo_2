@@ -1,6 +1,8 @@
-import { IComponentClassNameProps } from '../types/types';
+import { NavLink } from 'react-router-dom';
+import { IComponentClassNameProps, UrlPathnames } from '../types/types';
 
 interface ISpaceProps extends IComponentClassNameProps {
+    spaceId: string;
     mainImageUrl: string;
     price: number;
     roomsNumber: number;
@@ -9,7 +11,7 @@ interface ISpaceProps extends IComponentClassNameProps {
 }
 
 export default function Space(props: ISpaceProps): JSX.Element {
-    const { index, mainImageUrl, price, roomsNumber, city, address } = props;
+    const { spaceId, index, mainImageUrl, price, roomsNumber, city, address } = props;
     const renderPrice = (): JSX.Element => {
         return (
             <div className={`space-card__price space-card--${index}`}>
@@ -19,7 +21,7 @@ export default function Space(props: ISpaceProps): JSX.Element {
     };
 
     return (
-        <div className={`space-card space-card--${index}`}>
+        <NavLink to={`${UrlPathnames.SPACES}/${spaceId}`} className={`space-card space-card--${index}`}>
             <div className={`space-card__content space-card--${index}`}>
                 <img className="space-card__image" src={mainImageUrl || '/no-image.src'} alt="Пространство" />
                 {renderPrice()}
@@ -50,6 +52,6 @@ export default function Space(props: ISpaceProps): JSX.Element {
                     </div>
                 </div>
             </div>
-        </div>
+        </NavLink>
     );
 }

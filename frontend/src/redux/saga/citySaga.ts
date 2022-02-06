@@ -24,6 +24,7 @@ const fetchCitiesBySearchPattern = async (findCitySearchPattern: string): Promis
 };
 function* findCitiesBySearchPatternWorker(action: IAction): Generator<StrictEffect, void, PutEffect> {
     const payload = yield call(fetchCitiesBySearchPattern, action.payload);
+    console.log(payload);
 
     yield put(fetchCitiesAction(payload));
 }

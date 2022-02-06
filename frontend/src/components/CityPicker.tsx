@@ -10,6 +10,7 @@ import { IComponentClassNameProps, TActiveTab } from '../types/types';
 type ICityPickerProps = TActiveTab & IComponentClassNameProps;
 
 export default function CityPicker(props: ICityPickerProps): JSX.Element {
+    const { handleActiveTab, mainDivClassName } = props;
     const [currentCity, setCurrentCity] = useState('Город');
     const [cityPickerBoxIsOpen, setCityPickerBoxIsOpen] = useState(false);
     const { foundBySearchPatternCities } = useSelector((state: IReduxState) => state.cityStorage);
@@ -35,7 +36,7 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
         dispatch(annualizeFoundBySearchPatternCitiesAction());
     };
     const pickCurrentCity = (value: string, cityId: number): (() => void) => {
-        return (): void => {
+        return () => {
             setCityPickerBoxIsOpen(false);
             setCurrentCity(value);
             annualizeFoundBySearchPatternCities();
@@ -44,8 +45,8 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
         };
     };
     const handlePickCity = (cityValue: string, cityId: number): (() => void) => {
-        return (): void => {
-            props.handleActiveTab('city');
+        return () => {
+            handleActiveTab('city');
             pickCurrentCity(cityValue, cityId)();
         };
     };
@@ -89,7 +90,7 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
     useEffect(applyEffectsOnInit, []);
 
     return (
-        <div className={props.mainDivClassName}>
+        <div className={mainDivClassName}>
             <h3 className="heading--tertiary" onClick={toggleCityPickerBox}>
                 {currentCity}
             </h3>

@@ -38,7 +38,7 @@ export class Application extends Singleton {
 
     public configureApp(): void {
         this.app.use(express.json({ limit: '10Kb' })); // NOTE
-        this.app.use(express.static('public'));
+        this.app.use(express.static('assets/images'));
         this.app.use(cookieParser());
         this.app.use(this.passportConfig.initializePassport());
         this.app.use(ApiRoutes.USERS, userRouter);

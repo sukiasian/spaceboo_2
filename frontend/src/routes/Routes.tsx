@@ -14,6 +14,7 @@ import SpacePage from '../pages/SpacePage';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import ProvideSpacePage from '../pages/ProvideSpacePage';
 
+// FIXME много повторяющегося кода
 export default function Routes(): JSX.Element {
     const { userLoginState } = useSelector((state: IReduxState) => state.authStorage);
 
@@ -21,8 +22,9 @@ export default function Routes(): JSX.Element {
         return (
             <ReactRoutes>
                 <Route path="/" element={<ConfirmAccountPage />} />
+                <Route path="/spaces" element={<ConfirmAccountPage />} />
+                <Route path="/spaces/:spaceId" element={<SpacePage />} />
                 <Route path="/provide-space" element={<ProvideSpacePage />} />
-                {/*  NOTE on '/' element (or homepage should be) should be account-verification */}
                 <Route path="/for-inverstors" element={<ForInvestorsPage />} />
                 <Route path="/how-it-works" element={<HowItWorksPage />} />
                 <Route path="/about" element={<AboutUsPage />} />
@@ -31,10 +33,13 @@ export default function Routes(): JSX.Element {
             </ReactRoutes>
         );
     }
+
     if (!userLoginState.loggedIn) {
         return (
             <ReactRoutes>
                 <Route path="/" element={<HomePage />} />
+                <Route path="/spaces" element={<HomePage />} />
+                <Route path="/spaces/:spaceId" element={<SpacePage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/provide-space" element={<ProvideSpacePage />} />
@@ -51,12 +56,9 @@ export default function Routes(): JSX.Element {
     return (
         <ReactRoutes>
             <Route path="/" element={<HomePage />} />
-            {/* некоторые роуты должны быть только для  */}
-            {/* <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} /> */}
-            <Route path="/provide-space" element={<ProvideSpacePage />} />
             <Route path="/spaces" element={<HomePage />} />
             <Route path="/spaces/:spaceId" element={<SpacePage />} />
+            <Route path="/provide-space" element={<ProvideSpacePage />} />
             <Route path="/users/:userId/settings" element={<SettingsPage />} />
             <Route path="/about" element={<AboutUsPage />} />
             <Route path="/contact" element={<ContactUsPage />} />

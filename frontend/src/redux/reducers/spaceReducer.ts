@@ -1,3 +1,4 @@
+import { IQueryData } from '../../components/Filters';
 import { IServerResponse, ReduxSpaceActions } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 
@@ -9,7 +10,7 @@ export interface IProvideSpaceData {
     roomsNumber?: number;
     bedsNumber?: number;
     lockerConnected?: boolean;
-    spaceImages?: FileList;
+    spaceImages?: Array<any>;
     cityId?: number;
     userId?: string;
 }
@@ -20,7 +21,7 @@ export interface IEditSpaceData {
     description?: string;
     roomsNumber?: number;
     bedsNumber?: number;
-    spaceImages?: FileList;
+    spaceImages?: Array<any>;
     cityId?: number;
     userId?: string;
 }
@@ -29,13 +30,15 @@ export interface ISpaceFormData {
     editSpaceData?: IEditSpaceData;
 }
 export interface ISpaceState extends ISpaceFormData {
-    // spaces: Space[];
     isLoaded: boolean;
     spaces: any[];
     fetchSpacesSuccessResponse?: IServerResponse;
     fetchSpacesFailureResponse?: IServerResponse;
+    fetchSpaceByIdSuccessResponse?: IServerResponse;
+    fetchSpaceByIdFailureResponse?: IServerResponse;
     provideSpaceSuccessResponse?: IServerResponse;
     provideSpaceFailureResponse?: IServerResponse;
+    fetchSpacesQueryData?: IQueryData;
 }
 
 export enum SpaceType {
@@ -87,10 +90,28 @@ export const spaceReducer = (state = initialState, action: IAction): ISpaceState
                 fetchSpacesFailureResponse: action.payload,
             };
 
+        case ReduxSpaceActions.SET_FETCH_SPACE_BY_ID_SUCCESS_RESPONSE:
+            return {
+                ...state,
+                fetchSpaceByIdSuccessResponse: action.payload,
+            };
+
+        case ReduxSpaceActions.SET_FETCH_SPACE_BY_ID_FAILURE_RESPONSE:
+            return {
+                ...state,
+                fetchSpaceByIdFailureResponse: action.payload,
+            };
+
         case ReduxSpaceActions.SET_PROVIDE_SPACE_DATA:
             return {
                 ...state,
                 provideSpaceData: action.payload,
+            };
+
+        case ReduxSpaceActions.SET_FETCH_SPACES_QUERY_DATA:
+            return {
+                ...state,
+                fetchSpacesQueryData: action.payload,
             };
 
         default: {

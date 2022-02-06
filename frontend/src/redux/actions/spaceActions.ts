@@ -17,28 +17,41 @@ export const postProvideSpaceAction = (payload: IProvideSpaceData): IAction<Saga
     };
 };
 
-export const fetchSpacesSuccessAction = (payload: IServerResponse): IAction<ReduxSpaceActions, IServerResponse> => {
+export const requestSpaceByIdAction = (payload: string): IAction<SagaTasks, string> => {
+    return {
+        type: SagaTasks.REQUEST_SPACE_BY_ID,
+        payload,
+    };
+};
+
+export const setFetchSpacesSuccessResponseAction = (
+    payload: IServerResponse
+): IAction<ReduxSpaceActions, IServerResponse> => {
     return {
         type: ReduxSpaceActions.SET_FETCH_SPACES_SUCCESS_RESPONSE,
         payload,
     };
 };
 
-export const fetchSpacesFailureAction = (payload: IServerResponse): IAction<ReduxSpaceActions, IServerResponse> => {
+export const setFetchSpacesFailureResponseAction = (
+    payload: IServerResponse
+): IAction<ReduxSpaceActions, IServerResponse> => {
     return {
         type: ReduxSpaceActions.SET_FETCH_SPACES_FAILURE_RESPONSE,
         payload,
     };
 };
 
-export const setProvideSpaceDataAction = (payload: IProvideSpaceData): IAction<ReduxSpaceActions> => {
+export const setProvideSpaceDataAction = (
+    payload: IProvideSpaceData
+): IAction<ReduxSpaceActions, IProvideSpaceData> => {
     return {
         type: ReduxSpaceActions.SET_PROVIDE_SPACE_DATA,
         payload,
     };
 };
 
-export const setEditSpaceDataAction = (payload: IEditSpaceData): IAction<ReduxSpaceActions> => {
+export const setEditSpaceDataAction = (payload: IEditSpaceData): IAction<ReduxSpaceActions, IEditSpaceData> => {
     return {
         type: ReduxSpaceActions.SET_EDIT_SPACE_DATA,
         payload,
@@ -46,7 +59,7 @@ export const setEditSpaceDataAction = (payload: IEditSpaceData): IAction<ReduxSp
 };
 
 export const setProvideSpaceSuccessResponseAction = (
-    payload: IServerResponse
+    payload?: IServerResponse
 ): IAction<ReduxSpaceActions, IServerResponse> => {
     return {
         type: ReduxSpaceActions.SET_POST_PROVIDE_SPACE_SUCCESS_RESPONSE,
@@ -60,5 +73,30 @@ export const setProvideSpaceFailureResponseAction = (
     return {
         type: ReduxSpaceActions.SET_POST_PROVIDE_SPACE_FAILURE_RESPONSE,
         payload,
+    };
+};
+
+export const setFetchSpaceByIdSuccessResponse = (
+    payload: IServerResponse
+): IAction<ReduxSpaceActions, IServerResponse> => {
+    return {
+        type: ReduxSpaceActions.SET_FETCH_SPACE_BY_ID_SUCCESS_RESPONSE,
+        payload,
+    };
+};
+
+export const setFetchSpaceByIdFailureResponse = (
+    payload: IServerResponse
+): IAction<ReduxSpaceActions, IServerResponse> => {
+    return {
+        type: ReduxSpaceActions.SET_FETCH_SPACE_BY_ID_FAILURE_RESPONSE,
+        payload,
+    };
+};
+
+export const setFetchSpacesQueryData = (queryData: IQueryData): IAction<ReduxSpaceActions, IQueryData> => {
+    return {
+        type: ReduxSpaceActions.SET_FETCH_SPACES_QUERY_DATA,
+        payload: queryData,
     };
 };

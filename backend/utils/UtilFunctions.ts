@@ -195,20 +195,16 @@ class UtilFunctions {
     public static removeFile = promisify(fs.rm);
 
     public static findAndRemoveImage = async (userId: string, imageToRemoveFilename: string): Promise<void> => {
-        console.log(888888);
-
         const pathToImageParentDir = path.resolve('assets/images', userId);
         const pathToImage = path.join(pathToImageParentDir, imageToRemoveFilename);
         const checkIfImageParentDivExists = await UtilFunctions.checkIfExists(pathToImageParentDir);
         const checkIfFileExists = await UtilFunctions.checkIfExists(pathToImage);
-        console.log(44444444);
 
         if (!checkIfImageParentDivExists) {
             throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.DIR_NOT_FOUND);
         } else if (!checkIfFileExists) {
             throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.NO_IMAGE_FOUND);
         }
-        console.log(55555555);
 
         await UtilFunctions.removeFile(pathToImage);
     };

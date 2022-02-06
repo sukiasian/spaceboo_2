@@ -131,7 +131,7 @@ export enum ErrorMessages {
     NOT_ENOUGH_RIGHTS = 'Недостаточно прав.',
     VERIFICATION_CODE_NOT_VALID = 'Неверный код.',
     EMAIL_IS_EMPTY = 'Пожалуйста, укажите Вашу эл. почту.',
-    NAME_SHOULD_BE_LITERAL_AND_CYRILLIC_ONLY = "Имя пользователя может состоять только из символов А-Я, а также '-'.",
+    NAME_SHOULD_BE_LITERAL_AND_CYRILLIC_ONLY = "Инициалы пользователя могут состоять только из символов А-Я, а также '-'.",
     USER_ALREADY_CONFIRMED = 'Аккаунт уже подтвержден.',
     USER_NOT_CONFIRMED = 'Подтвердите аккаунт.',
     NOT_AUTHORIZED = 'Авторизуйтесь.',

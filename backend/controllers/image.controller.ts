@@ -40,7 +40,7 @@ export class ImageController extends Singleton {
         return (err) => {
             if (this.errorIsMulterUnexpectedFile(err)) {
                 next(new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.SPACE_IMAGES_AMOUNT_EXCEEDED));
-            } else {
+            } else if (err! instanceof multer.MulterError) {
                 next(err);
             }
 
@@ -107,31 +107,14 @@ export class ImageController extends Singleton {
     });
 
     public updateSpaceImagesInDb = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
-        let attempts = 5;
+        const { spaceId } = res.locals;
+        const { id: userId } = req.user;
+        const uploadedFiles = req.files as Express.Multer.File[];
+        const spaceImagesUrls = uploadedFiles.map((file: Express.Multer.File) => {
+            return `${userId}/${file.filename}`;
+        }) as string[];
 
-        const updateSpaceImagesDespiteErrors = async (): Promise<void> => {
-            if (attempts > 0) {
-                try {
-                    const { spaceId } = res.locals;
-                    const uploadedFiles = req.files as Express.Multer.File[];
-                    const uploadedFilesNames = uploadedFiles.map((file: Express.Multer.File) => {
-                        return file.filename;
-                    }) as string[];
-
-                    await this.spaceDao.updateSpaceImagesInDb(spaceId, uploadedFilesNames);
-                } catch {
-                    updateSpaceImagesDespiteErrors();
-                }
-            }
-        };
-
-        while (attempts > 0) {
-            updateSpaceImagesDespiteErrors();
-
-            attempts--;
-
-            // TODO if still cant upload to database then delete the space but we need to do it smoothly - letting the user to know about it
-        }
+        await this.spaceDao.updateSpaceImagesInDb(spaceId, spaceImagesUrls);
     });
 
     public removeSpaceImagesFromStorage = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {

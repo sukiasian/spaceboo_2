@@ -76,7 +76,7 @@ export const userEditFields: Partial<keyof IUserAttributes>[] = [
 export const userRoleField: Partial<keyof IUserAttributes>[] = ['role'];
 export const userConfirmedField: Partial<keyof IUserAttributes>[] = ['confirmed'];
 
-const isCyrillicLiteralsOnly = (value: string) => {
+const isCyrillicLiteralsOnly = (value: string): void => {
     const symbols = value.match(/[^а-я^-]/gi);
 
     if (symbols) {

@@ -33,13 +33,25 @@ class HttpRequest implements IHttpRequest {
         };
     }
 
-    async post(urlPath: string = '', body: any, headers?: HeadersInit | undefined): Promise<IServerResponse> {
+    async post(urlPath = '', body: any, headers?: HeadersInit): Promise<IServerResponse> {
         // FIXME this wont work if the content type is not application/json (but why ? if body is stringified)
 
         const res = await fetch(this.prepareUrlWithPath(urlPath), {
             method: HttpMethod.POST,
             body: JSON.stringify(body),
             headers: { ...this.headers, ...headers },
+        });
+
+        return {
+            statusCode: res.status,
+            ...(await res.json()),
+        };
+    }
+
+    async postMultipartFormData(urlPath = '', body: FormData): Promise<IServerResponse> {
+        const res = await fetch(this.prepareUrlWithPath(urlPath), {
+            method: HttpMethod.POST,
+            body,
         });
 
         return {
@@ -73,5 +85,5 @@ class HttpRequest implements IHttpRequest {
 }
 
 // FIXME probably it should be process.env.something + don't forget about using proxy
-export const httpRequester = new HttpRequest('api/v1/');
+export const httpRequester = new HttpRequest('/api/v1/');
 // NOTE can we go with static methods ?

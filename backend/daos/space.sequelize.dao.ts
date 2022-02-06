@@ -43,19 +43,11 @@ export class SpaceSequelizeDao extends Dao {
         try {
             return await this.model.create(data);
         } catch (err) {
-            console.log('123123123');
-            console.log(files);
-
             await Promise.all(
                 files.map(async (file) => {
                     await this.utilFunctions.findAndRemoveImage(data.userId, file.filename);
                 })
             );
-            console.log(999999999);
-
-            // NOTE не  сработает ли дважды ? почему не сработает в next? если выкинется ошибка один раз в try (от метода .create),
-            // то зачем выкидывать еще одну ошибку здесь? может быть для того чтобы дополнить инструкции? А если internal имеет выше приоритет,
-            // то почему должен сработать external? возможно потому  что мы бросаем error.
 
             throw err;
         }
@@ -108,23 +100,6 @@ export class SpaceSequelizeDao extends Dao {
         const order = sortBy
             ? this.defineSortOrder(sortBy)
             : `"${SpaceSortFields.DATE_OF_CREATION}" ${QuerySortDirection.DESC}`;
-
-        // let spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
-
-        // // NOTE horrible architecture
-        // if (datesToReserveQuery && !cityId) {
-        //     spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" WHERE NOT EXISTS
-        //         (SELECT 1 FROM "Appointments" a WHERE a."spaceId" = s."id"
-        //         AND a."isoDatesReserved" && '${isoDatesRange}') ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
-        // }
-        // if (cityId && !datesToReserveQuery) {
-        //     spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" AND c."cityId" = ${cityId} ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
-        // }
-        // if (datesToReserveQuery && cityId) {
-        //     spacesRawQuery = `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" AND c."cityId" = ${cityId} WHERE NOT EXISTS
-        //         (SELECT 1 FROM "Appointments" a WHERE a."spaceId" = s."id"
-        //         AND a."isoDatesReserved" && '${isoDatesRange}') ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
-        // }
         const queryFromParts = this.spacesQueryGeneratorByParts(
             order,
             limit,
@@ -158,7 +133,6 @@ export class SpaceSequelizeDao extends Dao {
     };
 
     public removeSpaceImagesFromDb = async (spaceId: string, spaceImagesToDelete: string[]) => {
-        // FIXME better add a custom postgres function
         let rawRemoveQueries = '';
 
         spaceImagesToDelete.forEach((spaceImageToDelete: string) => {

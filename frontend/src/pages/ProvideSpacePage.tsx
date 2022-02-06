@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import Alert from '../components/Alert';
 import SpaceInputFieldsForCreateAndEdit from '../components/SpaceInputFieldsForCreateAndEdit';
 import { requestUserLoginState } from '../redux/actions/authActions';
-import { postUploadSpaceImagesAction } from '../redux/actions/imageActions';
-import { postProvideSpaceAction } from '../redux/actions/spaceActions';
+import { postProvideSpaceAction, setProvideSpaceSuccessResponseAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { SagaTasks } from '../types/types';
+import { AlertTypes } from '../types/types';
 import { handleSubmit, updateDocumentTitle } from '../utils/utilFunctions';
 
 export default function ProvideSpacePage(): JSX.Element {
@@ -19,9 +19,15 @@ export default function ProvideSpacePage(): JSX.Element {
     const handleDocumentTitleOnInit = (): void => {
         updateDocumentTitle('Spaceboo | Предоставить пространство');
     };
-    const applyEffectsOnInit = (): void => {
+    const applyEffectsOnInit = (): (() => void) => {
         handleDocumentTitleOnInit();
         dispatch(requestUserLoginState());
+
+        return () => {
+            // annualize responses
+            // NOTE можно ли использовать reduxAction(undefined as Payload) вместо annualizeReduxAction() ? т.е. просто передать undefined.
+            dispatch(setProvideSpaceSuccessResponseAction());
+        };
     };
     const redirectByLoginStateCondition = (): void => {
         if (userLoginState.isLoaded) {
@@ -32,20 +38,19 @@ export default function ProvideSpacePage(): JSX.Element {
             }
         }
     };
+    const redirectToMySpacesAfterProvideSpace = (): void => {
+        if (provideSpaceSuccessResponse) {
+            dispatch(setProvideSpaceSuccessResponseAction());
+        }
+
+        // TODO не использовать захардкоженные
+
+        if (provideSpaceSuccessResponse) {
+            navigate('/spaces');
+        }
+    };
     const handleSubmitButton = (): void => {
         dispatch(postProvideSpaceAction(provideSpaceData!));
-    };
-    const uploadPhotosAfterSpaceIsCreated = (): void => {
-        if (provideSpaceSuccessResponse) {
-            dispatch(
-                postUploadSpaceImagesAction({
-                    spaceId: provideSpaceSuccessResponse.data.id,
-                    images: provideSpaceData!.spaceImages!,
-                })
-            );
-        } else if (provideSpaceFailureResponse) {
-            // dispatch remove space
-        }
     };
     const renderProvideForm = (): JSX.Element => {
         return (
@@ -59,10 +64,18 @@ export default function ProvideSpacePage(): JSX.Element {
             </form>
         );
     };
+    const renderAlertOnSubmitError = (): JSX.Element | void => {
+        if (provideSpaceFailureResponse) {
+            return (
+                <Alert alertType={AlertTypes.FAILURE} alertMessage={provideSpaceFailureResponse.message as string} />
+            );
+        }
+    };
 
     useEffect(applyEffectsOnInit, [dispatch]);
     useEffect(redirectByLoginStateCondition, [userLoginState, navigate]);
-    useEffect(uploadPhotosAfterSpaceIsCreated, [provideSpaceSuccessResponse]);
+    // перенаправить на страницу мои пространства при успешном ответе
+    useEffect(redirectToMySpacesAfterProvideSpace, [provideSpaceSuccessResponse, navigate]);
 
     return (
         <section className="provide-space-section">
@@ -70,7 +83,7 @@ export default function ProvideSpacePage(): JSX.Element {
                 <h2 className="heading heading--secondary heading--provide-space__title">Предоставить пространство</h2>
             </div>
             <div className="provide-space__form-container">{renderProvideForm()}</div>
-            <div onClick={() => dispatch({ type: SagaTasks.POST_UPLOAD_SPACE_IMAGES })}> click here </div>
+            {renderAlertOnSubmitError()}
         </section>
     );
 }
