@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setFetchSpacesQueryData } from '../redux/actions/spaceActions';
+import { setFetchSpacesQueryDataAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { formatSingleDigitUnitToTwoDigitString } from '../utils/utilFunctions';
 import DatePicker from './DatePicker';
@@ -65,7 +65,7 @@ export default function QueryDatePicker(props: IQueryDatePicker): JSX.Element {
             newDatesForRender.endingDate = generateRenderDateString(datePickerDate.year, datePickerDate.month, day + 1);
         }
 
-        dispatch(setFetchSpacesQueryData(newQueryData));
+        dispatch(setFetchSpacesQueryDataAction(newQueryData));
         setDatesForRender({
             beginningDate: newDatesForRender.beginningDate,
             endingDate: newDatesForRender.endingDate,

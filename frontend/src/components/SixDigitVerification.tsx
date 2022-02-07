@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { requestUserLoginState } from '../redux/actions/authActions';
+import { requestUserLoginStateAction } from '../redux/actions/authActions';
 import { postCheckVerificationCodeAction } from '../redux/actions/emailVerificationActions';
 import { IPostCheckVerificationEmailCodePayload } from '../redux/reducers/emailVerificationReducer';
 import { IReduxState } from '../redux/reducers/rootReducer';
@@ -31,7 +31,7 @@ export default function SixDigitVerification(): JSX.Element {
     const dispatch = useDispatch();
     const updateUserInformationAfterCheckingCode = () => {
         if (checkVerificationCodeResponse && checkVerificationCodeResponse.statusCode === HttpStatus.OK) {
-            dispatch(requestUserLoginState());
+            dispatch(requestUserLoginStateAction());
         }
     };
     const focusOnFirstInput = (): void => {

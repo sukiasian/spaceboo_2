@@ -1,6 +1,6 @@
 import * as express from 'express';
 import * as jwt from 'jsonwebtoken';
-import { User } from '../models/user.model';
+import { User, UserScopes } from '../models/user.model';
 import { ErrorMessages, HttpStatus } from '../types/enums';
 import AppError from './AppError';
 import UtilFunctions from './UtilFunctions';
@@ -18,10 +18,9 @@ export class Middleware {
             if (token) {
                 const payload = jwt.decode(token) as jwt.JwtPayload;
 
-                user = await this.userModel.findOne({ where: { id: payload.id as string } });
+                user = await this.userModel.scope(UserScopes.PUBLIC).findOne({ where: { id: payload.id as string } });
             } else {
                 email = req.body.email;
-
                 user = await this.userModel.findOne({
                     where: {
                         email,

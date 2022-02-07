@@ -1,4 +1,3 @@
-import * as path from 'path';
 import { Dao } from '../configurations/dao.config';
 import { ISpaceCreate, Space, ISpaceEdit, spaceEditFields } from '../models/space.model';
 import { QuerySortDirection } from '../types/enums';
@@ -151,10 +150,10 @@ export class SpaceSequelizeDao extends Dao {
                 return `"${SpaceSortFields.PRICE}" ${QuerySortDirection.DESC}`;
 
             case SpaceQuerySortFields.NEWEST:
-                return `"${SpaceSortFields.DATE_OF_CREATION}" ${QuerySortDirection.ASC}`;
+                return `"${SpaceSortFields.DATE_OF_CREATION}" ${QuerySortDirection.DESC}`;
 
             case SpaceQuerySortFields.OLDEST:
-                return `"${SpaceSortFields.DATE_OF_CREATION}" ${QuerySortDirection.DESC}`;
+                return `"${SpaceSortFields.DATE_OF_CREATION}" ${QuerySortDirection.ASC}`;
         }
     };
 
@@ -178,7 +177,7 @@ export class SpaceSequelizeDao extends Dao {
         const priceRangeToPartialQuery =
             priceRange && priceRange.to !== undefined ? `AND s."pricePerNight" <= ${priceRange.to}` : '';
 
-        return `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", city, city_type, timezone, region, region_type, supports_locker FROM "Cities") c ON s."cityId" = c."cityId" ${cityPartialQuery} ${datesToReservePartialQuery} ${priceRangeFromPartialQuery} ${priceRangeToPartialQuery} ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
+        return `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", "regionId", name FROM "Cities") c ON s."cityId" = c."cityId" ${cityPartialQuery} ${datesToReservePartialQuery} ${priceRangeFromPartialQuery} ${priceRangeToPartialQuery} ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
     };
 }
 

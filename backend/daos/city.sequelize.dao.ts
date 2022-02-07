@@ -5,6 +5,8 @@ import { applicationInstance } from '../App';
 import { Dao } from '../configurations/dao.config';
 import { IFindCitiesQuery } from '../controllers/city.controller';
 import { City } from '../models/city.model';
+import { District } from '../models/district.model';
+import { Region } from '../models/region.model';
 import { SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
 
@@ -29,11 +31,13 @@ export class CitySequelizeDao extends Dao {
 
         if (searchPattern) {
             sequelizeQuery.where = {
-                address: {
+                name: {
                     [Op.iLike]: searchPattern,
                 },
             };
         }
+
+        sequelizeQuery.include = [Region];
 
         return this.model.findAll(sequelizeQuery);
     };

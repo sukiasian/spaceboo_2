@@ -76,7 +76,7 @@ export const setProvideSpaceFailureResponseAction = (
     };
 };
 
-export const setFetchSpaceByIdSuccessResponse = (
+export const setFetchSpaceByIdSuccessResponseAction = (
     payload: IServerResponse
 ): IAction<ReduxSpaceActions, IServerResponse> => {
     return {
@@ -85,7 +85,7 @@ export const setFetchSpaceByIdSuccessResponse = (
     };
 };
 
-export const setFetchSpaceByIdFailureResponse = (
+export const setFetchSpaceByIdFailureResponseAction = (
     payload: IServerResponse
 ): IAction<ReduxSpaceActions, IServerResponse> => {
     return {
@@ -94,7 +94,7 @@ export const setFetchSpaceByIdFailureResponse = (
     };
 };
 
-export const setFetchSpacesQueryData = (queryData: IQueryData): IAction<ReduxSpaceActions, IQueryData> => {
+export const setFetchSpacesQueryDataAction = (queryData: IQueryData): IAction<ReduxSpaceActions, IQueryData> => {
     return {
         type: ReduxSpaceActions.SET_FETCH_SPACES_QUERY_DATA,
         payload: queryData,

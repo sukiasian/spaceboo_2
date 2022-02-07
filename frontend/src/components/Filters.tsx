@@ -4,7 +4,7 @@ import { faCalendar, faTimes } from '@fortawesome/free-solid-svg-icons';
 import InputWithLabel, { IInputWithLableProps, InputTypes } from './InputWithLabel';
 import { useDispatch, useSelector } from 'react-redux';
 import QueryDatePicker from './QueryDatePicker';
-import { setFetchSpacesQueryData } from '../redux/actions/spaceActions';
+import { setFetchSpacesQueryDataAction } from '../redux/actions/spaceActions';
 import { valueIsNumeric } from '../utils/utilFunctions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 
@@ -51,16 +51,11 @@ enum PriceRangeQueryDataReferences {
 }
 
 export default function Filters(): JSX.Element {
-    // const [queryData, setQueryData] = useState<IQueryData>({
-    //     sortBy: SpaceQuerySortFields.NEWEST,
-    //     cityId: localStorage.getItem('currentCityId') || '',
-    // });
-
     const [datesForRender, setDatesForRender] = useState<IDatesRange>();
     const [sortByDropDownBoxIsOpen, setSortByDropDownBoxIsOpen] = useState(false);
     const [priceRangeDropDownBoxIsOpen, setPriceRangeDropDownBoxIsOpen] = useState(false);
     const [requiredReservationDatesPickerIsOpen, setRequiredReservationDatesPickerIsOpen] = useState(false);
-    const [sortByDropDownOptions, setSortByDropDownOptions] = useState<ISortByDropDownOptions[]>([
+    const sortByDropDownOptions: ISortByDropDownOptions[] = [
         {
             field: SpaceQuerySortFields.PRICEDOWN,
             text: 'Цена по убыванию',
@@ -77,7 +72,7 @@ export default function Filters(): JSX.Element {
             field: SpaceQuerySortFields.NEWEST,
             text: 'Сначала новые',
         },
-    ]);
+    ];
     const { fetchSpacesQueryData } = useSelector((state: IReduxState) => state.spaceStorage);
     const annualizeDatesIconRef = useRef<HTMLSpanElement>(null);
     const priceRangeInputs: IPriceRangeInput[] = [
@@ -122,7 +117,7 @@ export default function Filters(): JSX.Element {
 
         newQueryData.sortBy = sortByOption;
 
-        dispatch(setFetchSpacesQueryData(newQueryData));
+        dispatch(setFetchSpacesQueryDataAction(newQueryData));
     };
     const updateQueryDataPriceRange: ChangeEventHandler<HTMLInputElement> = (e) => {
         const newQueryData: any = { ...fetchSpacesQueryData };
@@ -138,7 +133,7 @@ export default function Filters(): JSX.Element {
                 return;
             }
 
-            dispatch(setFetchSpacesQueryData(newQueryData));
+            dispatch(setFetchSpacesQueryDataAction(newQueryData));
         }
     };
     const calculateNumberOfDaysRequired = (): number => {
@@ -171,7 +166,7 @@ export default function Filters(): JSX.Element {
         newQueryData.beginningDate = '';
         newQueryData.endingDate = '';
 
-        dispatch(setFetchSpacesQueryData(newQueryData));
+        dispatch(setFetchSpacesQueryDataAction(newQueryData));
         setDatesForRender(undefined);
     };
     const renderSortByFilterDropDown = (): JSX.Element | void => {

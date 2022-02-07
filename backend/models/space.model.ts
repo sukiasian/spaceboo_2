@@ -109,5 +109,5 @@ export class Space extends Model<ISpaceAttributes, ISpaceCreationAttributes> imp
     public facilities?: string[];
 
     @HasMany(() => Appointment)
-    public appointments: Appointment[];
+    public appointments?: Appointment[];
 }

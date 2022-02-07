@@ -14,6 +14,15 @@ class UserRouter extends Singleton implements IRouter {
         this.router
             .route('/')
             .put(this.passport.authenticate(PassportStrategies.JWT, { session: false }), this.userController.editUser);
+
+        this.router
+            .route('/current')
+            .get(
+                this.passport.authenticate(PassportStrategies.JWT, { session: false }),
+                this.userController.getCurrentUser
+            );
+
+        this.router.route('/:userId').get(this.userController.getUserById);
     };
 }
 

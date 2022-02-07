@@ -2,7 +2,8 @@ import * as express from 'express';
 import * as path from 'path';
 import { userSequelizeDao, UserSequelizeDao } from '../daos/user.sequelize.dao';
 import { User } from '../models/user.model';
-import { HttpStatus, ResponseMessages } from '../types/enums';
+import { ErrorMessages, HttpStatus, ResponseMessages } from '../types/enums';
+import AppError from '../utils/AppError';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
 
@@ -19,6 +20,24 @@ class UserController extends Singleton {
         await this.dao.editUser(userId, userEditData);
 
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.DATA_UPDATED);
+    });
+
+    public getCurrentUser = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        const user = await this.dao.getCurrentUserById(req.user.id);
+
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, user);
+    });
+
+    public getUserById = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        const user: User = await this.dao.getUserById(req.params.userId);
+
+        // TODO use insensitive fields for getting user
+
+        if (!user) {
+            throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+        }
+
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, user);
     });
 }
 

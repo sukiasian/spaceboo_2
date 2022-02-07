@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Filters, { IQueryData } from '../components/Filters';
 import Slider from '../components/Slider';
 import Space from '../components/Space';
-import { requestSpacesAction, setFetchSpacesQueryData } from '../redux/actions/spaceActions';
+import { requestSpacesAction, setFetchSpacesQueryDataAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { updateDocumentTitle } from '../utils/utilFunctions';
 
@@ -14,7 +14,6 @@ export function HomePage() {
         (state: IReduxState) => state.spaceStorage
     );
     const sliderIntervalRef = useRef<NodeJS.Timeout>();
-    // NOTE может стоит держать здесь queryData?
     const dispatch = useDispatch();
     const handleDocumentTitle = () => {
         let documentTitle: string;
@@ -29,7 +28,7 @@ export function HomePage() {
 
         newFetchSpacesQueryData.cityId = localStorage.getItem('currentCityId') || '';
 
-        dispatch(setFetchSpacesQueryData(newFetchSpacesQueryData));
+        dispatch(setFetchSpacesQueryDataAction(newFetchSpacesQueryData));
     };
     const applyEffectsOnInit = (): (() => void) => {
         updateFetchSpacesQueryDataCityIdOnInit();
@@ -54,7 +53,7 @@ export function HomePage() {
                         mainImageUrl={space.imagesUrl[0]}
                         price={space.pricePerNight}
                         roomsNumber={space.roomsNumber}
-                        city={space.city.city || space.city.address}
+                        city={space.city}
                         address={space.address}
                         key={i}
                     />

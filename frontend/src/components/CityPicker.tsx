@@ -4,6 +4,7 @@ import {
     annualizeFoundBySearchPatternCitiesAction,
     requestCitiesBySearchPatternAction,
 } from '../redux/actions/cityActions';
+import { requestSpacesAction, setFetchSpacesQueryDataAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { IComponentClassNameProps, TActiveTab } from '../types/types';
 
@@ -14,7 +15,7 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
     const [currentCity, setCurrentCity] = useState('Город');
     const [cityPickerBoxIsOpen, setCityPickerBoxIsOpen] = useState(false);
     const { foundBySearchPatternCities } = useSelector((state: IReduxState) => state.cityStorage);
-
+    const { fetchSpacesQueryData } = useSelector((state: IReduxState) => state.spaceStorage);
     const dispatch = useDispatch();
     const getCurrentCityFromLocalStorage = (): void => {
         const currentCity = localStorage.getItem('currentCity');
@@ -35,22 +36,23 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
     const annualizeFoundBySearchPatternCities = (): void => {
         dispatch(annualizeFoundBySearchPatternCitiesAction());
     };
-    const pickCurrentCity = (value: string, cityId: number): (() => void) => {
-        return () => {
-            setCityPickerBoxIsOpen(false);
-            setCurrentCity(value);
-            annualizeFoundBySearchPatternCities();
-            localStorage.setItem('currentCity', value);
-            localStorage.setItem('currentCityId', cityId.toString());
-        };
+    const pickCurrentCity = (city: any): void => {
+        setCityPickerBoxIsOpen(false);
+        setCurrentCity(city.name);
+        annualizeFoundBySearchPatternCities();
+        localStorage.setItem('currentCity', city.name);
+        // NOTE maybe pas an object to currentCity instead of the line below? guess we can only store strings
+        localStorage.setItem('currentCityId', city.id.toString());
+        // FIXME NOTE
+
+        dispatch(requestSpacesAction({ cityId: city.id }));
     };
-    const handlePickCity = (cityValue: string, cityId: number): (() => void) => {
+    const handlePickCity = (city: any): (() => void) => {
         return () => {
             handleActiveTab('city');
-            pickCurrentCity(cityValue, cityId)();
+            pickCurrentCity(city);
         };
     };
-
     const renderFindCityResults = (): JSX.Element => {
         return (
             <>
@@ -59,9 +61,9 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
                           <p
                               className={`city-picker__search-results city-picker__search-results--${i}`}
                               key={i}
-                              onClick={handlePickCity(city.city || city.address, city.id)}
+                              onClick={handlePickCity(city)}
                           >
-                              {city.address}
+                              {city.name}
                           </p>
                       ))
                     : null}

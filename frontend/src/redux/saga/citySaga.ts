@@ -8,7 +8,7 @@ const fetchCities = async (): Promise<object> => {
     return (await httpRequester.get(ApiUrls.CITIES)).data;
 };
 
-function* citiesWorker(action: IAction): Generator<StrictEffect, void, PutEffect> {
+function* citiesWorker(): Generator<StrictEffect, void, PutEffect> {
     const payload = yield call(fetchCities);
 
     yield put({ type: ReduxCitiesActions.FETCH_CITIES, payload });
@@ -24,7 +24,7 @@ const fetchCitiesBySearchPattern = async (findCitySearchPattern: string): Promis
 };
 function* findCitiesBySearchPatternWorker(action: IAction): Generator<StrictEffect, void, PutEffect> {
     const payload = yield call(fetchCitiesBySearchPattern, action.payload);
-    console.log(payload);
+    // TODO use success failure response instead of direct payload
 
     yield put(fetchCitiesAction(payload));
 }

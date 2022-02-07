@@ -9,8 +9,8 @@ import {
     setFetchSpacesFailureResponseAction,
     setProvideSpaceFailureResponseAction,
     setProvideSpaceSuccessResponseAction,
-    setFetchSpaceByIdSuccessResponse,
-    setFetchSpaceByIdFailureResponse,
+    setFetchSpaceByIdSuccessResponseAction,
+    setFetchSpaceByIdFailureResponseAction,
 } from '../actions/spaceActions';
 import { IProvideSpaceData } from '../reducers/spaceReducer';
 
@@ -116,12 +116,12 @@ function* requestSpaceByIdWorker(action: IAction): Generator<CallEffect<any> | P
         const response = yield call(requestSpaceById, action.payload);
 
         if ((response as IServerResponse).statusCode >= 200 && (response as IServerResponse).statusCode < 300) {
-            yield put(setFetchSpaceByIdSuccessResponse(response as IServerResponse));
+            yield put(setFetchSpaceByIdSuccessResponseAction(response as IServerResponse));
         } else {
             throw response;
         }
     } catch (err) {
-        yield put(setFetchSpaceByIdFailureResponse(err as IServerResponse));
+        yield put(setFetchSpaceByIdFailureResponseAction(err as IServerResponse));
     }
 }
 export function* watchRequestSpaceById(): Generator<ForkEffect, void, void> {

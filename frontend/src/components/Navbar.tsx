@@ -1,22 +1,24 @@
-import { ReactElement, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
 import LoginModal from '../modals/LoginModal';
 import SignupModal from '../modals/SignupModal';
-import { annualizeLogoutResponse, requestUserLoginState, requestUserLogoutAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { AlertTypes, HttpStatus, UrlPathnames } from '../types/types';
+import { AlertTypes, UrlPathnames } from '../types/types';
 import Alert from './Alert';
 import AltButton from './AltButton';
 import CityPicker from './CityPicker';
+import UserDropdownMenu from './UserDropdownMenu';
 
-export default function Navbar(): ReactElement {
+export default function Navbar(): JSX.Element {
     const [activeTab, setActiveTab] = useState<string>();
+    const [userDropdownMenuIsOpen, setUserDropdownMenuIsOpen] = useState(false);
     const { userLoginState, logoutResponse } = useSelector((state: IReduxState) => state.authStorage);
-    const dispatch = useDispatch();
+    const { fetchCurrentUserSuccessResponse } = useSelector((state: IReduxState) => state.userStorage);
+    const userData = fetchCurrentUserSuccessResponse?.data;
     const location = useLocation();
-    const navigateProvideSpace = (): UrlPathnames => {
+    const getLinkForProvideSpaceButton = (): UrlPathnames => {
         if (userLoginState.loggedIn && !userLoginState.confirmed) {
             return UrlPathnames.HOME;
         }
@@ -29,37 +31,121 @@ export default function Navbar(): ReactElement {
         }
         return '';
     };
-    const refreshUserLoggedInAfterLogout = (): void => {
-        if (logoutResponse && logoutResponse.statusCode === HttpStatus.OK) {
-            dispatch(requestUserLoginState());
-            dispatch(annualizeLogoutResponse());
-        }
-    };
-    const handleLogout = (): void => {
-        dispatch(requestUserLogoutAction());
-    };
     const handleActiveTab = (tab: string): (() => void) => {
         return (): void => {
             setActiveTab(tab);
         };
     };
+    const handleToggleUserDropdownMenu = (): void => {
+        setUserDropdownMenuIsOpen(!userDropdownMenuIsOpen);
+    };
+    // TODO: решить где это будет - всплывающее уведомление как отдельный тип.
     const renderLogoutError = (): JSX.Element | void => {
         if (logoutResponse && logoutResponse.error) {
             return <Alert alertType={AlertTypes.FAILURE} alertMessage={logoutResponse.error.message} />;
         }
     };
-    const renderAuthOrUser = (): JSX.Element => {
-        if (userLoginState.loggedIn) {
+    const renderUserInitialsOrUserAvatar = (): JSX.Element | void => {
+        if (userData?.avatarUrl) {
             return (
-                <div className="navbar__user navbar-elem--4">
-                    <img className="navbar__user-avatar" src="" alt="" />
-                    <div onClick={handleLogout}> logout </div>
-                    {renderLogoutError()}
+                <div className="user-image user-image-or-initials">
+                    <img src={userData.avatarUrl} alt="Пользователь" />
                 </div>
             );
         }
 
-        if (location.pathname === UrlPathnames.LOGIN || location.pathname === UrlPathnames.SIGNUP) {
+        // NOTE: нам не нужно будет делать toLocalUpperCase() так как это должно будет делаться sequelize-ом
+        return (
+            <div className="user-no-image user-image-or-initials">
+                <div className="user-initials">
+                    <p className="user-initials__last-name">
+                        {userData?.name?.[0]}
+                        {userData?.surname?.[0] as string}
+                    </p>
+                </div>
+            </div>
+        );
+    };
+    // const renderAuthOrUserIcon = (): JSX.Element | void => {
+    //     if (userLoginState.loggedIn) {
+    //         return (
+    //             <div className="navbar__user navbar-elem--4" onClick={handleToggleUserDropdownMenu}>
+    //                 {renderUserInitialsOrUserAvatar()}
+    //                 {renderUserdropDownMenu()}
+    //             </div>
+    //         );
+    //     }
+
+    //     if (location.pathname === UrlPathnames.LOGIN || location.pathname === UrlPathnames.SIGNUP) {
+    //         return (
+    //             <>
+    //                 <NavLink to={UrlPathnames.LOGIN}>
+    //                     <div
+    //                         className={`heading heading--tertiary ${defineActiveClassName('login')}`}
+    //                         onClick={handleActiveTab('login')}
+    //                     >
+    //                         Войти
+    //                     </div>
+    //                 </NavLink>
+    //                 <div className="navbar__separator navbar-elem--5">
+    //                     <h3 className="heading heading--tertiary"> | </h3>
+    //                 </div>
+    //                 <NavLink to={UrlPathnames.SIGNUP}>
+    //                     <div
+    //                         className={`heading heading--tertiary ${defineActiveClassName('signup')}`}
+    //                         onClick={handleActiveTab('signup')}
+    //                     >
+    //                         Зарегистрируйтесь
+    //                     </div>
+    //                 </NavLink>
+    //             </>
+    //         );
+    //     }
+
+    //     return (
+    //         <>
+    //             <LoginModal
+    //                 mainDivClassName="navbar__login navbar-elem--4"
+    //                 defineActiveClassName={defineActiveClassName}
+    //                 handleActiveTab={handleActiveTab}
+    //             />
+    //             <div className="navbar__separator navbar-elem--5">
+    //                 <h3 className="heading heading--tertiary"> | </h3>
+    //             </div>
+    //             <SignupModal
+    //                 mainDivClassName="navbar__signup navbar-elem--6"
+    //                 defineActiveClassName={defineActiveClassName}
+    //                 handleActiveTab={handleActiveTab}
+    //             />
+    //         </>
+    //     );
+    // };
+    const renderAuthTabsOpeningModals = (): JSX.Element | void => {
+        if (!userLoginState.loggedIn) {
+            return (
+                <>
+                    <LoginModal
+                        mainDivClassName="navbar__login navbar-elem--4"
+                        defineActiveClassName={defineActiveClassName}
+                        handleActiveTab={handleActiveTab}
+                    />
+                    <div className="navbar__separator navbar-elem--5">
+                        <h3 className="heading heading--tertiary"> | </h3>
+                    </div>
+                    <SignupModal
+                        mainDivClassName="navbar__signup navbar-elem--6"
+                        defineActiveClassName={defineActiveClassName}
+                        handleActiveTab={handleActiveTab}
+                    />
+                </>
+            );
+        }
+    };
+    const renderAuthTabsLeadingToPages = (): JSX.Element | void => {
+        if (
+            (location.pathname === UrlPathnames.LOGIN || location.pathname === UrlPathnames.SIGNUP) &&
+            !userLoginState.loggedIn
+        ) {
             return (
                 <>
                     <NavLink to={UrlPathnames.LOGIN}>
@@ -84,27 +170,35 @@ export default function Navbar(): ReactElement {
                 </>
             );
         }
-
-        return (
-            <>
-                <LoginModal
-                    mainDivClassName="navbar__login navbar-elem--4"
-                    defineActiveClassName={defineActiveClassName}
-                    handleActiveTab={handleActiveTab}
-                />
-                <div className="navbar__separator navbar-elem--5">
-                    <h3 className="heading heading--tertiary"> | </h3>
-                </div>
-                <SignupModal
-                    mainDivClassName="navbar__signup navbar-elem--6"
-                    defineActiveClassName={defineActiveClassName}
-                    handleActiveTab={handleActiveTab}
-                />
-            </>
-        );
     };
-
-    useEffect(refreshUserLoggedInAfterLogout, [logoutResponse, dispatch]);
+    const renderUserAvatarOrUserInitals = (): JSX.Element | void => {
+        if (userLoginState.loggedIn) {
+            return (
+                <div className="navbar__user navbar-elem--4" onClick={handleToggleUserDropdownMenu}>
+                    {userData?.avatarUrl ? (
+                        <div className="user-image user-image-or-initials">
+                            <img src={userData.avatarUrl} alt="Пользователь" />
+                        </div>
+                    ) : (
+                        <div className="user-no-image user-image-or-initials">
+                            <div className="user-initials">
+                                <p className="user-initials__last-name">
+                                    {userData?.name?.[0]}
+                                    {userData?.surname?.[0] as string}
+                                </p>
+                            </div>
+                        </div>
+                    )}
+                    {renderUserdropDownMenu()}
+                </div>
+            );
+        }
+    };
+    const renderUserdropDownMenu = (): JSX.Element | void => {
+        if (userDropdownMenuIsOpen) {
+            return <UserDropdownMenu />;
+        }
+    };
 
     return (
         <nav className="navbar">
@@ -129,12 +223,13 @@ export default function Navbar(): ReactElement {
                 </NavLink>
             </div>
             <div className="navbar__create-space navbar-elem--3">
-                <NavLink to={navigateProvideSpace()}>
+                <NavLink to={getLinkForProvideSpaceButton()}>
                     <AltButton mainDivClassName="primary" buttonText="Предоставить пространство" />
                 </NavLink>
             </div>
-
-            {renderAuthOrUser()}
+            {renderAuthTabsOpeningModals()}
+            {renderAuthTabsLeadingToPages()}
+            {renderUserAvatarOrUserInitals()}
         </nav>
     );
 }

@@ -4,6 +4,7 @@ import { watchCities, watchFindCitiesBySearchPattern, watchFindMajorCities } fro
 import { watchAuth, watchLogoutUser, watchPostLogin, watchPostSignup } from './authSaga';
 import { watchCheckVerificationCode, watchSendVerificationCode } from './emailVerificationSaga';
 import { watchPostUploadSpaceImages } from './imageSaga';
+import { watchRequestCurrentUser } from './userSaga';
 
 export function* rootSaga() {
     // NOTE probably will need to fork all these if we do this on the page loading
@@ -20,6 +21,7 @@ export function* rootSaga() {
         watchFindMajorCities(),
         watchPostProvideSpace(),
         watchRequestSpaceById(),
+        watchRequestCurrentUser(),
         watchPostUploadSpaceImages(),
     ]);
 }

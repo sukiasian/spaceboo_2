@@ -17,6 +17,8 @@ import { passportConfig, PassportConfig } from './configurations/passport.config
 import { City } from './models/city.model';
 import { Appointment } from './models/appointment.model';
 import { EmailVerification } from './models/email-verification.model';
+import { District } from './models/district.model';
+import { Region } from './models/region.model';
 
 export class Application extends Singleton {
     public readonly app: express.Express = express();
@@ -32,7 +34,7 @@ export class Application extends Singleton {
         username: process.env.DATABASE_USERNAME || 'postgres',
         password: process.env.DATABASE_PASSWORD || 'postgres',
         database: process.env.DATABASE_NAME || 'postgres',
-        models: [City, User, Space, Appointment, EmailVerification],
+        models: [District, Region, City, User, Space, Appointment, EmailVerification],
         logging: false,
     });
 

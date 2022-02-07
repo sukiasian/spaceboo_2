@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Alert from '../components/Alert';
 import SpaceInputFieldsForCreateAndEdit from '../components/SpaceInputFieldsForCreateAndEdit';
-import { requestUserLoginState } from '../redux/actions/authActions';
+import { requestUserLoginStateAction } from '../redux/actions/authActions';
 import { postProvideSpaceAction, setProvideSpaceSuccessResponseAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { AlertTypes } from '../types/types';
@@ -21,7 +21,7 @@ export default function ProvideSpacePage(): JSX.Element {
     };
     const applyEffectsOnInit = (): (() => void) => {
         handleDocumentTitleOnInit();
-        dispatch(requestUserLoginState());
+        dispatch(requestUserLoginStateAction());
 
         return () => {
             // annualize responses
@@ -74,8 +74,7 @@ export default function ProvideSpacePage(): JSX.Element {
 
     useEffect(applyEffectsOnInit, [dispatch]);
     useEffect(redirectByLoginStateCondition, [userLoginState, navigate]);
-    // перенаправить на страницу мои пространства при успешном ответе
-    useEffect(redirectToMySpacesAfterProvideSpace, [provideSpaceSuccessResponse, navigate]);
+    useEffect(redirectToMySpacesAfterProvideSpace, [provideSpaceSuccessResponse, dispatch, navigate]);
 
     return (
         <section className="provide-space-section">

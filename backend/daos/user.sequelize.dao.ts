@@ -1,5 +1,5 @@
 import { Dao } from '../configurations/dao.config';
-import { IUserEdit, User, userEditFields } from '../models/user.model';
+import { IUserEdit, User, userEditFields, UserScopes } from '../models/user.model';
 import { SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
 import { applicationInstance } from '../App';
@@ -14,6 +14,22 @@ export class UserSequelizeDao extends Dao {
 
     public signUpLocal = async (userData: any): Promise<User> => {
         return this.model.create(userData);
+    };
+
+    public getCurrentUserById = async (userId: string): Promise<User> => {
+        return this.model.scope(UserScopes.PUBLIC).findOne({
+            where: {
+                id: userId,
+            },
+        });
+    };
+
+    public getUserById = async (userId: string): Promise<User> => {
+        return this.model.findOne({
+            where: {
+                id: userId,
+            },
+        });
     };
 
     public createAdmin = async () => {};

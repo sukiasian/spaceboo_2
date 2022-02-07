@@ -119,15 +119,15 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
     const annualizeFoundBySearchPatternCities = (): void => {
         dispatch(annualizeFoundBySearchPatternCitiesAction());
     };
-    const handlePickCity = (cityValue: string, cityId: number): (() => void) => {
+    const handlePickCity = (city: any): (() => void) => {
         return () => {
             const newFormData: TFormDataForComponent = { ...formData };
 
-            newFormData.cityId = cityId;
+            newFormData.cityId = city.id;
 
             dispatch(reduxSetFormDataActionForComponent(newFormData));
 
-            findCityRef.current!.value = cityValue;
+            findCityRef.current!.value = city.name;
 
             annualizeFoundBySearchPatternCities();
         };
@@ -163,6 +163,11 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
 
             dispatch(reduxSetFormDataActionForComponent(newFormData));
         };
+    };
+    const separateCityNameFromRegionIfCityNameContains = (cityName: string) => {
+        const cityNameValuesSeparately = cityName.split(' ');
+
+        return cityNameValuesSeparately[0];
     };
     const renderTypeOfSpaceCheckboxes = (): JSX.Element[] => {
         return typeOfSpaceInputsData.map((typeOfSpaceInputData: ITypeOfSpaceInputData, i: number) => {
@@ -203,9 +208,9 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
                           <p
                               className={`city-picker__search-results city-picker__search-results--${i}`}
                               key={i}
-                              onClick={handlePickCity(city.city || city.address, city.id)}
+                              onClick={handlePickCity(city)}
                           >
-                              {city.address}
+                              {`${city.region.name}, ${separateCityNameFromRegionIfCityNameContains(city.name)}`}
                           </p>
                       ))
                     : null}
