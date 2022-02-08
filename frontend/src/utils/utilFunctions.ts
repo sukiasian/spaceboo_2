@@ -1,7 +1,7 @@
 import { Dispatch, FormEventHandler } from 'react';
 import { Action } from 'redux';
 import { IAction } from '../redux/actions/ActionTypes';
-import { ReduxModalActions } from '../types/types';
+import { HttpStatus, IServerResponse, ReduxModalActions } from '../types/types';
 
 export const toggleLoginOrSignupModal = (
     actionForOpeningModal: () => Action<ReduxModalActions>,
@@ -36,4 +36,8 @@ export const valueIsNumeric = (targetValue: string): boolean => {
 
 export const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
+};
+
+export const serverResponseIsSuccessful = (response: IServerResponse): boolean => {
+    return response.statusCode >= HttpStatus.OK && response.statusCode < HttpStatus.AMBIGUOUS ? true : false;
 };

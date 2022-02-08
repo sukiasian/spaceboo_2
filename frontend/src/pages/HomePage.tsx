@@ -9,10 +9,11 @@ import { updateDocumentTitle } from '../utils/utilFunctions';
 
 export function HomePage() {
     const [queryData, setQueryData] = useState<IQueryData>();
-    const { userLoginState } = useSelector((state: IReduxState) => state.authStorage);
+    const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
     const { fetchSpacesQueryData, fetchSpacesSuccessResponse } = useSelector(
         (state: IReduxState) => state.spaceStorage
     );
+    const userLoginState = fetchUserLoginStateSuccessResponse?.data;
     const sliderIntervalRef = useRef<NodeJS.Timeout>();
     const dispatch = useDispatch();
     const handleDocumentTitle = () => {

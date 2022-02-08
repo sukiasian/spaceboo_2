@@ -1,4 +1,4 @@
-import { ReduxEmailVerificationActions } from '../../types/types';
+import { IServerResponse, ReduxEmailVerificationActions } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 
 export enum EmailPurpose {
@@ -7,10 +7,7 @@ export enum EmailPurpose {
 }
 
 // FIXME there can be 2 types of response - first success (status, data, message) and second is error response. Implement that
-export interface IEmailVerificationState {
-    sendVerificationCodeResponse?: any;
-    checkVerificationCodeResponse?: any;
-}
+
 export interface IPostSendVerificationEmailPayload {
     purpose: string;
     email?: string;
@@ -21,32 +18,49 @@ export interface IPostCheckVerificationEmailCodePayload {
     confirmation?: boolean;
     email?: string;
 }
-
-type TEmailVerificationPayloads = IPostSendVerificationEmailPayload | IPostCheckVerificationEmailCodePayload;
+export interface IEmailVerificationState {
+    postSendVerificationCodeSuccessResponse?: IServerResponse;
+    postSendVerificationCodeFailureResponse?: IServerResponse;
+    postCheckVerificationCodeSuccessResponse?: IServerResponse;
+    postCheckVerificationCodeFailureResponse?: IServerResponse;
+}
 
 const initialState: IEmailVerificationState = {};
 
 export const emailVerificationReducer = (
     state = initialState,
-    action: IAction<ReduxEmailVerificationActions, TEmailVerificationPayloads>
+    action: IAction<ReduxEmailVerificationActions>
 ): IEmailVerificationState => {
     switch (action.type) {
-        case ReduxEmailVerificationActions.SEND_VERIFICATION_CODE:
+        case ReduxEmailVerificationActions.SET_POST_SEND_VERIFICATION_CODE_SUCCESS_RESPONSE:
             return {
                 ...state,
-                sendVerificationCodeResponse: action.payload,
+                postSendVerificationCodeSuccessResponse: action.payload,
             };
 
-        case ReduxEmailVerificationActions.ANNUALIZE_SEND_VERIFICATION_CODE_RESPONSE:
+        case ReduxEmailVerificationActions.SET_POST_SEND_VERIFICATION_CODE_FAILURE_RESPONSE:
             return {
                 ...state,
-                sendVerificationCodeResponse: undefined,
+                postSendVerificationCodeFailureResponse: action.payload,
             };
 
-        case ReduxEmailVerificationActions.CHECK_VERIFICATION_CODE:
+        case ReduxEmailVerificationActions.ANNUALIZE_SEND_VERIFICATION_CODE_RESPONSES:
             return {
                 ...state,
-                checkVerificationCodeResponse: action.payload,
+                postSendVerificationCodeSuccessResponse: undefined,
+                postSendVerificationCodeFailureResponse: undefined,
+            };
+
+        case ReduxEmailVerificationActions.SET_POST_CHECK_VERIFICATION_CODE_SUCCESS_RESPONSE:
+            return {
+                ...state,
+                postCheckVerificationCodeSuccessResponse: action.payload,
+            };
+
+        case ReduxEmailVerificationActions.SET_POST_CHECK_VERIFICATION_CODE_FAILURE_RESPONSE:
+            return {
+                ...state,
+                postCheckVerificationCodeFailureResponse: action.payload,
             };
 
         default:

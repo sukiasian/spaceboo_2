@@ -13,7 +13,8 @@ import './sass/main.scss';
 
 // FIXME any, any - types for props
 function App(): JSX.Element {
-    const { userLoginState } = useSelector((state: IReduxState) => state.authStorage);
+    const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
+    const userLoginState = fetchUserLoginStateSuccessResponse?.data;
     const dispatch: Dispatch<IAction> = useDispatch();
     const requestAppData = useCallback(() => {
         dispatch(requestUserLoginStateAction());
@@ -23,7 +24,7 @@ function App(): JSX.Element {
         requestAppData();
     };
     const requestCurrentUserIfLoggedInAndConfirmed = (): void => {
-        if (userLoginState.confirmed) {
+        if (userLoginState?.confirmed) {
             dispatch(requestCurrentUserAction());
         }
     };

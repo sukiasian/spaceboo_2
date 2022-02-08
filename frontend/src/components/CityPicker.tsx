@@ -4,7 +4,7 @@ import {
     annualizeFoundBySearchPatternCitiesAction,
     requestCitiesBySearchPatternAction,
 } from '../redux/actions/cityActions';
-import { requestSpacesAction, setFetchSpacesQueryDataAction } from '../redux/actions/spaceActions';
+import { requestSpacesAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { IComponentClassNameProps, TActiveTab } from '../types/types';
 
@@ -14,8 +14,7 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
     const { handleActiveTab, mainDivClassName } = props;
     const [currentCity, setCurrentCity] = useState('Город');
     const [cityPickerBoxIsOpen, setCityPickerBoxIsOpen] = useState(false);
-    const { foundBySearchPatternCities } = useSelector((state: IReduxState) => state.cityStorage);
-    const { fetchSpacesQueryData } = useSelector((state: IReduxState) => state.spaceStorage);
+    const { fetchCitiesByPatternSuccessResponse } = useSelector((state: IReduxState) => state.cityStorage);
     const dispatch = useDispatch();
     const getCurrentCityFromLocalStorage = (): void => {
         const currentCity = localStorage.getItem('currentCity');
@@ -41,9 +40,7 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
         setCurrentCity(city.name);
         annualizeFoundBySearchPatternCities();
         localStorage.setItem('currentCity', city.name);
-        // NOTE maybe pas an object to currentCity instead of the line below? guess we can only store strings
         localStorage.setItem('currentCityId', city.id.toString());
-        // FIXME NOTE
 
         dispatch(requestSpacesAction({ cityId: city.id }));
     };
@@ -56,8 +53,8 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
     const renderFindCityResults = (): JSX.Element => {
         return (
             <>
-                {foundBySearchPatternCities && foundBySearchPatternCities.length !== 0
-                    ? foundBySearchPatternCities.map((city: any, i: number) => (
+                {fetchCitiesByPatternSuccessResponse?.data.length !== 0
+                    ? fetchCitiesByPatternSuccessResponse?.data.map((city: any, i: number) => (
                           <p
                               className={`city-picker__search-results city-picker__search-results--${i}`}
                               key={i}

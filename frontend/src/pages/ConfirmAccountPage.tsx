@@ -3,18 +3,20 @@ import { useDispatch, useSelector } from 'react-redux';
 import Alert from '../components/Alert';
 import SixDigitVerification from '../components/SixDigitVerification';
 import Timer from '../components/Timer';
-import { postSendVerificationCodeAction } from '../redux/actions/emailVerificationActions';
+import { requestSendVerificationCodeAction } from '../redux/actions/emailVerificationActions';
 import { EmailPurpose, IPostSendVerificationEmailPayload } from '../redux/reducers/emailVerificationReducer';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { AlertTypes, CustomResponseMessages, HttpStatus, LocalStorageItems } from '../types/types';
+import { AlertTypes, CustomResponseMessages, LocalStorageItems } from '../types/types';
 import { updateDocumentTitle } from '../utils/utilFunctions';
 
 export default function ConfirmAccountPage(): JSX.Element {
-    const { userLoginState } = useSelector((state: any) => state.authStorage);
     const timerRef = useRef<NodeJS.Timeout>();
-    const { checkVerificationCodeResponse, sendVerificationCodeResponse } = useSelector(
-        (state: IReduxState) => state.emailVerificationStorage
-    );
+    const {
+        postSendVerificationCodeSuccessResponse,
+        postSendVerificationCodeFailureResponse,
+        postCheckVerificationCodeSuccessResponse,
+        postCheckVerificationCodeFailureResponse,
+    } = useSelector((state: IReduxState) => state.emailVerificationStorage);
     const dispatch = useDispatch();
     const handleDocumentTitle = (): void => {
         const documentTitle = 'Spaceboo | Последний шаг!';
@@ -36,15 +38,15 @@ export default function ConfirmAccountPage(): JSX.Element {
             purpose: EmailPurpose[10],
         };
 
-        dispatch(postSendVerificationCodeAction(payload));
+        dispatch(requestSendVerificationCodeAction(payload));
     };
     const renderSendCodeAgainAlert = (): JSX.Element | void => {
-        if (sendVerificationCodeResponse) {
-            return sendVerificationCodeResponse.statusCode === HttpStatus.OK ? (
-                <Alert alertType={AlertTypes.SUCCESS} alertMessage={sendVerificationCodeResponse.message} />
-            ) : (
-                <Alert alertType={AlertTypes.FAILURE} alertMessage={CustomResponseMessages.UNKNOWN_ERROR} />
+        if (postSendVerificationCodeSuccessResponse) {
+            return (
+                <Alert alertType={AlertTypes.SUCCESS} alertMessage={postSendVerificationCodeSuccessResponse.message!} />
             );
+        } else if (postSendVerificationCodeFailureResponse) {
+            return <Alert alertType={AlertTypes.FAILURE} alertMessage={CustomResponseMessages.UNKNOWN_ERROR} />;
         }
     };
     const renderSendCodeOptions = (): JSX.Element | void => {
@@ -73,22 +75,24 @@ export default function ConfirmAccountPage(): JSX.Element {
             );
         }
     };
-    const renderCheckCodeResultAlert = (): JSX.Element | void => {
-        if (checkVerificationCodeResponse) {
-            switch (checkVerificationCodeResponse.statusCode) {
-                case HttpStatus.OK:
-                    return (
-                        <Alert alertType={AlertTypes.SUCCESS} alertMessage={checkVerificationCodeResponse.message} />
-                    );
-
-                case HttpStatus.BAD_REQUEST:
-                    return (
-                        <Alert alertType={AlertTypes.FAILURE} alertMessage={checkVerificationCodeResponse.message} />
-                    );
-
-                default:
-                    return <Alert alertType={AlertTypes.FAILURE} alertMessage={CustomResponseMessages.UNKNOWN_ERROR} />;
-            }
+    const renderCheckCodeSuccessAlert = (): JSX.Element | void => {
+        if (postCheckVerificationCodeSuccessResponse) {
+            return (
+                <Alert
+                    alertType={AlertTypes.SUCCESS}
+                    alertMessage={postCheckVerificationCodeSuccessResponse.message!}
+                />
+            );
+        }
+    };
+    const renderCheckCodeFailureAlert = (): JSX.Element | void => {
+        if (postCheckVerificationCodeFailureResponse) {
+            return (
+                <Alert
+                    alertType={AlertTypes.FAILURE}
+                    alertMessage={postCheckVerificationCodeFailureResponse.message!}
+                />
+            );
         }
     };
 
@@ -106,7 +110,8 @@ export default function ConfirmAccountPage(): JSX.Element {
 
                 <SixDigitVerification />
                 <div className="send-code-options"> {renderSendCodeOptions()} </div>
-                {renderCheckCodeResultAlert()}
+                {renderCheckCodeSuccessAlert()}
+                {renderCheckCodeFailureAlert()}
             </section>
         </div>
     );

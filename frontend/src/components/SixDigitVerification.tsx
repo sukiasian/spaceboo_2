@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { requestUserLoginStateAction } from '../redux/actions/authActions';
-import { postCheckVerificationCodeAction } from '../redux/actions/emailVerificationActions';
+import { requestCheckVerificationCodeAction } from '../redux/actions/emailVerificationActions';
 import { IPostCheckVerificationEmailCodePayload } from '../redux/reducers/emailVerificationReducer';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { HttpStatus } from '../types/types';
 import { valueIsNumeric } from '../utils/utilFunctions';
 
 type TDigitInput = { value?: string; ref: React.RefObject<HTMLInputElement> };
@@ -27,10 +26,12 @@ export default function SixDigitVerification(): JSX.Element {
         { ref: inputRefs[4] },
         { ref: inputRefs[5] },
     ]);
-    const { checkVerificationCodeResponse } = useSelector((state: IReduxState) => state.emailVerificationStorage);
+    const { postCheckVerificationCodeSuccessResponse } = useSelector(
+        (state: IReduxState) => state.emailVerificationStorage
+    );
     const dispatch = useDispatch();
     const updateUserInformationAfterCheckingCode = () => {
-        if (checkVerificationCodeResponse && checkVerificationCodeResponse.statusCode === HttpStatus.OK) {
+        if (postCheckVerificationCodeSuccessResponse) {
             dispatch(requestUserLoginStateAction());
         }
     };
@@ -87,7 +88,7 @@ export default function SixDigitVerification(): JSX.Element {
             confirmation: true,
         };
 
-        dispatch(postCheckVerificationCodeAction(payload));
+        dispatch(requestCheckVerificationCodeAction(payload));
     };
     const renderDigitInputs = (): JSX.Element[] => {
         return digitInputs.map((digitInput: TDigitInput, i: number) => {
@@ -108,9 +109,8 @@ export default function SixDigitVerification(): JSX.Element {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(applyEffectsOnInit, []);
-    // TODO we can use one custom effect to not pass dispatch every time to dependencies list in useEffect
     useEffect(checkCodeToConfirmAccount, [digitInputs, dispatch]);
-    useEffect(updateUserInformationAfterCheckingCode, [checkVerificationCodeResponse, dispatch]);
+    useEffect(updateUserInformationAfterCheckingCode, [postCheckVerificationCodeSuccessResponse, dispatch]);
 
     return <form className="code-verificaion"> {renderDigitInputs()} </form>;
 }

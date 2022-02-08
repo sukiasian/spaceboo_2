@@ -6,10 +6,11 @@ import SwitchAuthForPage from '../components/SwitchAuthForPage';
 import { UrlPathnames } from '../types/types';
 
 export default function LoginPage(): JSX.Element {
-    const { userLoginState } = useSelector((state: IReduxState) => state.authStorage);
+    const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
+    const userLoginState = fetchUserLoginStateSuccessResponse?.data;
     const handleHistoryBack = (): (() => void) => {
         const getBack = (): void => {
-            if (!userLoginState.loggedIn && window.location.pathname === '/provide-space') {
+            if (!userLoginState?.loggedIn && window.location.pathname === '/provide-space') {
                 window.history.back();
             }
         };

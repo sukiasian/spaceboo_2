@@ -1,42 +1,32 @@
-import { ReduxCitiesActions } from '../../types/types';
+import { IServerResponse, ReduxCitiesActions } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 
 export interface ICityState {
-    cities: string[];
-    majorCities: string[];
-    foundBySearchPatternCities: string[];
+    fetchCitiesByPatternSuccessResponse?: IServerResponse;
+    fetchCitiesByPatternFailureResponse?: IServerResponse;
 }
 
-const initialState: ICityState = {
-    cities: [],
-    majorCities: [],
-    foundBySearchPatternCities: [],
-};
+const initialState: ICityState = {};
 
 export const cityReducer = (state = initialState, action: IAction): ICityState => {
     switch (action.type) {
-        case ReduxCitiesActions.FETCH_CITIES:
+        case ReduxCitiesActions.SET_FETCH_CITIES_BY_SEARCH_PATTERN_SUCCESS_RESPONSE:
             return {
                 ...state,
-                cities: action.payload,
+                fetchCitiesByPatternSuccessResponse: action.payload,
             };
 
-        case ReduxCitiesActions.FETCH_CITIES_BY_SEARCH_PATTERN:
+        case ReduxCitiesActions.SET_FETCH_CITIES_BY_SEARCH_PATTERN_FAILURE_RESPONSE:
             return {
                 ...state,
-                foundBySearchPatternCities: action.payload,
+                fetchCitiesByPatternFailureResponse: action.payload,
             };
 
-        case ReduxCitiesActions.FETCH_MAJOR_CITIES:
+        case ReduxCitiesActions.ANNUALIZE_FOUND_BY_SEARCH_PATTERN_CITIES_RESPONSES:
             return {
                 ...state,
-                majorCities: action.payload,
-            };
-
-        case ReduxCitiesActions.ANNUALIZE_FOUND_BY_SEARCH_PATTERN_CITIES:
-            return {
-                ...state,
-                foundBySearchPatternCities: [],
+                fetchCitiesByPatternSuccessResponse: undefined,
+                fetchCitiesByPatternFailureResponse: undefined,
             };
 
         default: {

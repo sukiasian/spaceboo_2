@@ -1,12 +1,12 @@
-import { ChangeEventHandler, FormEventHandler, useEffect, useState } from 'react';
+import { ChangeEventHandler, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { postLoginAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import InputWithLabel, { InputAutoCompleteOptions, IFormInputs, InputTypes } from '../components/InputWithLabel';
 import Alert from '../components/Alert';
 import { AlertTypes, CustomResponseMessages, HttpStatus } from '../types/types';
 import { handleSubmit } from '../utils/utilFunctions';
+import { requestLoginUserAction } from '../redux/actions/authActions';
 
 export interface ILoginData {
     [key: keyof IFormInputs]: string | undefined;
@@ -39,11 +39,13 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
             isRequiredField: true,
         },
     });
-    const { loginResponse } = useSelector((state: IReduxState) => state.authStorage);
+    const { postLoginUserSuccessResponse, postLoginUserFailureResponse } = useSelector(
+        (state: IReduxState) => state.authStorage
+    );
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const handleAfterLogin = (): void => {
-        if (loginResponse && !loginResponse.error) {
+        if (postLoginUserSuccessResponse) {
             props.handleAfterLogin();
             navigate('/');
         }
@@ -63,7 +65,7 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
             loginData[inputName] = formInputs[inputName].value;
         });
 
-        dispatch(postLoginAction(loginData));
+        dispatch(requestLoginUserAction(loginData));
     };
     const renderInputs = (): JSX.Element[] => {
         return Object.keys(formInputs).map((inputName: string, i: number) => {
@@ -85,10 +87,12 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
         });
     };
     const renderLoginErrorAlerts = (): JSX.Element | void => {
-        if (loginResponse && loginResponse.error) {
-            switch (loginResponse.error.statusCode) {
+        if (postLoginUserFailureResponse) {
+            switch (postLoginUserFailureResponse.statusCode) {
                 case HttpStatus.UNAUTHORIZED:
-                    return <Alert alertType={AlertTypes.FAILURE} alertMessage={loginResponse.message} />;
+                    return (
+                        <Alert alertType={AlertTypes.FAILURE} alertMessage={postLoginUserFailureResponse.message!} />
+                    );
 
                 default:
                     return <Alert alertType={AlertTypes.FAILURE} alertMessage={CustomResponseMessages.UNKNOWN_ERROR} />;
@@ -96,7 +100,7 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
         }
     };
 
-    useEffect(handleAfterLogin, [loginResponse, props, navigate]);
+    useEffect(handleAfterLogin, [postLoginUserSuccessResponse, props, navigate]);
 
     // TODO validators!
     return (

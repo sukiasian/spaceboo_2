@@ -3,9 +3,10 @@ import { useSelector } from 'react-redux';
 import { IReduxState } from '../redux/reducers/rootReducer';
 
 export default function SettingsPage(): JSX.Element {
-    const { userLoginState } = useSelector((state: IReduxState) => state.authStorage);
+    const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
+    const userLoginState = fetchUserLoginStateSuccessResponse?.data;
 
-    if (!userLoginState.loggedIn) {
+    if (!userLoginState?.loggedIn) {
         return <Navigate to="/login" />;
     }
     return <> Настройки </>;

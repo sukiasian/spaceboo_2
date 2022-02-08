@@ -1,4 +1,4 @@
-import { ReduxAuthActions } from '../../types/types';
+import { IServerResponse, ReduxAuthActions } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 
 export interface IUserLoginState {
@@ -8,62 +8,87 @@ export interface IUserLoginState {
 }
 
 export interface IAuthState {
-    userLoginState: IUserLoginState;
-    loginResponse?: any;
-    signupResponse?: any;
-    logoutResponse?: any;
+    postLoginUserSuccessResponse?: IServerResponse;
+    postLoginUserFailureResponse?: IServerResponse;
+    postSignupUserSuccessResponse?: IServerResponse;
+    postSignupUserFailureResponse?: IServerResponse;
+    fetchUserLoginStateSuccessResponse?: IServerResponse<IUserLoginState & { isLoaded: boolean }>;
+    fetchUserLoginStateFailureResponse?: IServerResponse;
+    fetchLogoutUserSuccessResponse?: IServerResponse;
+    fetchLogoutUserFailureResponse?: IServerResponse;
 }
 
-const initialState: IAuthState = {
-    userLoginState: {
-        loggedIn: false,
-        confirmed: false,
-        isLoaded: false,
-    },
-};
+const initialState: IAuthState = {};
 
 export const authReducer = (state = initialState, action: IAction<ReduxAuthActions>): IAuthState => {
     switch (action.type) {
-        case ReduxAuthActions.FETCH_USER_IS_LOGGED_IN:
+        case ReduxAuthActions.SET_POST_LOGIN_USER_SUCCESS_RESPONSE:
             return {
                 ...state,
-                userLoginState: action.payload,
+                postLoginUserSuccessResponse: action.payload,
             };
 
-        case ReduxAuthActions.LOGIN_USER:
+        case ReduxAuthActions.SET_POST_LOGIN_USER_FAILURE_RESPONSE:
             return {
                 ...state,
-                loginResponse: action.payload,
+                postLoginUserFailureResponse: action.payload,
             };
 
-        case ReduxAuthActions.ANNUALIZE_LOGIN_RESPONSE:
+        case ReduxAuthActions.ANNUALIZE_LOGIN_USER_RESPONSES:
             return {
                 ...state,
-                loginResponse: undefined,
+                postLoginUserSuccessResponse: undefined,
+                postLoginUserFailureResponse: undefined,
             };
 
-        case ReduxAuthActions.SIGNUP_USER:
+        case ReduxAuthActions.SET_POST_SIGNUP_USER_SUCCESS_RESPONSE:
             return {
                 ...state,
-                signupResponse: action.payload,
+                postSignupUserSuccessResponse: action.payload,
             };
 
-        case ReduxAuthActions.ANNUALIZE_SIGNUP_RESPONSE:
+        case ReduxAuthActions.SET_POST_SIGNUP_USER_FAILURE_RESPONSE:
             return {
                 ...state,
-                signupResponse: undefined,
+                postSignupUserFailureResponse: action.payload,
             };
 
-        case ReduxAuthActions.LOGOUT_USER:
+        case ReduxAuthActions.ANNUALIZE_SIGNUP_USER_RESPONSES:
             return {
                 ...state,
-                logoutResponse: action.payload,
+                postSignupUserSuccessResponse: undefined,
             };
 
-        case ReduxAuthActions.ANNUALIZE_LOGOUT_RESPONSE:
+        case ReduxAuthActions.SET_FETCH_LOGOUT_USER_SUCCESS_RESPONSE:
             return {
                 ...state,
-                logoutResponse: undefined,
+                fetchLogoutUserSuccessResponse: action.payload,
+            };
+
+        case ReduxAuthActions.SET_FETCH_LOGOUT_USER_FAILURE_RESPONSE:
+            return {
+                ...state,
+                fetchLogoutUserFailureResponse: action.payload,
+            };
+
+        // NOTE: что должно здесь произойти? нужно ли вообще аннулирование? наверное да, так как если пользователь выйдет а затем зайдет то получится так что logout response все еще определен.
+        case ReduxAuthActions.ANNUALIZE_LOGOUT_USER_RESPONSES:
+            return {
+                ...state,
+                fetchLogoutUserSuccessResponse: undefined,
+                fetchLogoutUserFailureResponse: undefined,
+            };
+
+        case ReduxAuthActions.SET_FETCH_USER_IS_LOGGED_IN_SUCCESS_RESPONSE:
+            return {
+                ...state,
+                fetchUserLoginStateSuccessResponse: action.payload,
+            };
+
+        case ReduxAuthActions.SET_FETCH_USER_IS_LOGGED_IN_FAILURE_RESPONSE:
+            return {
+                ...state,
+                fetchUserLoginStateFailureResponse: action.payload,
             };
 
         default: {

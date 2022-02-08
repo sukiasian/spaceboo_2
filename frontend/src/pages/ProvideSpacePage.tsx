@@ -10,10 +10,11 @@ import { AlertTypes } from '../types/types';
 import { handleSubmit, updateDocumentTitle } from '../utils/utilFunctions';
 
 export default function ProvideSpacePage(): JSX.Element {
-    const { userLoginState } = useSelector((state: IReduxState) => state.authStorage);
+    const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
     const { provideSpaceData, provideSpaceSuccessResponse, provideSpaceFailureResponse } = useSelector(
         (state: IReduxState) => state.spaceStorage
     );
+    const userLoginState = fetchUserLoginStateSuccessResponse?.data;
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const handleDocumentTitleOnInit = (): void => {
@@ -30,10 +31,10 @@ export default function ProvideSpacePage(): JSX.Element {
         };
     };
     const redirectByLoginStateCondition = (): void => {
-        if (userLoginState.isLoaded) {
-            if (!userLoginState.loggedIn && !userLoginState.confirmed) {
+        if (userLoginState?.isLoaded) {
+            if (!userLoginState?.loggedIn && !userLoginState?.confirmed) {
                 navigate('/login');
-            } else if (!userLoginState.confirmed) {
+            } else if (!userLoginState?.confirmed) {
                 window.history.back();
             }
         }

@@ -16,9 +16,10 @@ import ProvideSpacePage from '../pages/ProvideSpacePage';
 
 // FIXME много повторяющегося кода
 export default function Routes(): JSX.Element {
-    const { userLoginState } = useSelector((state: IReduxState) => state.authStorage);
+    const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
+    const userLoginState = fetchUserLoginStateSuccessResponse?.data;
 
-    if (userLoginState.loggedIn && !userLoginState.confirmed) {
+    if (userLoginState?.loggedIn && !userLoginState?.confirmed) {
         return (
             <ReactRoutes>
                 <Route path="/" element={<ConfirmAccountPage />} />
@@ -34,7 +35,7 @@ export default function Routes(): JSX.Element {
         );
     }
 
-    if (!userLoginState.loggedIn) {
+    if (!userLoginState?.loggedIn) {
         return (
             <ReactRoutes>
                 <Route path="/" element={<HomePage />} />

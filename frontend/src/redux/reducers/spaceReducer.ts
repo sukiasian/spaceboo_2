@@ -31,14 +31,13 @@ export interface ISpaceFormData {
 }
 export interface ISpaceState extends ISpaceFormData {
     isLoaded: boolean;
-    spaces: any[];
+    fetchSpacesQueryData?: IQueryData;
     fetchSpacesSuccessResponse?: IServerResponse;
     fetchSpacesFailureResponse?: IServerResponse;
     fetchSpaceByIdSuccessResponse?: IServerResponse;
     fetchSpaceByIdFailureResponse?: IServerResponse;
     provideSpaceSuccessResponse?: IServerResponse;
     provideSpaceFailureResponse?: IServerResponse;
-    fetchSpacesQueryData?: IQueryData;
 }
 
 export enum SpaceType {
@@ -48,24 +47,16 @@ export enum SpaceType {
 
 const initialState: ISpaceState = {
     isLoaded: false,
-    spaces: [],
     provideSpaceData: {
         type: SpaceType.FLAT,
         roomsNumber: 2,
         bedsNumber: 2,
         lockerConnected: false,
     },
-    editSpaceData: {},
 };
 
 export const spaceReducer = (state = initialState, action: IAction): ISpaceState => {
     switch (action.type) {
-        case ReduxSpaceActions.FETCH_SPACES:
-            return {
-                ...state,
-                spaces: action.payload,
-            };
-
         case ReduxSpaceActions.SET_POST_PROVIDE_SPACE_SUCCESS_RESPONSE:
             return {
                 ...state,

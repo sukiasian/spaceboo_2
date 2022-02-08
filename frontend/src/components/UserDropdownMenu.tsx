@@ -4,10 +4,9 @@ import { IReduxState } from '../redux/reducers/rootReducer';
 import {
     annualizeLogoutResponseAction,
     requestUserLoginStateAction,
-    requestUserLogoutAction,
+    requestLogoutUserAction,
 } from '../redux/actions/authActions';
 import { useEffect } from 'react';
-import { HttpStatus } from '../types/types';
 
 interface IDropdownLinkableTab {
     tabName: string;
@@ -16,9 +15,11 @@ interface IDropdownLinkableTab {
 }
 
 export default function UserDropdownMenu(): JSX.Element {
-    const { userLoginState } = useSelector((state: IReduxState) => state.authStorage);
+    const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
     const { fetchCurrentUserSuccessResponse } = useSelector((state: IReduxState) => state.userStorage);
-    const { logoutResponse } = useSelector((state: IReduxState) => state.authStorage);
+    const { fetchLogoutUserSuccessResponse, fetchLogoutUserFailureResponse } = useSelector(
+        (state: IReduxState) => state.authStorage
+    );
     const userData = fetchCurrentUserSuccessResponse!.data;
     const linkableTabs: IDropdownLinkableTab[] = [
         {
@@ -39,10 +40,10 @@ export default function UserDropdownMenu(): JSX.Element {
     ];
     const dispatch = useDispatch();
     const handleLogout = (): void => {
-        dispatch(requestUserLogoutAction());
+        dispatch(requestLogoutUserAction());
     };
     const refreshUserLoggedInAfterLogout = (): void => {
-        if (logoutResponse && logoutResponse.statusCode === HttpStatus.OK) {
+        if (fetchLogoutUserSuccessResponse) {
             dispatch(requestUserLoginStateAction());
             dispatch(annualizeLogoutResponseAction());
         }
@@ -61,7 +62,7 @@ export default function UserDropdownMenu(): JSX.Element {
         });
     };
 
-    useEffect(refreshUserLoggedInAfterLogout, [logoutResponse, dispatch]);
+    useEffect(refreshUserLoggedInAfterLogout, [fetchLogoutUserSuccessResponse, dispatch]);
 
     return (
         <div className="user-drop-down-menu">

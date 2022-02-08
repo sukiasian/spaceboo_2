@@ -1,14 +1,14 @@
-import { ChangeEventHandler, FormEventHandler, useEffect, useState } from 'react';
+import { ChangeEventHandler, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { postSignupAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import InputWithLabel, { IFormInputs, InputAutoCompleteOptions, InputTypes } from '../components/InputWithLabel';
 import AlertFirstDbValidationError from '../components/AlertFirstDbValidationError';
-import { postSendVerificationCodeAction } from '../redux/actions/emailVerificationActions';
+import { requestSendVerificationCodeAction } from '../redux/actions/emailVerificationActions';
 import { EmailPurpose, IPostSendVerificationEmailPayload } from '../redux/reducers/emailVerificationReducer';
-import { HttpStatus, LocalStorageItems } from '../types/types';
+import { IServerResponse, LocalStorageItems } from '../types/types';
 import { handleSubmit } from '../utils/utilFunctions';
+import { requestSignupUserAction } from '../redux/actions/authActions';
 
 export interface ISignupData {
     [key: keyof IFormInputs]: string | undefined;
@@ -74,30 +74,34 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
         },
     });
     const [loading, setLoading] = useState<boolean>();
-    const { signupResponse } = useSelector((state: IReduxState) => state.authStorage);
-    const { sendVerificationCodeResponse } = useSelector((state: IReduxState) => state.emailVerificationStorage);
+    const { postSignupUserSuccessResponse, postSignupUserFailureResponse } = useSelector(
+        (state: IReduxState) => state.authStorage
+    );
+    const { postSendVerificationCodeSuccessResponse, postCheckVerificationCodeSuccessResponse } = useSelector(
+        (state: IReduxState) => state.emailVerificationStorage
+    );
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const sendVerificationCodeOnSuccess = (): void => {
-        if (signupResponse && signupResponse.statusCode === HttpStatus.CREATED) {
+        if (postSignupUserSuccessResponse) {
             const payload: IPostSendVerificationEmailPayload = {
                 purpose: EmailPurpose[10],
             };
 
-            dispatch(postSendVerificationCodeAction(payload));
+            dispatch(requestSendVerificationCodeAction(payload));
             setLoading(true);
         }
     };
     const storeLastVerificationRequestedAtLocalStorage = (): void => {
         localStorage.setItem(
             LocalStorageItems.LAST_VERIFICATION_REQUESTED,
-            sendVerificationCodeResponse.data.lastVerificationRequested
+            postCheckVerificationCodeSuccessResponse!.data.lastVerificationRequested
         );
     };
     const handleAfterSignup = (): void => {
         setLoading(false);
 
-        if (sendVerificationCodeResponse && sendVerificationCodeResponse.statusCode === HttpStatus.OK) {
+        if (postSendVerificationCodeSuccessResponse) {
             storeLastVerificationRequestedAtLocalStorage();
             props.handleAfterSignup();
 
@@ -119,7 +123,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
             signupData[inputName] = formInputs[inputName].value;
         });
 
-        dispatch(postSignupAction(signupData));
+        dispatch(requestSignupUserAction(signupData));
     };
     const renderInputs = (): JSX.Element[] => {
         return Object.keys(formInputs).map((inputName: string, i: number) => {
@@ -142,8 +146,8 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
         });
     };
 
-    useEffect(sendVerificationCodeOnSuccess, [signupResponse, dispatch]);
-    useEffect(handleAfterSignup, [sendVerificationCodeResponse, handleAfterSignup]);
+    useEffect(sendVerificationCodeOnSuccess, [postSignupUserSuccessResponse, dispatch]);
+    useEffect(handleAfterSignup, [postSendVerificationCodeSuccessResponse, handleAfterSignup]);
 
     // TODO validators!
     return (
@@ -153,7 +157,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
                 <button className="button--primary" onClick={handleSignupButton}>
                     Зарегистрироваться
                 </button>
-                <AlertFirstDbValidationError response={signupResponse} />
+                <AlertFirstDbValidationError response={postSignupUserFailureResponse as IServerResponse} />
                 <div>{loading ? 'loading...' : 'loaded!'}</div>
             </form>
         </div>

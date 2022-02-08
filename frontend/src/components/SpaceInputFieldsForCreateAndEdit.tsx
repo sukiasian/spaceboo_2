@@ -36,7 +36,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
     const { buttonClassName, buttonText, componentIsFor, handleSubmitButton, children } = props;
     const findCityRef = useRef<HTMLInputElement>(null);
     const formData = useSelector((state: IReduxState) => state.spaceStorage[componentIsFor]);
-    const { foundBySearchPatternCities } = useSelector((state: IReduxState) => state.cityStorage);
+    const { fetchCitiesByPatternSuccessResponse } = useSelector((state: IReduxState) => state.cityStorage);
     const dispatch = useDispatch();
     const reduxSetFormDataActionsFor: IReduxSetFormDataActionsFor = {
         provideSpaceData: setProvideSpaceDataAction,
@@ -114,7 +114,11 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
         dispatch(reduxSetFormDataActionForComponent(newFormData));
     };
     const handleFindCityInput = (e: ChangeEvent<{ value: string }>): void => {
-        dispatch(requestCitiesBySearchPatternAction(e.target.value));
+        const { value } = e.target;
+
+        if (value.length >= 1) {
+            dispatch(requestCitiesBySearchPatternAction(value));
+        }
     };
     const annualizeFoundBySearchPatternCities = (): void => {
         dispatch(annualizeFoundBySearchPatternCitiesAction());
@@ -203,8 +207,8 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
     const renderFindCityResults = (): JSX.Element => {
         return (
             <>
-                {foundBySearchPatternCities && foundBySearchPatternCities.length !== 0
-                    ? foundBySearchPatternCities.map((city: any, i: number) => (
+                {fetchCitiesByPatternSuccessResponse?.data?.length !== 0
+                    ? fetchCitiesByPatternSuccessResponse?.data?.map((city: any, i: number) => (
                           <p
                               className={`city-picker__search-results city-picker__search-results--${i}`}
                               key={i}
