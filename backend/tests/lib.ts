@@ -8,11 +8,12 @@ import { IUserCreate } from '../models/user.model';
 import connectToDb from '../database/connectToDb';
 import { SingletonFactory } from '../utils/Singleton';
 import * as dotenv from 'dotenv';
-import { ErrorMessages, LoggerLevels, ModelNames } from '../types/enums';
+import { ErrorMessages, ModelNames } from '../types/enums';
 import { ISpaceCreate, SpaceType } from '../models/space.model';
 import { IAppointmentCreate, TIsoDatesReserved } from '../models/appointment.model';
 import UtilFunctions from '../utils/UtilFunctions';
 import logger from '../loggers/logger';
+import NodeCronFunctions from '../utils/NodeCronFunctions';
 
 dotenv.config({ path: '../test.env' });
 
@@ -39,7 +40,11 @@ export const closeDb = async (sequelize: Sequelize): Promise<void> => {
 export const clearDb = (sequelize: Sequelize): void => {
     Promise.all(
         Object.values(sequelize.models).map(async (model) => {
-            if (model.name !== ModelNames.CITY) {
+            if (
+                model.name !== ModelNames.DISTRICT &&
+                model.name !== ModelNames.REGION &&
+                model.name !== ModelNames.CITY
+            ) {
                 await model.destroy({ truncate: true, cascade: true });
             }
         })
@@ -63,6 +68,10 @@ export const clearDbAndStorage = async (sequelize: Sequelize): Promise<void> => 
 
 export const createApplicationInstance = (): Application => {
     return SingletonFactory.produce<Application>(Application);
+};
+
+export const createNodeCronFunctions = (): NodeCronFunctions => {
+    return SingletonFactory.produce<NodeCronFunctions>(NodeCronFunctions);
 };
 
 export const createUserData = (): IUserCreate => {
@@ -113,6 +122,7 @@ export const createSpaceData = (userId: string, cityId: number, pricePerNight = 
         pricePerNight,
         type: SpaceType.FLAT,
         roomsNumber: 2,
+        bedsNumber: 2,
         imagesUrl: ['/public/images/space/1.jpg'],
         lockerConnected: false,
         facilities: ['TV'],

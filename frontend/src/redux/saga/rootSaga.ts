@@ -1,5 +1,5 @@
 import { all } from '@redux-saga/core/effects';
-import { watchFetchSpaces, watchPostProvideSpace, watchRequestSpaceById } from './spaceSaga';
+import { watchFetchSpaces, watchPostProvideSpace, watchRequestSpaceById, watchRequestUserSpaces } from './spaceSaga';
 import { watchFindCitiesBySearchPattern } from './citySaga';
 import { watchAfetchUserLoginState, watchLogoutUser, watchPostLogin, watchPostSignup } from './authSaga';
 import { watchCheckVerificationCode, watchSendVerificationCode } from './emailVerificationSaga';
@@ -19,6 +19,7 @@ export function* rootSaga() {
         watchCheckVerificationCode(),
         watchPostProvideSpace(),
         watchRequestSpaceById(),
+        watchRequestUserSpaces(),
         watchRequestCurrentUser(),
         watchPostUploadSpaceImages(),
     ]);

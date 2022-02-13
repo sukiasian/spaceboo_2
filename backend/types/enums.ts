@@ -59,6 +59,8 @@ export enum ResponseStatus {
 export enum ModelNames {
     USER = 'User',
     CITY = 'City',
+    REGION = 'Region',
+    DISTRICT = 'District',
 }
 
 export enum SequelizeModelProps {

@@ -1,6 +1,5 @@
 import * as express from 'express';
 import * as request from 'supertest';
-import {} from 'jest';
 import * as dotenv from 'dotenv';
 import { Application } from '../App';
 import { clearDb, closeTestEnv, createApplicationInstance, openTestEnv } from './lib';

@@ -8,7 +8,7 @@ import * as path from 'path';
 import * as jwt from 'jsonwebtoken';
 import logger from '../loggers/logger';
 import { applicationInstance } from '../App';
-import { TIsoDatesReserved } from '../models/appointment.model';
+import { Appointment, TIsoDatesReserved } from '../models/appointment.model';
 import { Environment, ErrorMessages, HttpStatus, ResponseMessages, ResponseStatus } from '../types/enums';
 import AppError from './AppError';
 
@@ -178,10 +178,9 @@ class UtilFunctions {
 
     public static createSequelizeRawQuery = async (
         sequelize: Sequelize,
-        query: string,
-        isPlain = false
+        query: string
     ): Promise<unknown | unknown[]> => {
-        return sequelize.query(query, { type: QueryTypes.SELECT, plain: isPlain });
+        return sequelize.query(query, { type: QueryTypes.SELECT });
     };
 
     public static makeDirectory = promisify(fs.mkdir);

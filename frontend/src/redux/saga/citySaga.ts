@@ -7,6 +7,7 @@ import {
     setFetchCitiesByPatternFailureResponseAction,
     setFetchCitiesByPatternSuccessResponseAction,
 } from '../actions/cityActions';
+import { serverResponseIsSuccessful } from '../../utils/utilFunctions';
 
 const fetchCitiesBySearchPattern = async (findCitySearchPattern: string): Promise<IServerResponse> => {
     return httpRequester.get(`${ApiUrls.CITIES}?searchPattern=%25${findCitySearchPattern}%25`);
@@ -15,10 +16,7 @@ function* findCitiesBySearchPatternWorker(action: IAction): Generator<CallEffect
     try {
         const response = yield call(fetchCitiesBySearchPattern, action.payload);
 
-        if (
-            (response as IServerResponse).statusCode >= HttpStatus.OK &&
-            (response as IServerResponse).statusCode < HttpStatus.AMBIGUOUS
-        ) {
+        if (serverResponseIsSuccessful(response as IServerResponse)) {
             yield put(setFetchCitiesByPatternSuccessResponseAction(response as IServerResponse));
         } else {
             throw response;

@@ -11,7 +11,7 @@ import { setEditSpaceDataAction, setProvideSpaceDataAction } from '../redux/acti
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { IProvideSpaceData, IEditSpaceData, SpaceType, ISpaceFormData } from '../redux/reducers/spaceReducer';
 import { ReduxSpaceActions } from '../types/types';
-import { valueIsNumeric } from '../utils/utilFunctions';
+import { handleSubmit, valueIsNumeric } from '../utils/utilFunctions';
 import Checkbox from './Checkbox';
 import RequiredField from './RequiredField';
 
@@ -37,6 +37,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
     const findCityRef = useRef<HTMLInputElement>(null);
     const formData = useSelector((state: IReduxState) => state.spaceStorage[componentIsFor]);
     const { fetchCitiesByPatternSuccessResponse } = useSelector((state: IReduxState) => state.cityStorage);
+    const imagesSources: string[] = [];
     const dispatch = useDispatch();
     const reduxSetFormDataActionsFor: IReduxSetFormDataActionsFor = {
         provideSpaceData: setProvideSpaceDataAction,
@@ -62,12 +63,8 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
 
         dispatch(reduxSetFormDataActionForComponent(newFormData));
     };
-    const applyEffectsOnInit = (): (() => void) => {
+    const applyEffectsOnInit = (): void => {
         applyDropdownValuesToFormDataOnInit();
-
-        return () => {
-            // TODO записывать все src в глобальную переменную, а удалять здесь revokeObjectUrl
-        };
     };
     const handleTypeOfSpaceBoxCheckingBySpaceType = (spaceType: SpaceType): (() => void) => {
         return () => {
@@ -230,7 +227,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
 
                 return (
                     <div className="images-to-upload-container" key={i}>
-                        <img className="image-to-upload" src={src} alt="Загруженное изображение" onClick={() => {}} />
+                        <img className="image-to-upload" src={src} alt="Загруженное изображение" />
                         <div className="remove-image-to-upload" onClick={removeSpaceImageFromList(file)}>
                             <FontAwesomeIcon icon={faTimes} />
                         </div>
@@ -354,6 +351,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
                 <div className="address__input-container">
                     {renderUploadedFiles()}
                     <label
+                        className="add-button-icon"
                         // TODO this is a working  example to go with in css
                         style={{
                             display: 'block',
@@ -364,7 +362,6 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
                         }}
                     >
                         <input
-                            id="aaaa"
                             style={{ display: 'none' }}
                             name="spaceImages"
                             className="photos__input"

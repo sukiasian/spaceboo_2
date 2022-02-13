@@ -4,14 +4,18 @@ import { useNavigate } from 'react-router-dom';
 import Alert from '../components/Alert';
 import SpaceInputFieldsForCreateAndEdit from '../components/SpaceInputFieldsForCreateAndEdit';
 import { requestUserLoginStateAction } from '../redux/actions/authActions';
-import { postProvideSpaceAction, setProvideSpaceSuccessResponseAction } from '../redux/actions/spaceActions';
+import {
+    annualizeProvideSpaceData,
+    annualizeProvideSpaceResponses,
+    postProvideSpaceAction,
+} from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { AlertTypes } from '../types/types';
+import { AlertTypes, UrlPathnames } from '../types/types';
 import { handleSubmit, updateDocumentTitle } from '../utils/utilFunctions';
 
 export default function ProvideSpacePage(): JSX.Element {
     const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
-    const { provideSpaceData, provideSpaceSuccessResponse, provideSpaceFailureResponse } = useSelector(
+    const { provideSpaceData, postProvideSpaceSuccessResponse, postProvideSpaceFailureResponse } = useSelector(
         (state: IReduxState) => state.spaceStorage
     );
     const userLoginState = fetchUserLoginStateSuccessResponse?.data;
@@ -25,9 +29,9 @@ export default function ProvideSpacePage(): JSX.Element {
         dispatch(requestUserLoginStateAction());
 
         return () => {
-            // annualize responses
-            // NOTE можно ли использовать reduxAction(undefined as Payload) вместо annualizeReduxAction() ? т.е. просто передать undefined.
-            dispatch(setProvideSpaceSuccessResponseAction());
+            // FIXME: неправильная архитектура. использовать annualize
+            dispatch(annualizeProvideSpaceResponses());
+            dispatch(annualizeProvideSpaceData());
         };
     };
     const redirectByLoginStateCondition = (): void => {
@@ -40,14 +44,12 @@ export default function ProvideSpacePage(): JSX.Element {
         }
     };
     const redirectToMySpacesAfterProvideSpace = (): void => {
-        if (provideSpaceSuccessResponse) {
-            dispatch(setProvideSpaceSuccessResponseAction());
-        }
+        // if (provideSpaceSuccessResponse) {
+        //     dispatch(setProvideSpaceSuccessResponseAction());
+        // }
 
-        // TODO не использовать захардкоженные
-
-        if (provideSpaceSuccessResponse) {
-            navigate('/spaces');
+        if (postProvideSpaceSuccessResponse) {
+            navigate(UrlPathnames.SPACES);
         }
     };
     const handleSubmitButton = (): void => {
@@ -66,16 +68,19 @@ export default function ProvideSpacePage(): JSX.Element {
         );
     };
     const renderAlertOnSubmitError = (): JSX.Element | void => {
-        if (provideSpaceFailureResponse) {
+        if (postProvideSpaceFailureResponse) {
             return (
-                <Alert alertType={AlertTypes.FAILURE} alertMessage={provideSpaceFailureResponse.message as string} />
+                <Alert
+                    alertType={AlertTypes.FAILURE}
+                    alertMessage={postProvideSpaceFailureResponse.message as string}
+                />
             );
         }
     };
 
     useEffect(applyEffectsOnInit, [dispatch]);
     useEffect(redirectByLoginStateCondition, [userLoginState, navigate]);
-    useEffect(redirectToMySpacesAfterProvideSpace, [provideSpaceSuccessResponse, dispatch, navigate]);
+    useEffect(redirectToMySpacesAfterProvideSpace, [postProvideSpaceSuccessResponse, dispatch, navigate]);
 
     return (
         <section className="provide-space-section">

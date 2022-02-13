@@ -15,6 +15,7 @@ import {
 import { ILoginData } from '../../forms/LoginForm';
 import { ISignupData } from '../../forms/SignupForm';
 import { AnyAction } from 'redux';
+import { serverResponseIsSuccessful } from '../../utils/utilFunctions';
 
 const fetchUserLoginState = async (): Promise<IServerResponse> => {
     return httpRequester.get(`${ApiUrls.AUTH}/userLoginState`);
@@ -24,7 +25,7 @@ function* fetchUserLoginStateWorker(): Generator<CallEffect<any> | PutEffect<Any
     try {
         const response = yield call(fetchUserLoginState);
 
-        if ((response as IServerResponse).statusCode >= 200 && (response as IServerResponse).statusCode < 300) {
+        if (serverResponseIsSuccessful(response as IServerResponse)) {
             yield put(
                 setFetchUserLoginStateSuccessResponseAction({ ...(response as IServerResponse), isLoaded: true })
             );
@@ -71,10 +72,7 @@ function* signupWorker(action: IAction): Generator<CallEffect<any> | PutEffect<A
     try {
         const response = yield call(signupUser, action.payload);
 
-        if (
-            (response as IServerResponse).statusCode >= HttpStatus.OK &&
-            (response as IServerResponse).statusCode < HttpStatus.AMBIGUOUS
-        ) {
+        if (serverResponseIsSuccessful(response as IServerResponse)) {
             yield put(setPostSignupUserSuccessResponse(response as IServerResponse));
         } else {
             throw response;
@@ -96,10 +94,7 @@ function* logoutWorker(): Generator<CallEffect<any> | PutEffect<AnyAction>, void
     try {
         const response = yield call(logoutUser);
 
-        if (
-            (response as IServerResponse).statusCode >= HttpStatus.OK &&
-            (response as IServerResponse).statusCode < HttpStatus.AMBIGUOUS
-        ) {
+        if (serverResponseIsSuccessful(response as IServerResponse)) {
             yield put(setFetchLogoutUserSuccessResponseAction(response as IServerResponse));
         } else {
             throw response;

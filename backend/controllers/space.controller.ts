@@ -41,6 +41,13 @@ export class SpaceController extends Singleton {
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, spaces);
     });
 
+    public getSpacesByUserId = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        // использовать jwt guard, затем обратиться к юзеру
+        const spaces = await this.dao.getUserSpaces(req.user.id);
+
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, spaces);
+    });
+
     public editSpaceById = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const { spaceId } = req.params;
         const { spaceEditData } = req.body;

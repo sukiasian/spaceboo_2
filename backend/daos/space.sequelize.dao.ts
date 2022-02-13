@@ -111,6 +111,14 @@ export class SpaceSequelizeDao extends Dao {
         return this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, queryFromParts);
     };
 
+    public getUserSpaces = async (userId: string): Promise<Space[]> => {
+        return this.model.findAll({
+            where: {
+                userId,
+            },
+        });
+    };
+
     public editSpaceById = async (spaceId: string, spaceEditData: ISpaceEdit): Promise<void> => {
         const space = await this.model.findOne({ where: { id: spaceId } });
 

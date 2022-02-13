@@ -14,12 +14,14 @@ interface IAppointmentAttributes {
     isoDatesReserved: TIsoDatesReserved | TIsoDatesToFindAppointments;
     spaceId: string;
     userId: string;
+    archived?: boolean;
 }
 export interface IAppointment {
     id: string;
     datesReserved: TIsoDatesReserved;
     spaceId: string;
     userId: string;
+    archived?: boolean;
 }
 interface IAppointmentCreationAttributes extends Optional<IAppointmentAttributes, 'id'> {}
 export interface IAppointmentCreate extends IAppointmentCreationAttributes {}
@@ -45,6 +47,9 @@ export class Appointment
     @ForeignKey(() => User)
     @Column({ type: DataType.UUID })
     public userId: string;
+
+    @Column({ defaultValue: false })
+    public archived?: boolean;
 
     @BelongsTo(() => Space)
     public space: Space;

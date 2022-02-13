@@ -28,6 +28,13 @@ class SpaceRouter extends Singleton implements IRouter {
             .get(this.spaceController.getSpacesByQuery);
 
         this.router
+            .route('/user')
+            .get(
+                this.passport.authenticate(PassportStrategies.JWT, { session: false }),
+                this.spaceController.getSpacesByUserId
+            );
+
+        this.router
             .route('/:spaceId')
             .get(this.spaceController.getSpaceById)
             .put(

@@ -13,6 +13,8 @@ import SignupPage from '../pages/SignupPage';
 import SpacePage from '../pages/SpacePage';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import ProvideSpacePage from '../pages/ProvideSpacePage';
+import MyAppointmentsPage from '../pages/MyAppointmentsPage';
+import MySpacesPage from '../pages/MySpacesPage';
 
 // FIXME много повторяющегося кода
 export default function Routes(): JSX.Element {
@@ -60,6 +62,8 @@ export default function Routes(): JSX.Element {
             <Route path="/spaces" element={<HomePage />} />
             <Route path="/spaces/:spaceId" element={<SpacePage />} />
             <Route path="/provide-space" element={<ProvideSpacePage />} />
+            <Route path="/my-spaces" element={<MySpacesPage />} />
+            <Route path="/my-appointments" element={<MyAppointmentsPage />} />
             <Route path="/users/:userId/settings" element={<SettingsPage />} />
             <Route path="/about" element={<AboutUsPage />} />
             <Route path="/contact" element={<ContactUsPage />} />

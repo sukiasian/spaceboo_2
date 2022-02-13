@@ -66,7 +66,7 @@ describe('Image (e2e)', () => {
     });
     beforeEach(async () => {
         city = await cityModel.findOne({ raw: true });
-        city_2 = await cityModel.findOne({ where: { city: 'Краснодар' } });
+        city_2 = await cityModel.findOne({ where: { name: 'Краснодар' } });
         user = await userModel.create(userData);
         spaceData = createSpaceData(user.id, city.id, 1500);
         spaceData_2 = createSpaceData(user.id, city_2.id);

@@ -57,7 +57,9 @@ export class ImageController extends Singleton {
     };
 
     public updateUserAvatarInDb = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
-        await this.userDao.updateUserAvatarInDb(req.user.id, req.file.filename);
+        const userAvatarRelativeUrl = `${req.user.id}/${req.file.filename}`;
+
+        await this.userDao.updateUserAvatarInDb(req.user.id, userAvatarRelativeUrl);
 
         this.utilFunctions.sendResponse(res)(HttpStatus.OK);
     });
@@ -99,7 +101,7 @@ export class ImageController extends Singleton {
     });
 
     public uploadSpaceImagesToStorage = this.utilFunctions.catchAsync(async (req, res, next) => {
-        imageUpload.array(StorageUploadFilenames.SPACE_IMAGES, this.allowedAmountOfSpaceImages)(
+        this.imageUpload.array(StorageUploadFilenames.SPACE_IMAGES, this.allowedAmountOfSpaceImages)(
             req,
             res,
             this.spaceImagesUploadErrorHandler(req, res, next)

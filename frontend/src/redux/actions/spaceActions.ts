@@ -24,6 +24,12 @@ export const requestSpaceByIdAction = (payload: string): IAction<SagaTasks, stri
     };
 };
 
+export const requestUserSpaces = (): IAction<SagaTasks> => {
+    return {
+        type: SagaTasks.REQUEST_USER_SPACES,
+    };
+};
+
 export const setFetchSpacesSuccessResponseAction = (
     payload: IServerResponse
 ): IAction<ReduxSpaceActions, IServerResponse> => {
@@ -46,20 +52,20 @@ export const setProvideSpaceDataAction = (
     payload: IProvideSpaceData
 ): IAction<ReduxSpaceActions, IProvideSpaceData> => {
     return {
-        type: ReduxSpaceActions.SET_PROVIDE_SPACE_DATA,
+        type: ReduxSpaceActions.SET_POST_PROVIDE_SPACE_DATA,
         payload,
     };
 };
 
 export const setEditSpaceDataAction = (payload: IEditSpaceData): IAction<ReduxSpaceActions, IEditSpaceData> => {
     return {
-        type: ReduxSpaceActions.SET_EDIT_SPACE_DATA,
+        type: ReduxSpaceActions.SET_PUT_EDIT_SPACE_DATA,
         payload,
     };
 };
 
 export const setProvideSpaceSuccessResponseAction = (
-    payload?: IServerResponse
+    payload: IServerResponse
 ): IAction<ReduxSpaceActions, IServerResponse> => {
     return {
         type: ReduxSpaceActions.SET_POST_PROVIDE_SPACE_SUCCESS_RESPONSE,
@@ -94,9 +100,39 @@ export const setFetchSpaceByIdFailureResponseAction = (
     };
 };
 
+export const setFetchUserSpacesSuccessResponseAction = (
+    payload: IServerResponse
+): IAction<ReduxSpaceActions, IServerResponse> => {
+    return {
+        type: ReduxSpaceActions.SET_FETCH_USER_SPACES_SUCCESS_RESPONSE,
+        payload,
+    };
+};
+
+export const setFetchUserSpacesFailureResponseAction = (
+    payload: IServerResponse
+): IAction<ReduxSpaceActions, IServerResponse> => {
+    return {
+        type: ReduxSpaceActions.SET_FETCH_USER_SPACES_FAILURE_RESPONSE,
+        payload,
+    };
+};
+
 export const setFetchSpacesQueryDataAction = (queryData: IQueryData): IAction<ReduxSpaceActions, IQueryData> => {
     return {
         type: ReduxSpaceActions.SET_FETCH_SPACES_QUERY_DATA,
         payload: queryData,
+    };
+};
+
+export const annualizeProvideSpaceData = (): IAction<ReduxSpaceActions> => {
+    return {
+        type: ReduxSpaceActions.ANNUALIZE_PROVIDE_SPACE_DATA,
+    };
+};
+
+export const annualizeProvideSpaceResponses = (): IAction<ReduxSpaceActions> => {
+    return {
+        type: ReduxSpaceActions.ANNUALIZE_PROVIDE_SPACE_RESPONSES,
     };
 };

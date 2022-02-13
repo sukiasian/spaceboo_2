@@ -36,8 +36,10 @@ export interface ISpaceState extends ISpaceFormData {
     fetchSpacesFailureResponse?: IServerResponse;
     fetchSpaceByIdSuccessResponse?: IServerResponse;
     fetchSpaceByIdFailureResponse?: IServerResponse;
-    provideSpaceSuccessResponse?: IServerResponse;
-    provideSpaceFailureResponse?: IServerResponse;
+    fetchUserSpacesSuccessResponse?: IServerResponse;
+    fetchUserSpacesFailureResponse?: IServerResponse;
+    postProvideSpaceSuccessResponse?: IServerResponse;
+    postProvideSpaceFailureResponse?: IServerResponse;
 }
 
 export enum SpaceType {
@@ -45,14 +47,16 @@ export enum SpaceType {
     HOUSE = 'Жилой дом',
 }
 
+const initialProvideSpaceData = {
+    type: SpaceType.FLAT,
+    roomsNumber: 2,
+    bedsNumber: 2,
+    lockerConnected: false,
+};
+
 const initialState: ISpaceState = {
     isLoaded: false,
-    provideSpaceData: {
-        type: SpaceType.FLAT,
-        roomsNumber: 2,
-        bedsNumber: 2,
-        lockerConnected: false,
-    },
+    provideSpaceData: initialProvideSpaceData,
 };
 
 export const spaceReducer = (state = initialState, action: IAction): ISpaceState => {
@@ -60,13 +64,13 @@ export const spaceReducer = (state = initialState, action: IAction): ISpaceState
         case ReduxSpaceActions.SET_POST_PROVIDE_SPACE_SUCCESS_RESPONSE:
             return {
                 ...state,
-                provideSpaceSuccessResponse: action.payload,
+                postProvideSpaceSuccessResponse: action.payload,
             };
 
         case ReduxSpaceActions.SET_POST_PROVIDE_SPACE_FAILURE_RESPONSE:
             return {
                 ...state,
-                provideSpaceFailureResponse: action.payload,
+                postProvideSpaceFailureResponse: action.payload,
             };
 
         case ReduxSpaceActions.SET_FETCH_SPACES_SUCCESS_RESPONSE:
@@ -93,7 +97,19 @@ export const spaceReducer = (state = initialState, action: IAction): ISpaceState
                 fetchSpaceByIdFailureResponse: action.payload,
             };
 
-        case ReduxSpaceActions.SET_PROVIDE_SPACE_DATA:
+        case ReduxSpaceActions.SET_FETCH_USER_SPACES_SUCCESS_RESPONSE:
+            return {
+                ...state,
+                fetchUserSpacesSuccessResponse: action.payload,
+            };
+
+        case ReduxSpaceActions.SET_FETCH_USER_SPACES_FAILURE_RESPONSE:
+            return {
+                ...state,
+                fetchUserSpacesFailureResponse: action.payload,
+            };
+
+        case ReduxSpaceActions.SET_POST_PROVIDE_SPACE_DATA:
             return {
                 ...state,
                 provideSpaceData: action.payload,
@@ -103,6 +119,19 @@ export const spaceReducer = (state = initialState, action: IAction): ISpaceState
             return {
                 ...state,
                 fetchSpacesQueryData: action.payload,
+            };
+
+        case ReduxSpaceActions.ANNUALIZE_PROVIDE_SPACE_DATA:
+            return {
+                ...state,
+                provideSpaceData: initialProvideSpaceData,
+            };
+
+        case ReduxSpaceActions.ANNUALIZE_PROVIDE_SPACE_RESPONSES:
+            return {
+                ...state,
+                postProvideSpaceSuccessResponse: undefined,
+                postProvideSpaceFailureResponse: undefined,
             };
 
         default: {

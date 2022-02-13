@@ -11,8 +11,11 @@ import {
     setProvideSpaceSuccessResponseAction,
     setFetchSpaceByIdSuccessResponseAction,
     setFetchSpaceByIdFailureResponseAction,
+    setFetchUserSpacesSuccessResponseAction,
+    setFetchUserSpacesFailureResponseAction,
 } from '../actions/spaceActions';
 import { IProvideSpaceData } from '../reducers/spaceReducer';
+import { serverResponseIsSuccessful } from '../../utils/utilFunctions';
 
 interface IPriceRangeQueryString {
     priceFrom?: string;
@@ -61,7 +64,7 @@ function* fetchSpacesWorker(action: IAction): Generator<CallEffect<IServerRespon
     try {
         const response = yield call(fetchSpaces, action.payload);
 
-        if ((response as IServerResponse).statusCode >= 200 && (response as IServerResponse).statusCode < 300) {
+        if (serverResponseIsSuccessful(response as IServerResponse)) {
             yield put(setFetchSpacesSuccessResponseAction(response as IServerResponse));
         } else {
             throw response;
@@ -95,7 +98,7 @@ function* postProvideSpaceWorker(action: IAction): Generator<CallEffect<any> | P
     try {
         const response = yield call(postProvideSpace, action.payload);
 
-        if ((response as IServerResponse).statusCode >= 200 && (response as IServerResponse).statusCode < 300) {
+        if (serverResponseIsSuccessful(response as IServerResponse)) {
             yield put(setProvideSpaceSuccessResponseAction(response as IServerResponse));
         } else {
             throw response;
@@ -111,11 +114,12 @@ export function* watchPostProvideSpace(): Generator<ForkEffect, void, void> {
 const requestSpaceById = (spaceId: string): Promise<IServerResponse> => {
     return httpRequester.get(`${ApiUrls.SPACES}/${spaceId}`);
 };
+
 function* requestSpaceByIdWorker(action: IAction): Generator<CallEffect<any> | PutEffect<AnyAction>, void> {
     try {
         const response = yield call(requestSpaceById, action.payload);
 
-        if ((response as IServerResponse).statusCode >= 200 && (response as IServerResponse).statusCode < 300) {
+        if (serverResponseIsSuccessful(response as IServerResponse)) {
             yield put(setFetchSpaceByIdSuccessResponseAction(response as IServerResponse));
         } else {
             throw response;
@@ -126,4 +130,25 @@ function* requestSpaceByIdWorker(action: IAction): Generator<CallEffect<any> | P
 }
 export function* watchRequestSpaceById(): Generator<ForkEffect, void, void> {
     yield takeEvery(SagaTasks.REQUEST_SPACE_BY_ID, requestSpaceByIdWorker);
+}
+
+const requestUserSpaces = (): Promise<IServerResponse> => {
+    return httpRequester.get(`${ApiUrls.SPACES}/user`);
+};
+
+function* requestUserSpacesWorker(): Generator<CallEffect<any> | PutEffect<AnyAction>, void> {
+    try {
+        const response = yield call(requestUserSpaces);
+
+        if (serverResponseIsSuccessful(response as IServerResponse)) {
+            yield put(setFetchUserSpacesSuccessResponseAction(response as IServerResponse));
+        } else {
+            throw response;
+        }
+    } catch (err) {
+        yield put(setFetchUserSpacesFailureResponseAction(err as IServerResponse));
+    }
+}
+export function* watchRequestUserSpaces(): Generator<ForkEffect, void, void> {
+    yield takeEvery(SagaTasks.REQUEST_USER_SPACES, requestUserSpacesWorker);
 }

@@ -1,6 +1,7 @@
 import { ForkEffect, takeEvery, put, call } from '@redux-saga/core/effects';
 import { ApiUrls, IServerResponse, SagaTasks } from '../../types/types';
 import { httpRequester } from '../../utils/HttpRequest';
+import { serverResponseIsSuccessful } from '../../utils/utilFunctions';
 import { IAction } from '../actions/ActionTypes';
 import {
     setUploadImageFailureResponseAction,
@@ -20,7 +21,7 @@ function* postSpaceImagesWorker(action: IAction<SagaTasks, TPostUploadSpaceImage
     try {
         const response = yield call(postSpaceImages, action.payload as TPostUploadSpaceImagesPayload);
 
-        if ((response as IServerResponse).statusCode >= 200 && (response as IServerResponse).statusCode < 400) {
+        if (serverResponseIsSuccessful(response as IServerResponse)) {
             yield put(setUploadImageSuccessResponseAction(response as IServerResponse));
         } else {
             throw response;
