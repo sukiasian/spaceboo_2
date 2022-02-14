@@ -1,12 +1,12 @@
 import * as express from 'express';
 import * as request from 'supertest';
 import * as dotenv from 'dotenv';
-import { Application } from '../App';
+import { AppConfig } from '../AppConfig';
 import { IUserCreate, User } from '../models/user.model';
 import {
     clearDb,
     closeTestEnv,
-    createApplicationInstance,
+    createAppConfig,
     createSpaceData,
     createTokenAndSign,
     createUserData,
@@ -21,7 +21,7 @@ import { City } from '../models/city.model';
 describe('Appointment (e2e)', () => {
     let app: express.Express;
     let server: any;
-    let applicationInstance: Application;
+    let appConfig: AppConfig;
     let db: Sequelize;
     let userData: IUserCreate;
     let user: User;
@@ -40,10 +40,10 @@ describe('Appointment (e2e)', () => {
     beforeAll(async () => {
         dotenv.config({ path: '../test.env' });
 
-        applicationInstance = createApplicationInstance();
+        appConfig = createAppConfig();
 
-        app = applicationInstance.app;
-        db = applicationInstance.sequelize;
+        app = appConfig.app;
+        db = appConfig.sequelize;
 
         userModel = User;
         spaceModel = Space;
@@ -69,7 +69,7 @@ describe('Appointment (e2e)', () => {
             endingDate: '2020-12-25',
             endingTime: '12:00',
         };
-        server = (await openTestEnv(applicationInstance)).server;
+        server = (await openTestEnv(appConfig)).server;
     });
 
     beforeEach(async () => {

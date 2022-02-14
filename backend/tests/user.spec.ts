@@ -1,13 +1,12 @@
 import * as express from 'express';
 import * as request from 'supertest';
 import * as path from 'path';
-import * as faker from 'faker';
-import { Application } from '../App';
+import { AppConfig } from '../AppConfig';
 import { IUserCreate, User, UserRoles, UserScopes } from '../models/user.model';
 import {
     clearDbAndStorage,
     closeTestEnv,
-    createApplicationInstance,
+    createAppConfig,
     createSpaceData,
     createTokenAndSign,
     createUserData,
@@ -25,7 +24,7 @@ import { fake } from 'faker';
 describe('User (e2e)', () => {
     let app: express.Express;
     let server: any;
-    let applicationInstance: Application;
+    let appConfig: AppConfig;
     let db: Sequelize;
     let user_1: User;
     let user_2: User;
@@ -46,10 +45,10 @@ describe('User (e2e)', () => {
     let fakeName: string;
 
     beforeAll(async () => {
-        applicationInstance = createApplicationInstance();
+        appConfig = createAppConfig();
 
-        app = applicationInstance.app;
-        db = applicationInstance.sequelize;
+        app = appConfig.app;
+        db = appConfig.sequelize;
 
         pathToTestImage = path.resolve('tests', 'files', 'images', '1.png');
 
@@ -66,7 +65,7 @@ describe('User (e2e)', () => {
         fakePassword = 'fakepassword';
         fakeName = 'Петр';
 
-        server = (await openTestEnv(applicationInstance)).server;
+        server = (await openTestEnv(appConfig)).server;
     });
 
     beforeEach(async () => {
@@ -79,8 +78,8 @@ describe('User (e2e)', () => {
             where: { id: space_1.id },
             include: [City, Appointment],
         });
-        token_1 = await createTokenAndSign<object>({ id: user_1.id });
-        token_2 = await createTokenAndSign<object>({ id: user_2.id });
+        token_1 = createTokenAndSign<object>({ id: user_1.id });
+        token_2 = createTokenAndSign<object>({ id: user_2.id });
     });
 
     afterEach(async () => {

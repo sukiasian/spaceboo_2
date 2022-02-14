@@ -28,7 +28,7 @@ export enum ResLocalsImageAmountEntity {
 export class StorageConfig extends Singleton {
     private readonly multer = multer;
     private readonly UtilFunctions = UtilFunctions;
-    public readonly spaceImagesTotalAmount = 10;
+    public readonly spaceImagesTotalAmount = 5;
 
     private readonly diskStorageFactory = (): multer.StorageEngine => {
         return this.multer.diskStorage({

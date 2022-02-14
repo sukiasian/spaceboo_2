@@ -3,19 +3,23 @@ import * as fs from 'fs';
 import { User } from '../models/user.model';
 import { Singleton, SingletonFactory } from './Singleton';
 import UtilFunctions from './UtilFunctions';
-import { applicationInstance } from '../App';
+import { appConfig } from '../AppConfig';
 import { Appointment, IAppointment } from '../models/appointment.model';
 import { Space } from '../models/space.model';
 import logger from '../loggers/logger';
+import { verificationCodeValidityInterval } from '../controllers/email-verification.controller';
+import { EmailVerification } from '../models/email-verification.model';
 
-export default class NodeCronFunctions extends Singleton {
+export class NodeCronFunctions extends Singleton {
     private readonly pathToImagesDir = 'assets/images';
     private readonly userModel: typeof User = User;
     private readonly spaceModel: typeof Space = Space;
     private readonly appointmentModel: typeof Appointment = Appointment;
+    private readonly emailVerificationModel: typeof EmailVerification = EmailVerification;
     private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
-    private readonly sequelize = applicationInstance.sequelize;
+    private readonly sequelize = appConfig.sequelize;
     private readonly logger = logger;
+    private readonly verificationCodeValidityInterval = verificationCodeValidityInterval;
 
     public archiveOutdatedAppointments = async (): Promise<void> => {
         try {
@@ -35,7 +39,7 @@ export default class NodeCronFunctions extends Singleton {
                 })
             );
         } catch (err) {
-            logger.error(err);
+            this.logger.error(err);
         }
     };
 
@@ -58,7 +62,7 @@ export default class NodeCronFunctions extends Singleton {
                 }
             }
         } catch (err) {
-            logger.error(err);
+            this.logger.error(err);
         }
     };
 
@@ -84,7 +88,32 @@ export default class NodeCronFunctions extends Singleton {
                 }
             }
         } catch (err) {
-            logger.error(err);
+            this.logger.error(err);
+        }
+    };
+
+    public removeOutdatedEmailsFromDb = async (): Promise<void> => {
+        try {
+            const dateIntervalAgo = new Date(Date.now() - this.verificationCodeValidityInterval).toISOString();
+            const getOutdatedVerificationCodesRawQuery = `SELECT * FROM "EmailVerification" ev WHERE ev."createdAt" < '${dateIntervalAgo}'`;
+            const outdatedVerificationCodes = (await this.utilFunctions.createSequelizeRawQuery(
+                this.sequelize,
+                getOutdatedVerificationCodesRawQuery
+            )) as EmailVerification[];
+
+            await Promise.all(
+                outdatedVerificationCodes.map(async (code) => {
+                    const outdatedVerificationCode = await this.emailVerificationModel.findOne({
+                        where: {
+                            id: code.id,
+                        },
+                    });
+
+                    await outdatedVerificationCode.destroy();
+                })
+            );
+        } catch (err) {
+            this.logger.error(err);
         }
     };
 }

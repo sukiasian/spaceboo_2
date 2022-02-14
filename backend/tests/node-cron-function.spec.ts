@@ -4,12 +4,12 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as request from 'supertest';
 import * as jwt from 'jsonwebtoken';
-import { Application } from '../App';
+import { AppConfig } from '../AppConfig';
 import {
     clearDb,
     clearDbAndStorage,
     closeTestEnv,
-    createApplicationInstance,
+    createAppConfig,
     createAppoinmentData,
     createNodeCronFunctions,
     createSpaceData,
@@ -17,7 +17,7 @@ import {
     openTestEnv,
 } from './lib';
 import { Sequelize } from 'sequelize-typescript';
-import NodeCronFunctions from '../utils/NodeCronFunctions';
+import { NodeCronFunctions } from '../utils/NodeCronFunctions';
 import { IUserCreate, User } from '../models/user.model';
 import { Space } from '../models/space.model';
 import { Appointment, TIsoDatesReserved } from '../models/appointment.model';
@@ -28,7 +28,7 @@ import { StorageUploadFilenames } from '../configurations/storage.config';
 describe('NodeCronjob (e2e)', () => {
     let app: express.Express;
     let server: any;
-    let applicationInstance: Application;
+    let appConfig: AppConfig;
     let sequelize: Sequelize;
     let nodeCronFunctions: NodeCronFunctions;
     let userModel: typeof User;
@@ -50,7 +50,7 @@ describe('NodeCronjob (e2e)', () => {
     beforeAll(async () => {
         dotenv.config({ path: '../test.env' });
 
-        applicationInstance = createApplicationInstance();
+        appConfig = createAppConfig();
         nodeCronFunctions = createNodeCronFunctions();
 
         userModel = User;
@@ -83,10 +83,10 @@ describe('NodeCronjob (e2e)', () => {
             },
         ];
 
-        app = applicationInstance.app;
-        sequelize = applicationInstance.sequelize;
+        app = appConfig.app;
+        sequelize = appConfig.sequelize;
 
-        server = (await openTestEnv(applicationInstance)).server;
+        server = (await openTestEnv(appConfig)).server;
     });
 
     beforeEach(async () => {
@@ -115,6 +115,7 @@ describe('NodeCronjob (e2e)', () => {
         const space_2 = await spaceModel.create(spaceData_2);
         const appointmentData_2 = createAppoinmentData(isoDatesReserved_2, space_2.id, user_2.id);
         const appointmentForSpace_2 = await appointmentModel.create(appointmentData_2);
+
         expect(appointmentForSpace_1.archived).toBeFalsy();
         expect(appointmentForSpace_2.archived).toBeFalsy();
 
@@ -182,24 +183,107 @@ describe('NodeCronjob (e2e)', () => {
     });
 
     it('Function "removeOutdatedSpaceImagesFromStorage" should remove outdated space images according to avatarUrl', async () => {
-        // NOTE
-        // добавить изображения к спейсам (создать  через эндпоинт) и аттачнуть изображения для двух спейсов
-        // затем удалить какие либо изображения. Как это делается ? через запихивание нового массива. Старые же фотки должны просто удаляться.
-        // но речь должна идти о живых фото а не о ссылках в базе данных (эта тема для фронта). мы должны посмотреть меняется ли как то список изображений и отправлять только те изображения которые изменились.
+        const spaceData_1 = createSpaceData(user_1.id, city.id, 1000);
+        const spaceData_2 = createSpaceData(user_2.id, city.id, 1000);
+        const configureRequestForSpace = (request: request.SuperTest<request.Test>): request.Test => {
+            let req = request.post(ApiRoutes.SPACES);
 
-        // судя по всему нужно менять эндпоинт editSpaces. использовать мы будем editUserSpace для добавления фотографий и он будет выглядеть также как и provideSpace
-        const responseForProvidingSpace_1 = await request(app)
+            for (const field in spaceData_1) {
+                req = req.field(field, spaceData_1[field]);
+            }
+
+            req.set('Authorization', `Bearer ${token_1}`).attach(
+                StorageUploadFilenames.SPACE_IMAGES,
+                pathToTestImage_2
+            );
+
+            return req;
+        };
+
+        const space_1 = await configureRequestForSpace(request(app));
+
+        /* 
+            
+             address: faker.address.streetAddress(),
+        pricePerNight,
+        type: SpaceType.FLAT,
+        roomsNumber: 2,
+        bedsNumber: 2,
+        imagesUrl: ['/public/images/space/1.jpg'],
+        lockerConnected: false,
+        facilities: ['TV'],
+        description: faker.lorem.sentence(5),
+        userId,
+        cityId,
+            
+            */
+        console.log(space_1.body);
+
+        // .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage_1);
+        // const outdatedImagesUrlForSpace_1 = (
+        //     await spaceModel.findOne({
+        //         where: {
+        //             id: space_1.body.data.id,
+        //         },
+        //     })
+        // ).imagesUrl;
+        // const space_2 = await request(app)
+        //     .post(ApiRoutes.SPACES)
+        //     .send(spaceData_2)
+        //     .set('Authorization', `Bearer ${token_2}`)
+        //     .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage_1);
+        // const outdatedImagesUrlForSpace_2 = (
+        //     await spaceModel.findOne({
+        //         where: {
+        //             id: space_2.body.data.id,
+        //         },
+        //     })
+        // ).imagesUrl;
+        const responseForEditingSpace_1 = await request(app)
+            .put(`ApiRoutes.SPACES/${space_1}`)
+            // .send({ spaceImagesToRemove: [space_1.body.data.imagesUrl[0]] })
+            .set('Authorization', `Bearer ${token_1}`)
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage_2);
+        const freshSpace_1 = await spaceModel.findOne({
+            where: {
+                id: space_1.body.data.id,
+            },
+        });
+        // const checkIfOutdatedSpaceImageExistForSpace_1 = fs.existsSync(
+        //     path.resolve('assets/images', space_1.body.data.imagesUrl[0])
+        // );
+
+        // console.log(checkIfOutdatedSpaceImageExistForSpace_1);
+
+        // const checkIfFreshSpaceImageExistsForSpace_1 = fs.existsSync(
+        //     path.resolve('assets/images', freshSpace_1.imagesUrl[0])
+        // );
+        // console.log(checkIfFreshSpaceImageExistsForSpace_1);
+
+        // const responseForEditingSpace_2 = await request(app)
+        //     .put(`ApiRoutes.SPACES/${space_2}`)
+        //     .set('Authorization', `Bearer ${token_2}`)
+        //     .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage_2);
+    });
+
+    it('Function "removeOutdatedEmailsFromDb" should remove outdated space images according to avatarUrl', async () => {
+        const spaceData_1 = createSpaceData(user_1.id, city.id, 1000);
+        const spaceData_2 = createSpaceData(user_2.id, city.id, 1000);
+
+        const space_1 = await request(app)
             .post(ApiRoutes.SPACES)
+            .send(spaceData_1)
             .set('Authorization', `Bearer ${token_1}`)
             .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage_1);
 
-        const responseForProvidingSpace_2 = await request(app)
+        const space_2 = await request(app)
             .post(ApiRoutes.SPACES)
-            .set('Authorization', `Bearer ${token_1}`)
+            .send(spaceData_2)
+            .set('Authorization', `Bearer ${token_2}`)
             .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage_1);
 
-        await request(app)
-            .put(ApiRoutes.SPACES)
+        const responseForEditingSpace_1 = await request(app)
+            .put(`ApiRoutes.SPACES/${space_1}`)
             .set('Authorization', `Bearer ${token_1}`)
             .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage_2);
     });

@@ -1,12 +1,11 @@
 import * as express from 'express';
 import * as request from 'supertest';
-import * as dotenv from 'dotenv';
-import { Application } from '../App';
+import { AppConfig } from '../AppConfig';
 import { IUserCreate, User } from '../models/user.model';
 import {
     clearDb,
     closeTestEnv,
-    createApplicationInstance,
+    createAppConfig,
     createSpaceData,
     createTokenAndSign,
     createUserData,
@@ -21,7 +20,7 @@ import { City } from '../models/city.model';
 describe('Route Protector (e2e)', () => {
     let app: express.Express;
     let server: any;
-    let applicationInstance: Application;
+    let appConfig: AppConfig;
     let db: Sequelize;
     let user_1: User;
     let user_2: User;
@@ -39,10 +38,10 @@ describe('Route Protector (e2e)', () => {
     let appointmentModel: typeof Appointment;
 
     beforeAll(async () => {
-        applicationInstance = createApplicationInstance();
+        appConfig = createAppConfig();
 
-        app = applicationInstance.app;
-        db = applicationInstance.sequelize;
+        app = appConfig.app;
+        db = appConfig.sequelize;
 
         userModel = User;
         spaceModel = Space;
@@ -52,7 +51,7 @@ describe('Route Protector (e2e)', () => {
         userData_1 = createUserData();
         userData_2 = createUserData();
 
-        server = (await openTestEnv(applicationInstance)).server;
+        server = (await openTestEnv(appConfig)).server;
     });
 
     beforeEach(async () => {

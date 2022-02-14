@@ -2,7 +2,7 @@ import * as jwt from 'jsonwebtoken';
 import { SpaceSequelizeDao, spaceSequelizeDao } from '../daos/space.sequelize.dao';
 import { userSequelizeDao, UserSequelizeDao } from '../daos/user.sequelize.dao';
 import { Space } from '../models/space.model';
-import { User, UserRoles } from '../models/user.model';
+import { User, UserRoles, UserScopes } from '../models/user.model';
 import { ErrorMessages, HttpStatus } from '../types/enums';
 import AppError from './AppError';
 import UtilFunctions from './UtilFunctions';
@@ -42,6 +42,21 @@ export class RouteProtector {
         next();
     });
 
+    public static confirmedUserProtector = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        const user = await this.userModel.scope(UserScopes.WITH_CONFIRMED).findOne({
+            where: {
+                id: req.user.id,
+            },
+        });
+
+        if (!user.confirmed) {
+            throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.VERIFY_ACCOUNT);
+        }
+
+        next();
+    });
+
+    // FIXME: this is realized in passport JWT but in case if we need to allow access for unconfirmed users through passport jwt then we need to use this one.
     public static passwordRecoveryProtector = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const token = req.cookies['jwt'];
 

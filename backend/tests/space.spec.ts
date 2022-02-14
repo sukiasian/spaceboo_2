@@ -3,12 +3,12 @@ import * as request from 'supertest';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as faker from 'faker';
-import { Application } from '../App';
-import { IUserCreate, User, userEditFields } from '../models/user.model';
+import { AppConfig } from '../AppConfig';
+import { IUserCreate, User } from '../models/user.model';
 import {
     clearDb,
     closeTestEnv,
-    createApplicationInstance,
+    createAppConfig,
     createSpaceData,
     createTokenAndSign,
     createUserData,
@@ -26,7 +26,7 @@ import { StorageUploadFilenames } from '../configurations/storage.config';
 describe('Space (e2e)', () => {
     let app: express.Express;
     let server: any;
-    let applicationInstance: Application;
+    let appConfig: AppConfig;
     let db: Sequelize;
     let userData: IUserCreate;
     let user: User;
@@ -68,12 +68,12 @@ describe('Space (e2e)', () => {
             '2022-12-20',
             '12:00'
         );
-        applicationInstance = createApplicationInstance();
+        appConfig = createAppConfig();
 
         pathToTestImage = path.resolve('tests', 'files', 'images', '1.png');
 
-        app = applicationInstance.app;
-        db = applicationInstance.sequelize;
+        app = appConfig.app;
+        db = appConfig.sequelize;
 
         spaceDao = spaceSequelizeDao;
 
@@ -82,11 +82,11 @@ describe('Space (e2e)', () => {
         cityModel = City;
         appointmentModel = Appointment;
         userData = createUserData();
-        server = (await openTestEnv(applicationInstance)).server;
+        server = (await openTestEnv(appConfig)).server;
     });
     beforeEach(async () => {
         city = await cityModel.findOne({ raw: true });
-        city_2 = await cityModel.findOne({ where: { city: 'Краснодар' } });
+        city_2 = await cityModel.findOne({ where: { name: 'Краснодар' } });
         user = await userModel.create(userData);
         spaceData = createSpaceData(user.id, city.id, 1500);
         spaceData_2 = createSpaceData(user.id, city_2.id);
@@ -363,7 +363,7 @@ describe('Space (e2e)', () => {
         await request(app)
             .post(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
             .set('Authorization', `Bearer ${token}`)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage);
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage);
 
         const freshSpace: Space = await spaceDao.findById(space_1.id);
         expect(freshSpace.imagesUrl.length).toBe(2);
@@ -375,10 +375,10 @@ describe('Space (e2e)', () => {
         await request(app)
             .post(`${ApiRoutes.IMAGES}/spaces/${space_1.id}`)
             .set('Authorization', `Bearer ${token}`)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage)
-            .attach(StorageUploadFilenames.SPACE_IMAGE, pathToTestImage);
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage)
+            .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage);
 
         const space: Space = await spaceDao.findById(space_1.id);
 

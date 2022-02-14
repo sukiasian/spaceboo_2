@@ -1,39 +1,52 @@
-import { app, applicationInstance } from './App';
+import { app, appConfig } from './AppConfig';
 import logger from './loggers/logger';
 import * as process from 'process';
 import * as dotenv from 'dotenv';
 import { Environment } from './types/enums';
 import UtilFunctions from './utils/UtilFunctions';
 import databaseConnection from './database/connectToDb';
+import { Singleton, SingletonFactory } from './utils/Singleton';
+import setCrons from './crons';
 
-const PORT = process.env.PORT || 8000;
+class Server extends Singleton {
+    private readonly app = app;
+    private readonly PORT = process.env.PORT || 8000;
+    private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
 
-// if (process.env.NODE_ENV === Environment.DEVELOPMENT || process.env) {
-//     dotenv.config({ path: './.env' });
-// } else if (process.env.NODE_ENV === Environment.TEST) {
-//     dotenv.config({ path: './test.config.env' });
-// }
+    public static configureDotenv = (): void => {
+        switch (process.env.NODE_ENV) {
+            case Environment.DEVELOPMENT || Environment.PRODUCTION:
+                dotenv.config({ path: './.env' });
+                break;
 
-switch (process.env.NODE_ENV) {
-    case Environment.DEVELOPMENT || Environment.PRODUCTION:
-        dotenv.config({ path: './.env' });
-        break;
+            case Environment.TEST:
+                dotenv.config({ path: './.test.config.env' });
+                break;
+        }
+    };
 
-    case Environment.TEST:
-        dotenv.config({ path: './.test.config.env' });
-        break;
+    public startCrons = () => {
+        setCrons();
+    };
+
+    public start = async () => {
+        await databaseConnection(appConfig.sequelize);
+
+        const server = this.app.listen(this.PORT, () => {
+            logger.info(`Server is listening on ${this.PORT}`);
+
+            if (process.env.NODE_ENV === Environment.PRODUCTION) {
+                process.send('Server is ready');
+            }
+        });
+
+        this.utilFunctions.exitHandler(server);
+    };
 }
 
-(async () => {
-    await databaseConnection(applicationInstance.sequelize);
+Server.configureDotenv();
 
-    const server = app.listen(PORT, () => {
-        logger.info(`Server is listening on ${PORT}`);
+const server = SingletonFactory.produce<Server>(Server);
 
-        if (process.env.NODE_ENV === Environment.PRODUCTION) {
-            process.send('Server is ready');
-        }
-    });
-
-    UtilFunctions.exitHandler(server);
-})();
+server.startCrons();
+server.start();

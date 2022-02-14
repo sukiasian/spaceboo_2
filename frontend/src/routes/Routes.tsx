@@ -27,7 +27,7 @@ export default function Routes(): JSX.Element {
                 <Route path="/" element={<ConfirmAccountPage />} />
                 <Route path="/spaces" element={<ConfirmAccountPage />} />
                 <Route path="/spaces/:spaceId" element={<SpacePage />} />
-                <Route path="/provide-space" element={<ProvideSpacePage />} />
+                <Route path="/provide-space" element={<ConfirmAccountPage />} />
                 <Route path="/for-inverstors" element={<ForInvestorsPage />} />
                 <Route path="/how-it-works" element={<HowItWorksPage />} />
                 <Route path="/about" element={<AboutUsPage />} />

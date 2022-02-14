@@ -2,12 +2,12 @@ import * as express from 'express';
 import * as request from 'supertest';
 import * as faker from 'faker';
 import * as jwt from 'jsonwebtoken';
-import { Application } from '../App';
+import { AppConfig } from '../AppConfig';
 import { IUserCreate, User, userCreateFields } from '../models/user.model';
 import {
     clearDb,
     closeTestEnv,
-    createApplicationInstance,
+    createAppConfig,
     createInvalidUserData,
     createSpaceData,
     createTokenAndSign,
@@ -17,27 +17,26 @@ import {
 } from './lib';
 import { Sequelize } from 'sequelize-typescript';
 import { ApiRoutes, ErrorMessages, HttpStatus } from '../types/enums';
-import { ISpaceCreate } from '../models/space.model';
 
 describe('Auth (e2e)', () => {
     let app: express.Express;
     let server: any;
-    let applicationInstance: Application;
+    let appConfig: AppConfig;
     let db: Sequelize;
     let userData: IUserCreate;
     let userModel: typeof User;
     let invalidUserData: any;
 
     beforeAll(async () => {
-        applicationInstance = createApplicationInstance();
+        appConfig = createAppConfig();
 
-        app = applicationInstance.app;
-        db = applicationInstance.sequelize;
+        app = appConfig.app;
+        db = appConfig.sequelize;
         invalidUserData = createInvalidUserData();
         userModel = User;
         userData = createUserData();
 
-        server = (await openTestEnv(applicationInstance)).server;
+        server = (await openTestEnv(appConfig)).server;
     });
     beforeEach(async () => {});
 

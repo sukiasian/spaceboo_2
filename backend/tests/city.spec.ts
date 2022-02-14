@@ -1,15 +1,15 @@
 import * as express from 'express';
 import * as request from 'supertest';
 import * as dotenv from 'dotenv';
-import { Application } from '../App';
-import { clearDb, closeTestEnv, createApplicationInstance, openTestEnv } from './lib';
+import { AppConfig } from '../AppConfig';
+import { clearDb, closeTestEnv, createAppConfig, openTestEnv } from './lib';
 import { Sequelize } from 'sequelize-typescript';
 import { City } from '../models/city.model';
 
 describe('City (e2e)', () => {
     let app: express.Express;
     let server: any;
-    let applicationInstance: Application;
+    let appConfig: AppConfig;
     let db: Sequelize;
     let city: City;
     let cityModel: typeof City;
@@ -17,14 +17,14 @@ describe('City (e2e)', () => {
     beforeAll(async () => {
         dotenv.config({ path: '../test.env' });
 
-        applicationInstance = createApplicationInstance();
+        appConfig = createAppConfig();
 
-        app = applicationInstance.app;
-        db = applicationInstance.sequelize;
+        app = appConfig.app;
+        db = appConfig.sequelize;
 
         cityModel = City;
 
-        server = (await openTestEnv(applicationInstance)).server;
+        server = (await openTestEnv(appConfig)).server;
         city = await cityModel.findOne({ raw: true });
     });
 

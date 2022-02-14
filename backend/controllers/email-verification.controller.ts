@@ -19,6 +19,7 @@ export class EmailVerificationController extends Singleton {
     private readonly authSequelizeDao: AuthSequelizeDao = authSequelizeDao;
     private readonly sendMail = sendMail;
     private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
+    public verificationCodeValidityPeriod = 15 * 60 * 1000;
 
     public sendVerificationCodeByPurpose = this.utilFunctions.catchAsync(
         async (req, res: express.Response, next): Promise<void> => {
@@ -81,10 +82,9 @@ export class EmailVerificationController extends Singleton {
                 throw new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.VERIFICATION_CODE_NOT_VALID);
             }
 
-            const interval = 15 * 60 * 1000;
             const codeCreatedAt = new Date(verificationCode.createdAt).getTime();
 
-            if (Date.now() - codeCreatedAt > interval) {
+            if (Date.now() - codeCreatedAt > this.verificationCodeValidityPeriod) {
                 throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.EXPIRED_REQUEST);
             }
 
@@ -119,3 +119,4 @@ export class EmailVerificationController extends Singleton {
 
 export const emailVerificationController =
     SingletonFactory.produce<EmailVerificationController>(EmailVerificationController);
+export const verificationCodeValidityInterval = emailVerificationController.verificationCodeValidityPeriod;

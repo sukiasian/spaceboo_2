@@ -1,12 +1,12 @@
 import * as express from 'express';
 import * as request from 'supertest';
 import * as path from 'path';
-import { Application } from '../App';
+import { AppConfig } from '../AppConfig';
 import { IUserCreate, User } from '../models/user.model';
 import {
     clearDbAndStorage,
     closeTestEnv,
-    createApplicationInstance,
+    createAppConfig,
     createPathToSpaceImagesDir,
     createPathToUserAvatarDir,
     createSpaceData,
@@ -27,7 +27,7 @@ import { userSequelizeDao, UserSequelizeDao } from '../daos/user.sequelize.dao';
 describe('Image (e2e)', () => {
     let app: express.Express;
     let server: any;
-    let applicationInstance: Application;
+    let appConfig: AppConfig;
     let db: Sequelize;
     let user: User;
     let userData: IUserCreate;
@@ -47,10 +47,10 @@ describe('Image (e2e)', () => {
     let pathToTestImage: string;
 
     beforeAll(async () => {
-        applicationInstance = createApplicationInstance();
+        appConfig = createAppConfig();
 
-        app = applicationInstance.app;
-        db = applicationInstance.sequelize;
+        app = appConfig.app;
+        db = appConfig.sequelize;
 
         pathToTestImage = path.resolve('tests', 'files', 'images', '1.png');
 
@@ -62,7 +62,7 @@ describe('Image (e2e)', () => {
         cityModel = City;
         appointmentModel = Appointment;
         userData = createUserData();
-        server = (await openTestEnv(applicationInstance)).server;
+        server = (await openTestEnv(appConfig)).server;
     });
     beforeEach(async () => {
         city = await cityModel.findOne({ raw: true });

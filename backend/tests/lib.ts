@@ -3,7 +3,7 @@ import * as faker from 'faker';
 import * as jwt from 'jsonwebtoken';
 import * as path from 'path';
 import { Sequelize } from 'sequelize-typescript';
-import { Application } from '../App';
+import { AppConfig } from '../AppConfig';
 import { IUserCreate } from '../models/user.model';
 import connectToDb from '../database/connectToDb';
 import { SingletonFactory } from '../utils/Singleton';
@@ -13,7 +13,7 @@ import { ISpaceCreate, SpaceType } from '../models/space.model';
 import { IAppointmentCreate, TIsoDatesReserved } from '../models/appointment.model';
 import UtilFunctions from '../utils/UtilFunctions';
 import logger from '../loggers/logger';
-import NodeCronFunctions from '../utils/NodeCronFunctions';
+import { NodeCronFunctions } from '../utils/NodeCronFunctions';
 
 dotenv.config({ path: '../test.env' });
 
@@ -66,8 +66,8 @@ export const clearDbAndStorage = async (sequelize: Sequelize): Promise<void> => 
     clearStorage();
 };
 
-export const createApplicationInstance = (): Application => {
-    return SingletonFactory.produce<Application>(Application);
+export const createAppConfig = (): AppConfig => {
+    return SingletonFactory.produce<AppConfig>(AppConfig);
 };
 
 export const createNodeCronFunctions = (): NodeCronFunctions => {
@@ -152,16 +152,16 @@ export const createAppoinmentData = (
     };
 };
 
-export const createTokenAndSign = async <T extends object | string>(payload: T): Promise<unknown> => {
-    // FIXME its not a promise
+export const createTokenAndSign = <T extends object | string>(payload: T): string => {
     return jwt.sign(payload, process.env.JWT_SECRET_KEY);
 };
 
-export const openTestEnv = async (applicationInstance: Application): Promise<{ server: object }> => {
-    applicationInstance.setupPassport();
-    applicationInstance.configureApp();
-    await startDb(applicationInstance.sequelize);
-    const server = startServer(applicationInstance.app); // NOTE
+export const openTestEnv = async (appConfig: AppConfig): Promise<{ server: object }> => {
+    appConfig.setupPassport();
+    appConfig.configureApp();
+    await startDb(appConfig.sequelize);
+
+    const server = startServer(appConfig.app); // NOTE
 
     return {
         server,

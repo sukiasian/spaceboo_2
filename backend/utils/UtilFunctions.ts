@@ -7,8 +7,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as jwt from 'jsonwebtoken';
 import logger from '../loggers/logger';
-import { applicationInstance } from '../App';
-import { Appointment, TIsoDatesReserved } from '../models/appointment.model';
+import { appConfig } from '../AppConfig';
+import { TIsoDatesReserved } from '../models/appointment.model';
 import { Environment, ErrorMessages, HttpStatus, ResponseMessages, ResponseStatus } from '../types/enums';
 import AppError from './AppError';
 
@@ -67,7 +67,7 @@ class UtilFunctions {
                         logger.error(err);
                         process.exit(1);
                     }
-                    applicationInstance.sequelize.close().then(() => {
+                    appConfig.sequelize.close().then(() => {
                         logger.error('Sequelize connection disconnected');
                         process.exit(0);
                     });
@@ -80,7 +80,7 @@ class UtilFunctions {
                         logger.error(err);
                         process.exit(1);
                     }
-                    applicationInstance.sequelize.close().then(() => {
+                    appConfig.sequelize.close().then(() => {
                         logger.info('Sequelize connection disconnected');
                         process.exit(0);
                     });
@@ -93,7 +93,7 @@ class UtilFunctions {
                         logger.error(err);
                         process.exit(1);
                     }
-                    applicationInstance.sequelize.close().then(() => {
+                    appConfig.sequelize.close().then(() => {
                         logger.info('Sequelize connection disconnected');
                         process.exit(0);
                     });
@@ -106,7 +106,7 @@ class UtilFunctions {
                         logger.error(err);
                         process.exit(1);
                     }
-                    applicationInstance.sequelize.close().then(() => {
+                    appConfig.sequelize.close().then(() => {
                         logger.info('Sequelize connection disconnected');
                         process.exit(0);
                     });

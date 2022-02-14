@@ -3,7 +3,7 @@ import { ISpaceCreate, Space, ISpaceEdit, spaceEditFields } from '../models/spac
 import { QuerySortDirection } from '../types/enums';
 import { SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
-import { applicationInstance } from '../App';
+import { appConfig } from '../AppConfig';
 
 interface IQueryString {
     page?: string | number;
@@ -42,11 +42,7 @@ export class SpaceSequelizeDao extends Dao {
         try {
             return await this.model.create(data);
         } catch (err) {
-            await Promise.all(
-                files.map(async (file) => {
-                    await this.utilFunctions.findAndRemoveImage(data.userId, file.filename);
-                })
-            );
+            await this.findUploadedImagesAndRemove(data.userId, files);
 
             throw err;
         }
@@ -69,12 +65,7 @@ export class SpaceSequelizeDao extends Dao {
             );
         }
 
-        /* 
-        
-        priceRange - если нет, то from должно быть от 0 - либо его вообще может не быть.
-        но также может не быть to - как тогда быть ?
-        
-        */
+        // NOTE priceRange - если нет, то from должно быть от 0 - либо его вообще может не быть. но также может не быть to - как тогда быть ?
 
         if (priceRange) {
             priceRange = (priceRange as string).split(',');
@@ -108,7 +99,7 @@ export class SpaceSequelizeDao extends Dao {
             pricesFromAndTo
         );
 
-        return this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, queryFromParts);
+        return this.utilFunctions.createSequelizeRawQuery(appConfig.sequelize, queryFromParts);
     };
 
     public getUserSpaces = async (userId: string): Promise<Space[]> => {
@@ -119,10 +110,21 @@ export class SpaceSequelizeDao extends Dao {
         });
     };
 
-    public editSpaceById = async (spaceId: string, spaceEditData: ISpaceEdit): Promise<void> => {
-        const space = await this.model.findOne({ where: { id: spaceId } });
+    public editSpaceById = async (
+        userId: string,
+        spaceId: string,
+        spaceEditData: ISpaceEdit,
+        files: Express.Multer.File[]
+    ): Promise<void> => {
+        try {
+            const space = await this.model.findOne({ where: { id: spaceId } });
 
-        await space.update(spaceEditData, { fields: spaceEditFields });
+            await space.update(spaceEditData, { fields: spaceEditFields });
+        } catch (err) {
+            await this.findUploadedImagesAndRemove(userId, files);
+
+            throw err;
+        }
     };
 
     public deleteSpaceById = async (spaceId: string): Promise<void> => {
@@ -131,12 +133,37 @@ export class SpaceSequelizeDao extends Dao {
         await space.destroy();
     };
 
-    public updateSpaceImagesInDb = async (spaceId: string, spaceImagesUrl: string[]): Promise<void> => {
-        const spaceImagesUrlJoined: string = spaceImagesUrl.join(', ');
+    public updateSpaceImagesInDb = async (
+        userId: string,
+        spaceId: string,
+        spaceImagesToRemove: string[],
+        uploadedFiles: Express.Multer.File[]
+    ): Promise<void> => {
         // NOTE SELECT array_cat(ARRAY[1,2,3], ARRAY[4,5]);
-        const updateRawQuery = `UPDATE "Spaces" SET "imagesUrl" = ARRAY_CAT("imagesUrl", '{${spaceImagesUrlJoined}}') WHERE id = '${spaceId}';`;
+        const actualSpaceImagesUrls = ((await this.findById(spaceId)) as Space).imagesUrl || [];
+        console.log(actualSpaceImagesUrls, 'aaaa');
 
-        await this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, updateRawQuery);
+        let spaceImagesUrlsAfterRemoval: string[] = actualSpaceImagesUrls;
+        console.log(spaceImagesUrlsAfterRemoval, 'bbbbbbbbb');
+
+        for (const spaceImageToRemove of spaceImagesToRemove) {
+            spaceImagesUrlsAfterRemoval = spaceImagesUrlsAfterRemoval.filter((el) => el !== spaceImageToRemove);
+        }
+        console.log(spaceImagesUrlsAfterRemoval, 'ccccccc');
+
+        const spaceImagesToAddUrls = uploadedFiles.map((file: Express.Multer.File) => {
+            return `${userId}/${file.filename}`;
+        }) as string[];
+
+        console.log(spaceImagesToAddUrls, 'dddddddddddd');
+
+        const newSpaceImagesUrlsFromRemainingAndNewOnes = [...spaceImagesUrlsAfterRemoval, ...spaceImagesToAddUrls];
+        const newSpaceImagesUrlsFromRemainingAndNewOnesJoined = newSpaceImagesUrlsFromRemainingAndNewOnes.join(', ');
+        console.log(newSpaceImagesUrlsFromRemainingAndNewOnesJoined, 'fffffffff');
+
+        const updateRawQuery = `UPDATE "Spaces" SET "imagesUrl" = ARRAY_CAT("imagesUrl", '{${newSpaceImagesUrlsFromRemainingAndNewOnesJoined}}') WHERE id = '${spaceId}';`;
+
+        await this.utilFunctions.createSequelizeRawQuery(appConfig.sequelize, updateRawQuery);
     };
 
     public removeSpaceImagesFromDb = async (spaceId: string, spaceImagesToDelete: string[]) => {
@@ -146,7 +173,7 @@ export class SpaceSequelizeDao extends Dao {
             rawRemoveQueries += `UPDATE "Spaces" SET "imagesUrl" = ARRAY_REMOVE("imagesUrl", '${spaceImageToDelete}') WHERE id = '${spaceId}';`;
         });
 
-        await this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, rawRemoveQueries);
+        await this.utilFunctions.createSequelizeRawQuery(appConfig.sequelize, rawRemoveQueries);
     };
 
     private defineSortOrder = (sortBy: SpaceQuerySortFields): string => {
@@ -186,6 +213,14 @@ export class SpaceSequelizeDao extends Dao {
             priceRange && priceRange.to !== undefined ? `AND s."pricePerNight" <= ${priceRange.to}` : '';
 
         return `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", "regionId", name FROM "Cities") c ON s."cityId" = c."cityId" ${cityPartialQuery} ${datesToReservePartialQuery} ${priceRangeFromPartialQuery} ${priceRangeToPartialQuery} ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
+    };
+
+    private findUploadedImagesAndRemove = (userId: string, files: Express.Multer.File[]): Promise<void[]> => {
+        return Promise.all(
+            files.map(async (file) => {
+                await this.utilFunctions.findAndRemoveImage(userId, file.filename);
+            })
+        );
     };
 }
 

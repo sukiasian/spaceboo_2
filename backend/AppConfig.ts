@@ -19,11 +19,11 @@ import { Appointment } from './models/appointment.model';
 import { EmailVerification } from './models/email-verification.model';
 import { District } from './models/district.model';
 import { Region } from './models/region.model';
+import setCrons from './crons';
 
-export class Application extends Singleton {
-    public readonly app: express.Express = express();
+export class AppConfig extends Singleton {
     private readonly passportConfig: PassportConfig = passportConfig;
-
+    public readonly app: express.Express = express();
     public readonly sequelize: Sequelize = new Sequelize({
         dialect: 'postgres',
         dialectOptions: {
@@ -38,7 +38,7 @@ export class Application extends Singleton {
         logging: false,
     });
 
-    public configureApp(): void {
+    public configureApp = (): void => {
         this.app.use(express.json({ limit: '10Kb' })); // NOTE
         this.app.use(express.static('assets/images'));
         this.app.use(cookieParser());
@@ -51,16 +51,18 @@ export class Application extends Singleton {
         this.app.use(ApiRoutes.IMAGES, imageRouter);
         this.app.use(ApiRoutes.CITIES, cityRouter);
         this.app.use(globalErrorController);
-    }
+    };
 
-    public setupPassport(): void {
+    public setupPassport = (): void => {
         this.passportConfig.configurePassport();
-    }
+    };
 }
 
-export const applicationInstance = SingletonFactory.produce<Application>(Application);
+export const appConfig = SingletonFactory.produce<AppConfig>(AppConfig);
 
-applicationInstance.setupPassport();
-applicationInstance.configureApp();
+// NOTE: circular dependency resolution since NodeCronFunctions uses appConfig.sequelize.
 
-export const app = applicationInstance.app;
+appConfig.setupPassport();
+appConfig.configureApp();
+
+export const app = appConfig.app;

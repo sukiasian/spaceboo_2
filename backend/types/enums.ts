@@ -139,6 +139,7 @@ export enum ErrorMessages {
     NOT_AUTHORIZED = 'Авторизуйтесь.',
     WAIT_BEFORE_GETTING_EMAIL = 'Получить код повторно можно только по истечении 2 минут.',
     EXPIRED_REQUEST = 'Срок действия кода истек. Повторите попытку.',
+    VERIFY_ACCOUNT = 'Пожалуйста, подтвердите ваш аккаунт.',
 }
 
 export enum Environment {

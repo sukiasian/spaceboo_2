@@ -1,16 +1,9 @@
 import * as express from 'express';
 import * as request from 'supertest';
 import * as jwt from 'jsonwebtoken';
-import { Application } from '../App';
+import { AppConfig } from '../AppConfig';
 import { User } from '../models/user.model';
-import {
-    clearDb,
-    closeTestEnv,
-    createApplicationInstance,
-    createInvalidUserData,
-    createUserData,
-    openTestEnv,
-} from './lib';
+import { clearDb, closeTestEnv, createAppConfig, createInvalidUserData, createUserData, openTestEnv } from './lib';
 import { Sequelize } from 'sequelize-typescript';
 import { ApiRoutes, HttpStatus } from '../types/enums';
 import { EmailPurpose } from '../routes/email-verification.router';
@@ -19,7 +12,7 @@ import { EmailVerification } from '../models/email-verification.model';
 describe('Email Verification (e2e)', () => {
     let app: express.Express;
     let server: any;
-    let applicationInstance: Application;
+    let appConfig: AppConfig;
     let db: Sequelize;
     let invalidUserData: any;
     let user: User;
@@ -28,16 +21,16 @@ describe('Email Verification (e2e)', () => {
     let emailVerificationModel: typeof EmailVerification;
 
     beforeAll(async () => {
-        applicationInstance = createApplicationInstance();
+        appConfig = createAppConfig();
 
-        app = applicationInstance.app;
-        db = applicationInstance.sequelize;
+        app = appConfig.app;
+        db = appConfig.sequelize;
         invalidUserData = createInvalidUserData();
         userModel = User;
         userData = createUserData();
         emailVerificationModel = EmailVerification;
 
-        server = (await openTestEnv(applicationInstance)).server;
+        server = (await openTestEnv(appConfig)).server;
     });
     beforeEach(async () => {
         user = await userModel.create(userData);

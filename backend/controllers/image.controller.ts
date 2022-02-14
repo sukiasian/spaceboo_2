@@ -15,7 +15,6 @@ dotenv.config();
 export class ImageController extends Singleton {
     private readonly userDao: UserSequelizeDao = userSequelizeDao;
     private readonly spaceDao: SpaceSequelizeDao = spaceSequelizeDao;
-    private readonly allowedAmountOfSpaceImages = 5;
     private readonly imageUpload = imageUpload;
     private readonly spaceImagesTotalAmount = spaceImagesTotalAmount;
     private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
@@ -84,11 +83,12 @@ export class ImageController extends Singleton {
     public checkSpaceImagesAvailableAmount = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const { id: spaceId } = req.space;
         const space: Space = await this.spaceDao.findById(spaceId);
-
-        let spaceImagesAmountLeft = this.allowedAmountOfSpaceImages;
+        // NOTE: since we cannot access req.body before middleware we have to append numberOfImagesToDelete to req.headers
+        const amountOfImagesToDelete = req.headers.amountOfImagesToDelete || 0;
+        let spaceImagesAmountLeft = this.spaceImagesTotalAmount;
 
         if (space.imagesUrl) {
-            spaceImagesAmountLeft = this.spaceImagesTotalAmount - space.imagesUrl.length;
+            spaceImagesAmountLeft = this.spaceImagesTotalAmount - space.imagesUrl.length + amountOfImagesToDelete;
         }
 
         if (spaceImagesAmountLeft === 0) {
@@ -101,7 +101,9 @@ export class ImageController extends Singleton {
     });
 
     public uploadSpaceImagesToStorage = this.utilFunctions.catchAsync(async (req, res, next) => {
-        this.imageUpload.array(StorageUploadFilenames.SPACE_IMAGES, this.allowedAmountOfSpaceImages)(
+        const spaceImagesAvaiblableAmount = res.locals.spaceImagesAmountLeft || this.spaceImagesTotalAmount;
+
+        this.imageUpload.array(StorageUploadFilenames.SPACE_IMAGES, spaceImagesAvaiblableAmount)(
             req,
             res,
             this.spaceImagesUploadErrorHandler(req, res, next)
@@ -109,14 +111,15 @@ export class ImageController extends Singleton {
     });
 
     public updateSpaceImagesInDb = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
-        const { spaceId } = res.locals;
-        const { id: userId } = req.user;
         const uploadedFiles = req.files as Express.Multer.File[];
-        const spaceImagesUrls = uploadedFiles.map((file: Express.Multer.File) => {
-            return `${userId}/${file.filename}`;
-        }) as string[];
 
-        await this.spaceDao.updateSpaceImagesInDb(spaceId, spaceImagesUrls);
+        if (uploadedFiles) {
+            const { id: userId } = req.user;
+            const spaceImagesToRemove = req.body.spaceImagesToRemove || [];
+            const { spaceId } = res.locals;
+
+            await this.spaceDao.updateSpaceImagesInDb(userId, spaceId, spaceImagesToRemove, uploadedFiles);
+        }
     });
 
     public removeSpaceImagesFromStorage = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {

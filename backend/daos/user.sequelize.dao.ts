@@ -2,7 +2,7 @@ import { Dao } from '../configurations/dao.config';
 import { IUserEdit, User, userEditFields, UserScopes } from '../models/user.model';
 import { SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
-import { applicationInstance } from '../App';
+import { appConfig } from '../AppConfig';
 
 export class UserSequelizeDao extends Dao {
     private readonly userModel: typeof User = User;
@@ -43,13 +43,13 @@ export class UserSequelizeDao extends Dao {
     public updateUserAvatarInDb = async (userId: string, avatarUrl: string): Promise<void> => {
         const updateRawQuery = `UPDATE "Users" SET "avatarUrl" = '${avatarUrl}' WHERE id = '${userId}'`;
 
-        await this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, updateRawQuery);
+        await this.utilFunctions.createSequelizeRawQuery(appConfig.sequelize, updateRawQuery);
     };
 
     public removeUserAvatarFromDb = async (userId: string): Promise<void> => {
         const annualizeRawQuery = `UPDATE "Users" SET "avatarUrl" = NULL WHERE id = '${userId}'`;
 
-        await this.utilFunctions.createSequelizeRawQuery(applicationInstance.sequelize, annualizeRawQuery);
+        await this.utilFunctions.createSequelizeRawQuery(appConfig.sequelize, annualizeRawQuery);
     };
 
     public updateUserLastVerificationRequest = async (user: User): Promise<void> => {

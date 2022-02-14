@@ -21,7 +21,6 @@ class SpaceRouter extends Singleton implements IRouter {
             .post(
                 this.passport.authenticate(PassportStrategies.JWT, { session: false }),
                 this.imageController.uploadSpaceImagesToStorage,
-                // imageUpload.array('spaceImages', 5),
                 this.spaceController.provideSpace,
                 this.imageController.updateSpaceImagesInDb
             )
@@ -40,7 +39,10 @@ class SpaceRouter extends Singleton implements IRouter {
             .put(
                 this.passport.authenticate(PassportStrategies.JWT, { session: false }),
                 this.routeProtector.spaceOwnerProtector,
-                this.spaceController.editSpaceById
+                this.imageController.checkSpaceImagesAvailableAmount,
+                this.imageController.uploadSpaceImagesToStorage,
+                this.spaceController.editSpaceById,
+                this.imageController.updateSpaceImagesInDb
             )
             .delete(
                 this.passport.authenticate(PassportStrategies.JWT, { session: false }),

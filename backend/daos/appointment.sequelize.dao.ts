@@ -1,4 +1,4 @@
-import { applicationInstance } from '../App';
+import { appConfig } from '../AppConfig';
 import { Dao } from '../configurations/dao.config';
 import { IResIsoDatesReserved } from '../../frontend/src/types/types';
 import { Appointment } from '../models/appointment.model';
@@ -56,7 +56,7 @@ export class AppointmentSequelizeDao extends Dao {
         // FIXME: здесь может быть проблема с SQLInjection так как spaceId исходит либо из req.params либо из req.body. Лучше использовать regexp.
         const findAppointmentRawQuery = `SELECT COUNT(*) FROM "Appointments" WHERE "spaceId" = '${spaceId}' AND "isoDatesReserved" && '${isoDatesToReserve}';`;
         const appointmentCount = await this.utilFunctions.createSequelizeRawQuery(
-            applicationInstance.sequelize,
+            appConfig.sequelize,
             findAppointmentRawQuery
         );
 

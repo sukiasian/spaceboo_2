@@ -1,6 +1,5 @@
-import { BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import { Optional } from 'sequelize';
-import { User } from './user.model';
 
 interface IEmailVerificationAttributes {
     id: string;
@@ -8,6 +7,7 @@ interface IEmailVerificationAttributes {
     email: string;
 }
 interface IEmailVerificationCreationAttributes extends Optional<IEmailVerificationAttributes, 'id'> {}
+export interface IEmailVerification extends IEmailVerificationAttributes {}
 
 @Table({ timestamps: true })
 export class EmailVerification

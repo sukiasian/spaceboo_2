@@ -10,8 +10,9 @@ export class SpaceController extends Singleton {
 
     public provideSpace = this.utilFunctions.catchAsync(async (req, res, next) => {
         const { id: userId } = req.user;
+        console.log(req.files);
 
-        if (req.files.length === 0) {
+        if (!req.files || req.files.length === 0) {
             throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.SPACE_IMAGES_ARE_NOT_PROVIDED);
         }
 
@@ -49,10 +50,11 @@ export class SpaceController extends Singleton {
     });
 
     public editSpaceById = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        const { id: userId } = req.user;
         const { spaceId } = req.params;
         const { spaceEditData } = req.body;
 
-        await this.dao.editSpaceById(spaceId, spaceEditData);
+        await this.dao.editSpaceById(userId, spaceId, spaceEditData, req.files);
 
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.DATA_UPDATED);
     });
