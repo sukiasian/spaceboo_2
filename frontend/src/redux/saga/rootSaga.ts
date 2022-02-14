@@ -24,3 +24,6 @@ export function* rootSaga() {
         watchPostUploadSpaceImages(),
     ]);
 }
+
+// FIXME: guess the way is to put every saga in a separate  file (eeeeevery saga is a new file - watchPostLogin - in a new file; watchPostUploadSpaceImages - in a new file).
+// so we will solve the issue of unreadability of the code.

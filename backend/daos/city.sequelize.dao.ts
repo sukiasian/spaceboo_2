@@ -42,7 +42,7 @@ export class CitySequelizeDao extends Dao {
         return this.model.findAll(sequelizeQuery);
     };
 
-    public getMajorCities;
+    public getMajorCities: any;
 }
 
 export const citySequelizeDao = SingletonFactory.produce<CitySequelizeDao>(CitySequelizeDao);
