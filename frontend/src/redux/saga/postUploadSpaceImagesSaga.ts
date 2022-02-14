@@ -1,12 +1,12 @@
-import { ForkEffect, takeEvery, put, call } from '@redux-saga/core/effects';
-import { ApiUrls, IServerResponse, SagaTasks } from '../../types/types';
+import { ForkEffect, call, put, takeEvery } from '@redux-saga/core/effects';
+import { IServerResponse, ApiUrls, SagaTasks } from '../../types/types';
 import { httpRequester } from '../../utils/HttpRequest';
 import { serverResponseIsSuccessful } from '../../utils/utilFunctions';
 import { IAction } from '../actions/ActionTypes';
 import {
-    setUploadImageFailureResponseAction,
-    setUploadImageSuccessResponseAction,
     TPostUploadSpaceImagesPayload,
+    setUploadImageSuccessResponseAction,
+    setUploadImageFailureResponseAction,
 } from '../actions/imageActions';
 
 const postSpaceImages = ({ spaceId, images }: TPostUploadSpaceImagesPayload): Promise<IServerResponse> => {

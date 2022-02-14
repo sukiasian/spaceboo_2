@@ -175,6 +175,7 @@ export enum SagaTasks {
 
 export enum ApiUrls {
     SPACES = 'spaces',
+    APPOINTMENTS = 'appointments',
     USERS = 'users',
     AUTH = 'auth',
     CITIES = 'cities',
