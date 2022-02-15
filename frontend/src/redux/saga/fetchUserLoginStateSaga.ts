@@ -27,6 +27,6 @@ function* fetchUserLoginStateWorker(): Generator<CallEffect<any> | PutEffect<Any
         yield put(setFetchUserLoginStateFailureResponseAction(err as IServerResponse));
     }
 }
-export function* watchAfetchUserLoginState(): Generator<ForkEffect, void, void> {
-    yield takeEvery(SagaTasks.REQUEST_USER_LOGIN_STATE, fetchUserLoginStateWorker); // слушает action-ы
+export function* watchFetchUserLoginState(): Generator<ForkEffect, void, void> {
+    yield takeEvery(SagaTasks.FETCH_USER_LOGIN_STATE, fetchUserLoginStateWorker); // слушает action-ы
 }

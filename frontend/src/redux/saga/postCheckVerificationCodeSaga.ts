@@ -40,5 +40,5 @@ function* postCheckVerificationCodeWorker(
     }
 }
 export function* watchPostCheckVerificationCode(): Generator<ForkEffect, void, void> {
-    yield takeEvery(SagaTasks.REQUEST_CHECK_VERIFICATION_CODE, postCheckVerificationCodeWorker);
+    yield takeEvery(SagaTasks.POST_CHECK_VERIFICATION_CODE, postCheckVerificationCodeWorker);
 }

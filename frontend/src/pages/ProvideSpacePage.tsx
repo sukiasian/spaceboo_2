@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Alert from '../components/Alert';
 import SpaceInputFieldsForCreateAndEdit from '../components/SpaceInputFieldsForCreateAndEdit';
-import { requestUserLoginStateAction } from '../redux/actions/authActions';
+import { fetchUserLoginStateAction } from '../redux/actions/authActions';
 import {
     annualizeProvideSpaceData,
     annualizeProvideSpaceResponses,
@@ -26,7 +26,7 @@ export default function ProvideSpacePage(): JSX.Element {
     };
     const applyEffectsOnInit = (): (() => void) => {
         handleDocumentTitleOnInit();
-        dispatch(requestUserLoginStateAction());
+        dispatch(fetchUserLoginStateAction());
 
         return () => {
             // FIXME: неправильная архитектура. использовать annualize

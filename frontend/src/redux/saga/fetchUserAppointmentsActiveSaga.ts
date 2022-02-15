@@ -27,5 +27,5 @@ function* fetchUserAppointmentsWorker(action: IAction): Generator<AllEffect<Call
     }
 }
 export function* watchFetchCitiesBySearchPattern(): Generator<ForkEffect, void, void> {
-    yield takeLatest(SagaTasks.REQUEST_CITIES_BY_SEARCH_PATTERN, fetchUserAppointmentsWorker);
+    yield takeLatest(SagaTasks.FETCH_CITIES_BY_SEARCH_PATTERN, fetchUserAppointmentsWorker);
 }

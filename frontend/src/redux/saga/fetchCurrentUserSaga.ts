@@ -25,5 +25,5 @@ function* fetchCurrentUserWorker(): Generator<CallEffect<any> | PutEffect<AnyAct
     }
 }
 export function* watchFetchCurrentUser(): Generator<ForkEffect, void, void> {
-    yield takeEvery(SagaTasks.REQUEST_CURRENT_USER, fetchCurrentUserWorker);
+    yield takeEvery(SagaTasks.FETCH_CURRENT_USER, fetchCurrentUserWorker);
 }

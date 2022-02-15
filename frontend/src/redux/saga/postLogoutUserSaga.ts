@@ -27,5 +27,5 @@ function* postLogoutWorker(): Generator<CallEffect<any> | PutEffect<AnyAction>, 
 }
 
 export function* watchPostLogoutUser(): Generator<ForkEffect, void, void> {
-    yield takeLatest(SagaTasks.REQUEST_LOGOUT_USER, postLogoutWorker);
+    yield takeLatest(SagaTasks.POST_LOGOUT_USER, postLogoutWorker);
 }

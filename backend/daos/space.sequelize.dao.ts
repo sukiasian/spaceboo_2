@@ -141,26 +141,17 @@ export class SpaceSequelizeDao extends Dao {
     ): Promise<void> => {
         // NOTE SELECT array_cat(ARRAY[1,2,3], ARRAY[4,5]);
         const actualSpaceImagesUrls = ((await this.findById(spaceId)) as Space).imagesUrl || [];
-        console.log(actualSpaceImagesUrls, 'aaaa');
-
         let spaceImagesUrlsAfterRemoval: string[] = actualSpaceImagesUrls;
-        console.log(spaceImagesUrlsAfterRemoval, 'bbbbbbbbb');
 
         for (const spaceImageToRemove of spaceImagesToRemove) {
             spaceImagesUrlsAfterRemoval = spaceImagesUrlsAfterRemoval.filter((el) => el !== spaceImageToRemove);
         }
-        console.log(spaceImagesUrlsAfterRemoval, 'ccccccc');
 
         const spaceImagesToAddUrls = uploadedFiles.map((file: Express.Multer.File) => {
             return `${userId}/${file.filename}`;
         }) as string[];
-
-        console.log(spaceImagesToAddUrls, 'dddddddddddd');
-
         const newSpaceImagesUrlsFromRemainingAndNewOnes = [...spaceImagesUrlsAfterRemoval, ...spaceImagesToAddUrls];
         const newSpaceImagesUrlsFromRemainingAndNewOnesJoined = newSpaceImagesUrlsFromRemainingAndNewOnes.join(', ');
-        console.log(newSpaceImagesUrlsFromRemainingAndNewOnesJoined, 'fffffffff');
-
         const updateRawQuery = `UPDATE "Spaces" SET "imagesUrl" = ARRAY_CAT("imagesUrl", '{${newSpaceImagesUrlsFromRemainingAndNewOnesJoined}}') WHERE id = '${spaceId}';`;
 
         await this.utilFunctions.createSequelizeRawQuery(appConfig.sequelize, updateRawQuery);

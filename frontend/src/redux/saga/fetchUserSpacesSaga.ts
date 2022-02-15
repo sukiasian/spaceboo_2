@@ -26,5 +26,5 @@ function* fetchUserSpacesWorker(): Generator<CallEffect<any> | PutEffect<AnyActi
     }
 }
 export function* watchFetchUserSpaces(): Generator<ForkEffect, void, void> {
-    yield takeEvery(SagaTasks.REQUEST_USER_SPACES, fetchUserSpacesWorker);
+    yield takeEvery(SagaTasks.FETCH_USER_SPACES, fetchUserSpacesWorker);
 }

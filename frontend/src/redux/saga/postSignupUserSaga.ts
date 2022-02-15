@@ -24,7 +24,6 @@ function* signupWorker(action: IAction): Generator<CallEffect<any> | PutEffect<A
         yield put(setPostSignupUserFailureResponse(err as IServerResponse));
     }
 }
-
 export function* watchPostSignup(): Generator<ForkEffect, void, void> {
-    yield takeLatest(SagaTasks.REQUEST_SIGNUP_USER, signupWorker);
+    yield takeLatest(SagaTasks.POST_SIGNUP_USER, signupWorker);
 }

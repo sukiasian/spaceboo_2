@@ -1,9 +1,9 @@
 import { IServerResponse, ReduxUserActions, SagaTasks } from '../../types/types';
 import { IAction } from './ActionTypes';
 
-export const requestCurrentUserAction = (): IAction<SagaTasks> => {
+export const fetchCurrentUserAction = (): IAction<SagaTasks> => {
     return {
-        type: SagaTasks.REQUEST_CURRENT_USER,
+        type: SagaTasks.FETCH_CURRENT_USER,
     };
 };
 

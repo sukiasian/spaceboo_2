@@ -50,6 +50,7 @@ const fetchSpaces = async (queryData?: IQueryData): Promise<IServerResponse> => 
         }&sortBy=${queryData?.sortBy || ''}&limit=${queryData?.limit || ''}&offset=12`
     );
 };
+
 function* fetchSpacesWorker(action: IAction): Generator<CallEffect<IServerResponse> | PutEffect<AnyAction>, void> {
     try {
         const response = yield call(fetchSpaces, action.payload);
@@ -64,5 +65,5 @@ function* fetchSpacesWorker(action: IAction): Generator<CallEffect<IServerRespon
     }
 }
 export function* watchFetchSpaces(): Generator<ForkEffect, void, void> {
-    yield takeEvery(SagaTasks.REQUEST_SPACES, fetchSpacesWorker);
+    yield takeEvery(SagaTasks.FETCH_SPACES, fetchSpacesWorker);
 }

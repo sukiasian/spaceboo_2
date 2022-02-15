@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import {
     annualizeLogoutResponseAction,
-    requestUserLoginStateAction,
-    requestLogoutUserAction,
+    fetchUserLoginStateAction,
+    postLogoutUserAction,
 } from '../redux/actions/authActions';
 import { useEffect } from 'react';
 
@@ -15,11 +15,8 @@ interface IDropdownLinkableTab {
 }
 
 export default function UserDropdownMenu(): JSX.Element {
-    const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
     const { fetchCurrentUserSuccessResponse } = useSelector((state: IReduxState) => state.userStorage);
-    const { fetchLogoutUserSuccessResponse, fetchLogoutUserFailureResponse } = useSelector(
-        (state: IReduxState) => state.authStorage
-    );
+    const { fetchLogoutUserSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
     const userData = fetchCurrentUserSuccessResponse!.data;
     const linkableTabs: IDropdownLinkableTab[] = [
         {
@@ -40,11 +37,11 @@ export default function UserDropdownMenu(): JSX.Element {
     ];
     const dispatch = useDispatch();
     const handleLogout = (): void => {
-        dispatch(requestLogoutUserAction());
+        dispatch(postLogoutUserAction());
     };
     const refreshUserLoggedInAfterLogout = (): void => {
         if (fetchLogoutUserSuccessResponse) {
-            dispatch(requestUserLoginStateAction());
+            dispatch(fetchUserLoginStateAction());
             dispatch(annualizeLogoutResponseAction());
         }
     };

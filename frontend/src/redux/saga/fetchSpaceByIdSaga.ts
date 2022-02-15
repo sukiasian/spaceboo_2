@@ -27,5 +27,5 @@ function* fetchSpaceByIdWorker(action: IAction): Generator<CallEffect<any> | Put
     }
 }
 export function* watchFetchSpaceById(): Generator<ForkEffect, void, void> {
-    yield takeEvery(SagaTasks.REQUEST_SPACE_BY_ID, fetchSpaceByIdWorker);
+    yield takeEvery(SagaTasks.FETCH_SPACE_BY_ID, fetchSpaceByIdWorker);
 }

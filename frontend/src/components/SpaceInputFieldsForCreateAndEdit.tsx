@@ -5,13 +5,13 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { IAction } from '../redux/actions/ActionTypes';
 import {
     annualizeFoundBySearchPatternCitiesAction,
-    requestCitiesBySearchPatternAction,
+    fetchCitiesBySearchPatternAction,
 } from '../redux/actions/cityActions';
-import { setEditSpaceDataAction, setProvideSpaceDataAction } from '../redux/actions/spaceActions';
+import { setPutEditSpaceDataAction, setPostProvideSpaceDataAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { IProvideSpaceData, IEditSpaceData, SpaceType, ISpaceFormData } from '../redux/reducers/spaceReducer';
 import { ReduxSpaceActions } from '../types/types';
-import { handleSubmit, valueIsNumeric } from '../utils/utilFunctions';
+import { valueIsNumeric } from '../utils/utilFunctions';
 import Checkbox from './Checkbox';
 import RequiredField from './RequiredField';
 
@@ -37,11 +37,10 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
     const findCityRef = useRef<HTMLInputElement>(null);
     const formData = useSelector((state: IReduxState) => state.spaceStorage[componentIsFor]);
     const { fetchCitiesByPatternSuccessResponse } = useSelector((state: IReduxState) => state.cityStorage);
-    const imagesSources: string[] = [];
     const dispatch = useDispatch();
     const reduxSetFormDataActionsFor: IReduxSetFormDataActionsFor = {
-        provideSpaceData: setProvideSpaceDataAction,
-        editSpaceData: setEditSpaceDataAction,
+        provideSpaceData: setPostProvideSpaceDataAction,
+        editSpaceData: setPutEditSpaceDataAction,
     };
     const initialRoomsNumber = 2;
     const initialBedsNumber = 2;
@@ -114,7 +113,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
         const { value } = e.target;
 
         if (value.length >= 1) {
-            dispatch(requestCitiesBySearchPatternAction(value));
+            dispatch(fetchCitiesBySearchPatternAction(value));
         }
     };
     const annualizeFoundBySearchPatternCities = (): void => {

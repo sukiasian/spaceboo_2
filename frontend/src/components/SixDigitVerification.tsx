@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { requestUserLoginStateAction } from '../redux/actions/authActions';
-import { requestCheckVerificationCodeAction } from '../redux/actions/emailVerificationActions';
+import { fetchUserLoginStateAction } from '../redux/actions/authActions';
+import { postCheckVerificationCodeAction } from '../redux/actions/emailVerificationActions';
 import { IPostCheckVerificationEmailCodePayload } from '../redux/reducers/emailVerificationReducer';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { valueIsNumeric } from '../utils/utilFunctions';
@@ -32,7 +32,7 @@ export default function SixDigitVerification(): JSX.Element {
     const dispatch = useDispatch();
     const updateUserInformationAfterCheckingCode = () => {
         if (postCheckVerificationCodeSuccessResponse) {
-            dispatch(requestUserLoginStateAction());
+            dispatch(fetchUserLoginStateAction());
         }
     };
     const focusOnFirstInput = (): void => {
@@ -88,7 +88,7 @@ export default function SixDigitVerification(): JSX.Element {
             confirmation: true,
         };
 
-        dispatch(requestCheckVerificationCodeAction(payload));
+        dispatch(postCheckVerificationCodeAction(payload));
     };
     const renderDigitInputs = (): JSX.Element[] => {
         return digitInputs.map((digitInput: TDigitInput, i: number) => {

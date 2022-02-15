@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import InputWithLabel, { IFormInputs, InputAutoCompleteOptions, InputTypes } from '../components/InputWithLabel';
 import AlertFirstDbValidationError from '../components/AlertFirstDbValidationError';
-import { requestSendVerificationCodeAction } from '../redux/actions/emailVerificationActions';
+import { postSendVerificationCodeAction } from '../redux/actions/emailVerificationActions';
 import { EmailPurpose, IPostSendVerificationEmailPayload } from '../redux/reducers/emailVerificationReducer';
 import { IServerResponse, LocalStorageItems } from '../types/types';
 import { handleSubmit } from '../utils/utilFunctions';
-import { requestSignupUserAction } from '../redux/actions/authActions';
+import { postSignupUserAction } from '../redux/actions/authActions';
 
 export interface ISignupData {
     [key: keyof IFormInputs]: string | undefined;
@@ -88,7 +88,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
                 purpose: EmailPurpose[10],
             };
 
-            dispatch(requestSendVerificationCodeAction(payload));
+            dispatch(postSendVerificationCodeAction(payload));
             setLoading(true);
         }
     };
@@ -123,7 +123,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
             signupData[inputName] = formInputs[inputName].value;
         });
 
-        dispatch(requestSignupUserAction(signupData));
+        dispatch(postSignupUserAction(signupData));
     };
     const renderInputs = (): JSX.Element[] => {
         return Object.keys(formInputs).map((inputName: string, i: number) => {

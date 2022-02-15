@@ -4,28 +4,27 @@ import { Dispatch } from 'redux';
 import Footer from './components/Footer';
 import Navbar from './components/Navbar';
 import { IAction } from './redux/actions/ActionTypes';
-import { requestUserLoginStateAction } from './redux/actions/authActions';
-import { requestCitiesAction } from './redux/actions/cityActions';
-import { requestCurrentUserAction } from './redux/actions/userActions';
+import { fetchUserLoginStateAction } from './redux/actions/authActions';
+import { fetchCitiesAction } from './redux/actions/cityActions';
+import { fetchCurrentUserAction } from './redux/actions/userActions';
 import { IReduxState } from './redux/reducers/rootReducer';
 import Routes from './routes/Routes';
 import './sass/main.scss';
 
-// FIXME any, any - types for props
 function App(): JSX.Element {
     const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
     const userLoginState = fetchUserLoginStateSuccessResponse?.data;
     const dispatch: Dispatch<IAction> = useDispatch();
     const requestAppData = useCallback(() => {
-        dispatch(requestUserLoginStateAction());
-        dispatch(requestCitiesAction());
+        dispatch(fetchUserLoginStateAction());
+        dispatch(fetchCitiesAction());
     }, [dispatch]);
     const applyEffectsOnInit = (): void => {
         requestAppData();
     };
     const requestCurrentUserIfLoggedInAndConfirmed = (): void => {
         if (userLoginState?.confirmed) {
-            dispatch(requestCurrentUserAction());
+            dispatch(fetchCurrentUserAction());
         }
     };
 

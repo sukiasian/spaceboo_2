@@ -2,14 +2,14 @@ import { Action } from 'redux';
 import { IServerResponse, ReduxCitiesActions, SagaTasks } from '../../types/types';
 import { IAction } from './ActionTypes';
 
-export const requestCitiesAction = (): Action<SagaTasks> => {
+export const fetchCitiesAction = (): Action<SagaTasks> => {
     return {
-        type: SagaTasks.REQUEST_CITIES,
+        type: SagaTasks.FETCH_CITIES,
     };
 };
-export const requestCitiesBySearchPatternAction = (payload: string): IAction<SagaTasks, string> => {
+export const fetchCitiesBySearchPatternAction = (payload: string): IAction<SagaTasks, string> => {
     return {
-        type: SagaTasks.REQUEST_CITIES_BY_SEARCH_PATTERN,
+        type: SagaTasks.FETCH_CITIES_BY_SEARCH_PATTERN,
         payload,
     };
 };

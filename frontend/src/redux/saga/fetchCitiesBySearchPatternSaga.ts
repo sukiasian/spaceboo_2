@@ -27,5 +27,5 @@ function* fetchCitiesBySearchPatternWorker(action: IAction): Generator<CallEffec
     }
 }
 export function* watchFetchCitiesBySearchPattern(): Generator<ForkEffect, void, void> {
-    yield takeLatest(SagaTasks.REQUEST_CITIES_BY_SEARCH_PATTERN, fetchCitiesBySearchPatternWorker);
+    yield takeLatest(SagaTasks.FETCH_CITIES_BY_SEARCH_PATTERN, fetchCitiesBySearchPatternWorker);
 }

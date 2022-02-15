@@ -4,7 +4,7 @@ import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 import Titles from '../components/Titles';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { ReactNode, useEffect, useState } from 'react';
-import { requestUserSpaces } from '../redux/actions/spaceActions';
+import { fetchUserSpaces } from '../redux/actions/spaceActions';
 import LoadingSpin from '../components/LoadingSpin';
 import Space from '../components/Space';
 import { UrlPathnames } from '../types/types';
@@ -15,7 +15,7 @@ export default function MySpacesPage(): JSX.Element {
     const { fetchUserSpacesSuccessResponse } = useSelector((state: IReduxState) => state.spaceStorage);
     const dispatch = useDispatch();
     const applyEffectsOnInit = (): void => {
-        dispatch(requestUserSpaces());
+        dispatch(fetchUserSpaces());
     };
     const renderLoadingSpin = (): ReactNode => {
         if (!fetchUserSpacesSuccessResponse) {

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
-import { requestSpaceByIdAction } from '../redux/actions/spaceActions';
+import { fetchSpaceByIdAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 
 export default function SpacePage(): JSX.Element {
@@ -15,7 +15,7 @@ export default function SpacePage(): JSX.Element {
     const requestSpaceById = (): void => {
         const { spaceId } = params;
 
-        dispatch(requestSpaceByIdAction(spaceId!));
+        dispatch(fetchSpaceByIdAction(spaceId!));
     };
     const applyEffectsOnInit = (): void => {
         requestSpaceById();

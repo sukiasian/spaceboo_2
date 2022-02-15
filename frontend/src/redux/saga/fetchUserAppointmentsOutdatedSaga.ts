@@ -13,7 +13,9 @@ const fetchOutdatedUserAppointments = async (): Promise<IServerResponse> => {
     return httpRequester.get(`${ApiUrls.APPOINTMENTS}/user/outdated`);
 };
 
-function* fetchUserAppointmentsWorker(action: IAction): Generator<AllEffect<CallEffect> | PutEffect<AnyAction>, void> {
+function* fetchUserOutdatedAppointmentsWorker(
+    action: IAction
+): Generator<AllEffect<CallEffect> | PutEffect<AnyAction>, void> {
     try {
         const response = yield all([call(fetchOutdatedUserAppointments)]);
 
@@ -27,5 +29,5 @@ function* fetchUserAppointmentsWorker(action: IAction): Generator<AllEffect<Call
     }
 }
 export function* watchFetchCitiesBySearchPattern(): Generator<ForkEffect, void, void> {
-    yield takeLatest(SagaTasks.REQUEST_CITIES_BY_SEARCH_PATTERN, fetchUserAppointmentsWorker);
+    yield takeLatest(SagaTasks.FETCH_CITIES_BY_SEARCH_PATTERN, fetchUserOutdatedAppointmentsWorker);
 }

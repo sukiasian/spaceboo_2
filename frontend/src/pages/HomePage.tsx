@@ -1,14 +1,13 @@
-import { MutableRefObject, useEffect, useRef, useState } from 'react';
+import { MutableRefObject, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Filters, { IQueryData } from '../components/Filters';
+import Filters from '../components/Filters';
 import Slider from '../components/Slider';
 import Space from '../components/Space';
-import { requestSpacesAction, setFetchSpacesQueryDataAction } from '../redux/actions/spaceActions';
+import { fetchSpacesAction, setFetchSpacesQueryDataAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { updateDocumentTitle } from '../utils/utilFunctions';
 
 export function HomePage() {
-    const [queryData, setQueryData] = useState<IQueryData>();
     const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
     const { fetchSpacesQueryData, fetchSpacesSuccessResponse } = useSelector(
         (state: IReduxState) => state.spaceStorage
@@ -37,7 +36,7 @@ export function HomePage() {
         return () => {};
     };
     const requestSpaces = (): void => {
-        dispatch(requestSpacesAction(fetchSpacesQueryData));
+        dispatch(fetchSpacesAction(fetchSpacesQueryData));
     };
     const checkIfSpacesExistToRender = (): boolean => {
         return fetchSpacesSuccessResponse && fetchSpacesSuccessResponse.data.length !== 0 ? true : false;

@@ -5,11 +5,11 @@ import {
 import { IServerResponse, ReduxEmailVerificationActions, SagaTasks } from '../../types/types';
 import { IAction } from './ActionTypes';
 
-export const requestSendVerificationCodeAction: (
+export const postSendVerificationCodeAction: (
     payload: IPostSendVerificationEmailPayload
 ) => IAction<SagaTasks, IPostSendVerificationEmailPayload> = ({ purpose, email }) => {
     return {
-        type: SagaTasks.REQUEST_SEND_VERIFICATION_CODE,
+        type: SagaTasks.POST_SEND_VERIFICATION_CODE,
         payload: {
             purpose,
             email,
@@ -17,7 +17,7 @@ export const requestSendVerificationCodeAction: (
     };
 };
 
-export const requestCheckVerificationCodeAction: (
+export const postCheckVerificationCodeAction: (
     payload: IPostCheckVerificationEmailCodePayload
 ) => IAction<SagaTasks, IPostCheckVerificationEmailCodePayload> = ({
     currentCode,
@@ -26,7 +26,7 @@ export const requestCheckVerificationCodeAction: (
     confirmation,
 }): IAction<SagaTasks, IPostCheckVerificationEmailCodePayload> => {
     return {
-        type: SagaTasks.REQUEST_CHECK_VERIFICATION_CODE,
+        type: SagaTasks.POST_CHECK_VERIFICATION_CODE,
         payload: {
             currentCode,
             email,

@@ -2,9 +2,9 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     annualizeFoundBySearchPatternCitiesAction,
-    requestCitiesBySearchPatternAction,
+    fetchCitiesBySearchPatternAction,
 } from '../redux/actions/cityActions';
-import { requestSpacesAction } from '../redux/actions/spaceActions';
+import { fetchSpacesAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { IComponentClassNameProps, TActiveTab } from '../types/types';
 
@@ -30,7 +30,7 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
         setCityPickerBoxIsOpen(!cityPickerBoxIsOpen);
     };
     const handleFindCityInput = (e: ChangeEvent<{ value: string }>): void => {
-        dispatch(requestCitiesBySearchPatternAction(e.target.value));
+        dispatch(fetchCitiesBySearchPatternAction(e.target.value));
     };
     const annualizeFoundBySearchPatternCities = (): void => {
         dispatch(annualizeFoundBySearchPatternCitiesAction());
@@ -42,7 +42,7 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
         localStorage.setItem('currentCity', city.name);
         localStorage.setItem('currentCityId', city.id.toString());
 
-        dispatch(requestSpacesAction({ cityId: city.id }));
+        dispatch(fetchSpacesAction({ cityId: city.id }));
     };
     const handlePickCity = (city: any): (() => void) => {
         return () => {

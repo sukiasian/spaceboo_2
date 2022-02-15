@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
 import LoginModal from '../modals/LoginModal';
 import SignupModal from '../modals/SignupModal';
-import { annualizeLogoutResponseAction, requestUserLoginStateAction } from '../redux/actions/authActions';
+import { annualizeLogoutResponseAction, fetchUserLoginStateAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { AlertTypes, UrlPathnames } from '../types/types';
 import Alert from './Alert';
@@ -45,7 +45,7 @@ export default function Navbar(): JSX.Element {
     };
     const refreshUserLoggedInAfterLogout = (): void => {
         if (fetchLogoutUserSuccessResponse) {
-            dispatch(requestUserLoginStateAction());
+            dispatch(fetchUserLoginStateAction());
             dispatch(annualizeLogoutResponseAction());
         }
     };

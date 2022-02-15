@@ -6,7 +6,7 @@ import InputWithLabel, { InputAutoCompleteOptions, IFormInputs, InputTypes } fro
 import Alert from '../components/Alert';
 import { AlertTypes, CustomResponseMessages, HttpStatus } from '../types/types';
 import { handleSubmit } from '../utils/utilFunctions';
-import { requestLoginUserAction } from '../redux/actions/authActions';
+import { postLoginUserAction } from '../redux/actions/authActions';
 
 export interface ILoginData {
     [key: keyof IFormInputs]: string | undefined;
@@ -65,7 +65,7 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
             loginData[inputName] = formInputs[inputName].value;
         });
 
-        dispatch(requestLoginUserAction(loginData));
+        dispatch(postLoginUserAction(loginData));
     };
     const renderInputs = (): JSX.Element[] => {
         return Object.keys(formInputs).map((inputName: string, i: number) => {

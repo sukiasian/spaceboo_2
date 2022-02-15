@@ -3,13 +3,6 @@ import { IServerResponse, ReduxSpaceActions, SagaTasks } from '../../types/types
 import { IEditSpaceData, IProvideSpaceData } from '../reducers/spaceReducer';
 import { IAction } from './ActionTypes';
 
-export const requestSpacesAction = (payload?: IQueryData): IAction<SagaTasks> => {
-    return {
-        type: SagaTasks.REQUEST_SPACES,
-        payload,
-    };
-};
-
 export const postProvideSpaceAction = (payload: IProvideSpaceData): IAction<SagaTasks, IProvideSpaceData> => {
     return {
         type: SagaTasks.POST_PROVIDE_SPACE,
@@ -17,16 +10,23 @@ export const postProvideSpaceAction = (payload: IProvideSpaceData): IAction<Saga
     };
 };
 
-export const requestSpaceByIdAction = (payload: string): IAction<SagaTasks, string> => {
+export const fetchSpacesAction = (payload?: IQueryData): IAction<SagaTasks> => {
     return {
-        type: SagaTasks.REQUEST_SPACE_BY_ID,
+        type: SagaTasks.FETCH_SPACES,
         payload,
     };
 };
 
-export const requestUserSpaces = (): IAction<SagaTasks> => {
+export const fetchSpaceByIdAction = (payload: string): IAction<SagaTasks, string> => {
     return {
-        type: SagaTasks.REQUEST_USER_SPACES,
+        type: SagaTasks.FETCH_SPACE_BY_ID,
+        payload,
+    };
+};
+
+export const fetchUserSpaces = (): IAction<SagaTasks> => {
+    return {
+        type: SagaTasks.FETCH_USER_SPACES,
     };
 };
 
@@ -48,7 +48,7 @@ export const setFetchSpacesFailureResponseAction = (
     };
 };
 
-export const setProvideSpaceDataAction = (
+export const setPostProvideSpaceDataAction = (
     payload: IProvideSpaceData
 ): IAction<ReduxSpaceActions, IProvideSpaceData> => {
     return {
@@ -57,7 +57,7 @@ export const setProvideSpaceDataAction = (
     };
 };
 
-export const setEditSpaceDataAction = (payload: IEditSpaceData): IAction<ReduxSpaceActions, IEditSpaceData> => {
+export const setPutEditSpaceDataAction = (payload: IEditSpaceData): IAction<ReduxSpaceActions, IEditSpaceData> => {
     return {
         type: ReduxSpaceActions.SET_PUT_EDIT_SPACE_DATA,
         payload,

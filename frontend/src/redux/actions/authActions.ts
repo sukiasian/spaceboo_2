@@ -4,29 +4,29 @@ import { ISignupData } from '../../forms/SignupForm';
 import { IServerResponse, ReduxAuthActions, SagaTasks } from '../../types/types';
 import { IAction } from './ActionTypes';
 
-export const requestUserLoginStateAction = (): Action<SagaTasks> => {
+export const postLogoutUserAction = (): Action<SagaTasks> => {
     return {
-        type: SagaTasks.REQUEST_USER_LOGIN_STATE,
+        type: SagaTasks.POST_LOGOUT_USER,
     };
 };
 
-export const requestLogoutUserAction = (): Action<SagaTasks> => {
+export const postLoginUserAction = (payload: ILoginData): IAction<SagaTasks, ILoginData> => {
     return {
-        type: SagaTasks.REQUEST_LOGOUT_USER,
-    };
-};
-
-export const requestLoginUserAction = (payload: ILoginData): IAction<SagaTasks, ILoginData> => {
-    return {
-        type: SagaTasks.REQUEST_LOGIN_USER,
+        type: SagaTasks.POST_LOGIN_USER,
         payload,
     };
 };
 
-export const requestSignupUserAction = (payload: ISignupData): IAction<SagaTasks, ISignupData> => {
+export const postSignupUserAction = (payload: ISignupData): IAction<SagaTasks, ISignupData> => {
     return {
-        type: SagaTasks.REQUEST_SIGNUP_USER,
+        type: SagaTasks.POST_SIGNUP_USER,
         payload,
+    };
+};
+
+export const fetchUserLoginStateAction = (): Action<SagaTasks> => {
+    return {
+        type: SagaTasks.FETCH_USER_LOGIN_STATE,
     };
 };
 

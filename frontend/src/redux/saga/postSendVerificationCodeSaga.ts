@@ -35,5 +35,5 @@ function* postSendVerificationCodeWorker(
     }
 }
 export function* watchPostSendVerificationCode(): Generator<ForkEffect, void, void> {
-    yield takeEvery(SagaTasks.REQUEST_SEND_VERIFICATION_CODE, postSendVerificationCodeWorker);
+    yield takeEvery(SagaTasks.POST_SEND_VERIFICATION_CODE, postSendVerificationCodeWorker);
 }

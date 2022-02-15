@@ -27,5 +27,5 @@ function* loginWorker(action: IAction): Generator<CallEffect<any> | PutEffect<An
     }
 }
 export function* watchPostLogin(): Generator<ForkEffect, void, void> {
-    yield takeLatest(SagaTasks.REQUEST_LOGIN_USER, loginWorker);
+    yield takeLatest(SagaTasks.POST_LOGIN_USER, loginWorker);
 }

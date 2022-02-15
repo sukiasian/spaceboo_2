@@ -9,13 +9,15 @@ import {
     setFetchCitiesByPatternFailureResponseAction,
 } from '../actions/cityActions';
 
-const fetchUpcomingUserAppointments = async (): Promise<IServerResponse> => {
+const ƒetchUpcomingUserAppointments = async (): Promise<IServerResponse> => {
     return httpRequester.get(`${ApiUrls.APPOINTMENTS}/user/upcoming`);
 };
 
-function* fetchUserAppointmentsWorker(action: IAction): Generator<AllEffect<CallEffect> | PutEffect<AnyAction>, void> {
+function* ƒetchUserUpcomingAppointmentsWorker(
+    action: IAction
+): Generator<AllEffect<CallEffect> | PutEffect<AnyAction>, void> {
     try {
-        const response = yield all([call(fetchUpcomingUserAppointments)]);
+        const response = yield all([call(ƒetchUpcomingUserAppointments)]);
 
         if (serverResponseIsSuccessful(response as IServerResponse)) {
             yield put(setFetchCitiesByPatternSuccessResponseAction(response as IServerResponse));
@@ -26,6 +28,6 @@ function* fetchUserAppointmentsWorker(action: IAction): Generator<AllEffect<Call
         yield put(setFetchCitiesByPatternFailureResponseAction(err as IServerResponse));
     }
 }
-export function* watchFetchCitiesBySearchPattern(): Generator<ForkEffect, void, void> {
-    yield takeLatest(SagaTasks.REQUEST_CITIES_BY_SEARCH_PATTERN, fetchUserAppointmentsWorker);
+export function* watchfetchUserUpcomingAppointmentsWorkers(): Generator<ForkEffect, void, void> {
+    yield takeLatest(SagaTasks.FETCH_CITIES_BY_SEARCH_PATTERN, ƒetchUserUpcomingAppointmentsWorker);
 }

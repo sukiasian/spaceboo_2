@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Alert from '../components/Alert';
 import SixDigitVerification from '../components/SixDigitVerification';
 import Timer from '../components/Timer';
-import { requestSendVerificationCodeAction } from '../redux/actions/emailVerificationActions';
+import { postSendVerificationCodeAction } from '../redux/actions/emailVerificationActions';
 import { EmailPurpose, IPostSendVerificationEmailPayload } from '../redux/reducers/emailVerificationReducer';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { AlertTypes, CustomResponseMessages, LocalStorageItems } from '../types/types';
@@ -38,7 +38,7 @@ export default function ConfirmAccountPage(): JSX.Element {
             purpose: EmailPurpose[10],
         };
 
-        dispatch(requestSendVerificationCodeAction(payload));
+        dispatch(postSendVerificationCodeAction(payload));
     };
     const renderSendCodeAgainAlert = (): JSX.Element | void => {
         if (postSendVerificationCodeSuccessResponse) {
