@@ -1,7 +1,7 @@
 import { CookieOptions, Response } from 'express';
 import * as express from 'express';
 import { Sequelize } from 'sequelize-typescript';
-import { QueryTypes } from 'sequelize';
+import { QueryOptions, QueryTypes } from 'sequelize';
 import { promisify } from 'util';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -58,7 +58,7 @@ class UtilFunctions {
         };
     };
 
-    public static exitHandler = (server: any) => {
+    public static exitHandler = (server: any, sequelize: Sequelize) => {
         process
             .on('unhandledRejection', (reason, p) => {
                 console.error(reason, 'Unhandled Rejection at Promise', p);
@@ -67,7 +67,7 @@ class UtilFunctions {
                         logger.error(err);
                         process.exit(1);
                     }
-                    appConfig.sequelize.close().then(() => {
+                    sequelize.close().then(() => {
                         logger.error('Sequelize connection disconnected');
                         process.exit(0);
                     });
@@ -80,7 +80,7 @@ class UtilFunctions {
                         logger.error(err);
                         process.exit(1);
                     }
-                    appConfig.sequelize.close().then(() => {
+                    sequelize.close().then(() => {
                         logger.info('Sequelize connection disconnected');
                         process.exit(0);
                     });
@@ -93,7 +93,7 @@ class UtilFunctions {
                         logger.error(err);
                         process.exit(1);
                     }
-                    appConfig.sequelize.close().then(() => {
+                    sequelize.close().then(() => {
                         logger.info('Sequelize connection disconnected');
                         process.exit(0);
                     });
@@ -106,7 +106,7 @@ class UtilFunctions {
                         logger.error(err);
                         process.exit(1);
                     }
-                    appConfig.sequelize.close().then(() => {
+                    sequelize.close().then(() => {
                         logger.info('Sequelize connection disconnected');
                         process.exit(0);
                     });
@@ -178,9 +178,10 @@ class UtilFunctions {
 
     public static createSequelizeRawQuery = async (
         sequelize: Sequelize,
-        query: string
+        query: string,
+        options: QueryOptions = {}
     ): Promise<unknown | unknown[]> => {
-        return sequelize.query(query, { type: QueryTypes.SELECT });
+        return sequelize.query(query, { type: QueryTypes.SELECT, ...options });
     };
 
     public static makeDirectory = promisify(fs.mkdir);

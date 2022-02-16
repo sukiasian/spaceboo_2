@@ -19,7 +19,6 @@ import { Appointment } from './models/appointment.model';
 import { EmailVerification } from './models/email-verification.model';
 import { District } from './models/district.model';
 import { Region } from './models/region.model';
-import setCrons from './crons';
 
 export class AppConfig extends Singleton {
     private readonly passportConfig: PassportConfig = passportConfig;
@@ -60,9 +59,7 @@ export class AppConfig extends Singleton {
 
 export const appConfig = SingletonFactory.produce<AppConfig>(AppConfig);
 
-// NOTE: circular dependency resolution since NodeCronFunctions uses appConfig.sequelize.
-
 appConfig.setupPassport();
 appConfig.configureApp();
 
-export const app = appConfig.app;
+// export const app = appConfig.app;

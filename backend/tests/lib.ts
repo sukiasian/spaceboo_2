@@ -161,7 +161,7 @@ export const openTestEnv = async (appConfig: AppConfig): Promise<{ server: objec
     appConfig.configureApp();
     await startDb(appConfig.sequelize);
 
-    const server = startServer(appConfig.app); // NOTE
+    const server = startServer(appConfig.app);
 
     return {
         server,

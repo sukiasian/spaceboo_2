@@ -21,33 +21,6 @@ export class AppointmentController extends Singleton {
         this.utilFunctions.sendResponse(res)(HttpStatus.CREATED, ResponseMessages.APPOINTMENT_CREATED, appointment);
     });
 
-    public getAppointmentBySpaceId;
-
-    public getAppointmentsByUserId = this.utilFunctions.catchAsync(async (req, res, next) => {
-        const appointments = this.dao.getAppointmentsByUserId(req.user.id);
-    });
-
-    public getUserOutdatedAppointments = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
-        const { userId } = req.user;
-        const outdatedAppointments = await this.dao.getUserOutdatedAppointments(userId);
-
-        this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, outdatedAppointments);
-    });
-
-    public getUserActiveAppointments = this.utilFunctions.catchAsync(async (req, res, next) => {
-        const { userId } = req.user;
-        const activeAppointments = await this.dao.getUserActiveAppointments(userId);
-
-        this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, activeAppointments);
-    });
-
-    public getUserUpcomingAppointments = this.utilFunctions.catchAsync(async (req, res, next) => {
-        const { userId } = req.user;
-        const activeAppointments = await this.dao.getUserUpcomingAppointments(userId);
-
-        this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, activeAppointments);
-    });
-
     // PASS THE SPACE LITERALLY
     public stopAppointment = this.utilFunctions.catchAsync(async (req, res, next) => {});
 }

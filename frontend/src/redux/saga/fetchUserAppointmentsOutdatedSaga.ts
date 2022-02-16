@@ -28,6 +28,6 @@ function* fetchUserOutdatedAppointmentsWorker(
         yield put(setFetchCitiesByPatternFailureResponseAction(err as IServerResponse));
     }
 }
-export function* watchFetchCitiesBySearchPattern(): Generator<ForkEffect, void, void> {
-    yield takeLatest(SagaTasks.FETCH_CITIES_BY_SEARCH_PATTERN, fetchUserOutdatedAppointmentsWorker);
+export function* watchFetchUserOutdatedAppointments(): Generator<ForkEffect, void, void> {
+    yield takeLatest(SagaTasks.FETCH_USER_OUTDATED_APPOINTMENTS, fetchUserOutdatedAppointmentsWorker);
 }

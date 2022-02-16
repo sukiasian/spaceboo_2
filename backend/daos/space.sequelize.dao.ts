@@ -1,9 +1,10 @@
 import { Dao } from '../configurations/dao.config';
-import { ISpaceCreate, Space, ISpaceEdit, spaceEditFields } from '../models/space.model';
+import { ISpaceCreate, Space, ISpaceEdit, spaceEditFields, ISpace } from '../models/space.model';
 import { QuerySortDirection } from '../types/enums';
 import { SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
 import { appConfig } from '../AppConfig';
+import { Appointment, IAppointment } from '../models/appointment.model';
 
 interface IQueryString {
     page?: string | number;
@@ -108,6 +109,69 @@ export class SpaceSequelizeDao extends Dao {
                 userId,
             },
         });
+    };
+
+    public getSpacesForUserOutdatedAppointmentsIds = async (userId: string): Promise<ISpace[]> => {
+        const now = new Date().toISOString();
+        const getOutdatedAppointmentsRawQuery = `SELECT * FROM "Appointments" a WHERE a."userId" = '${userId}' AND UPPER(a."isoDatesReserved") < '${now}';`;
+        const userOutdatedAppointments = (await this.utilFunctions.createSequelizeRawQuery(
+            appConfig.sequelize,
+            getOutdatedAppointmentsRawQuery
+        )) as IAppointment[];
+
+        const spacesForUserOutdatedAppointments = await Promise.all(
+            userOutdatedAppointments.map(async (appointment) => {
+                const getSpaceForUserOutdatedAppointment = `SELECT * FROM "Appointments" a JOIN "Spaces" s ON a."spaceId" = s."id" WHERE a."id" = '${appointment.id}';`;
+
+                return this.utilFunctions.createSequelizeRawQuery(
+                    appConfig.sequelize,
+                    getSpaceForUserOutdatedAppointment,
+                    { plain: true }
+                );
+            })
+        );
+
+        return spacesForUserOutdatedAppointments as ISpace[];
+    };
+
+    public getSpacesForUserActiveAppointmentsIds = async (userId: string): Promise<ISpace[]> => {
+        const now = new Date().toISOString();
+        const getActiveAppointmentsRawQuery = `SELECT * FROM "Appointments" a WHERE a."userId" = '${userId}' AND a."isoDatesReserved" @> '${now}'::timestamptz;`;
+        const userActiveAppointments = (await this.utilFunctions.createSequelizeRawQuery(
+            appConfig.sequelize,
+            getActiveAppointmentsRawQuery
+        )) as IAppointment[];
+
+        const spacesForUserActiveAppointments = await Promise.all(
+            userActiveAppointments.map(this.getSpaceByAppointment)
+        );
+
+        return spacesForUserActiveAppointments as ISpace[];
+    };
+
+    public getSpacesForUserUpcomingAppointmentsIds = async (userId: string): Promise<ISpace[]> => {
+        const now = new Date().toISOString();
+        const getActiveAppointmentsRawQuery = `SELECT * FROM "Appointments" a WHERE a."userId" = '${userId}' AND LOWER(a."isoDatesReserved") > '${now}';`;
+        const userUpcomingAppointments = (await this.utilFunctions.createSequelizeRawQuery(
+            appConfig.sequelize,
+            getActiveAppointmentsRawQuery
+        )) as IAppointment[];
+
+        const spacesForUserUpcomingAppointments = await Promise.all(
+            userUpcomingAppointments.map(this.getSpaceByAppointment)
+        );
+
+        return spacesForUserUpcomingAppointments;
+    };
+
+    private getSpaceByAppointment = async (appointment: IAppointment): Promise<ISpace> => {
+        const getSpaceForUserOutdatedAppointment = `SELECT * FROM "Appointments" a JOIN "Spaces" s ON a."spaceId" = s."id" WHERE a."id" = '${appointment.id}';`;
+
+        return (await this.utilFunctions.createSequelizeRawQuery(
+            appConfig.sequelize,
+            getSpaceForUserOutdatedAppointment,
+            { plain: true }
+        )) as ISpace;
     };
 
     public editSpaceById = async (

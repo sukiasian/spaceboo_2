@@ -68,41 +68,6 @@ export class AppointmentSequelizeDao extends Dao {
                 return false;
         }
     };
-
-    public getUserOutdatedAppointments = async (userId: string): Promise<IAppointment[]> => {
-        const now = new Date().toISOString();
-        const getOutdatedAppointmentsRawQuery = `SELECT * FROM "Appointments" a WHERE a."userId" = '${userId}' AND UPPER(a."isoDatesReserver") < '${now}'`;
-        const outdatedAppointments = (await this.utilFunctions.createSequelizeRawQuery(
-            appConfig.sequelize,
-            getOutdatedAppointmentsRawQuery
-        )) as IAppointment[];
-
-        return outdatedAppointments;
-    };
-
-    public getUserActiveAppointments = async (userId: string): Promise<IAppointment[]> => {
-        const now = new Date().toISOString();
-        // NOTE: should overlap
-        const getActiveAppointmentsRawQuery = `SELECT * FROM "Appointments" a WHERE a."userId" = '${userId}' AND UPPER(a."isoDatesReserver") < '${now}'`;
-        const activeAppointments = (await this.utilFunctions.createSequelizeRawQuery(
-            appConfig.sequelize,
-            getActiveAppointmentsRawQuery
-        )) as IAppointment[];
-
-        return activeAppointments;
-    };
-
-    public getUserUpcomingAppointments = async (userId: string): Promise<IAppointment[]> => {
-        const now = new Date().toISOString();
-        // NOTE: lower  bound should be higher than now
-        const getActiveAppointmentsRawQuery = `SELECT * FROM "Appointments" a WHERE a."userId" = '${userId}' AND UPPER(a."isoDatesReserver") < '${now}'`;
-        const upcomingAppointments = (await this.utilFunctions.createSequelizeRawQuery(
-            appConfig.sequelize,
-            getActiveAppointmentsRawQuery
-        )) as IAppointment[];
-
-        return upcomingAppointments;
-    };
 }
 
 export const appointmentSequelizeDao = SingletonFactory.produce<AppointmentSequelizeDao>(AppointmentSequelizeDao);

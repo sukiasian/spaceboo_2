@@ -49,6 +49,27 @@ class SpaceRouter extends Singleton implements IRouter {
                 this.routeProtector.spaceOwnerProtector,
                 this.spaceController.deleteSpaceById
             );
+
+        this.router
+            .route('/appointed/outdated')
+            .get(
+                this.passport.authenticate(PassportStrategies.JWT, { session: false }),
+                this.spaceController.getSpacesForUserOutdatedAppointmentsIds
+            );
+
+        this.router
+            .route('/appointed/active')
+            .get(
+                this.passport.authenticate(PassportStrategies.JWT, { session: false }),
+                this.spaceController.getSpacesForUserActiveAppointmentsIds
+            );
+
+        this.router
+            .route('/appointed/upcoming')
+            .get(
+                this.passport.authenticate(PassportStrategies.JWT, { session: false }),
+                this.spaceController.getSpacesForUserUpcomingAppointmentsIds
+            );
     };
 }
 

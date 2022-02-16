@@ -3,6 +3,9 @@ import { watchFetchCitiesBySearchPattern } from './fetchCitiesBySearchPatternSag
 import { watchFetchCurrentUser } from './fetchCurrentUserSaga';
 import { watchFetchSpaceById } from './fetchSpaceByIdSaga';
 import { watchFetchSpaces } from './fetchSpacesSaga';
+import { watchFetchUserActiveAppointments } from './fetchUserAppointmentsActiveSaga';
+import { watchFetchUserOutdatedAppointments } from './fetchUserAppointmentsOutdatedSaga';
+import { watchFetchUserUpcomingAppointments } from './fetchUserAppointmentsUpcomingSaga';
 import { watchFetchUserLoginState } from './fetchUserLoginStateSaga';
 import { watchFetchUserSpaces } from './fetchUserSpacesSaga';
 import { watchPostCheckVerificationCode } from './postCheckVerificationCodeSaga';
@@ -29,5 +32,8 @@ export function* rootSaga() {
         watchFetchSpaceById(),
         watchFetchUserSpaces(),
         watchFetchCurrentUser(),
+        watchFetchUserOutdatedAppointments(),
+        watchFetchUserActiveAppointments(),
+        watchFetchUserUpcomingAppointments(),
     ]);
 }

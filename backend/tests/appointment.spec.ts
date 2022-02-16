@@ -7,6 +7,7 @@ import {
     clearDb,
     closeTestEnv,
     createAppConfig,
+    createAppoinmentData,
     createSpaceData,
     createTokenAndSign,
     createUserData,
@@ -81,7 +82,13 @@ describe('Appointment (e2e)', () => {
             where: { id: space.id },
             include: [City, Appointment],
         });
-        token = await createTokenAndSign<object>({ id: user.id });
+        token = createTokenAndSign<object>({ id: user.id });
+        /* 
+            TODO: здесь мы создаем напрямую. если у нас стоят валидаторы у модели то здесь мы не должны суметь создавать записи на время 
+            которое меньше чем дата сейчас.
+
+            Мы можем сделать это напрямую в endpoint-e и возможно так будет даже лучше. 
+        */
     });
 
     afterEach(async () => {

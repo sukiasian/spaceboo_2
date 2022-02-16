@@ -1,5 +1,3 @@
-import * as express from 'express';
-import * as path from 'path';
 import { userSequelizeDao, UserSequelizeDao } from '../daos/user.sequelize.dao';
 import { User } from '../models/user.model';
 import { ErrorMessages, HttpStatus, ResponseMessages } from '../types/enums';
@@ -11,7 +9,7 @@ class UserController extends Singleton {
     private readonly dao: UserSequelizeDao = userSequelizeDao;
     private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
 
-    public editUser = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+    public editUser = UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const { id: userId } = req.user;
         const { userEditData } = req.body;
 
@@ -22,13 +20,13 @@ class UserController extends Singleton {
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.DATA_UPDATED);
     });
 
-    public getCurrentUser = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+    public getCurrentUser = UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const user = await this.dao.getCurrentUserById(req.user.id);
 
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, user);
     });
 
-    public getUserById = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+    public getUserById = UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const user: User = await this.dao.getUserById(req.params.userId);
 
         // TODO use insensitive fields for getting user

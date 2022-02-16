@@ -13,7 +13,9 @@ const fetchActiveUserAppointments = async (): Promise<IServerResponse> => {
     return httpRequester.get(`${ApiUrls.APPOINTMENTS}/user/active`);
 };
 
-function* fetchUserAppointmentsWorker(action: IAction): Generator<AllEffect<CallEffect> | PutEffect<AnyAction>, void> {
+function* fetchUserActiveAppointmentsWorker(
+    action: IAction
+): Generator<AllEffect<CallEffect> | PutEffect<AnyAction>, void> {
     try {
         const response = yield all([call(fetchActiveUserAppointments)]);
 
@@ -26,6 +28,6 @@ function* fetchUserAppointmentsWorker(action: IAction): Generator<AllEffect<Call
         yield put(setFetchCitiesByPatternFailureResponseAction(err as IServerResponse));
     }
 }
-export function* watchFetchCitiesBySearchPattern(): Generator<ForkEffect, void, void> {
-    yield takeLatest(SagaTasks.FETCH_CITIES_BY_SEARCH_PATTERN, fetchUserAppointmentsWorker);
+export function* watchFetchUserActiveAppointments(): Generator<ForkEffect, void, void> {
+    yield takeLatest(SagaTasks.FETCH_USER_ACTIVE_APPOINTMENTS, fetchUserActiveAppointmentsWorker);
 }

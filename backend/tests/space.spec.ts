@@ -9,6 +9,7 @@ import {
     clearDb,
     closeTestEnv,
     createAppConfig,
+    createAppoinmentData,
     createSpaceData,
     createTokenAndSign,
     createUserData,
@@ -90,7 +91,7 @@ describe('Space (e2e)', () => {
         user = await userModel.create(userData);
         spaceData = createSpaceData(user.id, city.id, 1500);
         spaceData_2 = createSpaceData(user.id, city_2.id);
-        token = await createTokenAndSign<object>({ id: user.id });
+        token = createTokenAndSign<object>({ id: user.id });
         space_1 = await spaceModel.create(spaceData);
         space_1 = await spaceModel.findOne({
             where: { id: space_1.id },
@@ -420,5 +421,143 @@ describe('Space (e2e)', () => {
         await request(app).delete(`${ApiRoutes.SPACES}/${space_1.id}`).set('Authorization', `Bearer ${token}`);
 
         const freshSpace: Space = await spaceDao.findById(space_1.id);
+    });
+
+    it("GET /spaces/user/outdated should get user's outdated appointments", async () => {
+        const outdatedAppointmentDataForSpace_1 = createAppoinmentData(
+            [
+                { value: '2020-01-01T14:00:00.000Z', inclusive: true },
+                { value: '2020-01-05T12:00:00.000Z', inclusive: false },
+            ],
+            space_1.id,
+            user.id
+        );
+        const activeAppointmentDataForSpace_2 = createAppoinmentData(
+            [
+                { value: new Date().toISOString(), inclusive: true },
+                { value: new Date(Date.now() + 100000000).toISOString(), inclusive: false },
+            ],
+            space_2.id,
+            user.id
+        );
+        const upcomingAppointmentDataForSpace_2 = createAppoinmentData(
+            [
+                { value: '2050-01-01T14:00:00.000Z', inclusive: true },
+                { value: '2050-01-05T12:00:00.000Z', inclusive: false },
+            ],
+            space_2.id,
+            user.id
+        );
+
+        await appointmentModel.create(outdatedAppointmentDataForSpace_1);
+        await appointmentModel.create(activeAppointmentDataForSpace_2);
+        await appointmentModel.create(upcomingAppointmentDataForSpace_2);
+
+        const userAppointments = await appointmentModel.findAll({
+            where: {
+                userId: user.id,
+            },
+        });
+
+        expect(userAppointments.length).toBe(3);
+
+        const res = await request(app)
+            .get(`${ApiRoutes.SPACES}/appointed/outdated`)
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.body.data.length).toBe(1);
+        expect(res.body.data[0].id).toBe(space_1.id);
+    });
+
+    it("GET /spaces/user/active should get user's active appointments", async () => {
+        const outdatedAppointmentDataForSpace_1 = createAppoinmentData(
+            [
+                { value: '2020-01-01T14:00:00.000Z', inclusive: true },
+                { value: '2020-01-05T12:00:00.000Z', inclusive: false },
+            ],
+            space_1.id,
+            user.id
+        );
+        const upcomingAppointmentDataForSpace_1 = createAppoinmentData(
+            [
+                { value: '2050-01-01T14:00:00.000Z', inclusive: true },
+                { value: '2050-01-05T12:00:00.000Z', inclusive: false },
+            ],
+            space_1.id,
+            user.id
+        );
+        const activeAppointmentDataForSpace_2 = createAppoinmentData(
+            [
+                { value: new Date().toISOString(), inclusive: true },
+                { value: new Date(Date.now() + 100000000).toISOString(), inclusive: false },
+            ],
+            space_2.id,
+            user.id
+        );
+
+        await appointmentModel.create(outdatedAppointmentDataForSpace_1);
+        await appointmentModel.create(upcomingAppointmentDataForSpace_1);
+        await appointmentModel.create(activeAppointmentDataForSpace_2);
+
+        const userAppointments = await appointmentModel.findAll({
+            where: {
+                userId: user.id,
+            },
+        });
+
+        expect(userAppointments.length).toBe(3);
+
+        const res = await request(app)
+            .get(`${ApiRoutes.SPACES}/appointed/active`)
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.body.data.length).toBe(1);
+        expect(res.body.data[0].id).toBe(space_2.id);
+    });
+
+    it("GET /spaces/user/upcoming should get user's upcoming appointments", async () => {
+        const outdatedAppointmentDataForSpace_1 = createAppoinmentData(
+            [
+                { value: '2020-01-01T14:00:00.000Z', inclusive: true },
+                { value: '2020-01-05T12:00:00.000Z', inclusive: false },
+            ],
+            space_1.id,
+            user.id
+        );
+        const activeAppointmentDataForSpace_1 = createAppoinmentData(
+            [
+                { value: new Date().toISOString(), inclusive: true },
+                { value: new Date(Date.now() + 100000000).toISOString(), inclusive: false },
+            ],
+            space_1.id,
+            user.id
+        );
+        const upcomingAppointmentDataForSpace_2 = createAppoinmentData(
+            [
+                { value: '2050-01-01T14:00:00.000Z', inclusive: true },
+                { value: '2050-01-05T12:00:00.000Z', inclusive: false },
+            ],
+            space_2.id,
+            user.id
+        );
+
+        await appointmentModel.create(outdatedAppointmentDataForSpace_1);
+        await appointmentModel.create(activeAppointmentDataForSpace_1);
+        await appointmentModel.create(upcomingAppointmentDataForSpace_2);
+
+        const userAppointments = await appointmentModel.findAll({
+            where: {
+                userId: user.id,
+            },
+        });
+
+        expect(userAppointments.length).toBe(3);
+
+        const res = await request(app)
+            .get(`${ApiRoutes.SPACES}/appointed/upcoming`)
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.body.data.length).toBe(1);
+        expect(res.body.data[0].id).toBe(space_2.id);
     });
 });

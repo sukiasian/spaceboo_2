@@ -28,6 +28,6 @@ function* ƒetchUserUpcomingAppointmentsWorker(
         yield put(setFetchCitiesByPatternFailureResponseAction(err as IServerResponse));
     }
 }
-export function* watchfetchUserUpcomingAppointmentsWorkers(): Generator<ForkEffect, void, void> {
-    yield takeLatest(SagaTasks.FETCH_CITIES_BY_SEARCH_PATTERN, ƒetchUserUpcomingAppointmentsWorker);
+export function* watchFetchUserUpcomingAppointments(): Generator<ForkEffect, void, void> {
+    yield takeLatest(SagaTasks.FETCH_USER_UPCOMING_APPOINTMENTS, ƒetchUserUpcomingAppointmentsWorker);
 }

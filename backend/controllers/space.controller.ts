@@ -10,7 +10,6 @@ export class SpaceController extends Singleton {
 
     public provideSpace = this.utilFunctions.catchAsync(async (req, res, next) => {
         const { id: userId } = req.user;
-        console.log(req.files);
 
         if (!req.files || req.files.length === 0) {
             throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.SPACE_IMAGES_ARE_NOT_PROVIDED);
@@ -47,6 +46,29 @@ export class SpaceController extends Singleton {
         const spaces = await this.dao.getUserSpaces(req.user.id);
 
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, spaces);
+    });
+
+    public getSpacesForUserOutdatedAppointmentsIds = this.utilFunctions.catchAsync(
+        async (req, res, next): Promise<void> => {
+            const { id: userId } = req.user;
+            const outdatedAppointments = await this.dao.getSpacesForUserOutdatedAppointmentsIds(userId);
+
+            this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, outdatedAppointments);
+        }
+    ); // getSpacesForUserOutdatedAppointmentsIds
+
+    public getSpacesForUserActiveAppointmentsIds = this.utilFunctions.catchAsync(async (req, res, next) => {
+        const { id: userId } = req.user;
+        const activeAppointments = await this.dao.getSpacesForUserActiveAppointmentsIds(userId);
+
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, activeAppointments);
+    });
+
+    public getSpacesForUserUpcomingAppointmentsIds = this.utilFunctions.catchAsync(async (req, res, next) => {
+        const { id: userId } = req.user;
+        const upcomingAppointments = await this.dao.getSpacesForUserUpcomingAppointmentsIds(userId);
+
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, upcomingAppointments);
     });
 
     public editSpaceById = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {

@@ -1,4 +1,4 @@
-import { app, appConfig } from './AppConfig';
+import { appConfig } from './AppConfig';
 import logger from './loggers/logger';
 import * as process from 'process';
 import * as dotenv from 'dotenv';
@@ -9,7 +9,8 @@ import { Singleton, SingletonFactory } from './utils/Singleton';
 import setCrons from './crons';
 
 class Server extends Singleton {
-    private readonly app = app;
+    private readonly appConfig = appConfig;
+    private readonly app = appConfig.app;
     private readonly PORT = process.env.PORT || 8000;
     private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
 
@@ -30,7 +31,7 @@ class Server extends Singleton {
     };
 
     public start = async () => {
-        await databaseConnection(appConfig.sequelize);
+        await databaseConnection(this.appConfig.sequelize);
 
         const server = this.app.listen(this.PORT, () => {
             logger.info(`Server is listening on ${this.PORT}`);
@@ -40,7 +41,7 @@ class Server extends Singleton {
             }
         });
 
-        this.utilFunctions.exitHandler(server);
+        this.utilFunctions.exitHandler(server, this.appConfig.sequelize);
     };
 }
 
