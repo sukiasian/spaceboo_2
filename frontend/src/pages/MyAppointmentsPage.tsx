@@ -1,19 +1,17 @@
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { NavLink } from 'react-router-dom';
-import {
-    fetchSpacesByUserActiveAppointments,
-    fetchSpacesByUserOutdatedAppointments,
-    fetchSpacesByUserUpcomingAppointments,
-} from '../redux/actions/spaceActions';
-import { IReduxState } from '../redux/reducers/rootReducer';
+import { useDispatch } from 'react-redux';
+import { NavLink, useNavigate } from 'react-router-dom';
 import MyAppointmentsPageRoutes from '../routes/MyAppointmentsPageRoutes';
-import { IServerResponse } from '../types/types';
+import { IServerResponse, ReduxCommonActions } from '../types/types';
 
 interface IAppointmentsClassificationTab {
     tabName: string;
     to: string;
 }
+
+export const checkIfSpacesAmountIsNull = (data?: any[]): boolean => {
+    return data?.length === 0 ? true : false;
+};
 
 export default function MyAppointmentsPage(): JSX.Element {
     const appointmentsClassificationTabs: IAppointmentsClassificationTab[] = [
@@ -31,34 +29,20 @@ export default function MyAppointmentsPage(): JSX.Element {
         },
     ];
     const [activeTab, setActiveTab] = useState(appointmentsClassificationTabs[1].tabName);
-    const {
-        fetchSpacesByUserOutdatedAppointmentsSuccessResponse,
-        fetchSpacesByUserOutdatedAppointmentsFailureResponse,
-        fetchSpacesByUserActiveAppointmentsSuccessResponse,
-        fetchSpacesByUserActiveAppointmentsFailureResponse,
-        fetchSpacesByUserUpcomingAppointmentsSuccessResponse,
-        fetchSpacesByUserUpcomingAppointmentsFailureResponse,
-    } = useSelector((state: IReduxState) => state.spaceStorage);
+    const navigate = useNavigate();
     const dispatch = useDispatch();
-    const fetchSpacesForUserOutdatedAppointments = (): void => {
-        dispatch(fetchSpacesByUserOutdatedAppointments());
-    };
-    const fetchSpacesForUserActiveAppointments = (): void => {
-        dispatch(fetchSpacesByUserActiveAppointments());
-    };
-    const fetchSpacesForUserUpcomingAppointments = (): void => {
-        dispatch(fetchSpacesByUserUpcomingAppointments());
-    };
-    const applyEffectsOnInit = (): void => {
-        // если есть активные то их отображает первыми.
-        // если есть предстоящие но нет активных то отображает предстоящие.
-        // если же есть только прошедшие
-        fetchSpacesForUserOutdatedAppointments();
-        fetchSpacesForUserActiveAppointments();
-        fetchSpacesForUserUpcomingAppointments();
 
-        // нужно navigate на определенный роут
-        // если какой то из этих вальнулся то надо останавливаться
+    const navigateToActive = (): void => {
+        if (window.location.pathname.includes('my-appointments')) {
+            navigate('active');
+        }
+    };
+    const applyEffectsOnInit = (): (() => void) => {
+        navigateToActive();
+
+        return () => {
+            dispatch({ type: ReduxCommonActions.SET_MY_APPOINTMENTS_PAGE_IS_LOADED_TO_TRUE });
+        };
     };
     const handleActiveTab = (tab: string): (() => void) => {
         return () => {
@@ -67,13 +51,6 @@ export default function MyAppointmentsPage(): JSX.Element {
     };
     const checkIfSpacesAmountIsNull = (response?: IServerResponse): boolean => {
         return response?.data.length > 0 ? false : true;
-    };
-    const switchActiveTab = (): void => {
-        if (checkIfSpacesAmountIsNull(fetchSpacesByUserActiveAppointmentsSuccessResponse)) {
-            handleActiveTab('Предстоящие');
-        } else if (checkIfSpacesAmountIsNull(fetchSpacesByUserUpcomingAppointmentsSuccessResponse)) {
-            handleActiveTab('Прошедшие');
-        }
     };
     const renderTabsBar = (): JSX.Element[] => {
         return appointmentsClassificationTabs.map((tab, i: number) => {
@@ -88,12 +65,18 @@ export default function MyAppointmentsPage(): JSX.Element {
     };
 
     useEffect(applyEffectsOnInit, []);
-    useEffect(switchActiveTab, []);
 
     return (
         <section className="my-appointments-page-section">
             <div className="type-of-appointments-tabs-bar">{renderTabsBar()}</div>
             <MyAppointmentsPageRoutes />
+            {/* если роут === my-appointments то здесь тупо ничего не будет отображаться. Как решить эту проблему?
+            
+            1. в applyEffectsOnInit перекидывать в active откуда начать всю деятельность алгоритма
+            2. использовать просто компонент active здесь - так можно будет будет при попадании на my-appointments иметь отображенным 
+                actives
+            
+            */}
         </section>
     );
 }

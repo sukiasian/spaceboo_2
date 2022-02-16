@@ -70,7 +70,7 @@ export const setFetchSpacesByUserActiveAppointmentsSuccessResponse = (
     payload: IServerResponse
 ): IAction<ReduxSpaceActions> => {
     return {
-        type: ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_SUCCESS_RESPONSE,
+        type: ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_ACTIVE_APPOINTMENTS_SUCCESS_RESPONSE,
         payload,
     };
 };
@@ -79,7 +79,7 @@ export const setFetchSpacesByUserActiveAppointmentsFailureResponse = (
     payload: IServerResponse
 ): IAction<ReduxSpaceActions> => {
     return {
-        type: ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_FAILURE_RESPONSE,
+        type: ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_ACTIVE_APPOINTMENTS_FAILURE_RESPONSE,
         payload,
     };
 };
@@ -88,7 +88,7 @@ export const setFetchSpacesByUserUpcomingAppointmentsSuccessResponse = (
     payload: IServerResponse
 ): IAction<ReduxSpaceActions> => {
     return {
-        type: ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_SUCCESS_RESPONSE,
+        type: ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_UPCOMING_APPOINTMENTS_SUCCESS_RESPONSE,
         payload,
     };
 };
@@ -97,7 +97,7 @@ export const setFetchSpacesByUserUpcomingAppointmentsFailureResponse = (
     payload: IServerResponse
 ): IAction<ReduxSpaceActions> => {
     return {
-        type: ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_FAILURE_RESPONSE,
+        type: ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_UPCOMING_APPOINTMENTS_FAILURE_RESPONSE,
         payload,
     };
 };

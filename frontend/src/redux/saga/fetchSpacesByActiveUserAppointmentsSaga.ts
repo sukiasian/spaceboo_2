@@ -1,4 +1,4 @@
-import { PutEffect, ForkEffect, CallEffect, call, put, takeLatest, all, AllEffect } from '@redux-saga/core/effects';
+import { PutEffect, ForkEffect, CallEffect, call, put, takeLatest } from '@redux-saga/core/effects';
 import { AnyAction } from 'redux';
 import { ApiUrls, IServerResponse, SagaTasks } from '../../types/types';
 import { httpRequester } from '../../utils/HttpRequest';
@@ -12,9 +12,9 @@ const fetchActiveUserAppointments = async (): Promise<IServerResponse> => {
     return httpRequester.get(`${ApiUrls.SPACES}/appointed/active`);
 };
 
-function* fetchUserActiveAppointmentsWorker(): Generator<AllEffect<CallEffect> | PutEffect<AnyAction>, void> {
+function* fetchUserActiveAppointmentsWorker(): Generator<CallEffect | PutEffect<AnyAction>, void> {
     try {
-        const response = yield all([call(fetchActiveUserAppointments)]);
+        const response = yield call(fetchActiveUserAppointments);
 
         if (serverResponseIsSuccessful(response as IServerResponse)) {
             yield put(setFetchSpacesByUserActiveAppointmentsSuccessResponse(response as IServerResponse));
