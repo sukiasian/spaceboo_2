@@ -41,3 +41,11 @@ export const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
 export const serverResponseIsSuccessful = (response: IServerResponse): boolean => {
     return response.statusCode >= HttpStatus.OK && response.statusCode < HttpStatus.AMBIGUOUS ? true : false;
 };
+
+export const defineActiveClassName = (activeTab: string, tab: string): string => {
+    if (activeTab === tab) {
+        return 'active';
+    }
+
+    return '';
+};

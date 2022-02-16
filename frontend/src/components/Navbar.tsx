@@ -33,6 +33,7 @@ export default function Navbar(): JSX.Element {
         if (activeTab === tab) {
             return 'active';
         }
+
         return '';
     };
     const handleActiveTab = (tab: string): (() => void) => {

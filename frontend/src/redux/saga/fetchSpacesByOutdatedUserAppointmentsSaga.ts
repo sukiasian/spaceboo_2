@@ -3,31 +3,28 @@ import { AnyAction } from 'redux';
 import { ApiUrls, IServerResponse, SagaTasks } from '../../types/types';
 import { httpRequester } from '../../utils/HttpRequest';
 import { serverResponseIsSuccessful } from '../../utils/utilFunctions';
-import { IAction } from '../actions/ActionTypes';
 import {
-    setFetchCitiesByPatternSuccessResponseAction,
-    setFetchCitiesByPatternFailureResponseAction,
-} from '../actions/cityActions';
+    setFetchSpacesByUserOutdatedAppointmentsFailureResponse,
+    setFetchSpacesByUserOutdatedAppointmentsSuccessResponse,
+} from '../actions/spaceActions';
 
 const fetchOutdatedUserAppointments = async (): Promise<IServerResponse> => {
-    return httpRequester.get(`${ApiUrls.APPOINTMENTS}/user/outdated`);
+    return httpRequester.get(`${ApiUrls.SPACES}/appointed/outdated`);
 };
 
-function* fetchUserOutdatedAppointmentsWorker(
-    action: IAction
-): Generator<AllEffect<CallEffect> | PutEffect<AnyAction>, void> {
+function* fetchUserOutdatedAppointmentsWorker(): Generator<AllEffect<CallEffect> | PutEffect<AnyAction>, void> {
     try {
         const response = yield all([call(fetchOutdatedUserAppointments)]);
 
         if (serverResponseIsSuccessful(response as IServerResponse)) {
-            yield put(setFetchCitiesByPatternSuccessResponseAction(response as IServerResponse));
+            yield put(setFetchSpacesByUserOutdatedAppointmentsSuccessResponse(response as IServerResponse));
         } else {
             throw response;
         }
     } catch (err) {
-        yield put(setFetchCitiesByPatternFailureResponseAction(err as IServerResponse));
+        yield put(setFetchSpacesByUserOutdatedAppointmentsFailureResponse(err as IServerResponse));
     }
 }
 export function* watchFetchUserOutdatedAppointments(): Generator<ForkEffect, void, void> {
-    yield takeLatest(SagaTasks.FETCH_USER_OUTDATED_APPOINTMENTS, fetchUserOutdatedAppointmentsWorker);
+    yield takeLatest(SagaTasks.FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS, fetchUserOutdatedAppointmentsWorker);
 }

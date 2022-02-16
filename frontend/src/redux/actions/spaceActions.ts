@@ -30,6 +30,78 @@ export const fetchUserSpaces = (): IAction<SagaTasks> => {
     };
 };
 
+export const fetchSpacesByUserOutdatedAppointments = (): IAction<SagaTasks> => {
+    return {
+        type: SagaTasks.FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS,
+    };
+};
+
+export const fetchSpacesByUserActiveAppointments = (): IAction<SagaTasks> => {
+    return {
+        type: SagaTasks.FETCH_SPACES_BY_USER_ACTIVE_APPOINTMENTS,
+    };
+};
+
+export const fetchSpacesByUserUpcomingAppointments = (): IAction<SagaTasks> => {
+    return {
+        type: SagaTasks.FETCH_SPACES_BY_USER_UPCOMING_APPOINTMENTS,
+    };
+};
+
+export const setFetchSpacesByUserOutdatedAppointmentsSuccessResponse = (
+    payload: IServerResponse
+): IAction<ReduxSpaceActions> => {
+    return {
+        type: ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_SUCCESS_RESPONSE,
+        payload,
+    };
+};
+
+export const setFetchSpacesByUserOutdatedAppointmentsFailureResponse = (
+    payload: IServerResponse
+): IAction<ReduxSpaceActions> => {
+    return {
+        type: ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_FAILURE_RESPONSE,
+        payload,
+    };
+};
+
+export const setFetchSpacesByUserActiveAppointmentsSuccessResponse = (
+    payload: IServerResponse
+): IAction<ReduxSpaceActions> => {
+    return {
+        type: ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_SUCCESS_RESPONSE,
+        payload,
+    };
+};
+
+export const setFetchSpacesByUserActiveAppointmentsFailureResponse = (
+    payload: IServerResponse
+): IAction<ReduxSpaceActions> => {
+    return {
+        type: ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_FAILURE_RESPONSE,
+        payload,
+    };
+};
+
+export const setFetchSpacesByUserUpcomingAppointmentsSuccessResponse = (
+    payload: IServerResponse
+): IAction<ReduxSpaceActions> => {
+    return {
+        type: ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_SUCCESS_RESPONSE,
+        payload,
+    };
+};
+
+export const setFetchSpacesByUserUpcomingAppointmentsFailureResponse = (
+    payload: IServerResponse
+): IAction<ReduxSpaceActions> => {
+    return {
+        type: ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_FAILURE_RESPONSE,
+        payload,
+    };
+};
+
 export const setFetchSpacesSuccessResponseAction = (
     payload: IServerResponse
 ): IAction<ReduxSpaceActions, IServerResponse> => {

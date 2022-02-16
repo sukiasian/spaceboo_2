@@ -3,9 +3,9 @@ import { watchFetchCitiesBySearchPattern } from './fetchCitiesBySearchPatternSag
 import { watchFetchCurrentUser } from './fetchCurrentUserSaga';
 import { watchFetchSpaceById } from './fetchSpaceByIdSaga';
 import { watchFetchSpaces } from './fetchSpacesSaga';
-import { watchFetchUserActiveAppointments } from './fetchUserAppointmentsActiveSaga';
-import { watchFetchUserOutdatedAppointments } from './fetchUserAppointmentsOutdatedSaga';
-import { watchFetchUserUpcomingAppointments } from './fetchUserAppointmentsUpcomingSaga';
+import { watchFetchUserActiveAppointments } from './fetchSpacesByActiveUserAppointmentsSaga';
+import { watchFetchUserOutdatedAppointments } from './fetchSpacesByOutdatedUserAppointmentsSaga';
+import { watchFetchUserUpcomingAppointments } from './fetchSpacesByUpcomingUserAppointmentsSaga';
 import { watchFetchUserLoginState } from './fetchUserLoginStateSaga';
 import { watchFetchUserSpaces } from './fetchUserSpacesSaga';
 import { watchPostCheckVerificationCode } from './postCheckVerificationCodeSaga';
@@ -17,7 +17,6 @@ import { watchPostSignup } from './postSignupUserSaga';
 import { watchPostUploadSpaceImages } from './postUploadSpaceImagesSaga';
 
 export function* rootSaga() {
-    // NOTE probably will need to fork all these if we do this on the page loading
     yield all([
         watchPostLogin(),
         watchPostSignup(),

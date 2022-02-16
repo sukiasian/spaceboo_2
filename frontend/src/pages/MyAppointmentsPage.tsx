@@ -1,46 +1,99 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { NavLink } from 'react-router-dom';
+import {
+    fetchSpacesByUserActiveAppointments,
+    fetchSpacesByUserOutdatedAppointments,
+    fetchSpacesByUserUpcomingAppointments,
+} from '../redux/actions/spaceActions';
+import { IReduxState } from '../redux/reducers/rootReducer';
+import MyAppointmentsPageRoutes from '../routes/MyAppointmentsPageRoutes';
+import { IServerResponse } from '../types/types';
 
 interface IAppointmentsClassificationTab {
     tabName: string;
+    to: string;
 }
 
 export default function MyAppointmentsPage(): JSX.Element {
-    // мы должны подтягивать бронирования пользователя.
-    // подтягивать пространства пользователей в которых у них есть предстоящие брони (то есть дата начала больше чем сейчас)
-
-    // Брони: предстоящие, настоящие ( в которых дата сейчас имеет точку пересечения и прошедшие - то есть нужно сделать 3 таба)
-    const appointmentsClassificationTabs = [
+    const appointmentsClassificationTabs: IAppointmentsClassificationTab[] = [
+        {
+            tabName: 'Прошедшие',
+            to: 'outdated',
+        },
         {
             tabName: 'Активные',
+            to: 'active',
         },
         {
             tabName: 'Предстоящие',
-        },
-        {
-            tabName: 'Прошедшие',
+            to: 'upcoming',
         },
     ];
-    const [activeTab, setActiveTab] = useState(appointmentsClassificationTabs[0].tabName);
+    const [activeTab, setActiveTab] = useState(appointmentsClassificationTabs[1].tabName);
+    const {
+        fetchSpacesByUserOutdatedAppointmentsSuccessResponse,
+        fetchSpacesByUserOutdatedAppointmentsFailureResponse,
+        fetchSpacesByUserActiveAppointmentsSuccessResponse,
+        fetchSpacesByUserActiveAppointmentsFailureResponse,
+        fetchSpacesByUserUpcomingAppointmentsSuccessResponse,
+        fetchSpacesByUserUpcomingAppointmentsFailureResponse,
+    } = useSelector((state: IReduxState) => state.spaceStorage);
+    const dispatch = useDispatch();
+    const fetchSpacesForUserOutdatedAppointments = (): void => {
+        dispatch(fetchSpacesByUserOutdatedAppointments());
+    };
+    const fetchSpacesForUserActiveAppointments = (): void => {
+        dispatch(fetchSpacesByUserActiveAppointments());
+    };
+    const fetchSpacesForUserUpcomingAppointments = (): void => {
+        dispatch(fetchSpacesByUserUpcomingAppointments());
+    };
     const applyEffectsOnInit = (): void => {
         // если есть активные то их отображает первыми.
         // если есть предстоящие но нет активных то отображает предстоящие.
         // если же есть только прошедшие
-        // как это должно делаться - на фронте или на бэке? пока что плюсы в копилку для бэкенда
-        /* 
-        1. один роут для выдачи userAppointments - и выдать в качестве data 
-        { 
-            active: ..., 
-            upcoming: ..., 
-            past: ... 
-        } 
+        fetchSpacesForUserOutdatedAppointments();
+        fetchSpacesForUserActiveAppointments();
+        fetchSpacesForUserUpcomingAppointments();
 
-        2. сделать  3 разных роута и на каждый делать запрос при переходе по каждому из табов. 
-        
-        
-        я склоняюсь к первому варианту. или же нужно отправлять 1 запрос как то форкая (как это делается в промис алл).
-        
-        */
+        // нужно navigate на определенный роут
+        // если какой то из этих вальнулся то надо останавливаться
+    };
+    const handleActiveTab = (tab: string): (() => void) => {
+        return () => {
+            setActiveTab(tab);
+        };
+    };
+    const checkIfSpacesAmountIsNull = (response?: IServerResponse): boolean => {
+        return response?.data.length > 0 ? false : true;
+    };
+    const switchActiveTab = (): void => {
+        if (checkIfSpacesAmountIsNull(fetchSpacesByUserActiveAppointmentsSuccessResponse)) {
+            handleActiveTab('Предстоящие');
+        } else if (checkIfSpacesAmountIsNull(fetchSpacesByUserUpcomingAppointmentsSuccessResponse)) {
+            handleActiveTab('Прошедшие');
+        }
+    };
+    const renderTabsBar = (): JSX.Element[] => {
+        return appointmentsClassificationTabs.map((tab, i: number) => {
+            return (
+                <NavLink to={tab.to} key={i}>
+                    <div className="" onClick={handleActiveTab(tab.tabName)}>
+                        {tab.tabName}
+                    </div>
+                </NavLink>
+            );
+        });
     };
 
-    return <> </>;
+    useEffect(applyEffectsOnInit, []);
+    useEffect(switchActiveTab, []);
+
+    return (
+        <section className="my-appointments-page-section">
+            <div className="type-of-appointments-tabs-bar">{renderTabsBar()}</div>
+            <MyAppointmentsPageRoutes />
+        </section>
+    );
 }

@@ -31,6 +31,8 @@ export interface ISpaceFormData {
 }
 export interface ISpaceState extends ISpaceFormData {
     isLoaded: boolean;
+    postProvideSpaceSuccessResponse?: IServerResponse;
+    postProvideSpaceFailureResponse?: IServerResponse;
     fetchSpacesQueryData?: IQueryData;
     fetchSpacesSuccessResponse?: IServerResponse;
     fetchSpacesFailureResponse?: IServerResponse;
@@ -38,8 +40,12 @@ export interface ISpaceState extends ISpaceFormData {
     fetchSpaceByIdFailureResponse?: IServerResponse;
     fetchUserSpacesSuccessResponse?: IServerResponse;
     fetchUserSpacesFailureResponse?: IServerResponse;
-    postProvideSpaceSuccessResponse?: IServerResponse;
-    postProvideSpaceFailureResponse?: IServerResponse;
+    fetchSpacesByUserOutdatedAppointmentsSuccessResponse?: IServerResponse;
+    fetchSpacesByUserOutdatedAppointmentsFailureResponse?: IServerResponse;
+    fetchSpacesByUserActiveAppointmentsSuccessResponse?: IServerResponse;
+    fetchSpacesByUserActiveAppointmentsFailureResponse?: IServerResponse;
+    fetchSpacesByUserUpcomingAppointmentsSuccessResponse?: IServerResponse;
+    fetchSpacesByUserUpcomingAppointmentsFailureResponse?: IServerResponse;
 }
 
 export enum SpaceType {
@@ -133,6 +139,48 @@ export const spaceReducer = (state = initialState, action: IAction): ISpaceState
                 postProvideSpaceSuccessResponse: undefined,
                 postProvideSpaceFailureResponse: undefined,
             };
+
+        case ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_SUCCESS_RESPONSE: {
+            return {
+                ...state,
+                fetchSpacesByUserOutdatedAppointmentsSuccessResponse: action.payload,
+            };
+        }
+
+        case ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_FAILURE_RESPONSE: {
+            return {
+                ...state,
+                fetchSpacesByUserOutdatedAppointmentsFailureResponse: action.payload,
+            };
+        }
+
+        case ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_ACTIVE_APPOINTMENTS_SUCCESS_RESPONSE: {
+            return {
+                ...state,
+                fetchSpacesByUserActiveAppointmentsSuccessResponse: action.payload,
+            };
+        }
+
+        case ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_ACTIVE_APPOINTMENTS_FAILURE_RESPONSE: {
+            return {
+                ...state,
+                fetchSpacesByUserActiveAppointmentsFailureResponse: action.payload,
+            };
+        }
+
+        case ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_UPCOMING_APPOINTMENTS_SUCCESS_RESPONSE: {
+            return {
+                ...state,
+                fetchSpacesByUserUpcomingAppointmentsSuccessResponse: action.payload,
+            };
+        }
+
+        case ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_UPCOMING_APPOINTMENTS_FAILURE_RESPONSE: {
+            return {
+                ...state,
+                fetchSpacesByUserUpcomingAppointmentsFailureResponse: action.payload,
+            };
+        }
 
         default: {
             return { ...state };

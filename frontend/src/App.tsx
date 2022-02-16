@@ -8,7 +8,7 @@ import { fetchUserLoginStateAction } from './redux/actions/authActions';
 import { fetchCitiesAction } from './redux/actions/cityActions';
 import { fetchCurrentUserAction } from './redux/actions/userActions';
 import { IReduxState } from './redux/reducers/rootReducer';
-import Routes from './routes/Routes';
+import Routes from './routes/HomePageRoutes';
 import './sass/main.scss';
 
 function App(): JSX.Element {

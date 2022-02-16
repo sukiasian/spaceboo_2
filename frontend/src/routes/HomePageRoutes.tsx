@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import { Route, Routes as ReactRoutes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import AboutUsPage from '../pages/AboutUsPage';
 import ConfirmAccountPage from '../pages/ConfirmAccountPage';
 import ContactUsPage from '../pages/ContactUsPage';
@@ -17,13 +17,13 @@ import MyAppointmentsPage from '../pages/MyAppointmentsPage';
 import MySpacesPage from '../pages/MySpacesPage';
 
 // FIXME много повторяющегося кода
-export default function Routes(): JSX.Element {
+export default function HomePageRoutes(): JSX.Element {
     const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
     const userLoginState = fetchUserLoginStateSuccessResponse?.data;
 
     if (userLoginState?.loggedIn && !userLoginState?.confirmed) {
         return (
-            <ReactRoutes>
+            <Routes>
                 <Route path="/" element={<ConfirmAccountPage />} />
                 <Route path="/spaces" element={<ConfirmAccountPage />} />
                 <Route path="/spaces/:spaceId" element={<SpacePage />} />
@@ -33,13 +33,13 @@ export default function Routes(): JSX.Element {
                 <Route path="/about" element={<AboutUsPage />} />
                 <Route path="/contact" element={<ContactUsPage />} />
                 <Route path="*" element={<NotFoundPage />} />
-            </ReactRoutes>
+            </Routes>
         );
     }
 
     if (!userLoginState?.loggedIn) {
         return (
-            <ReactRoutes>
+            <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/spaces" element={<HomePage />} />
                 <Route path="/spaces/:spaceId" element={<SpacePage />} />
@@ -51,25 +51,25 @@ export default function Routes(): JSX.Element {
                 <Route path="/about" element={<AboutUsPage />} />
                 <Route path="/contact" element={<ContactUsPage />} />
                 <Route path="*" element={<NotFoundPage />} />
-            </ReactRoutes>
+            </Routes>
         );
     }
 
     // for confirmed users
     return (
-        <ReactRoutes>
+        <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/spaces" element={<HomePage />} />
             <Route path="/spaces/:spaceId" element={<SpacePage />} />
             <Route path="/provide-space" element={<ProvideSpacePage />} />
             <Route path="/my-spaces" element={<MySpacesPage />} />
-            <Route path="/my-appointments" element={<MyAppointmentsPage />} />
+            <Route path="/my-appointments/*" element={<MyAppointmentsPage />} />
             <Route path="/users/:userId/settings" element={<SettingsPage />} />
             <Route path="/about" element={<AboutUsPage />} />
             <Route path="/contact" element={<ContactUsPage />} />
             <Route path="/for-inverstors" element={<ForInvestorsPage />} />
             <Route path="/how-it-works" element={<HowItWorksPage />} />
             <Route path="*" element={<NotFoundPage />} />
-        </ReactRoutes>
+        </Routes>
     );
 }

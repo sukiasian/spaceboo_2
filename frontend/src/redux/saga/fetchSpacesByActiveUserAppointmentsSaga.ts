@@ -3,31 +3,28 @@ import { AnyAction } from 'redux';
 import { ApiUrls, IServerResponse, SagaTasks } from '../../types/types';
 import { httpRequester } from '../../utils/HttpRequest';
 import { serverResponseIsSuccessful } from '../../utils/utilFunctions';
-import { IAction } from '../actions/ActionTypes';
 import {
-    setFetchCitiesByPatternSuccessResponseAction,
-    setFetchCitiesByPatternFailureResponseAction,
-} from '../actions/cityActions';
+    setFetchSpacesByUserActiveAppointmentsFailureResponse,
+    setFetchSpacesByUserActiveAppointmentsSuccessResponse,
+} from '../actions/spaceActions';
 
 const fetchActiveUserAppointments = async (): Promise<IServerResponse> => {
-    return httpRequester.get(`${ApiUrls.APPOINTMENTS}/user/active`);
+    return httpRequester.get(`${ApiUrls.SPACES}/appointed/active`);
 };
 
-function* fetchUserActiveAppointmentsWorker(
-    action: IAction
-): Generator<AllEffect<CallEffect> | PutEffect<AnyAction>, void> {
+function* fetchUserActiveAppointmentsWorker(): Generator<AllEffect<CallEffect> | PutEffect<AnyAction>, void> {
     try {
         const response = yield all([call(fetchActiveUserAppointments)]);
 
         if (serverResponseIsSuccessful(response as IServerResponse)) {
-            yield put(setFetchCitiesByPatternSuccessResponseAction(response as IServerResponse));
+            yield put(setFetchSpacesByUserActiveAppointmentsSuccessResponse(response as IServerResponse));
         } else {
             throw response;
         }
     } catch (err) {
-        yield put(setFetchCitiesByPatternFailureResponseAction(err as IServerResponse));
+        yield put(setFetchSpacesByUserActiveAppointmentsFailureResponse(err as IServerResponse));
     }
 }
 export function* watchFetchUserActiveAppointments(): Generator<ForkEffect, void, void> {
-    yield takeLatest(SagaTasks.FETCH_USER_ACTIVE_APPOINTMENTS, fetchUserActiveAppointmentsWorker);
+    yield takeLatest(SagaTasks.FETCH_SPACES_BY_USER_ACTIVE_APPOINTMENTS, fetchUserActiveAppointmentsWorker);
 }
