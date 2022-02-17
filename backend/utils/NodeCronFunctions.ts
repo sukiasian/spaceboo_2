@@ -33,7 +33,6 @@ export class NodeCronFunctions extends Singleton {
             await Promise.all(
                 outdatedAppointments.map(async (appointment) => {
                     const app = await this.appointmentModel.findOne({ where: { id: appointment.id } });
-                    console.log(appointment);
 
                     await app.update({ archived: true });
                 })

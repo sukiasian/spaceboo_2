@@ -1,17 +1,17 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import {
-    fetchSpacesByUserActiveAppointments,
-    fetchSpacesByUserUpcomingAppointments,
-} from '../redux/actions/spaceActions';
+import RefreshButton from '../buttons/RefreshButton';
+import Space from '../components/Space';
+import { toggleMyAppointmentsFinalLocationIsDefined } from '../redux/actions/commonActions';
+import { fetchSpacesByUserActiveAppointments } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { ReduxCommonActions } from '../types/types';
 
 export default function ActiveAppointmentsPage(): JSX.Element {
     const { fetchSpacesByUserActiveAppointmentsSuccessResponse, fetchSpacesByUserActiveAppointmentsFailureResponse } =
         useSelector((state: IReduxState) => state.spaceStorage);
-    const { myAppointmentsPageIsLoaded } = useSelector((state: IReduxState) => state.commonStorage);
+    const { myAppointmentsFinalLocationIsDefined } = useSelector((state: IReduxState) => state.commonStorage);
+    const spaces = fetchSpacesByUserActiveAppointmentsSuccessResponse?.data;
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const fetchSpacesForUserActiveAppointments = (): void => {
@@ -20,41 +20,45 @@ export default function ActiveAppointmentsPage(): JSX.Element {
     const applyEffectsOnInit = (): void => {
         fetchSpacesForUserActiveAppointments();
     };
-    const checkIfResponseIsReceived = (): boolean => {
-        return fetchSpacesByUserActiveAppointmentsSuccessResponse || fetchSpacesByUserActiveAppointmentsFailureResponse
+    const checkIfResponseIsReceivedFinalLocationIsDefinedAndBroughtThroughNavLink = (): boolean => {
+        return (fetchSpacesByUserActiveAppointmentsSuccessResponse ||
+            fetchSpacesByUserActiveAppointmentsFailureResponse) &&
+            !myAppointmentsFinalLocationIsDefined
             ? true
             : false;
     };
-    const navigateToOutdatedAppointmentsOrStay = (): void => {
-        if (checkIfResponseIsReceived()) {
-            if (fetchSpacesByUserActiveAppointmentsSuccessResponse?.data.length === 0 && !myAppointmentsPageIsLoaded) {
+    // NOTE: можно оставить только myAppointmentsFinalLocationIsDefined, поставить начальное значение true, а при переходе через navlink сделать его false.
+    const navigateToUpcomingAppointmentsOrStay = (): void => {
+        if (checkIfResponseIsReceivedFinalLocationIsDefinedAndBroughtThroughNavLink()) {
+            if (fetchSpacesByUserActiveAppointmentsSuccessResponse?.data.length === 0) {
                 navigate('/my-appointments/upcoming');
             } else {
-                dispatch({ type: ReduxCommonActions.SET_MY_APPOINTMENTS_PAGE_IS_LOADED_TO_TRUE });
+                dispatch(toggleMyAppointmentsFinalLocationIsDefined());
             }
         }
     };
     const renderReloadOnError = (): JSX.Element | void => {
         if (fetchSpacesByUserActiveAppointmentsFailureResponse) {
+            return <RefreshButton />;
+        }
+    };
+    const renderSpacesForActiveAppointments = (): JSX.Element[] => {
+        return spaces?.map((space: any, i: number) => {
             return (
-                <div
-                    className="reload-button-icon"
-                    style={{
-                        background: 'url(/images/icons/icon-refresh.png)',
-                        width: '60px',
-                        height: '60px',
-                        backgroundSize: 'cover',
-                    }}
-                    onClick={fetchSpacesForUserActiveAppointments}
+                <Space
+                    spaceId={space.id}
+                    mainImageUrl={space.imagesUrl[0]}
+                    price={space.price}
+                    roomsNumber={space.roomsNumber}
+                    city={space.city}
+                    address={space.address}
                 />
             );
-        }
-        // should reload actually reload the entire page from browser or should it  just dispatch again ? guess dispatching is smoother but in that case
-        // we will have to annualize error response if successful.
+        });
     };
 
     useEffect(applyEffectsOnInit, []);
-    useEffect(navigateToOutdatedAppointmentsOrStay, [
+    useEffect(navigateToUpcomingAppointmentsOrStay, [
         fetchSpacesByUserActiveAppointmentsSuccessResponse,
         fetchSpacesByUserActiveAppointmentsFailureResponse,
         navigate,
@@ -63,6 +67,7 @@ export default function ActiveAppointmentsPage(): JSX.Element {
 
     return (
         <div className="upcoming-appointments">
+            <div className="spaces-by-appointments">{renderSpacesForActiveAppointments()}</div>
             <div className="upcoming-appointments__reload"> {renderReloadOnError()}</div>
         </div>
     );

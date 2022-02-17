@@ -34,7 +34,7 @@ export const valueIsNumeric = (targetValue: string): boolean => {
     return valueConsistsOfNotOnlyNumbers || targetValue === '' ? false : true;
 };
 
-export const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+export const handleFormSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
 };
 

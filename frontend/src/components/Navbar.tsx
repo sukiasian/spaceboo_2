@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
 import LoginModal from '../modals/LoginModal';
 import SignupModal from '../modals/SignupModal';
-import { annualizeLogoutResponseAction, fetchUserLoginStateAction } from '../redux/actions/authActions';
+import { annualizeFetchLogoutResponseAction, fetchUserLoginStateAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { AlertTypes, UrlPathnames } from '../types/types';
 import Alert from './Alert';
@@ -20,6 +20,7 @@ export default function Navbar(): JSX.Element {
     const { fetchCurrentUserSuccessResponse } = useSelector((state: IReduxState) => state.userStorage);
     const userLoginState = fetchUserLoginStateSuccessResponse?.data;
     const userData = fetchCurrentUserSuccessResponse?.data;
+    const userDropdownMenuRef = useRef(null);
     const location = useLocation();
     const dispatch = useDispatch();
     const getLinkForProvideSpaceButton = (): UrlPathnames => {
@@ -47,11 +48,15 @@ export default function Navbar(): JSX.Element {
     const refreshUserLoggedInAfterLogout = (): void => {
         if (fetchLogoutUserSuccessResponse) {
             dispatch(fetchUserLoginStateAction());
-            dispatch(annualizeLogoutResponseAction());
+            dispatch(annualizeFetchLogoutResponseAction());
         }
     };
-
-    // TODO: решить где это будет - всплывающее уведомление как отдельный тип.
+    const closeUserDropdownMenuWhenChangingLocation = (): void => {
+        if (userDropdownMenuIsOpen) {
+            handleToggleUserDropdownMenu();
+        }
+    };
+    // TODO: решить где это будет - всплывающее уведомление как отдельный тип уведомлений.
     const renderLogoutError = (): JSX.Element | void => {
         if (fetchLogoutUserFailureResponse) {
             return <Alert alertType={AlertTypes.FAILURE} alertMessage={fetchLogoutUserFailureResponse.message!} />;
@@ -111,7 +116,11 @@ export default function Navbar(): JSX.Element {
     const renderUserAvatarOrUserInitals = (): JSX.Element | void => {
         if (userLoginState?.loggedIn) {
             return (
-                <div className="navbar__user navbar-elem--4" onClick={handleToggleUserDropdownMenu}>
+                <div
+                    className="navbar__user navbar-elem--4"
+                    onClick={handleToggleUserDropdownMenu}
+                    ref={userDropdownMenuRef}
+                >
                     {userData?.avatarUrl ? (
                         <div className="user-image user-image-or-initials">
                             <img src={userData.avatarUrl} alt="Пользователь" />
@@ -136,8 +145,17 @@ export default function Navbar(): JSX.Element {
             return <UserDropdownMenu />;
         }
     };
+    const closeUserDropdownMenuWhenClickingOutside = () => {
+        document.onclick = (e) => {
+            if (userDropdownMenuIsOpen && e.target !== userDropdownMenuRef.current) {
+                handleToggleUserDropdownMenu();
+            }
+        };
+    };
 
     useEffect(refreshUserLoggedInAfterLogout, [fetchLogoutUserSuccessResponse, dispatch]);
+    useEffect(closeUserDropdownMenuWhenClickingOutside, [userDropdownMenuIsOpen]);
+    useEffect(closeUserDropdownMenuWhenChangingLocation, [window.location.pathname]);
 
     return (
         <nav className="navbar">

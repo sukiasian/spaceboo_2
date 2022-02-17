@@ -201,47 +201,8 @@ describe('NodeCronjob (e2e)', () => {
         };
 
         const space_1 = await configureRequestForSpace(request(app));
-
-        /* 
-            
-             address: faker.address.streetAddress(),
-        pricePerNight,
-        type: SpaceType.FLAT,
-        roomsNumber: 2,
-        bedsNumber: 2,
-        imagesUrl: ['/public/images/space/1.jpg'],
-        lockerConnected: false,
-        facilities: ['TV'],
-        description: faker.lorem.sentence(5),
-        userId,
-        cityId,
-            
-            */
-        console.log(space_1.body);
-
-        // .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage_1);
-        // const outdatedImagesUrlForSpace_1 = (
-        //     await spaceModel.findOne({
-        //         where: {
-        //             id: space_1.body.data.id,
-        //         },
-        //     })
-        // ).imagesUrl;
-        // const space_2 = await request(app)
-        //     .post(ApiRoutes.SPACES)
-        //     .send(spaceData_2)
-        //     .set('Authorization', `Bearer ${token_2}`)
-        //     .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage_1);
-        // const outdatedImagesUrlForSpace_2 = (
-        //     await spaceModel.findOne({
-        //         where: {
-        //             id: space_2.body.data.id,
-        //         },
-        //     })
-        // ).imagesUrl;
         const responseForEditingSpace_1 = await request(app)
             .put(`ApiRoutes.SPACES/${space_1}`)
-            // .send({ spaceImagesToRemove: [space_1.body.data.imagesUrl[0]] })
             .set('Authorization', `Bearer ${token_1}`)
             .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage_2);
         const freshSpace_1 = await spaceModel.findOne({
@@ -249,21 +210,6 @@ describe('NodeCronjob (e2e)', () => {
                 id: space_1.body.data.id,
             },
         });
-        // const checkIfOutdatedSpaceImageExistForSpace_1 = fs.existsSync(
-        //     path.resolve('assets/images', space_1.body.data.imagesUrl[0])
-        // );
-
-        // console.log(checkIfOutdatedSpaceImageExistForSpace_1);
-
-        // const checkIfFreshSpaceImageExistsForSpace_1 = fs.existsSync(
-        //     path.resolve('assets/images', freshSpace_1.imagesUrl[0])
-        // );
-        // console.log(checkIfFreshSpaceImageExistsForSpace_1);
-
-        // const responseForEditingSpace_2 = await request(app)
-        //     .put(`ApiRoutes.SPACES/${space_2}`)
-        //     .set('Authorization', `Bearer ${token_2}`)
-        //     .attach(StorageUploadFilenames.SPACE_IMAGES, pathToTestImage_2);
     });
 
     it('Function "removeOutdatedEmailsFromDb" should remove outdated space images according to avatarUrl', async () => {

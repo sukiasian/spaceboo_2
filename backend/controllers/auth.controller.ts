@@ -20,7 +20,6 @@ export class AuthController extends Singleton {
     private readonly sendEmail = sendMail;
 
     public signUpLocal = this.utilFunctions.catchAsync(async (req, res, next) => {
-        // NOTE why we dont use scopes here?
         const user = await this.authSequelizeDao.signUpLocal(req.body);
 
         await this.utilFunctions.signTokenAndStoreInCookies(res, { id: user.id });
@@ -30,7 +29,7 @@ export class AuthController extends Singleton {
 
     public signInLocal = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const user = await this.authSequelizeDao.findById(req.user.id);
-        // NOTE
+
         await this.utilFunctions.signTokenAndStoreInCookies(res, { id: user.id });
 
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, 'Добро пожаловать на Spaceboo!', user);

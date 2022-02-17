@@ -7,7 +7,7 @@ import AlertFirstDbValidationError from '../components/AlertFirstDbValidationErr
 import { postSendVerificationCodeAction } from '../redux/actions/emailVerificationActions';
 import { EmailPurpose, IPostSendVerificationEmailPayload } from '../redux/reducers/emailVerificationReducer';
 import { IServerResponse, LocalStorageItems } from '../types/types';
-import { handleSubmit } from '../utils/utilFunctions';
+import { handleFormSubmit } from '../utils/utilFunctions';
 import { postSignupUserAction } from '../redux/actions/authActions';
 
 export interface ISignupData {
@@ -152,7 +152,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
     // TODO validators!
     return (
         <div className="signup-form-container">
-            <form className="signup-form" onSubmit={handleSubmit}>
+            <form className="signup-form" onSubmit={handleFormSubmit}>
                 {renderInputs()}
                 <button className="button--primary" onClick={handleSignupButton}>
                     Зарегистрироваться

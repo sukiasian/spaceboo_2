@@ -1,5 +1,6 @@
 import { Action } from 'redux';
 import { ILoginData } from '../../forms/LoginForm';
+import { IPasswordChangeFormData } from '../../forms/PasswordChangeForm';
 import { ISignupData } from '../../forms/SignupForm';
 import { IServerResponse, ReduxAuthActions, SagaTasks } from '../../types/types';
 import { IAction } from './ActionTypes';
@@ -20,6 +21,13 @@ export const postLoginUserAction = (payload: ILoginData): IAction<SagaTasks, ILo
 export const postSignupUserAction = (payload: ISignupData): IAction<SagaTasks, ISignupData> => {
     return {
         type: SagaTasks.POST_SIGNUP_USER,
+        payload,
+    };
+};
+
+export const postPasswordChange = (payload: IPasswordChangeFormData): IAction<SagaTasks> => {
+    return {
+        type: SagaTasks.POST_PASSWORD_CHANGE,
         payload,
     };
 };
@@ -66,9 +74,41 @@ export const setPostLoginFailureResponseAction = (
     };
 };
 
+export const setPasswordChangeFormData = (
+    passwordChangeData: IPasswordChangeFormData
+): IAction<ReduxAuthActions, IPasswordChangeFormData> => {
+    return {
+        type: ReduxAuthActions.SET_PASSWORD_CHANGE_FORM_DATA,
+        payload: passwordChangeData,
+    };
+};
+
+export const setPostPasswordChangeSuccessResponse = (
+    payload: IServerResponse
+): IAction<ReduxAuthActions, IServerResponse> => {
+    return {
+        type: ReduxAuthActions.SET_POST_PASSWORD_CHANGE_SUCCESS_RESPONSE,
+        payload,
+    };
+};
+export const setPostPasswordChangeFailureResponse = (
+    payload: IServerResponse
+): IAction<ReduxAuthActions, IServerResponse> => {
+    return {
+        type: ReduxAuthActions.SET_POST_PASSWORD_CHANGE_FAILURE_RESPONSE,
+        payload,
+    };
+};
+
+export const annualizePostPasswordChangeResponses = (): IAction<ReduxAuthActions> => {
+    return {
+        type: ReduxAuthActions.ANNUALIZE_POST_PASSWORD_CHANGE_RESPONSES,
+    };
+};
+
 export const annualizeLoginResponseAction = (): Action<ReduxAuthActions> => {
     return {
-        type: ReduxAuthActions.ANNUALIZE_LOGIN_USER_RESPONSES,
+        type: ReduxAuthActions.ANNUALIZE_POST_LOGIN_USER_RESPONSES,
     };
 };
 
@@ -92,7 +132,7 @@ export const setPostSignupUserFailureResponse = (
 
 export const annualizeSignupResponseAction = (): Action<ReduxAuthActions> => {
     return {
-        type: ReduxAuthActions.ANNUALIZE_SIGNUP_USER_RESPONSES,
+        type: ReduxAuthActions.ANNUALIZE_POST_SIGNUP_USER_RESPONSES,
     };
 };
 
@@ -114,8 +154,8 @@ export const setFetchLogoutUserFailureResponseAction = (
     };
 };
 
-export const annualizeLogoutResponseAction = (): IAction<ReduxAuthActions> => {
+export const annualizeFetchLogoutResponseAction = (): IAction<ReduxAuthActions> => {
     return {
-        type: ReduxAuthActions.ANNUALIZE_LOGOUT_USER_RESPONSES,
+        type: ReduxAuthActions.ANNUALIZE_FETCH_LOGOUT_USER_RESPONSES,
     };
 };

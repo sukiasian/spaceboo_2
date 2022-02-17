@@ -8,7 +8,7 @@ export interface IDatePickerDate {
 export interface ICommonState {
     timerIsOn: boolean;
     datePickerDate: IDatePickerDate;
-    myAppointmentsPageIsLoaded: boolean;
+    myAppointmentsFinalLocationIsDefined: boolean;
 }
 
 const initialState: ICommonState = {
@@ -17,7 +17,7 @@ const initialState: ICommonState = {
         year: 0,
         month: 0,
     },
-    myAppointmentsPageIsLoaded: false,
+    myAppointmentsFinalLocationIsDefined: true,
 };
 
 export const commonReducer = (state = initialState, action: IAction): ICommonState => {
@@ -38,16 +38,10 @@ export const commonReducer = (state = initialState, action: IAction): ICommonSta
         // then dispatch. thus when we dispatch we get our isloaded === true thus we are moved again to outdated. so we need to change the
         // condition.
 
-        case ReduxCommonActions.SET_MY_APPOINTMENTS_PAGE_IS_LOADED_TO_TRUE:
+        case ReduxCommonActions.SET_MY_APPOINTMENTS_FINAL_DESTINATION_IS_DEFINED:
             return {
                 ...state,
-                myAppointmentsPageIsLoaded: true,
-            };
-
-        case ReduxCommonActions.SET_MY_APPOINTMENTS_PAGE_IS_LOADED_TO_FALSE:
-            return {
-                ...state,
-                myAppointmentsPageIsLoaded: false,
+                myAppointmentsFinalLocationIsDefined: !state.myAppointmentsFinalLocationIsDefined,
             };
 
         default:

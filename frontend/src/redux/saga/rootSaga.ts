@@ -15,6 +15,7 @@ import { watchPostProvideSpace } from './postProvideSpaceSaga';
 import { watchPostSendVerificationCode } from './postSendVerificationCodeSaga';
 import { watchPostSignup } from './postSignupUserSaga';
 import { watchPostUploadSpaceImages } from './postUploadSpaceImagesSaga';
+import { watchPostPasswordChange } from './postPasswordChangeSaga';
 
 export function* rootSaga() {
     yield all([
@@ -34,5 +35,6 @@ export function* rootSaga() {
         watchFetchUserOutdatedAppointments(),
         watchFetchUserActiveAppointments(),
         watchFetchUserUpcomingAppointments(),
+        watchPostPasswordChange(),
     ]);
 }

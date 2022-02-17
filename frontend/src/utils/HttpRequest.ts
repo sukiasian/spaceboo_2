@@ -66,6 +66,7 @@ class HttpRequest implements IHttpRequest {
         const res = await fetch(this.prepareUrlWithPath(urlPath), {
             method: HttpMethod.PUT,
             body: JSON.stringify(body),
+            headers: { ...this.headers, ...headers },
         });
 
         return {

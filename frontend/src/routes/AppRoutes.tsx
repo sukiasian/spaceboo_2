@@ -17,7 +17,7 @@ import MyAppointmentsPage from '../pages/MyAppointmentsPage';
 import MySpacesPage from '../pages/MySpacesPage';
 
 // FIXME много повторяющегося кода
-export default function HomePageRoutes(): JSX.Element {
+export default function AppRoutes(): JSX.Element {
     const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
     const userLoginState = fetchUserLoginStateSuccessResponse?.data;
 
@@ -64,7 +64,7 @@ export default function HomePageRoutes(): JSX.Element {
             <Route path="/provide-space" element={<ProvideSpacePage />} />
             <Route path="/my-spaces" element={<MySpacesPage />} />
             <Route path="/my-appointments/*" element={<MyAppointmentsPage />} />
-            <Route path="/users/:userId/settings" element={<SettingsPage />} />
+            <Route path="/user/settings/*" element={<SettingsPage />} />
             <Route path="/about" element={<AboutUsPage />} />
             <Route path="/contact" element={<ContactUsPage />} />
             <Route path="/for-inverstors" element={<ForInvestorsPage />} />

@@ -33,6 +33,7 @@ export class AuthSequelizeDao extends Dao {
         recovery: boolean = false
     ) => {
         const user = await this.model.scope(UserScopes.WITH_PASSWORD).findOne({ where: { id: userId } });
+        console.log(passwordResetData);
 
         if (!recovery) {
             if (passwordResetData.oldPassword && !(await user.verifyPassword(user)(passwordResetData.oldPassword))) {

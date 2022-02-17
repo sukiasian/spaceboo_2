@@ -15,8 +15,8 @@ export const setDatePickerDateAction = (payload: IDatePickerDate): IAction<Redux
     };
 };
 
-export const toggleMyAppointmentsPageIsLoaded = (): IAction<ReduxCommonActions> => {
+export const toggleMyAppointmentsFinalLocationIsDefined = (): IAction<ReduxCommonActions> => {
     return {
-        type: ReduxCommonActions.SET_MY_APPOINTMENTS_PAGE_IS_LOADED_TO_TRUE,
+        type: ReduxCommonActions.SET_MY_APPOINTMENTS_FINAL_DESTINATION_IS_DEFINED,
     };
 };

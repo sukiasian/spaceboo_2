@@ -9,6 +9,7 @@ import LoadingSpin from '../components/LoadingSpin';
 import Space from '../components/Space';
 import { UrlPathnames } from '../types/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import AddButton from '../buttons/AddButton';
 
 export default function MySpacesPage(): JSX.Element {
     const [spaceActionsDropdownIsOpen, setSpaceActionsDropdownIsOpen] = useState(false);
@@ -42,16 +43,7 @@ export default function MySpacesPage(): JSX.Element {
         if (fetchUserSpacesSuccessResponse) {
             return (
                 <NavLink to={UrlPathnames.PROVIDE_SPACE}>
-                    <div
-                        className="add-button-icon"
-                        style={{
-                            display: 'block',
-                            width: '45px',
-                            height: '45px',
-                            background: 'url(/images/icons/icon-add.png)',
-                            backgroundSize: 'cover',
-                        }}
-                    ></div>
+                    <AddButton />
                 </NavLink>
             );
         }

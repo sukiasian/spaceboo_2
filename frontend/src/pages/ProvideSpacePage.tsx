@@ -11,7 +11,7 @@ import {
 } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { AlertTypes, UrlPathnames } from '../types/types';
-import { handleSubmit, updateDocumentTitle } from '../utils/utilFunctions';
+import { handleFormSubmit, updateDocumentTitle } from '../utils/utilFunctions';
 
 export default function ProvideSpacePage(): JSX.Element {
     const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
@@ -57,7 +57,7 @@ export default function ProvideSpacePage(): JSX.Element {
     };
     const renderProvideForm = (): JSX.Element => {
         return (
-            <form className="provide-space__form" onSubmit={handleSubmit} encType="multipart/form-data">
+            <form className="provide-space__form" onSubmit={handleFormSubmit} encType="multipart/form-data">
                 <SpaceInputFieldsForCreateAndEdit
                     buttonClassName="button button--primary button--submit"
                     buttonText="Предоставить пространство"

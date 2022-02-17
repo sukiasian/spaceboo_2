@@ -1,3 +1,4 @@
+import { IPasswordChangeFormData } from '../../forms/PasswordChangeForm';
 import { IServerResponse, ReduxAuthActions } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 
@@ -12,10 +13,13 @@ export interface IAuthState {
     postLoginUserFailureResponse?: IServerResponse;
     postSignupUserSuccessResponse?: IServerResponse;
     postSignupUserFailureResponse?: IServerResponse;
+    postPasswordChangeSuccessResponse?: IServerResponse;
+    postPasswordChangeFailureResponse?: IServerResponse;
     fetchUserLoginStateSuccessResponse?: IServerResponse<IUserLoginState & { isLoaded: boolean }>;
     fetchUserLoginStateFailureResponse?: IServerResponse;
     fetchLogoutUserSuccessResponse?: IServerResponse;
     fetchLogoutUserFailureResponse?: IServerResponse;
+    passwordChangeFormData?: IPasswordChangeFormData;
 }
 
 const initialState: IAuthState = {};
@@ -34,7 +38,7 @@ export const authReducer = (state = initialState, action: IAction<ReduxAuthActio
                 postLoginUserFailureResponse: action.payload,
             };
 
-        case ReduxAuthActions.ANNUALIZE_LOGIN_USER_RESPONSES:
+        case ReduxAuthActions.ANNUALIZE_POST_LOGIN_USER_RESPONSES:
             return {
                 ...state,
                 postLoginUserSuccessResponse: undefined,
@@ -53,7 +57,7 @@ export const authReducer = (state = initialState, action: IAction<ReduxAuthActio
                 postSignupUserFailureResponse: action.payload,
             };
 
-        case ReduxAuthActions.ANNUALIZE_SIGNUP_USER_RESPONSES:
+        case ReduxAuthActions.ANNUALIZE_POST_SIGNUP_USER_RESPONSES:
             return {
                 ...state,
                 postSignupUserSuccessResponse: undefined,
@@ -72,7 +76,7 @@ export const authReducer = (state = initialState, action: IAction<ReduxAuthActio
             };
 
         // NOTE: что должно здесь произойти? нужно ли вообще аннулирование? наверное да, так как если пользователь выйдет а затем зайдет то получится так что logout response все еще определен.
-        case ReduxAuthActions.ANNUALIZE_LOGOUT_USER_RESPONSES:
+        case ReduxAuthActions.ANNUALIZE_FETCH_LOGOUT_USER_RESPONSES:
             return {
                 ...state,
                 fetchLogoutUserSuccessResponse: undefined,
@@ -89,6 +93,31 @@ export const authReducer = (state = initialState, action: IAction<ReduxAuthActio
             return {
                 ...state,
                 fetchUserLoginStateFailureResponse: action.payload,
+            };
+
+        case ReduxAuthActions.SET_PASSWORD_CHANGE_FORM_DATA:
+            return {
+                ...state,
+                passwordChangeFormData: action.payload,
+            };
+
+        case ReduxAuthActions.SET_POST_PASSWORD_CHANGE_SUCCESS_RESPONSE:
+            return {
+                ...state,
+                postPasswordChangeSuccessResponse: action.payload,
+            };
+
+        case ReduxAuthActions.SET_POST_PASSWORD_CHANGE_FAILURE_RESPONSE:
+            return {
+                ...state,
+                postPasswordChangeFailureResponse: action.payload,
+            };
+
+        case ReduxAuthActions.ANNUALIZE_POST_PASSWORD_CHANGE_RESPONSES:
+            return {
+                ...state,
+                postPasswordChangeSuccessResponse: undefined,
+                postPasswordChangeFailureResponse: undefined,
             };
 
         default: {

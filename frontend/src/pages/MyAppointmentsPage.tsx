@@ -1,63 +1,57 @@
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { toggleMyAppointmentsFinalLocationIsDefined } from '../redux/actions/commonActions';
+import { IReduxState } from '../redux/reducers/rootReducer';
 import MyAppointmentsPageRoutes from '../routes/MyAppointmentsPageRoutes';
-import { IServerResponse, ReduxCommonActions } from '../types/types';
-
-interface IAppointmentsClassificationTab {
-    tabName: string;
-    to: string;
-}
-
-export const checkIfSpacesAmountIsNull = (data?: any[]): boolean => {
-    return data?.length === 0 ? true : false;
-};
+import { ITab } from '../types/types';
+import { defineActiveClassName } from '../utils/utilFunctions';
 
 export default function MyAppointmentsPage(): JSX.Element {
-    const appointmentsClassificationTabs: IAppointmentsClassificationTab[] = [
+    const a = useSelector((state: IReduxState) => state.commonStorage);
+    const appointmentsClassificationLinkableTabs: ITab[] = [
         {
             tabName: 'Прошедшие',
-            to: 'outdated',
+            linkTo: 'outdated',
         },
         {
             tabName: 'Активные',
-            to: 'active',
+            linkTo: 'active',
         },
         {
             tabName: 'Предстоящие',
-            to: 'upcoming',
+            linkTo: 'upcoming',
         },
     ];
-    const [activeTab, setActiveTab] = useState(appointmentsClassificationTabs[1].tabName);
+    const [activeTab, setActiveTab] = useState(appointmentsClassificationLinkableTabs[1].tabName);
+    const { myAppointmentsFinalLocationIsDefined } = useSelector((state: IReduxState) => state.commonStorage);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-
-    const navigateToActive = (): void => {
-        if (window.location.pathname.includes('my-appointments')) {
+    const checkIfMyAppointmentsRouteIsNotSpecified = () => {
+        return window.location.pathname === '/my-appointments' || window.location.pathname === '/my-appointments/';
+    };
+    const navigateToActiveAppointments = (): void => {
+        if (checkIfMyAppointmentsRouteIsNotSpecified()) {
             navigate('active');
         }
     };
-    const applyEffectsOnInit = (): (() => void) => {
-        navigateToActive();
-
-        return () => {
-            dispatch({ type: ReduxCommonActions.SET_MY_APPOINTMENTS_PAGE_IS_LOADED_TO_TRUE });
-        };
+    const applyEffectsOnInit = (): void => {
+        navigateToActiveAppointments();
     };
     const handleActiveTab = (tab: string): (() => void) => {
         return () => {
             setActiveTab(tab);
         };
     };
-    const checkIfSpacesAmountIsNull = (response?: IServerResponse): boolean => {
-        return response?.data.length > 0 ? false : true;
-    };
     const renderTabsBar = (): JSX.Element[] => {
-        return appointmentsClassificationTabs.map((tab, i: number) => {
+        return appointmentsClassificationLinkableTabs.map((tab, i: number) => {
             return (
-                <NavLink to={tab.to} key={i}>
-                    <div className="" onClick={handleActiveTab(tab.tabName)}>
-                        {tab.tabName}
+                <NavLink to={tab.linkTo!} key={i}>
+                    <div
+                        className={defineActiveClassName(activeTab, tab.tabName)}
+                        onClick={handleActiveTab(tab.tabName)}
+                    >
+                        <p className="paragraph">{tab.tabName}</p>
                     </div>
                 </NavLink>
             );
@@ -70,13 +64,6 @@ export default function MyAppointmentsPage(): JSX.Element {
         <section className="my-appointments-page-section">
             <div className="type-of-appointments-tabs-bar">{renderTabsBar()}</div>
             <MyAppointmentsPageRoutes />
-            {/* если роут === my-appointments то здесь тупо ничего не будет отображаться. Как решить эту проблему?
-            
-            1. в applyEffectsOnInit перекидывать в active откуда начать всю деятельность алгоритма
-            2. использовать просто компонент active здесь - так можно будет будет при попадании на my-appointments иметь отображенным 
-                actives
-            
-            */}
         </section>
     );
 }

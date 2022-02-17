@@ -189,6 +189,7 @@ export const setFetchUserSpacesFailureResponseAction = (
         payload,
     };
 };
+// FIXME: probably here we will need to have response instead of payload in parameters
 
 export const setFetchSpacesQueryDataAction = (queryData: IQueryData): IAction<ReduxSpaceActions, IQueryData> => {
     return {

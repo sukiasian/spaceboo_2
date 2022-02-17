@@ -576,6 +576,10 @@ a {
   border: 1px solid #00c1ff !important;
   color: #00c1ff !important; }
 
+.tab--active {
+  color: green;
+  text-decoration: none; }
+
 .drop-down {
   border-top: 1px solid black;
   width: 100%; }

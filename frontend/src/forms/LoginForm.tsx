@@ -5,7 +5,7 @@ import { IReduxState } from '../redux/reducers/rootReducer';
 import InputWithLabel, { InputAutoCompleteOptions, IFormInputs, InputTypes } from '../components/InputWithLabel';
 import Alert from '../components/Alert';
 import { AlertTypes, CustomResponseMessages, HttpStatus } from '../types/types';
-import { handleSubmit } from '../utils/utilFunctions';
+import { handleFormSubmit } from '../utils/utilFunctions';
 import { postLoginUserAction } from '../redux/actions/authActions';
 
 export interface ILoginData {
@@ -105,7 +105,7 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
     // TODO validators!
     return (
         <div className="login-form-container">
-            <form className="login-form" onSubmit={handleSubmit}>
+            <form className="login-form" onSubmit={handleFormSubmit}>
                 {renderInputs()}
                 <button className="button--primary" onClick={handleLoginButton}>
                     Войти
