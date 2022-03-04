@@ -5,7 +5,10 @@ import { ApiUrls, IServerResponse, SagaTasks } from '../../types/types';
 import { httpRequester } from '../../utils/HttpRequest';
 import { serverResponseIsSuccessful } from '../../utils/utilFunctions';
 import { IAction } from '../actions/ActionTypes';
-import { setPostPasswordChangeFailureResponse, setPostPasswordChangeSuccessResponse } from '../actions/authActions';
+import {
+    setPostPasswordChangeSuccessResponseAction,
+    setPostPasswordChangeFailureResponseAction,
+} from '../actions/authActions';
 
 const postPasswordChange = async (passwordChangeData: IPasswordChangeFormData): Promise<IServerResponse> => {
     return httpRequester.put(`${ApiUrls.AUTH}/passwordChange`, { passwordData: passwordChangeData });
@@ -14,15 +17,14 @@ const postPasswordChange = async (passwordChangeData: IPasswordChangeFormData): 
 function* postPasswordChangeWorker(action: IAction<SagaTasks>): Generator<CallEffect | PutEffect<AnyAction>, void> {
     try {
         const response = yield call(postPasswordChange, action.payload);
-        console.log(response);
 
         if (serverResponseIsSuccessful(response as IServerResponse)) {
-            yield put(setPostPasswordChangeSuccessResponse(response as IServerResponse));
+            yield put(setPostPasswordChangeSuccessResponseAction(response as IServerResponse));
         } else {
             throw response;
         }
     } catch (err) {
-        yield put(setPostPasswordChangeFailureResponse(err as IServerResponse));
+        yield put(setPostPasswordChangeFailureResponseAction(err as IServerResponse));
     }
 }
 export function* watchPostPasswordChange(): Generator<ForkEffect, void, void> {

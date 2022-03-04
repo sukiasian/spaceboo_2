@@ -6,11 +6,13 @@ import { IModalState, modalReducer } from './modalReducer';
 import { emailVerificationReducer, IEmailVerificationState } from './emailVerificationReducer';
 import { commonReducer, ICommonState } from './commonReducer';
 import { IUserState, userReducer } from './userReducer';
+import { IImageState, imageReducer } from './imageReducer';
 
 export interface IReduxState {
     spaceStorage: ISpaceState;
     authStorage: IAuthState;
     userStorage: IUserState;
+    imageStorage: IImageState;
     cityStorage: ICityState;
     modalStorage: IModalState;
     emailVerificationStorage: IEmailVerificationState;
@@ -21,6 +23,7 @@ const rootReducer: Reducer<IReduxState> = combineReducers({
     spaceStorage: spaceReducer,
     authStorage: authReducer,
     userStorage: userReducer,
+    imageStorage: imageReducer,
     cityStorage: cityReducer,
     modalStorage: modalReducer,
     emailVerificationStorage: emailVerificationReducer,

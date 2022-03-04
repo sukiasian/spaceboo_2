@@ -25,18 +25,6 @@ export class ImageController extends Singleton {
 
     private multerGeneralErrorHandler = (req, res, next): ((err) => void) => {
         return (err) => {
-            if (err instanceof multer.MulterError) {
-                next(new AppError(HttpStatus.BAD_REQUEST, err.message));
-            } else {
-                next(err);
-            }
-
-            next();
-        };
-    };
-
-    private spaceImagesUploadErrorHandler = (req, res, next): ((err) => void) => {
-        return (err) => {
             if (this.errorIsMulterUnexpectedFile(err)) {
                 next(new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.SPACE_IMAGES_AMOUNT_EXCEEDED));
             } else if (err! instanceof multer.MulterError) {
@@ -60,24 +48,30 @@ export class ImageController extends Singleton {
 
         await this.userDao.updateUserAvatarInDb(req.user.id, userAvatarRelativeUrl);
 
-        this.utilFunctions.sendResponse(res)(HttpStatus.OK);
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.USER_IMAGE_UPDATED);
     });
 
     public removeUserAvatarFromStorage = this.utilFunctions.catchAsync(async (req, res, next) => {
+        // NOTE: если работают кроны то оптимальнее просто удалять из базы данных вместо того чтобы удалять сначала в сторидже а затем в бд
         const { id: userId } = req.user;
-        const { userAvatarToRemove } = req.body;
+        const user = await this.userDao.findById(userId);
+        const { avatarUrl } = user;
 
-        await this.utilFunctions.findAndRemoveImage(userId, userAvatarToRemove);
+        if (!avatarUrl) {
+            throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.NO_IMAGES_FOUND);
+        }
+
+        await this.utilFunctions.findAndRemoveImage(userId, avatarUrl);
 
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.IMAGE_DELETED);
+
+        next();
     });
 
     public removeUserAvatarFromDb = this.utilFunctions.catchAsync(async (req, res, next) => {
         const { id: userId } = req.user;
 
         await this.userDao.removeUserAvatarFromDb(userId);
-
-        next();
     });
 
     public checkSpaceImagesAvailableAmount = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
@@ -106,7 +100,7 @@ export class ImageController extends Singleton {
         this.imageUpload.array(StorageUploadFilenames.SPACE_IMAGES, spaceImagesAvaiblableAmount)(
             req,
             res,
-            this.spaceImagesUploadErrorHandler(req, res, next)
+            this.multerGeneralErrorHandler(req, res, next)
         );
     });
 

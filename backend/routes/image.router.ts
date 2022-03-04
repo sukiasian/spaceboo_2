@@ -14,7 +14,7 @@ class ImageRouter extends Singleton implements IRouter {
 
     public prepareRouter = (): void => {
         this.router
-            .route('/users')
+            .route('/user')
             .post(
                 this.passport.authenticate(PassportStrategies.JWT, { session: false }),
                 this.imageController.uploadUserAvatarToStorage,
@@ -22,24 +22,8 @@ class ImageRouter extends Singleton implements IRouter {
             )
             .delete(
                 this.passport.authenticate(PassportStrategies.JWT, { session: false }),
-                this.imageController.removeUserAvatarFromDb,
-                this.imageController.removeUserAvatarFromStorage
-            );
-
-        this.router
-            .route('/spaces/:spaceId')
-            .post(
-                this.passport.authenticate(PassportStrategies.JWT, { session: false }),
-                this.routeProtector.spaceOwnerProtector,
-                this.imageController.checkSpaceImagesAvailableAmount,
-                this.imageController.uploadSpaceImagesToStorage,
-                this.imageController.updateSpaceImagesInDb
-            )
-            .delete(
-                this.passport.authenticate(PassportStrategies.JWT, { session: false }),
-                this.routeProtector.spaceOwnerProtector,
-                this.imageController.removeSpaceImagesFromDb,
-                this.imageController.removeSpaceImagesFromStorage
+                this.imageController.removeUserAvatarFromStorage,
+                this.imageController.removeUserAvatarFromDb
             );
     };
 }

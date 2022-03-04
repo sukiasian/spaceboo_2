@@ -74,7 +74,7 @@ export const setPostLoginFailureResponseAction = (
     };
 };
 
-export const setPasswordChangeFormData = (
+export const setPasswordChangeFormDataAction = (
     passwordChangeData: IPasswordChangeFormData
 ): IAction<ReduxAuthActions, IPasswordChangeFormData> => {
     return {
@@ -83,7 +83,7 @@ export const setPasswordChangeFormData = (
     };
 };
 
-export const setPostPasswordChangeSuccessResponse = (
+export const setPostPasswordChangeSuccessResponseAction = (
     payload: IServerResponse
 ): IAction<ReduxAuthActions, IServerResponse> => {
     return {
@@ -91,7 +91,7 @@ export const setPostPasswordChangeSuccessResponse = (
         payload,
     };
 };
-export const setPostPasswordChangeFailureResponse = (
+export const setPostPasswordChangeFailureResponseAction = (
     payload: IServerResponse
 ): IAction<ReduxAuthActions, IServerResponse> => {
     return {
@@ -100,7 +100,7 @@ export const setPostPasswordChangeFailureResponse = (
     };
 };
 
-export const annualizePostPasswordChangeResponses = (): IAction<ReduxAuthActions> => {
+export const annualizePostPasswordChangeResponsesAction = (): IAction<ReduxAuthActions> => {
     return {
         type: ReduxAuthActions.ANNUALIZE_POST_PASSWORD_CHANGE_RESPONSES,
     };
@@ -112,7 +112,7 @@ export const annualizeLoginResponseAction = (): Action<ReduxAuthActions> => {
     };
 };
 
-export const setPostSignupUserSuccessResponse = (
+export const setPostSignupUserSuccessResponseAction = (
     payload: IServerResponse
 ): IAction<ReduxAuthActions, IServerResponse> => {
     return {
@@ -121,7 +121,7 @@ export const setPostSignupUserSuccessResponse = (
     };
 };
 
-export const setPostSignupUserFailureResponse = (
+export const setPostSignupUserFailureResponseAction = (
     payload: IServerResponse
 ): IAction<ReduxAuthActions, IServerResponse> => {
     return {

@@ -6,20 +6,19 @@ import LoginModal from '../modals/LoginModal';
 import SignupModal from '../modals/SignupModal';
 import { annualizeFetchLogoutResponseAction, fetchUserLoginStateAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { AlertTypes, UrlPathnames } from '../types/types';
-import Alert from './Alert';
+import { UrlPathnames } from '../types/types';
 import AltButton from './AltButton';
 import CityPicker from './CityPicker';
+import UserAvatarOrInitials from './UserAvatarOrInitials';
 import UserDropdownMenu from './UserDropdownMenu';
 
 export default function Navbar(): JSX.Element {
     const [activeTab, setActiveTab] = useState<string>();
     const [userDropdownMenuIsOpen, setUserDropdownMenuIsOpen] = useState(false);
-    const { fetchUserLoginStateSuccessResponse, fetchLogoutUserSuccessResponse, fetchLogoutUserFailureResponse } =
-        useSelector((state: IReduxState) => state.authStorage);
-    const { fetchCurrentUserSuccessResponse } = useSelector((state: IReduxState) => state.userStorage);
+    const { fetchUserLoginStateSuccessResponse, fetchLogoutUserSuccessResponse } = useSelector(
+        (state: IReduxState) => state.authStorage
+    );
     const userLoginState = fetchUserLoginStateSuccessResponse?.data;
-    const userData = fetchCurrentUserSuccessResponse?.data;
     const userDropdownMenuRef = useRef(null);
     const location = useLocation();
     const dispatch = useDispatch();
@@ -57,11 +56,6 @@ export default function Navbar(): JSX.Element {
         }
     };
     // TODO: решить где это будет - всплывающее уведомление как отдельный тип уведомлений.
-    const renderLogoutError = (): JSX.Element | void => {
-        if (fetchLogoutUserFailureResponse) {
-            return <Alert alertType={AlertTypes.FAILURE} alertMessage={fetchLogoutUserFailureResponse.message!} />;
-        }
-    };
     const renderAuthTabsOpeningModals = (): JSX.Element | void => {
         if (!userLoginState?.loggedIn) {
             return (
@@ -113,7 +107,7 @@ export default function Navbar(): JSX.Element {
             );
         }
     };
-    const renderUserAvatarOrUserInitals = (): JSX.Element | void => {
+    const renderUserAvatarOrInitals = (): JSX.Element | void => {
         if (userLoginState?.loggedIn) {
             return (
                 <div
@@ -121,20 +115,7 @@ export default function Navbar(): JSX.Element {
                     onClick={handleToggleUserDropdownMenu}
                     ref={userDropdownMenuRef}
                 >
-                    {userData?.avatarUrl ? (
-                        <div className="user-image user-image-or-initials">
-                            <img src={userData.avatarUrl} alt="Пользователь" />
-                        </div>
-                    ) : (
-                        <div className="user-no-image user-image-or-initials">
-                            <div className="user-initials">
-                                <p className="user-initials__last-name">
-                                    {userData?.name?.[0]}
-                                    {userData?.surname?.[0] as string}
-                                </p>
-                            </div>
-                        </div>
-                    )}
+                    <UserAvatarOrInitials />
                     {renderUserdropDownMenu()}
                 </div>
             );
@@ -186,7 +167,7 @@ export default function Navbar(): JSX.Element {
             </div>
             {renderAuthTabsOpeningModals()}
             {renderAuthTabsLeadingToPages()}
-            {renderUserAvatarOrUserInitals()}
+            {renderUserAvatarOrInitals()}
         </nav>
     );
 }

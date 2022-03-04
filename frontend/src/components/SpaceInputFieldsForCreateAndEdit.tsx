@@ -9,7 +9,13 @@ import {
 } from '../redux/actions/cityActions';
 import { setPutEditSpaceDataAction, setPostProvideSpaceDataAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { IProvideSpaceData, IEditSpaceData, SpaceType, ISpaceFormData } from '../redux/reducers/spaceReducer';
+import {
+    IProvideSpaceData,
+    IEditSpaceData,
+    SpaceType,
+    ISpaceFormData,
+    IPutEditSpacePayload,
+} from '../redux/reducers/spaceReducer';
 import { ReduxSpaceActions } from '../types/types';
 import { valueIsNumeric } from '../utils/utilFunctions';
 import Checkbox from './Checkbox';
@@ -28,8 +34,8 @@ interface ITypeOfSpaceInputData {
     spaceType: SpaceType;
 }
 interface IReduxSetFormDataActionsFor {
-    provideSpaceData: (payload: IProvideSpaceData) => IAction<ReduxSpaceActions>;
-    editSpaceData: (payload: IEditSpaceData) => IAction<ReduxSpaceActions>;
+    provideSpaceData: (payload: IProvideSpaceData) => IAction<ReduxSpaceActions, IProvideSpaceData>;
+    editSpaceData: (payload: IPutEditSpacePayload) => IAction<ReduxSpaceActions, IPutEditSpacePayload>;
 }
 
 export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputFieldsForCreateAndEditProps): JSX.Element {
@@ -60,7 +66,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
         newFormData.roomsNumber = initialRoomsNumber;
         newFormData.bedsNumber = initialBedsNumber;
 
-        dispatch(reduxSetFormDataActionForComponent(newFormData));
+        dispatch(reduxSetFormDataActionForComponent({ editSpaceData: newFormData, spaceId: 'space' }));
     };
     const applyEffectsOnInit = (): void => {
         applyDropdownValuesToFormDataOnInit();
@@ -143,6 +149,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
 
         dispatch(reduxSetFormDataActionForComponent(newFormData));
     };
+    // NOTE: probably can be an utilfunction
     const transformSpaceImagesFileListIntoArray = (spaceImagesFileList: FileList): Array<any> => {
         let spaceImages: any[] = [];
 
@@ -171,7 +178,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
     };
     const renderTypeOfSpaceCheckboxes = (): JSX.Element[] => {
         return typeOfSpaceInputsData.map((typeOfSpaceInputData: ITypeOfSpaceInputData, i: number) => {
-            const checkboxIsChecked = typeOfSpaceInputData.spaceType === formData!.type;
+            const checkboxIsChecked = typeOfSpaceInputData.spaceType === formData?.type;
 
             return (
                 <div
@@ -218,7 +225,7 @@ export default function SpaceInputFieldsForCreateAndEdit(props: ISpaceInputField
         );
     };
     const renderUploadedFiles = (): JSX.Element[] | void => {
-        const { spaceImages } = formData as TFormDataForComponent;
+        const spaceImages = formData?.spaceImages;
 
         if (spaceImages) {
             const spaces = spaceImages.map((file: File, i: number) => {

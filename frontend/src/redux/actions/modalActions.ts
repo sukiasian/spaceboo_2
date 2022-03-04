@@ -12,3 +12,9 @@ export const toggleSignupModalAction = (): Action => {
         type: ReduxModalActions.TOGGLE_SIGNUP_MODAL,
     };
 };
+
+export const toggleEditSpaceModalAction = (): Action => {
+    return {
+        type: ReduxModalActions.TOGGLE_EDIT_SPACE_MODAL,
+    };
+};

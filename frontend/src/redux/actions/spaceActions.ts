@@ -1,6 +1,6 @@
 import { IQueryData } from '../../components/Filters';
 import { IServerResponse, ReduxSpaceActions, SagaTasks } from '../../types/types';
-import { IEditSpaceData, IProvideSpaceData } from '../reducers/spaceReducer';
+import { IEditSpaceData, IProvideSpaceData, IPutEditSpacePayload } from '../reducers/spaceReducer';
 import { IAction } from './ActionTypes';
 
 export const postProvideSpaceAction = (payload: IProvideSpaceData): IAction<SagaTasks, IProvideSpaceData> => {
@@ -129,7 +129,9 @@ export const setPostProvideSpaceDataAction = (
     };
 };
 
-export const setPutEditSpaceDataAction = (payload: IEditSpaceData): IAction<ReduxSpaceActions, IEditSpaceData> => {
+export const setPutEditSpaceDataAction = (
+    payload: IPutEditSpacePayload
+): IAction<ReduxSpaceActions, IPutEditSpacePayload> => {
     return {
         type: ReduxSpaceActions.SET_PUT_EDIT_SPACE_DATA,
         payload,

@@ -1,30 +1,53 @@
 import { ReduxImageActions, IServerResponse } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 
-type TImagePayloads = IServerResponse;
-
-interface IInitialState {
-    uploadImagesSuccessResponse?: IServerResponse;
-    uploadImagesFailureResponse?: IServerResponse;
+export interface IImageState {
+    postUploadUserAvatarSuccessResponse?: IServerResponse;
+    postUploadUserAvatarFailureResponse?: IServerResponse;
+    deleteUserAvatarSuccessResponse?: IServerResponse;
+    deleteUserAvatarFailureResponse?: IServerResponse;
 }
 
-const initialState: IInitialState = {};
+const initialState: IImageState = {};
 
-export const imageReducer = (
-    state = initialState,
-    action: IAction<ReduxImageActions, TImagePayloads>
-): IInitialState => {
+export const imageReducer = (state = initialState, action: IAction<ReduxImageActions>): IImageState => {
     switch (action.type) {
-        case ReduxImageActions.SET_UPLOAD_IMAGES_SUCCESS_RESPONSE:
+        case ReduxImageActions.SET_POST_UPLOAD_USER_AVATAR_SUCCESS_RESPONSE:
             return {
                 ...state,
-                uploadImagesSuccessResponse: action.payload as IServerResponse,
+                postUploadUserAvatarSuccessResponse: action.payload,
             };
 
-        case ReduxImageActions.SET_UPLOAD_IMAGES_FAILURE_RESPONSE:
+        case ReduxImageActions.SET_POST_UPLOAD_USER_AVATAR_FAILURE_RESPONSE:
             return {
                 ...state,
-                uploadImagesFailureResponse: action.payload as IServerResponse,
+                postUploadUserAvatarFailureResponse: action.payload,
+            };
+
+        case ReduxImageActions.ANNUALIZE_POST_UPLOAD_USER_AVATAR_RESPONSES:
+            return {
+                ...state,
+                postUploadUserAvatarSuccessResponse: undefined,
+                postUploadUserAvatarFailureResponse: undefined,
+            };
+
+        case ReduxImageActions.SET_DELETE_USER_AVATAR_SUCCESS_RESPONSE:
+            return {
+                ...state,
+                deleteUserAvatarSuccessResponse: action.payload,
+            };
+
+        case ReduxImageActions.SET_DELETE_USER_AVATAR_FAILURE_RESPONSE:
+            return {
+                ...state,
+                deleteUserAvatarFailureResponse: action.payload,
+            };
+
+        case ReduxImageActions.ANNUALIZE_DELETE_USER_AVATAR_RESPONSES:
+            return {
+                ...state,
+                deleteUserAvatarSuccessResponse: undefined,
+                deleteUserAvatarFailureResponse: undefined,
             };
 
         default:

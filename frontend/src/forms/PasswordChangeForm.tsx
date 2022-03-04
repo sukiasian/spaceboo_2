@@ -1,7 +1,7 @@
 import { ChangeEventHandler } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import RequiredField from '../components/RequiredField';
-import { postPasswordChange, setPasswordChangeFormData } from '../redux/actions/authActions';
+import { postPasswordChange, setPasswordChangeFormDataAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { handleFormSubmit } from '../utils/utilFunctions';
 
@@ -25,7 +25,7 @@ export function PasswordChangeForm(): JSX.Element {
             const newPasswordChangeFormData: IPasswordChangeFormData = { ...passwordChangeFormData };
             newPasswordChangeFormData[inputName] = e.target.value;
 
-            dispatch(setPasswordChangeFormData(newPasswordChangeFormData));
+            dispatch(setPasswordChangeFormDataAction(newPasswordChangeFormData));
         };
     };
     const passwordsInputs: IInput[] = [

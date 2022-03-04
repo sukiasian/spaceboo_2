@@ -10,7 +10,7 @@ import {
     postProvideSpaceAction,
 } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { AlertTypes, UrlPathnames } from '../types/types';
+import { UrlPathnames } from '../types/types';
 import { handleFormSubmit, updateDocumentTitle } from '../utils/utilFunctions';
 
 export default function ProvideSpacePage(): JSX.Element {
@@ -29,7 +29,6 @@ export default function ProvideSpacePage(): JSX.Element {
         dispatch(fetchUserLoginStateAction());
 
         return () => {
-            // FIXME: неправильная архитектура. использовать annualize
             dispatch(annualizeProvideSpaceResponses());
             dispatch(annualizeProvideSpaceData());
         };
@@ -44,10 +43,6 @@ export default function ProvideSpacePage(): JSX.Element {
         }
     };
     const redirectToMySpacesAfterProvideSpace = (): void => {
-        // if (provideSpaceSuccessResponse) {
-        //     dispatch(setProvideSpaceSuccessResponseAction());
-        // }
-
         if (postProvideSpaceSuccessResponse) {
             navigate(UrlPathnames.SPACES);
         }
@@ -67,15 +62,8 @@ export default function ProvideSpacePage(): JSX.Element {
             </form>
         );
     };
-    const renderAlertOnSubmitError = (): JSX.Element | void => {
-        if (postProvideSpaceFailureResponse) {
-            return (
-                <Alert
-                    alertType={AlertTypes.FAILURE}
-                    alertMessage={postProvideSpaceFailureResponse.message as string}
-                />
-            );
-        }
+    const renderAlertOnSubmitError = (): JSX.Element => {
+        return <Alert failureResponse={postProvideSpaceFailureResponse} />;
     };
 
     useEffect(applyEffectsOnInit, [dispatch]);

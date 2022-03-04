@@ -29,6 +29,10 @@ export interface ISpaceFormData {
     provideSpaceData?: IProvideSpaceData;
     editSpaceData?: IEditSpaceData;
 }
+export interface IPutEditSpacePayload {
+    editSpaceData: IEditSpaceData;
+    spaceId: string;
+}
 export interface ISpaceState extends ISpaceFormData {
     isLoaded: boolean;
     postProvideSpaceSuccessResponse?: IServerResponse;
@@ -119,6 +123,12 @@ export const spaceReducer = (state = initialState, action: IAction): ISpaceState
             return {
                 ...state,
                 provideSpaceData: action.payload,
+            };
+
+        case ReduxSpaceActions.SET_PUT_EDIT_SPACE_DATA:
+            return {
+                ...state,
+                editSpaceData: action.payload,
             };
 
         case ReduxSpaceActions.SET_FETCH_SPACES_QUERY_DATA:

@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import InputWithLabel, { InputAutoCompleteOptions, IFormInputs, InputTypes } from '../components/InputWithLabel';
 import Alert from '../components/Alert';
-import { AlertTypes, CustomResponseMessages, HttpStatus } from '../types/types';
 import { handleFormSubmit } from '../utils/utilFunctions';
 import { postLoginUserAction } from '../redux/actions/authActions';
 
@@ -86,18 +85,8 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
             );
         });
     };
-    const renderLoginErrorAlerts = (): JSX.Element | void => {
-        if (postLoginUserFailureResponse) {
-            switch (postLoginUserFailureResponse.statusCode) {
-                case HttpStatus.UNAUTHORIZED:
-                    return (
-                        <Alert alertType={AlertTypes.FAILURE} alertMessage={postLoginUserFailureResponse.message!} />
-                    );
-
-                default:
-                    return <Alert alertType={AlertTypes.FAILURE} alertMessage={CustomResponseMessages.UNKNOWN_ERROR} />;
-            }
-        }
+    const renderLoginResponseAlert = (): JSX.Element => {
+        return <Alert successResponse={postLoginUserSuccessResponse} failureResponse={postLoginUserSuccessResponse} />;
     };
 
     useEffect(handleAfterLogin, [postLoginUserSuccessResponse, props, navigate]);
@@ -111,7 +100,7 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
                     Войти
                 </button>
             </form>
-            {renderLoginErrorAlerts()}
+            {renderLoginResponseAlert()}
         </div>
     );
 }

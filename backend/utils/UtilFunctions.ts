@@ -195,18 +195,14 @@ class UtilFunctions {
     public static removeFile = promisify(fs.rm);
 
     public static findAndRemoveImage = async (userId: string, imageToRemoveFilename: string): Promise<void> => {
-        const pathToImageParentDir = path.resolve('assets/images', userId);
-        const pathToImage = path.join(pathToImageParentDir, imageToRemoveFilename);
-        const checkIfImageParentDivExists = await UtilFunctions.checkIfExists(pathToImageParentDir);
-        const checkIfFileExists = await UtilFunctions.checkIfExists(pathToImage);
+        const pathToFile = path.resolve('assets/images', imageToRemoveFilename);
+        const checkIfFileExists = await UtilFunctions.checkIfExists(pathToFile);
 
-        if (!checkIfImageParentDivExists) {
-            throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.DIR_NOT_FOUND);
-        } else if (!checkIfFileExists) {
+        if (!checkIfFileExists) {
             throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.NO_IMAGE_FOUND);
         }
 
-        await UtilFunctions.removeFile(pathToImage);
+        await UtilFunctions.removeFile(pathToFile);
     };
 
     public static signTokenAndStoreInCookies = async (

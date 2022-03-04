@@ -14,8 +14,10 @@ import { watchPostLogoutUser } from './postLogoutUserSaga';
 import { watchPostProvideSpace } from './postProvideSpaceSaga';
 import { watchPostSendVerificationCode } from './postSendVerificationCodeSaga';
 import { watchPostSignup } from './postSignupUserSaga';
-import { watchPostUploadSpaceImages } from './postUploadSpaceImagesSaga';
 import { watchPostPasswordChange } from './postPasswordChangeSaga';
+import { watchPostUploadUserAvatar } from './postUploadUserAvatarSaga';
+import { watchDeleteUserAvatar } from './deleteUserAvatarSaga';
+import { watchEditUser } from './putEditUserSaga';
 
 export function* rootSaga() {
     yield all([
@@ -25,7 +27,8 @@ export function* rootSaga() {
         watchPostSendVerificationCode(),
         watchPostCheckVerificationCode(),
         watchPostProvideSpace(),
-        watchPostUploadSpaceImages(),
+        watchPostPasswordChange(),
+        watchPostUploadUserAvatar(),
         watchFetchSpaces(),
         watchFetchUserLoginState(),
         watchFetchCitiesBySearchPattern(),
@@ -35,6 +38,7 @@ export function* rootSaga() {
         watchFetchUserOutdatedAppointments(),
         watchFetchUserActiveAppointments(),
         watchFetchUserUpcomingAppointments(),
-        watchPostPasswordChange(),
+        watchDeleteUserAvatar(),
+        watchEditUser(),
     ]);
 }

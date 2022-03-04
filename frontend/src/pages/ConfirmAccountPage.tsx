@@ -6,7 +6,7 @@ import Timer from '../components/Timer';
 import { postSendVerificationCodeAction } from '../redux/actions/emailVerificationActions';
 import { EmailPurpose, IPostSendVerificationEmailPayload } from '../redux/reducers/emailVerificationReducer';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { AlertTypes, CustomResponseMessages, LocalStorageItems } from '../types/types';
+import { LocalStorageItems } from '../types/types';
 import { updateDocumentTitle } from '../utils/utilFunctions';
 
 export default function ConfirmAccountPage(): JSX.Element {
@@ -40,14 +40,13 @@ export default function ConfirmAccountPage(): JSX.Element {
 
         dispatch(postSendVerificationCodeAction(payload));
     };
-    const renderSendCodeAgainAlert = (): JSX.Element | void => {
-        if (postSendVerificationCodeSuccessResponse) {
-            return (
-                <Alert alertType={AlertTypes.SUCCESS} alertMessage={postSendVerificationCodeSuccessResponse.message!} />
-            );
-        } else if (postSendVerificationCodeFailureResponse) {
-            return <Alert alertType={AlertTypes.FAILURE} alertMessage={CustomResponseMessages.UNKNOWN_ERROR} />;
-        }
+    const renderSendCodeAgainResponseAlert = (): JSX.Element => {
+        return (
+            <Alert
+                successResponse={postSendVerificationCodeSuccessResponse}
+                failureResponse={postSendVerificationCodeFailureResponse}
+            />
+        );
     };
     const renderSendCodeOptions = (): JSX.Element | void => {
         let lastVerificationRequested: string | number | undefined = localStorage.getItem(
@@ -70,27 +69,17 @@ export default function ConfirmAccountPage(): JSX.Element {
                     <p className="paragraph" onClick={handleGetNewCodeToConfirmAccount}>
                         Получить новый код
                     </p>
-                    {renderSendCodeAgainAlert()}
+                    {renderSendCodeAgainResponseAlert()}
                 </div>
             );
         }
     };
-    const renderCheckCodeSuccessAlert = (): JSX.Element | void => {
+    const renderCheckCodeResponseAlert = (): JSX.Element | void => {
         if (postCheckVerificationCodeSuccessResponse) {
             return (
                 <Alert
-                    alertType={AlertTypes.SUCCESS}
-                    alertMessage={postCheckVerificationCodeSuccessResponse.message!}
-                />
-            );
-        }
-    };
-    const renderCheckCodeFailureAlert = (): JSX.Element | void => {
-        if (postCheckVerificationCodeFailureResponse) {
-            return (
-                <Alert
-                    alertType={AlertTypes.FAILURE}
-                    alertMessage={postCheckVerificationCodeFailureResponse.message!}
+                    successResponse={postCheckVerificationCodeSuccessResponse}
+                    failureResponse={postCheckVerificationCodeFailureResponse}
                 />
             );
         }
@@ -110,8 +99,8 @@ export default function ConfirmAccountPage(): JSX.Element {
 
                 <SixDigitVerification />
                 <div className="send-code-options"> {renderSendCodeOptions()} </div>
-                {renderCheckCodeSuccessAlert()}
-                {renderCheckCodeFailureAlert()}
+                {renderSendCodeAgainResponseAlert()}
+                {renderCheckCodeResponseAlert()}
             </section>
         </div>
     );

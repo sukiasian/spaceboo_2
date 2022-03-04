@@ -54,7 +54,7 @@ export default function UserDropdownMenu(): JSX.Element {
                     className={`user-drop-down-menu__option user-drop-down-menu__option--${i + 1} ${
                         linkableTab.className
                     }`}
-                    onClick={linkableTab.onClick ?? (() => {})}
+                    onClick={linkableTab.onClick}
                     key={i}
                 >
                     <p className="paragraph">{linkableTab.tabName}</p>

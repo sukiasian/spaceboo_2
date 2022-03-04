@@ -53,8 +53,15 @@ export default function SettingsPage(): JSX.Element {
 
     return (
         <section className="settings-page">
-            {renderLinkableTabs()}
-            <SettingsPageRoutes />
+            <div className="settings-page__navigation-panel">
+                <div className="navigation-panel__title">
+                    <h3 className="heading heading--tertiary">Настройки</h3>
+                </div>
+                {renderLinkableTabs()}
+            </div>
+            <div className="settings-page__interface">
+                <SettingsPageRoutes />
+            </div>
         </section>
     );
 }

@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import InputWithLabel, { IFormInputs, InputAutoCompleteOptions, InputTypes } from '../components/InputWithLabel';
-import AlertFirstDbValidationError from '../components/AlertFirstDbValidationError';
 import { postSendVerificationCodeAction } from '../redux/actions/emailVerificationActions';
 import { EmailPurpose, IPostSendVerificationEmailPayload } from '../redux/reducers/emailVerificationReducer';
-import { IServerResponse, LocalStorageItems } from '../types/types';
+import { LocalStorageItems } from '../types/types';
 import { handleFormSubmit } from '../utils/utilFunctions';
 import { postSignupUserAction } from '../redux/actions/authActions';
+import Alert from '../components/Alert';
 
 export interface ISignupData {
     [key: keyof IFormInputs]: string | undefined;
@@ -145,6 +145,11 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
             );
         });
     };
+    const renderFirstDbErrorAlert = (): JSX.Element => {
+        return (
+            <Alert successResponse={postSignupUserSuccessResponse} failureResponse={postSignupUserFailureResponse} />
+        );
+    };
 
     useEffect(sendVerificationCodeOnSuccess, [postSignupUserSuccessResponse, dispatch]);
     useEffect(handleAfterSignup, [postSendVerificationCodeSuccessResponse, handleAfterSignup]);
@@ -157,7 +162,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
                 <button className="button--primary" onClick={handleSignupButton}>
                     Зарегистрироваться
                 </button>
-                <AlertFirstDbValidationError response={postSignupUserFailureResponse as IServerResponse} />
+                {renderFirstDbErrorAlert()}
                 <div>{loading ? 'loading...' : 'loaded!'}</div>
             </form>
         </div>

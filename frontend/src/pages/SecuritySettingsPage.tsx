@@ -3,9 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import Alert from '../components/Alert';
 import Titles from '../components/Titles';
 import { PasswordChangeForm } from '../forms/PasswordChangeForm';
-import { annualizePostPasswordChangeResponses } from '../redux/actions/authActions';
+import { annualizePostPasswordChangeResponsesAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { AlertTypes } from '../types/types';
 
 export default function SecuritySettingsPage(): JSX.Element {
     const { postPasswordChangeSuccessResponse, postPasswordChangeFailureResponse } = useSelector(
@@ -14,15 +13,16 @@ export default function SecuritySettingsPage(): JSX.Element {
     const dispatch = useDispatch();
     const applyEffectsOnInit = (): (() => void) => {
         return () => {
-            dispatch(annualizePostPasswordChangeResponses());
+            dispatch(annualizePostPasswordChangeResponsesAction());
         };
     };
-    const renderChangePasswordStatusAlert = (): JSX.Element | void => {
-        if (postPasswordChangeSuccessResponse) {
-            return <Alert alertType={AlertTypes.SUCCESS} alertMessage={postPasswordChangeSuccessResponse.message!} />;
-        } else if (postPasswordChangeFailureResponse) {
-            return <Alert alertType={AlertTypes.SUCCESS} alertMessage={postPasswordChangeFailureResponse.message!} />;
-        }
+    const renderChangePasswordResponseAlert = (): JSX.Element => {
+        return (
+            <Alert
+                successResponse={postPasswordChangeSuccessResponse}
+                failureResponse={postPasswordChangeFailureResponse}
+            />
+        );
     };
 
     useEffect(applyEffectsOnInit, []);
@@ -35,7 +35,7 @@ export default function SecuritySettingsPage(): JSX.Element {
                     <h2 className="heading heading--secondary password-change__title">Смена пароля</h2>
                 </div>
                 <PasswordChangeForm />
-                {renderChangePasswordStatusAlert()}
+                {renderChangePasswordResponseAlert()}
             </section>
         </div>
     );

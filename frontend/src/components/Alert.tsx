@@ -1,12 +1,41 @@
-import { AlertTypes } from '../types/types';
+import { useEffect, useState } from 'react';
+import { AlertType, CustomResponseMessages, HttpStatus, IServerResponse } from '../types/types';
 
 interface IAlertProps {
-    alertType: AlertTypes;
-    alertMessage: string;
+    successResponse?: IServerResponse;
+    failureResponse?: IServerResponse;
+}
+interface IResponseDataForAlert {
+    alertType: AlertType;
+    message: string;
 }
 
 export default function Alert(props: IAlertProps): JSX.Element {
-    const { alertType, alertMessage } = props;
+    const { successResponse, failureResponse } = props;
+    const [responseData, setResponseData] = useState<IResponseDataForAlert>();
+    const defineErrorMessageOnInternalServerError = () => {
+        if (failureResponse) {
+            if (failureResponse.statusCode === HttpStatus.INTERNAL_SERVER_ERROR) {
+                const newResponseData: IResponseDataForAlert = { ...responseData! };
 
-    return <div className={`alert alert--${alertType}`}> {alertMessage} </div>;
+                newResponseData.message = CustomResponseMessages.UNKNOWN_ERROR;
+            }
+        }
+    };
+    const defineResponseDataForAlert = () => {
+        if (successResponse) {
+            setResponseData({ alertType: AlertType.SUCCESS, message: successResponse.message || '' });
+        } else if (failureResponse) {
+            setResponseData({ alertType: AlertType.FAILURE, message: failureResponse.message || '' });
+        }
+    };
+
+    useEffect(defineResponseDataForAlert, [successResponse, failureResponse]);
+    useEffect(defineErrorMessageOnInternalServerError, [failureResponse, responseData]);
+
+    return (successResponse || failureResponse) && responseData ? (
+        <div className={`alert alert--${responseData?.alertType?.toLowerCase()}`}>{responseData.message}</div>
+    ) : (
+        <> </>
+    );
 }
