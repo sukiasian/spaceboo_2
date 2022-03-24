@@ -46,6 +46,7 @@ export const spaceEditFields: Partial<keyof ISpaceAttributes>[] = [
     'cityId',
     'userId',
     'facilities',
+    'imagesUrl',
 ];
 
 // TODO do we need paranoid or no? paranoid just 'mutes', hides

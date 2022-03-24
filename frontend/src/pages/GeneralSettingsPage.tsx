@@ -10,7 +10,7 @@ import {
 } from '../redux/actions/imageActions';
 import { fetchCurrentUserAction } from '../redux/actions/userActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import RemoveIcon from '../Icons/RemoveIcon';
+import RemoveIcon from '../icons/RemoveIcon';
 import Alert from '../components/Alert';
 import EditUserInputs from '../components/EditUserInputs';
 

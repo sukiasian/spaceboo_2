@@ -6,7 +6,7 @@ import Timer from '../components/Timer';
 import { postSendVerificationCodeAction } from '../redux/actions/emailVerificationActions';
 import { EmailPurpose, IPostSendVerificationEmailPayload } from '../redux/reducers/emailVerificationReducer';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { LocalStorageItems } from '../types/types';
+import { LocalStorageItem } from '../types/types';
 import { updateDocumentTitle } from '../utils/utilFunctions';
 
 export default function ConfirmAccountPage(): JSX.Element {
@@ -50,7 +50,7 @@ export default function ConfirmAccountPage(): JSX.Element {
     };
     const renderSendCodeOptions = (): JSX.Element | void => {
         let lastVerificationRequested: string | number | undefined = localStorage.getItem(
-            LocalStorageItems.LAST_VERIFICATION_REQUESTED
+            LocalStorageItem.LAST_VERIFICATION_REQUESTED
         ) as string;
 
         if (lastVerificationRequested) {

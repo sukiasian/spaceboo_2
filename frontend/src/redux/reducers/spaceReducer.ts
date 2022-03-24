@@ -1,5 +1,5 @@
 import { IQueryData } from '../../components/Filters';
-import { IServerResponse, ReduxSpaceActions } from '../../types/types';
+import { IServerResponse, ReduxSpaceAction } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 
 export interface IProvideSpaceData {
@@ -21,20 +21,19 @@ export interface IEditSpaceData {
     description?: string;
     roomsNumber?: number;
     bedsNumber?: number;
-    spaceImages?: Array<any>;
+    imagesUrl?: string[];
     cityId?: number;
     userId?: string;
 }
-export interface ISpaceFormData {
-    provideSpaceData?: IProvideSpaceData;
-    editSpaceData?: IEditSpaceData;
-}
-export interface IPutEditSpacePayload {
+export interface IEditSpacePayload {
     editSpaceData: IEditSpaceData;
     spaceId: string;
+    spaceImagesToRemove?: string[];
 }
-export interface ISpaceState extends ISpaceFormData {
+export interface ISpaceState {
     isLoaded: boolean;
+    provideSpaceData?: IProvideSpaceData;
+    editSpaceData?: IEditSpaceData;
     postProvideSpaceSuccessResponse?: IServerResponse;
     postProvideSpaceFailureResponse?: IServerResponse;
     fetchSpacesQueryData?: IQueryData;
@@ -50,6 +49,10 @@ export interface ISpaceState extends ISpaceFormData {
     fetchSpacesByUserActiveAppointmentsFailureResponse?: IServerResponse;
     fetchSpacesByUserUpcomingAppointmentsSuccessResponse?: IServerResponse;
     fetchSpacesByUserUpcomingAppointmentsFailureResponse?: IServerResponse;
+    fetchSpacesForKeyControlSuccessResponse?: IServerResponse;
+    fetchSpacesForKeyControlFailureResponse?: IServerResponse;
+    putEditSpaceSuccessResponse?: IServerResponse;
+    putEditSpaceFailureResponse?: IServerResponse;
 }
 
 export enum SpaceType {
@@ -71,126 +74,165 @@ const initialState: ISpaceState = {
 
 export const spaceReducer = (state = initialState, action: IAction): ISpaceState => {
     switch (action.type) {
-        case ReduxSpaceActions.SET_POST_PROVIDE_SPACE_SUCCESS_RESPONSE:
+        case ReduxSpaceAction.SET_POST_PROVIDE_SPACE_SUCCESS_RESPONSE:
             return {
                 ...state,
                 postProvideSpaceSuccessResponse: action.payload,
             };
 
-        case ReduxSpaceActions.SET_POST_PROVIDE_SPACE_FAILURE_RESPONSE:
+        case ReduxSpaceAction.SET_POST_PROVIDE_SPACE_FAILURE_RESPONSE:
             return {
                 ...state,
                 postProvideSpaceFailureResponse: action.payload,
             };
 
-        case ReduxSpaceActions.SET_FETCH_SPACES_SUCCESS_RESPONSE:
+        case ReduxSpaceAction.SET_FETCH_SPACES_SUCCESS_RESPONSE:
             return {
                 ...state,
                 fetchSpacesSuccessResponse: action.payload,
             };
 
-        case ReduxSpaceActions.SET_FETCH_SPACES_FAILURE_RESPONSE:
+        case ReduxSpaceAction.SET_FETCH_SPACES_FAILURE_RESPONSE:
             return {
                 ...state,
                 fetchSpacesFailureResponse: action.payload,
             };
 
-        case ReduxSpaceActions.SET_FETCH_SPACE_BY_ID_SUCCESS_RESPONSE:
+        case ReduxSpaceAction.SET_FETCH_SPACE_BY_ID_SUCCESS_RESPONSE:
             return {
                 ...state,
                 fetchSpaceByIdSuccessResponse: action.payload,
             };
 
-        case ReduxSpaceActions.SET_FETCH_SPACE_BY_ID_FAILURE_RESPONSE:
+        case ReduxSpaceAction.SET_FETCH_SPACE_BY_ID_FAILURE_RESPONSE:
             return {
                 ...state,
                 fetchSpaceByIdFailureResponse: action.payload,
             };
 
-        case ReduxSpaceActions.SET_FETCH_USER_SPACES_SUCCESS_RESPONSE:
+        case ReduxSpaceAction.SET_FETCH_USER_SPACES_SUCCESS_RESPONSE:
             return {
                 ...state,
                 fetchUserSpacesSuccessResponse: action.payload,
             };
 
-        case ReduxSpaceActions.SET_FETCH_USER_SPACES_FAILURE_RESPONSE:
+        case ReduxSpaceAction.SET_FETCH_USER_SPACES_FAILURE_RESPONSE:
             return {
                 ...state,
                 fetchUserSpacesFailureResponse: action.payload,
             };
 
-        case ReduxSpaceActions.SET_POST_PROVIDE_SPACE_DATA:
+        case ReduxSpaceAction.SET_POST_PROVIDE_SPACE_DATA:
             return {
                 ...state,
                 provideSpaceData: action.payload,
             };
 
-        case ReduxSpaceActions.SET_PUT_EDIT_SPACE_DATA:
+        case ReduxSpaceAction.SET_PUT_EDIT_SPACE_DATA:
             return {
                 ...state,
                 editSpaceData: action.payload,
             };
 
-        case ReduxSpaceActions.SET_FETCH_SPACES_QUERY_DATA:
+        case ReduxSpaceAction.SET_FETCH_SPACES_QUERY_DATA:
             return {
                 ...state,
                 fetchSpacesQueryData: action.payload,
             };
 
-        case ReduxSpaceActions.ANNUALIZE_PROVIDE_SPACE_DATA:
+        case ReduxSpaceAction.SET_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_SUCCESS_RESPONSE:
+            return {
+                ...state,
+                fetchSpacesByUserOutdatedAppointmentsSuccessResponse: action.payload,
+            };
+
+        case ReduxSpaceAction.SET_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_FAILURE_RESPONSE:
+            return {
+                ...state,
+                fetchSpacesByUserOutdatedAppointmentsFailureResponse: action.payload,
+            };
+
+        case ReduxSpaceAction.SET_FETCH_SPACES_BY_USER_ACTIVE_APPOINTMENTS_SUCCESS_RESPONSE:
+            return {
+                ...state,
+                fetchSpacesByUserActiveAppointmentsSuccessResponse: action.payload,
+            };
+
+        case ReduxSpaceAction.SET_FETCH_SPACES_BY_USER_ACTIVE_APPOINTMENTS_FAILURE_RESPONSE:
+            return {
+                ...state,
+                fetchSpacesByUserActiveAppointmentsFailureResponse: action.payload,
+            };
+
+        case ReduxSpaceAction.SET_FETCH_SPACES_BY_USER_UPCOMING_APPOINTMENTS_SUCCESS_RESPONSE:
+            return {
+                ...state,
+                fetchSpacesByUserUpcomingAppointmentsSuccessResponse: action.payload,
+            };
+
+        case ReduxSpaceAction.SET_FETCH_SPACES_BY_USER_UPCOMING_APPOINTMENTS_FAILURE_RESPONSE:
+            return {
+                ...state,
+                fetchSpacesByUserUpcomingAppointmentsFailureResponse: action.payload,
+            };
+
+        case ReduxSpaceAction.SET_FETCH_SPACES_FOR_KEY_CONTROL_SUCCESS_RESPONSE:
+            return {
+                ...state,
+                fetchSpacesForKeyControlSuccessResponse: action.payload,
+            };
+
+        case ReduxSpaceAction.SET_FETCH_SPACES_FOR_KEY_CONTROL_FAILURE_RESPONSE:
+            return {
+                ...state,
+                fetchSpacesForKeyControlFailureResponse: action.payload,
+            };
+
+        case ReduxSpaceAction.SET_PUT_EDIT_SPACE_SUCCESS_RESPONSE:
+            return {
+                ...state,
+                putEditSpaceSuccessResponse: action.payload,
+            };
+
+        case ReduxSpaceAction.SET_PUT_EDIT_SPACE_FAILURE_RESPONSE:
+            return {
+                ...state,
+                putEditSpaceFailureResponse: action.payload,
+            };
+
+        case ReduxSpaceAction.ANNUALIZE_PROVIDE_SPACE_DATA:
             return {
                 ...state,
                 provideSpaceData: initialProvideSpaceData,
             };
 
-        case ReduxSpaceActions.ANNUALIZE_PROVIDE_SPACE_RESPONSES:
+        case ReduxSpaceAction.ANNUALIZE_PROVIDE_SPACE_RESPONSES:
             return {
                 ...state,
                 postProvideSpaceSuccessResponse: undefined,
                 postProvideSpaceFailureResponse: undefined,
             };
 
-        case ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_SUCCESS_RESPONSE: {
+        case ReduxSpaceAction.ANNUALIZE_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_RESPONSES:
             return {
                 ...state,
-                fetchSpacesByUserOutdatedAppointmentsSuccessResponse: action.payload,
+                fetchSpacesByUserOutdatedAppointmentsSuccessResponse: undefined,
+                fetchSpacesByUserOutdatedAppointmentsFailureResponse: undefined,
             };
-        }
 
-        case ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_FAILURE_RESPONSE: {
+        case ReduxSpaceAction.ANNUALIZE_FETCH_SPACES_BY_USER_ACTIVE_APPOINTMENTS_RESPONSES:
             return {
                 ...state,
-                fetchSpacesByUserOutdatedAppointmentsFailureResponse: action.payload,
+                fetchSpacesByUserActiveAppointmentsSuccessResponse: undefined,
+                fetchSpacesByUserActiveAppointmentsFailureResponse: undefined,
             };
-        }
 
-        case ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_ACTIVE_APPOINTMENTS_SUCCESS_RESPONSE: {
+        case ReduxSpaceAction.ANNUALIZE_FETCH_SPACES_BY_USER_UPCOMING_APPOINTMENTS_RESPONSES:
             return {
                 ...state,
-                fetchSpacesByUserActiveAppointmentsSuccessResponse: action.payload,
+                fetchSpacesByUserUpcomingAppointmentsSuccessResponse: undefined,
+                fetchSpacesByUserUpcomingAppointmentsFailureResponse: undefined,
             };
-        }
-
-        case ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_ACTIVE_APPOINTMENTS_FAILURE_RESPONSE: {
-            return {
-                ...state,
-                fetchSpacesByUserActiveAppointmentsFailureResponse: action.payload,
-            };
-        }
-
-        case ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_UPCOMING_APPOINTMENTS_SUCCESS_RESPONSE: {
-            return {
-                ...state,
-                fetchSpacesByUserUpcomingAppointmentsSuccessResponse: action.payload,
-            };
-        }
-
-        case ReduxSpaceActions.SET_FETCH_SPACES_BY_USER_UPCOMING_APPOINTMENTS_FAILURE_RESPONSE: {
-            return {
-                ...state,
-                fetchSpacesByUserUpcomingAppointmentsFailureResponse: action.payload,
-            };
-        }
 
         default: {
             return { ...state };

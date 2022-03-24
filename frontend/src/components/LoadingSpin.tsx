@@ -1,5 +1,5 @@
 import ReactLoadingSpin from 'react-loading-spin';
-import { AppColors } from '../types/types';
+import { AppColor } from '../types/types';
 
 export default function LoadingSpin(): JSX.Element {
     const defineSpinSizeByDisplayWidth = (): string => {
@@ -23,8 +23,8 @@ export default function LoadingSpin(): JSX.Element {
             style={{ marginLeft: '50%', marginRight: '50%', transform: 'translate(-50%, -50%)' }}
         >
             <ReactLoadingSpin
-                primaryColor={AppColors.YELLOW_PRIMARY}
-                secondaryColor={AppColors.PURE_WHITE}
+                primaryColor={AppColor.YELLOW_PRIMARY}
+                secondaryColor={AppColor.PURE_WHITE}
                 size={defineSpinSizeByDisplayWidth()}
             />
         </div>

@@ -4,9 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import RefreshButton from '../buttons/RefreshButton';
 import Space from '../components/Space';
 import { toggleMyAppointmentsFinalLocationIsDefined } from '../redux/actions/commonActions';
-import { fetchSpacesByUserActiveAppointments } from '../redux/actions/spaceActions';
+import {
+    annualizeFetchSpacesForUserActiveAppointmentsResponsesAction,
+    fetchSpacesByUserActiveAppointmentsAction,
+} from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 
+// NOTE: control panel should be about stopping appointment. That means that the user should leave the house within 1 hour
 export default function ActiveAppointmentsPage(): JSX.Element {
     const { fetchSpacesByUserActiveAppointmentsSuccessResponse, fetchSpacesByUserActiveAppointmentsFailureResponse } =
         useSelector((state: IReduxState) => state.spaceStorage);
@@ -15,7 +19,7 @@ export default function ActiveAppointmentsPage(): JSX.Element {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const fetchSpacesForUserActiveAppointments = (): void => {
-        dispatch(fetchSpacesByUserActiveAppointments());
+        dispatch(fetchSpacesByUserActiveAppointmentsAction());
     };
     const applyEffectsOnInit = (): void => {
         fetchSpacesForUserActiveAppointments();
@@ -37,23 +41,18 @@ export default function ActiveAppointmentsPage(): JSX.Element {
             }
         }
     };
+    const handleRefreshButton = (): void => {
+        dispatch(annualizeFetchSpacesForUserActiveAppointmentsResponsesAction());
+        fetchSpacesForUserActiveAppointments();
+    };
     const renderReloadOnError = (): JSX.Element | void => {
         if (fetchSpacesByUserActiveAppointmentsFailureResponse) {
-            return <RefreshButton />;
+            return <RefreshButton handleClick={handleRefreshButton} />;
         }
     };
-    const renderSpacesForActiveAppointments = (): JSX.Element[] => {
+    const renderSpaces = (): JSX.Element[] => {
         return spaces?.map((space: any, i: number) => {
-            return (
-                <Space
-                    spaceId={space.id}
-                    mainImageUrl={space.imagesUrl[0]}
-                    price={space.price}
-                    roomsNumber={space.roomsNumber}
-                    city={space.city}
-                    address={space.address}
-                />
-            );
+            return <Space space={space} index={i} key={i} />;
         });
     };
 
@@ -67,7 +66,9 @@ export default function ActiveAppointmentsPage(): JSX.Element {
 
     return (
         <div className="upcoming-appointments">
-            <div className="spaces-by-appointments">{renderSpacesForActiveAppointments()}</div>
+            <div className="spaces-by-appointments">
+                <div className="spaces-with-active-appointments">{renderSpaces()}</div>
+            </div>
             <div className="upcoming-appointments__reload"> {renderReloadOnError()}</div>
         </div>
     );

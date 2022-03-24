@@ -1,11 +1,11 @@
 import { Dispatch, FormEventHandler } from 'react';
 import { Action } from 'redux';
 import { IAction } from '../redux/actions/ActionTypes';
-import { HttpStatus, IServerResponse, ReduxModalActions } from '../types/types';
+import { HttpStatus, IServerResponse, ReduxModalAction } from '../types/types';
 
 export const toggleLoginOrSignupModal = (
-    actionForOpeningModal: () => Action<ReduxModalActions>,
-    actionForClosingModal: () => Action<ReduxModalActions>,
+    actionForOpeningModal: () => Action<ReduxModalAction>,
+    actionForClosingModal: () => Action<ReduxModalAction>,
     dispatch: Dispatch<IAction>,
     loginModalIsOpen: boolean,
     signupModalIsOpen: boolean

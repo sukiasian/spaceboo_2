@@ -1,10 +1,10 @@
 import { NavLink } from 'react-router-dom';
-import { IComponentClassNameProps, UrlPathnames } from '../types/types';
+import { IComponentClassNameProps, UrlPathname } from '../types/types';
 
 interface ISwitchAuthForPage extends IComponentClassNameProps {
     question: string;
     action: string;
-    navigateTo: UrlPathnames;
+    navigateTo: UrlPathname;
 }
 
 export default function SwitchAuthForPage(props: ISwitchAuthForPage): JSX.Element {

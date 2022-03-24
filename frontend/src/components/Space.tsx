@@ -1,17 +1,23 @@
 import { NavLink } from 'react-router-dom';
-import { IComponentClassNameProps, UrlPathnames } from '../types/types';
+import { IComponentClassNameProps, UrlPathname } from '../types/types';
 
-interface ISpaceProps extends IComponentClassNameProps {
-    spaceId: string;
-    mainImageUrl: string;
+interface ISpace {
+    id: string;
+    imagesUrl: string[];
     price: number;
     roomsNumber: number;
     city: string;
     address: string;
 }
+interface ISpaceProps extends IComponentClassNameProps {
+    space: ISpace;
+    children?: JSX.Element;
+}
 
 export default function Space(props: ISpaceProps): JSX.Element {
-    const { spaceId, index, mainImageUrl, price, roomsNumber, city, address } = props;
+    const { index, space, children } = props;
+    const { id, imagesUrl, price, roomsNumber, city, address } = space;
+    const mainImageUrl = imagesUrl[0];
     const renderPrice = (): JSX.Element => {
         return (
             <div className={`space-card__price space-card--${index}`}>
@@ -19,9 +25,14 @@ export default function Space(props: ISpaceProps): JSX.Element {
             </div>
         );
     };
+    const renderChildren = (): JSX.Element | void => {
+        if (children) {
+            return children;
+        }
+    };
 
     return (
-        <NavLink to={`${UrlPathnames.SPACES}/${spaceId}`} className={`space-card space-card--${index}`}>
+        <NavLink to={`${UrlPathname.SPACES}/${id}`} className={`space-card space-card--${index}`}>
             <div className={`space-card__content space-card--${index}`}>
                 <img className="space-card__image" src={mainImageUrl || '/no-image.src'} alt="Пространство" />
                 {renderPrice()}
@@ -50,6 +61,7 @@ export default function Space(props: ISpaceProps): JSX.Element {
                             </h3>
                         </div>
                     </div>
+                    {renderChildren()}
                 </div>
             </div>
         </NavLink>

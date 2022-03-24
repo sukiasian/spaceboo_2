@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Action } from 'redux';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { IComponentClassNameProps, ReduxModalActions } from '../types/types';
+import { IComponentClassNameProps, ReduxModalAction } from '../types/types';
 import { toggleLoginOrSignupModal } from '../utils/utilFunctions';
 
 export enum SwitchModalFor {
@@ -15,8 +15,8 @@ interface ISwitchTypeOfAuthProps extends IComponentClassNameProps {
     switchQuestion: string;
     switchCallToAction: string;
     switchFor: SwitchModalFor;
-    openingModalAction: () => Action<ReduxModalActions>;
-    closingModalAction: () => Action<ReduxModalActions>;
+    openingModalAction: () => Action<ReduxModalAction>;
+    closingModalAction: () => Action<ReduxModalAction>;
 }
 
 export function SwitchAuthForModal(props: ISwitchTypeOfAuthProps): JSX.Element {

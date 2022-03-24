@@ -1,22 +1,22 @@
-import { ReduxCommonActions } from '../../types/types';
+import { ReduxCommonAction } from '../../types/types';
 import { IDatePickerDate } from '../reducers/commonReducer';
 import { IAction } from './ActionTypes';
 
-export const toggleTimerAction = (): IAction<ReduxCommonActions> => {
+export const toggleTimerAction = (): IAction<ReduxCommonAction> => {
     return {
-        type: ReduxCommonActions.TOGGLE_TIMER,
+        type: ReduxCommonAction.TOGGLE_TIMER,
     };
 };
 
-export const setDatePickerDateAction = (payload: IDatePickerDate): IAction<ReduxCommonActions> => {
+export const setDatePickerDateAction = (payload: IDatePickerDate): IAction<ReduxCommonAction> => {
     return {
-        type: ReduxCommonActions.SET_DATE_PICKER_DATE,
+        type: ReduxCommonAction.SET_DATE_PICKER_DATE,
         payload,
     };
 };
 
-export const toggleMyAppointmentsFinalLocationIsDefined = (): IAction<ReduxCommonActions> => {
+export const toggleMyAppointmentsFinalLocationIsDefined = (): IAction<ReduxCommonAction> => {
     return {
-        type: ReduxCommonActions.SET_MY_APPOINTMENTS_FINAL_DESTINATION_IS_DEFINED,
+        type: ReduxCommonAction.SET_MY_APPOINTMENTS_FINAL_DESTINATION_IS_DEFINED,
     };
 };

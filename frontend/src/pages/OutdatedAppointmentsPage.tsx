@@ -1,18 +1,24 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import RefreshButton from '../buttons/RefreshButton';
+import Space from '../components/Space';
 import { toggleMyAppointmentsFinalLocationIsDefined } from '../redux/actions/commonActions';
-import { fetchSpacesByUserUpcomingAppointments } from '../redux/actions/spaceActions';
+import {
+    annualizeFetchSpacesForUserOutdatedAppointmentsResponsesAction,
+    fetchSpacesByUserUpcomingAppointmentsAction,
+} from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 
 export default function OutdatedAppointmentsPage(): JSX.Element {
-    const { fetchSpacesByUserOutdatedAppointmentsFailureResponse } = useSelector(
-        (state: IReduxState) => state.spaceStorage
-    );
+    const {
+        fetchSpacesByUserOutdatedAppointmentsSuccessResponse,
+        fetchSpacesByUserOutdatedAppointmentsFailureResponse,
+    } = useSelector((state: IReduxState) => state.spaceStorage);
     const { myAppointmentsFinalLocationIsDefined } = useSelector((state: IReduxState) => state.commonStorage);
+    const spaces = fetchSpacesByUserOutdatedAppointmentsFailureResponse?.data;
     const dispatch = useDispatch();
     const fetchSpacesForUserUpcomingAppointments = (): void => {
-        dispatch(fetchSpacesByUserUpcomingAppointments());
+        dispatch(fetchSpacesByUserUpcomingAppointmentsAction());
     };
     const setMyAppointmentsFinalLocationAsDefined = (): void => {
         if (!myAppointmentsFinalLocationIsDefined) {
@@ -23,9 +29,22 @@ export default function OutdatedAppointmentsPage(): JSX.Element {
         fetchSpacesForUserUpcomingAppointments();
         setMyAppointmentsFinalLocationAsDefined();
     };
+    const handleRefreshButton = (): void => {
+        dispatch(annualizeFetchSpacesForUserOutdatedAppointmentsResponsesAction());
+        fetchSpacesForUserUpcomingAppointments();
+    };
+    const renderSpaces = (): JSX.Element[] => {
+        return spaces?.map((space: any, i: number) => {
+            return <Space space={space} index={i} key={i} />;
+        });
+    };
     const renderReloadOnError = (): JSX.Element | void => {
         if (fetchSpacesByUserOutdatedAppointmentsFailureResponse) {
-            return <RefreshButton handleClick={fetchSpacesForUserUpcomingAppointments} />;
+            return (
+                <div className="upcoming-appointments__reload">
+                    <RefreshButton handleClick={handleRefreshButton} />
+                </div>
+            );
         }
     };
 
@@ -33,7 +52,10 @@ export default function OutdatedAppointmentsPage(): JSX.Element {
 
     return (
         <div className="upcoming-appointments">
-            <div className="upcoming-appointments__reload"> {renderReloadOnError()}</div>
+            <div className="spaces-by-appointments">
+                <div className="spaces-with-outdated-appointments">{renderSpaces()}</div>
+            </div>
+            {renderReloadOnError()}
         </div>
     );
 }

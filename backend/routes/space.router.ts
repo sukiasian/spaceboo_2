@@ -70,6 +70,8 @@ class SpaceRouter extends Singleton implements IRouter {
                 this.passport.authenticate(PassportStrategies.JWT, { session: false }),
                 this.spaceController.getSpacesForUserUpcomingAppointmentsIds
             );
+
+        this.router.route('appointed/keyControl');
     };
 }
 

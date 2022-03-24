@@ -1,4 +1,4 @@
-import { ReduxCommonActions } from '../../types/types';
+import { ReduxCommonAction } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 
 export interface IDatePickerDate {
@@ -22,13 +22,13 @@ const initialState: ICommonState = {
 
 export const commonReducer = (state = initialState, action: IAction): ICommonState => {
     switch (action.type) {
-        case ReduxCommonActions.TOGGLE_TIMER:
+        case ReduxCommonAction.TOGGLE_TIMER:
             return {
                 ...state,
                 timerIsOn: !state.timerIsOn,
             };
 
-        case ReduxCommonActions.SET_DATE_PICKER_DATE:
+        case ReduxCommonAction.SET_DATE_PICKER_DATE:
             return {
                 ...state,
                 datePickerDate: action.payload,
@@ -38,7 +38,7 @@ export const commonReducer = (state = initialState, action: IAction): ICommonSta
         // then dispatch. thus when we dispatch we get our isloaded === true thus we are moved again to outdated. so we need to change the
         // condition.
 
-        case ReduxCommonActions.SET_MY_APPOINTMENTS_FINAL_DESTINATION_IS_DEFINED:
+        case ReduxCommonAction.SET_MY_APPOINTMENTS_FINAL_DESTINATION_IS_DEFINED:
             return {
                 ...state,
                 myAppointmentsFinalLocationIsDefined: !state.myAppointmentsFinalLocationIsDefined,

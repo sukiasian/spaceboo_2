@@ -7,9 +7,11 @@ import { emailVerificationReducer, IEmailVerificationState } from './emailVerifi
 import { commonReducer, ICommonState } from './commonReducer';
 import { IUserState, userReducer } from './userReducer';
 import { IImageState, imageReducer } from './imageReducer';
+import { appointmentReducer, IAppointmentState } from './appointmentReducer';
 
 export interface IReduxState {
     spaceStorage: ISpaceState;
+    appointmentStorage: IAppointmentState;
     authStorage: IAuthState;
     userStorage: IUserState;
     imageStorage: IImageState;
@@ -21,6 +23,7 @@ export interface IReduxState {
 
 const rootReducer: Reducer<IReduxState> = combineReducers({
     spaceStorage: spaceReducer,
+    appointmentStorage: appointmentReducer,
     authStorage: authReducer,
     userStorage: userReducer,
     imageStorage: imageReducer,

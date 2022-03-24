@@ -4,10 +4,10 @@ import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 import Titles from '../components/Titles';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { ReactNode, useEffect, useState } from 'react';
-import { fetchUserSpaces } from '../redux/actions/spaceActions';
+import { fetchUserSpacesAction } from '../redux/actions/spaceActions';
 import LoadingSpin from '../components/LoadingSpin';
 import Space from '../components/Space';
-import { UrlPathnames } from '../types/types';
+import { UrlPathname } from '../types/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import AddButton from '../buttons/AddButton';
 
@@ -16,7 +16,7 @@ export default function MySpacesPage(): JSX.Element {
     const { fetchUserSpacesSuccessResponse } = useSelector((state: IReduxState) => state.spaceStorage);
     const dispatch = useDispatch();
     const applyEffectsOnInit = (): void => {
-        dispatch(fetchUserSpaces());
+        dispatch(fetchUserSpacesAction());
     };
     const renderLoadingSpin = (): ReactNode => {
         if (!fetchUserSpacesSuccessResponse) {
@@ -27,14 +27,7 @@ export default function MySpacesPage(): JSX.Element {
         return fetchUserSpacesSuccessResponse?.data?.map((space: any, i: number) => {
             return (
                 <div className="user-space" key={i}>
-                    <Space
-                        spaceId={space.id}
-                        mainImageUrl={space.imagesUrl[0]}
-                        price={space.price}
-                        roomsNumber={space.roomsNumber}
-                        city={space.city}
-                        address={space.address}
-                    />
+                    <Space space={space} index={i} key={i} />
                 </div>
             );
         });
@@ -42,7 +35,7 @@ export default function MySpacesPage(): JSX.Element {
     const renderAddSpaceButton = (): JSX.Element | void => {
         if (fetchUserSpacesSuccessResponse) {
             return (
-                <NavLink to={UrlPathnames.PROVIDE_SPACE}>
+                <NavLink to={UrlPathname.PROVIDE_SPACE}>
                     <AddButton />
                 </NavLink>
             );

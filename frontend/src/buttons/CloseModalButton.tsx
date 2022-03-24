@@ -1,5 +1,5 @@
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 interface ICloseModalButtonProps {
     clickHandler: (...props: any) => any;

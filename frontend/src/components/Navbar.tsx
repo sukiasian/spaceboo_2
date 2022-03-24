@@ -6,7 +6,7 @@ import LoginModal from '../modals/LoginModal';
 import SignupModal from '../modals/SignupModal';
 import { annualizeFetchLogoutResponseAction, fetchUserLoginStateAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { UrlPathnames } from '../types/types';
+import { UrlPathname } from '../types/types';
 import AltButton from './AltButton';
 import CityPicker from './CityPicker';
 import UserAvatarOrInitials from './UserAvatarOrInitials';
@@ -22,12 +22,12 @@ export default function Navbar(): JSX.Element {
     const userDropdownMenuRef = useRef(null);
     const location = useLocation();
     const dispatch = useDispatch();
-    const getLinkForProvideSpaceButton = (): UrlPathnames => {
+    const getLinkForProvideSpaceButton = (): UrlPathname => {
         if (userLoginState?.loggedIn && !userLoginState?.confirmed) {
-            return UrlPathnames.HOME;
+            return UrlPathname.HOME;
         }
 
-        return UrlPathnames.PROVIDE_SPACE;
+        return UrlPathname.PROVIDE_SPACE;
     };
     const defineActiveClassName = (tab: string): string => {
         if (activeTab === tab) {
@@ -79,12 +79,12 @@ export default function Navbar(): JSX.Element {
     };
     const renderAuthTabsLeadingToPages = (): JSX.Element | void => {
         if (
-            (location.pathname === UrlPathnames.LOGIN || location.pathname === UrlPathnames.SIGNUP) &&
+            (location.pathname === UrlPathname.LOGIN || location.pathname === UrlPathname.SIGNUP) &&
             !userLoginState?.loggedIn
         ) {
             return (
                 <>
-                    <NavLink to={UrlPathnames.LOGIN}>
+                    <NavLink to={UrlPathname.LOGIN}>
                         <div
                             className={`heading heading--tertiary ${defineActiveClassName('login')}`}
                             onClick={handleActiveTab('login')}
@@ -95,7 +95,7 @@ export default function Navbar(): JSX.Element {
                     <div className="navbar__separator navbar-elem--5">
                         <h3 className="heading heading--tertiary"> | </h3>
                     </div>
-                    <NavLink to={UrlPathnames.SIGNUP}>
+                    <NavLink to={UrlPathname.SIGNUP}>
                         <div
                             className={`heading heading--tertiary ${defineActiveClassName('signup')}`}
                             onClick={handleActiveTab('signup')}
@@ -141,7 +141,7 @@ export default function Navbar(): JSX.Element {
     return (
         <nav className="navbar">
             <div className="navbar__logo navbar-elem--0">
-                <NavLink to={UrlPathnames.HOME}>
+                <NavLink to={UrlPathname.HOME}>
                     <img src="" alt="logo" className="logo" />
                 </NavLink>
             </div>
@@ -151,7 +151,7 @@ export default function Navbar(): JSX.Element {
                 handleActiveTab={handleActiveTab}
             />
             <div className="navbar__how-it-works navbar-elem--2">
-                <NavLink to={UrlPathnames.HOW_IT_WORKS}>
+                <NavLink to={UrlPathname.HOW_IT_WORKS}>
                     <h3
                         className={`heading heading--tertiary ${defineActiveClassName('how-it-works')}`}
                         onClick={handleActiveTab('how-it-works')}

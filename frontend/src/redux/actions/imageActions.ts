@@ -1,63 +1,63 @@
-import { IServerResponse, ReduxImageActions, SagaTasks } from '../../types/types';
+import { IServerResponse, ReduxImageAction, SagaTask } from '../../types/types';
 import { IAction } from './ActionTypes';
 
-export const postUploadUserAvatarAction = (payload: File): IAction<SagaTasks, File> => {
+export const postUploadUserAvatarAction = (payload: File): IAction<SagaTask, File> => {
     return {
-        type: SagaTasks.POST_UPLOAD_USER_AVATAR,
+        type: SagaTask.POST_UPLOAD_USER_AVATAR,
         payload,
     };
 };
 
-export const deleteUserAvatarAction = (): IAction<SagaTasks> => {
+export const deleteUserAvatarAction = (): IAction<SagaTask> => {
     return {
-        type: SagaTasks.DELETE_USER_AVATAR,
+        type: SagaTask.DELETE_USER_AVATAR,
     };
 };
 
 export const setPostUploadUserAvatarSuccessResponseAction = (
     payload: IServerResponse
-): IAction<ReduxImageActions, IServerResponse> => {
+): IAction<ReduxImageAction, IServerResponse> => {
     return {
-        type: ReduxImageActions.SET_POST_UPLOAD_USER_AVATAR_SUCCESS_RESPONSE,
+        type: ReduxImageAction.SET_POST_UPLOAD_USER_AVATAR_SUCCESS_RESPONSE,
         payload,
     };
 };
 
 export const setPostUploadUserAvatarFailureResponseAction = (
     payload: IServerResponse
-): IAction<ReduxImageActions, IServerResponse> => {
+): IAction<ReduxImageAction, IServerResponse> => {
     return {
-        type: ReduxImageActions.SET_POST_UPLOAD_USER_AVATAR_FAILURE_RESPONSE,
+        type: ReduxImageAction.SET_POST_UPLOAD_USER_AVATAR_FAILURE_RESPONSE,
         payload,
     };
 };
 
-export const annualizePostUploadUserAvatarResponsesAction = (): IAction<ReduxImageActions> => {
+export const annualizePostUploadUserAvatarResponsesAction = (): IAction<ReduxImageAction> => {
     return {
-        type: ReduxImageActions.ANNUALIZE_POST_UPLOAD_USER_AVATAR_RESPONSES,
+        type: ReduxImageAction.ANNUALIZE_POST_UPLOAD_USER_AVATAR_RESPONSES,
     };
 };
 
 export const setDeleteUserAvatarSuccessResponse = (
     payload: IServerResponse
-): IAction<ReduxImageActions, IServerResponse> => {
+): IAction<ReduxImageAction, IServerResponse> => {
     return {
-        type: ReduxImageActions.SET_DELETE_USER_AVATAR_SUCCESS_RESPONSE,
+        type: ReduxImageAction.SET_DELETE_USER_AVATAR_SUCCESS_RESPONSE,
         payload,
     };
 };
 
 export const setDeleteUserAvatarFailureResponse = (
     payload: IServerResponse
-): IAction<ReduxImageActions, IServerResponse> => {
+): IAction<ReduxImageAction, IServerResponse> => {
     return {
-        type: ReduxImageActions.SET_DELETE_USER_AVATAR_FAILURE_RESPONSE,
+        type: ReduxImageAction.SET_DELETE_USER_AVATAR_FAILURE_RESPONSE,
         payload,
     };
 };
 
-export const annualizeDeleteUserAvatarResponsesAction = (): IAction<ReduxImageActions> => {
+export const annualizeDeleteUserAvatarResponsesAction = (): IAction<ReduxImageAction> => {
     return {
-        type: ReduxImageActions.ANNUALIZE_DELETE_USER_AVATAR_RESPONSES,
+        type: ReduxImageAction.ANNUALIZE_DELETE_USER_AVATAR_RESPONSES,
     };
 };

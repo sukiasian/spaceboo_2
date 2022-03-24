@@ -2,20 +2,16 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Alert from '../components/Alert';
-import SpaceInputFieldsForCreateAndEdit from '../components/SpaceInputFieldsForCreateAndEdit';
+import ProvideSpaceForm from '../forms/ProvideSpaceForm';
 import { fetchUserLoginStateAction } from '../redux/actions/authActions';
-import {
-    annualizeProvideSpaceData,
-    annualizeProvideSpaceResponses,
-    postProvideSpaceAction,
-} from '../redux/actions/spaceActions';
+import { annualizeProvideSpaceDataAction, annualizeProvideSpaceResponsesAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { UrlPathnames } from '../types/types';
-import { handleFormSubmit, updateDocumentTitle } from '../utils/utilFunctions';
+import { UrlPathname } from '../types/types';
+import { updateDocumentTitle } from '../utils/utilFunctions';
 
 export default function ProvideSpacePage(): JSX.Element {
     const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
-    const { provideSpaceData, postProvideSpaceSuccessResponse, postProvideSpaceFailureResponse } = useSelector(
+    const { postProvideSpaceSuccessResponse, postProvideSpaceFailureResponse } = useSelector(
         (state: IReduxState) => state.spaceStorage
     );
     const userLoginState = fetchUserLoginStateSuccessResponse?.data;
@@ -29,10 +25,12 @@ export default function ProvideSpacePage(): JSX.Element {
         dispatch(fetchUserLoginStateAction());
 
         return () => {
-            dispatch(annualizeProvideSpaceResponses());
-            dispatch(annualizeProvideSpaceData());
+            dispatch(annualizeProvideSpaceResponsesAction());
+            dispatch(annualizeProvideSpaceDataAction());
         };
     };
+    console.log(postProvideSpaceFailureResponse);
+
     const redirectByLoginStateCondition = (): void => {
         if (userLoginState?.isLoaded) {
             if (!userLoginState?.loggedIn && !userLoginState?.confirmed) {
@@ -44,23 +42,11 @@ export default function ProvideSpacePage(): JSX.Element {
     };
     const redirectToMySpacesAfterProvideSpace = (): void => {
         if (postProvideSpaceSuccessResponse) {
-            navigate(UrlPathnames.SPACES);
+            navigate(UrlPathname.SPACES);
         }
     };
-    const handleSubmitButton = (): void => {
-        dispatch(postProvideSpaceAction(provideSpaceData!));
-    };
     const renderProvideForm = (): JSX.Element => {
-        return (
-            <form className="provide-space__form" onSubmit={handleFormSubmit} encType="multipart/form-data">
-                <SpaceInputFieldsForCreateAndEdit
-                    buttonClassName="button button--primary button--submit"
-                    buttonText="Предоставить пространство"
-                    componentIsFor={'provideSpaceData'}
-                    handleSubmitButton={handleSubmitButton}
-                />
-            </form>
-        );
+        return <ProvideSpaceForm />;
     };
     const renderAlertOnSubmitError = (): JSX.Element => {
         return <Alert failureResponse={postProvideSpaceFailureResponse} />;

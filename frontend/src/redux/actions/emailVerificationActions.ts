@@ -2,14 +2,14 @@ import {
     IPostCheckVerificationEmailCodePayload,
     IPostSendVerificationEmailPayload,
 } from '../reducers/emailVerificationReducer';
-import { IServerResponse, ReduxEmailVerificationActions, SagaTasks } from '../../types/types';
+import { IServerResponse, ReduxEmailVerificationAction, SagaTask } from '../../types/types';
 import { IAction } from './ActionTypes';
 
 export const postSendVerificationCodeAction: (
     payload: IPostSendVerificationEmailPayload
-) => IAction<SagaTasks, IPostSendVerificationEmailPayload> = ({ purpose, email }) => {
+) => IAction<SagaTask, IPostSendVerificationEmailPayload> = ({ purpose, email }) => {
     return {
-        type: SagaTasks.POST_SEND_VERIFICATION_CODE,
+        type: SagaTask.POST_SEND_VERIFICATION_CODE,
         payload: {
             purpose,
             email,
@@ -19,14 +19,14 @@ export const postSendVerificationCodeAction: (
 
 export const postCheckVerificationCodeAction: (
     payload: IPostCheckVerificationEmailCodePayload
-) => IAction<SagaTasks, IPostCheckVerificationEmailCodePayload> = ({
+) => IAction<SagaTask, IPostCheckVerificationEmailCodePayload> = ({
     currentCode,
     email,
     recovery,
     confirmation,
-}): IAction<SagaTasks, IPostCheckVerificationEmailCodePayload> => {
+}): IAction<SagaTask, IPostCheckVerificationEmailCodePayload> => {
     return {
-        type: SagaTasks.POST_CHECK_VERIFICATION_CODE,
+        type: SagaTask.POST_CHECK_VERIFICATION_CODE,
         payload: {
             currentCode,
             email,
@@ -38,43 +38,43 @@ export const postCheckVerificationCodeAction: (
 
 export const setPostSendVerificationCodeSuccessResponse = (
     payload: IServerResponse
-): IAction<ReduxEmailVerificationActions, IServerResponse> => {
+): IAction<ReduxEmailVerificationAction, IServerResponse> => {
     return {
-        type: ReduxEmailVerificationActions.SET_POST_SEND_VERIFICATION_CODE_SUCCESS_RESPONSE,
+        type: ReduxEmailVerificationAction.SET_POST_SEND_VERIFICATION_CODE_SUCCESS_RESPONSE,
         payload,
     };
 };
 
 export const setPostSendVerificationCodeFailureResponse = (
     payload: IServerResponse
-): IAction<ReduxEmailVerificationActions, IServerResponse> => {
+): IAction<ReduxEmailVerificationAction, IServerResponse> => {
     return {
-        type: ReduxEmailVerificationActions.SET_POST_SEND_VERIFICATION_CODE_FAILURE_RESPONSE,
+        type: ReduxEmailVerificationAction.SET_POST_SEND_VERIFICATION_CODE_FAILURE_RESPONSE,
         payload,
     };
 };
 
 export const annualizeSendVerificationCodeResponse =
-    (): IAction<ReduxEmailVerificationActions.ANNUALIZE_SEND_VERIFICATION_CODE_RESPONSES> => {
+    (): IAction<ReduxEmailVerificationAction.ANNUALIZE_SEND_VERIFICATION_CODE_RESPONSES> => {
         return {
-            type: ReduxEmailVerificationActions.ANNUALIZE_SEND_VERIFICATION_CODE_RESPONSES,
+            type: ReduxEmailVerificationAction.ANNUALIZE_SEND_VERIFICATION_CODE_RESPONSES,
         };
     };
 
 export const setPostCheckVerificationCodeSuccessResponse = (
     payload: IServerResponse
-): IAction<ReduxEmailVerificationActions, IServerResponse> => {
+): IAction<ReduxEmailVerificationAction, IServerResponse> => {
     return {
-        type: ReduxEmailVerificationActions.SET_POST_CHECK_VERIFICATION_CODE_SUCCESS_RESPONSE,
+        type: ReduxEmailVerificationAction.SET_POST_CHECK_VERIFICATION_CODE_SUCCESS_RESPONSE,
         payload,
     };
 };
 
 export const setPostCheckVerificationCodeFailureResponse = (
     payload: IServerResponse
-): IAction<ReduxEmailVerificationActions, IServerResponse> => {
+): IAction<ReduxEmailVerificationAction, IServerResponse> => {
     return {
-        type: ReduxEmailVerificationActions.SET_POST_CHECK_VERIFICATION_CODE_FAILURE_RESPONSE,
+        type: ReduxEmailVerificationAction.SET_POST_CHECK_VERIFICATION_CODE_FAILURE_RESPONSE,
         payload,
     };
 };

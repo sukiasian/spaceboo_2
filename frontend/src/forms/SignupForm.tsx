@@ -5,7 +5,7 @@ import { IReduxState } from '../redux/reducers/rootReducer';
 import InputWithLabel, { IFormInputs, InputAutoCompleteOptions, InputTypes } from '../components/InputWithLabel';
 import { postSendVerificationCodeAction } from '../redux/actions/emailVerificationActions';
 import { EmailPurpose, IPostSendVerificationEmailPayload } from '../redux/reducers/emailVerificationReducer';
-import { LocalStorageItems } from '../types/types';
+import { LocalStorageItem } from '../types/types';
 import { handleFormSubmit } from '../utils/utilFunctions';
 import { postSignupUserAction } from '../redux/actions/authActions';
 import Alert from '../components/Alert';
@@ -94,7 +94,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
     };
     const storeLastVerificationRequestedAtLocalStorage = (): void => {
         localStorage.setItem(
-            LocalStorageItems.LAST_VERIFICATION_REQUESTED,
+            LocalStorageItem.LAST_VERIFICATION_REQUESTED,
             postCheckVerificationCodeSuccessResponse!.data.lastVerificationRequested
         );
     };

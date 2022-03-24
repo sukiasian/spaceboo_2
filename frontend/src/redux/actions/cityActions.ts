@@ -1,36 +1,36 @@
 import { Action } from 'redux';
-import { IServerResponse, ReduxCitiesActions, SagaTasks } from '../../types/types';
+import { IServerResponse, ReduxCitiesAction, SagaTask } from '../../types/types';
 import { IAction } from './ActionTypes';
 
-export const fetchCitiesAction = (): Action<SagaTasks> => {
+export const fetchCitiesAction = (): Action<SagaTask> => {
     return {
-        type: SagaTasks.FETCH_CITIES,
+        type: SagaTask.FETCH_CITIES,
     };
 };
-export const fetchCitiesBySearchPatternAction = (payload: string): IAction<SagaTasks, string> => {
+export const fetchCitiesBySearchPatternAction = (payload: string): IAction<SagaTask, string> => {
     return {
-        type: SagaTasks.FETCH_CITIES_BY_SEARCH_PATTERN,
+        type: SagaTask.FETCH_CITIES_BY_SEARCH_PATTERN,
         payload,
     };
 };
 export const setFetchCitiesByPatternSuccessResponseAction = (
     payload: IServerResponse
-): IAction<ReduxCitiesActions, IServerResponse> => {
+): IAction<ReduxCitiesAction, IServerResponse> => {
     return {
-        type: ReduxCitiesActions.SET_FETCH_CITIES_BY_SEARCH_PATTERN_SUCCESS_RESPONSE,
+        type: ReduxCitiesAction.SET_FETCH_CITIES_BY_SEARCH_PATTERN_SUCCESS_RESPONSE,
         payload,
     };
 };
 export const setFetchCitiesByPatternFailureResponseAction = (
     payload: IServerResponse
-): IAction<ReduxCitiesActions, IServerResponse> => {
+): IAction<ReduxCitiesAction, IServerResponse> => {
     return {
-        type: ReduxCitiesActions.SET_FETCH_CITIES_BY_SEARCH_PATTERN_FAILURE_RESPONSE,
+        type: ReduxCitiesAction.SET_FETCH_CITIES_BY_SEARCH_PATTERN_FAILURE_RESPONSE,
         payload,
     };
 };
-export const annualizeFoundBySearchPatternCitiesAction = (): Action<ReduxCitiesActions> => {
+export const annualizeFoundBySearchPatternCitiesAction = (): Action<ReduxCitiesAction> => {
     return {
-        type: ReduxCitiesActions.ANNUALIZE_FOUND_BY_SEARCH_PATTERN_CITIES_RESPONSES,
+        type: ReduxCitiesAction.ANNUALIZE_FOUND_BY_SEARCH_PATTERN_CITIES_RESPONSES,
     };
 };

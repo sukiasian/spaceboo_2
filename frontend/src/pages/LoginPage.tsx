@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import LoginForm from '../forms/LoginForm';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import SwitchAuthForPage from '../components/SwitchAuthForPage';
-import { UrlPathnames } from '../types/types';
+import { UrlPathname } from '../types/types';
 
 export default function LoginPage(): JSX.Element {
     const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
@@ -35,7 +35,7 @@ export default function LoginPage(): JSX.Element {
                 question="Еще нет аккаунта?"
                 action="Зарегистрируйтесь!"
                 mainDivClassName="login"
-                navigateTo={UrlPathnames.SIGNUP}
+                navigateTo={UrlPathname.SIGNUP}
             />
         </div>
     );

@@ -2,7 +2,7 @@ import { useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { toggleLoginModalAction, toggleSignupModalAction } from '../redux/actions/modalActions';
-import { IComponentClassNameProps, TActiveTab, UrlPathnames } from '../types/types';
+import { IComponentClassNameProps, TActiveTab, UrlPathname } from '../types/types';
 import Titles from '../components/Titles';
 import { annualizeSignupResponseAction, fetchUserLoginStateAction } from '../redux/actions/authActions';
 import SignupForm from '../forms/SignupForm';
@@ -15,7 +15,7 @@ export default function SignupModal(props: ISignupModalProps): JSX.Element {
     const dispatch = useDispatch();
     const location = useLocation();
     const openSignupModal = (): void => {
-        if (location.pathname !== UrlPathnames.SIGNUP) {
+        if (location.pathname !== UrlPathname.SIGNUP) {
             dispatch(toggleSignupModalAction());
         }
     };

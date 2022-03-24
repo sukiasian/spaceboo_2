@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertType, CustomResponseMessages, HttpStatus, IServerResponse } from '../types/types';
+import { AlertType, CustomResponseMessage, HttpStatus, IServerResponse } from '../types/types';
 
 interface IAlertProps {
     successResponse?: IServerResponse;
@@ -7,7 +7,7 @@ interface IAlertProps {
 }
 interface IResponseDataForAlert {
     alertType: AlertType;
-    message: string;
+    message?: string;
 }
 
 export default function Alert(props: IAlertProps): JSX.Element {
@@ -18,15 +18,19 @@ export default function Alert(props: IAlertProps): JSX.Element {
             if (failureResponse.statusCode === HttpStatus.INTERNAL_SERVER_ERROR) {
                 const newResponseData: IResponseDataForAlert = { ...responseData! };
 
-                newResponseData.message = CustomResponseMessages.UNKNOWN_ERROR;
+                newResponseData.message = CustomResponseMessage.UNKNOWN_ERROR;
             }
         }
     };
     const defineResponseDataForAlert = () => {
         if (successResponse) {
-            setResponseData({ alertType: AlertType.SUCCESS, message: successResponse.message || '' });
+            console.log(successResponse.message);
+
+            setResponseData({ alertType: AlertType.SUCCESS, message: successResponse.message });
         } else if (failureResponse) {
-            setResponseData({ alertType: AlertType.FAILURE, message: failureResponse.message || '' });
+            console.log(failureResponse.message);
+
+            setResponseData({ alertType: AlertType.FAILURE, message: failureResponse.message });
         }
     };
 

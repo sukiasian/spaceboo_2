@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector, useStore } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { toggleMyAppointmentsFinalLocationIsDefined } from '../redux/actions/commonActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import MyAppointmentsPageRoutes from '../routes/MyAppointmentsPageRoutes';
 import { ITab } from '../types/types';

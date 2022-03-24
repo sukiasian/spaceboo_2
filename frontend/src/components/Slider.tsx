@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { UrlPathnames } from '../types/types';
+import { UrlPathname } from '../types/types';
 import AltButton, { IAltButtonProps } from './AltButton';
 
 interface ISliderProps {
     sliderIntervalRef: React.MutableRefObject<NodeJS.Timeout>;
 }
 interface ISlideButton extends IAltButtonProps {
-    to: UrlPathnames;
+    to: UrlPathname;
     handleClick?: (...props: any) => any;
 }
 
@@ -19,7 +19,7 @@ type TSlide = {
 
 export default function Slider(props: ISliderProps): JSX.Element {
     const buttonToHowItWorks: ISlideButton = {
-        to: UrlPathnames.HOW_IT_WORKS,
+        to: UrlPathname.HOW_IT_WORKS,
         buttonText: 'Узнать больше',
     };
     const [slides] = useState<TSlide[]>([
@@ -29,7 +29,7 @@ export default function Slider(props: ISliderProps): JSX.Element {
             buttons: [
                 buttonToHowItWorks,
                 {
-                    to: UrlPathnames.PROVIDE_SPACE,
+                    to: UrlPathname.PROVIDE_SPACE,
                     buttonText: 'Подключиться к системе',
                 },
             ],
@@ -41,7 +41,7 @@ export default function Slider(props: ISliderProps): JSX.Element {
             buttons: [
                 buttonToHowItWorks,
                 {
-                    to: UrlPathnames.PROVIDE_SPACE,
+                    to: UrlPathname.PROVIDE_SPACE,
                     buttonText: 'Найти жилье',
                 },
             ],

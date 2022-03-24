@@ -14,7 +14,7 @@ export default function Titles(props: IModalsTitleProps): JSX.Element {
     };
     return (
         <div className={props.mainDivClassName}>
-            <h2 className="heading heading--secondary modals-title">{props.heading}</h2>
+            <h1 className="heading heading--primary">{props.heading}</h1>
             {renderParagraph()}
             {props.children}
         </div>

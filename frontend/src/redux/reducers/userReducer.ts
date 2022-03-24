@@ -1,4 +1,4 @@
-import { IServerResponse, ReduxUserActions } from '../../types/types';
+import { IServerResponse, ReduxUserAction } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 
 export interface IUserState {
@@ -18,31 +18,31 @@ const initialState: IUserState = {};
 
 export const userReducer = (state = initialState, action: IAction): IUserState => {
     switch (action.type) {
-        case ReduxUserActions.SET_FETCH_CURRENT_USER_SUCCESS_RESPONSE:
+        case ReduxUserAction.SET_FETCH_CURRENT_USER_SUCCESS_RESPONSE:
             return {
                 ...state,
                 fetchCurrentUserSuccessResponse: action.payload,
             };
 
-        case ReduxUserActions.SET_FETCH_CURRENT_USER_FAILURE_RESPONSE:
+        case ReduxUserAction.SET_FETCH_CURRENT_USER_FAILURE_RESPONSE:
             return {
                 ...state,
                 fetchCurrentUserFailureResponse: action.payload,
             };
 
-        case ReduxUserActions.SET_EDIT_USER_DATA:
+        case ReduxUserAction.SET_EDIT_USER_DATA:
             return {
                 ...state,
                 editUserData: action.payload,
             };
 
-        case ReduxUserActions.SET_PUT_EDIT_USER_SUCCESS_RESPONSE:
+        case ReduxUserAction.SET_PUT_EDIT_USER_SUCCESS_RESPONSE:
             return {
                 ...state,
                 putEditUserSuccessResponse: action.payload,
             };
 
-        case ReduxUserActions.SET_PUT_EDIT_USER_FAILURE_RESPONSE:
+        case ReduxUserAction.SET_PUT_EDIT_USER_FAILURE_RESPONSE:
             return {
                 ...state,
                 putEditUserFailureResponse: action.payload,

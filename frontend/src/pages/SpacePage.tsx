@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
-import { fetchSpaceByIdAction, fetchUserSpaces } from '../redux/actions/spaceActions';
+import { fetchSpaceByIdAction, fetchUserSpacesAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import EditSpaceModal from '../modals/EditSpaceModal';
 import { toggleEditSpaceModalAction } from '../redux/actions/modalActions';
@@ -45,7 +45,7 @@ export default function SpacePage(): JSX.Element {
         dispatch(fetchSpaceByIdAction(spaceId!));
     };
     const requestUserSpaces = (): void => {
-        dispatch(fetchUserSpaces());
+        dispatch(fetchUserSpacesAction());
     };
     const applyEffectsOnInit = (): void => {
         requestSpaceById();

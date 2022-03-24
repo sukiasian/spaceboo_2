@@ -47,17 +47,7 @@ export function HomePage() {
     const renderSpaces = (): JSX.Element => {
         if (checkIfSpacesExistToRender()) {
             return fetchSpacesSuccessResponse!.data.map((space: any, i: number) => {
-                return (
-                    <Space
-                        spaceId={space.id}
-                        mainImageUrl={space.imagesUrl[0]}
-                        price={space.pricePerNight}
-                        roomsNumber={space.roomsNumber}
-                        city={space.city}
-                        address={space.address}
-                        key={i}
-                    />
-                );
+                return <Space space={space} index={i} key={i} />;
             });
         }
 

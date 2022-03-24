@@ -1,5 +1,5 @@
 import SwitchAuthPage from '../components/SwitchAuthForPage';
-import { UrlPathnames } from '../types/types';
+import { UrlPathname } from '../types/types';
 import SignupForm from '../forms/SignupForm';
 
 export default function SignupPage(): JSX.Element {
@@ -15,7 +15,7 @@ export default function SignupPage(): JSX.Element {
                 question="Уже есть аккаунт?"
                 action="Выполните вход!"
                 mainDivClassName="signup"
-                navigateTo={UrlPathnames.LOGIN}
+                navigateTo={UrlPathname.LOGIN}
             />
         </div>
     );
