@@ -61,15 +61,15 @@ export default function Navbar(): JSX.Element {
             return (
                 <>
                     <LoginModal
-                        mainDivClassName="navbar__login navbar-elem--4"
+                        mainDivClassName="navbar__login navbar-elem navbar-elem--4"
                         defineActiveClassName={defineActiveClassName}
                         handleActiveTab={handleActiveTab}
                     />
-                    <div className="navbar__separator navbar-elem--5">
+                    <div className="navbar__separator navbar-elem navbar-elem--5">
                         <h3 className="heading heading--tertiary"> | </h3>
                     </div>
                     <SignupModal
-                        mainDivClassName="navbar__signup navbar-elem--6"
+                        mainDivClassName="navbar__signup navbar-elem navbar-elem--6"
                         defineActiveClassName={defineActiveClassName}
                         handleActiveTab={handleActiveTab}
                     />
@@ -84,7 +84,7 @@ export default function Navbar(): JSX.Element {
         ) {
             return (
                 <>
-                    <NavLink to={UrlPathname.LOGIN}>
+                    <NavLink to={UrlPathname.LOGIN} className="navbar-link">
                         <div
                             className={`heading heading--tertiary ${defineActiveClassName('login')}`}
                             onClick={handleActiveTab('login')}
@@ -92,10 +92,10 @@ export default function Navbar(): JSX.Element {
                             Войти
                         </div>
                     </NavLink>
-                    <div className="navbar__separator navbar-elem--5">
+                    <div className="navbar__separator navbar-elem navbar-elem--5">
                         <h3 className="heading heading--tertiary"> | </h3>
                     </div>
-                    <NavLink to={UrlPathname.SIGNUP}>
+                    <NavLink to={UrlPathname.SIGNUP} className="navbar-link">
                         <div
                             className={`heading heading--tertiary ${defineActiveClassName('signup')}`}
                             onClick={handleActiveTab('signup')}
@@ -111,7 +111,7 @@ export default function Navbar(): JSX.Element {
         if (userLoginState?.loggedIn) {
             return (
                 <div
-                    className="navbar__user navbar-elem--4"
+                    className="navbar__user navbar-elem navbar-elem--4"
                     onClick={handleToggleUserDropdownMenu}
                     ref={userDropdownMenuRef}
                 >
@@ -138,30 +138,32 @@ export default function Navbar(): JSX.Element {
     useEffect(closeUserDropdownMenuWhenClickingOutside, [userDropdownMenuIsOpen]);
     useEffect(closeUserDropdownMenuWhenChangingLocation, [window.location.pathname]);
 
+    // NOTE hereafter we will wrap a flex item in a div in order to be able to move without making position absolute
     return (
         <nav className="navbar">
-            <div className="navbar__logo navbar-elem--0">
-                <NavLink to={UrlPathname.HOME}>
-                    <img src="" alt="logo" className="logo" />
-                </NavLink>
+            <NavLink to={UrlPathname.HOME} className="navbar-link">
+                <object id="logo" data="/logo.svg" aria-labelledby={'logo'} />
+            </NavLink>
+            <div className="navbar__city-picker navbar-elem navbar-elem--1">
+                <CityPicker
+                    mainDivClassName=""
+                    defineActiveClassName={defineActiveClassName}
+                    handleActiveTab={handleActiveTab}
+                />
             </div>
-            <CityPicker
-                mainDivClassName="navbar__city-picker navbar-elem--1"
-                defineActiveClassName={defineActiveClassName}
-                handleActiveTab={handleActiveTab}
-            />
-            <div className="navbar__how-it-works navbar-elem--2">
-                <NavLink to={UrlPathname.HOW_IT_WORKS}>
-                    <h3
-                        className={`heading heading--tertiary ${defineActiveClassName('how-it-works')}`}
+            <div className="navbar__how-it-works navbar-elem navbar-elem--2">
+                <div id="how-it-works">
+                    <NavLink
+                        to={UrlPathname.HOW_IT_WORKS}
+                        className={`navbar-link`}
                         onClick={handleActiveTab('how-it-works')}
                     >
                         Как это работает?
-                    </h3>
-                </NavLink>
+                    </NavLink>
+                </div>
             </div>
-            <div className="navbar__create-space navbar-elem--3">
-                <NavLink to={getLinkForProvideSpaceButton()}>
+            <div className="navbar__create-space navbar-elem navbar-elem--3">
+                <NavLink to={getLinkForProvideSpaceButton()} className="navbar-link">
                     <AltButton mainDivClassName="primary" buttonText="Предоставить пространство" />
                 </NavLink>
             </div>

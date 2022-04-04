@@ -19,8 +19,9 @@ import { watchPostUploadUserAvatar } from './postUploadUserAvatarSaga';
 import { watchDeleteUserAvatar } from './deleteUserAvatarSaga';
 import { watchPutEditUser } from './putEditUserSaga';
 import { watchPutEditSpace } from './putEditSpaceSaga';
-import { watchDeleteCancelAppointment } from './deleteCancelAppointment';
-import { watchFetchSpacesForKeyControl } from './fetchSpacesForKeyControl';
+import { watchDeleteCancelAppointment } from './deleteCancelAppointmentSaga';
+import { watchFetchSpacesForKeyControl } from './fetchSpacesForKeyControlSaga';
+import { watchToggleLocker } from './toggleLockerSaga';
 
 export function* rootSaga() {
     yield all([
@@ -44,6 +45,7 @@ export function* rootSaga() {
         watchFetchSpacesForKeyControl(),
         watchPutEditUser(),
         watchPutEditSpace(),
+        watchToggleLocker(),
         watchDeleteUserAvatar(),
         watchDeleteCancelAppointment(),
     ]);

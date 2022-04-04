@@ -1,214 +1,60 @@
-.right-box {
-    display: none;
-
-    &__content {
-        position: absolute;
-
-        width: 33.33%;
-
-        transform: translate(calc(100% * 3.33 - 133%), 0);
-
-        background-color: $color-grey-dark-2;
-        border-radius: 2px;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-
-        @include respond(phone) {
-            width: 70%;
-            transform: translate(50%, 0);
-        }
-    }
-
-    &__blocker {
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        content: ' ';
-        background: rgba(0, 0, 0, 0.5);
-    }
+#logo {
+    align-self: flex-start;
+    width: 200px;
+    height: 40px;
+    margin-top: 0.9rem;
 }
 
-// для создания подвижности
-// .open {
-//     transform: translate(calc(100% * 3.33 - 133%), 0);
-// }
-
-.right-box.open {
-    display: block;
-
-    // .collapsing-burger {
-    //     background-color: $color-grey-dark-2;
-
-    //     .collapsing-burger__icon,
-    //     .collapsing-burger__icon::before,
-    //     .collapsing-burger__icon::after {
-    //         background-color: white;
-    //     }
-    // }
+#city-picker {
+    margin-left: -2rem;
 }
 
-.navigation {
-    display: grid;
-    grid-template-rows: 70px;
-    grid-template-columns: repeat(2, 1fr);
+#how-it-works {
+    margin-left: -5rem;
+}
 
-    justify-items: center;
+svg {
+    font-family: SukhumvitSet-Medium;
+}
 
-    align-content: center;
+.navbar {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    height: 10vh;
-    min-height: 70px;
-    border-bottom: 1px solid rgba(196, 178, 178, 0.3);
-    position: relative;
-    //box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.05);
+    height: 60px;
+    border-bottom: 0.5px solid rgba(208, 208, 208, 0.1);
+    box-shadow: 0 0 1px 3px rgba(209, 209, 209, 0.2);
+    padding: 0.5rem 1.5rem;
 
-    &__logo-box {
-        // position: absolute;
-        // left: 2rem;
-        // top: 0.4rem;
-        justify-self: start;
-        margin-left: 2rem;
-        margin-top: 0.4rem;
-        @include respond(phone) {
-            margin-left: 1rem;
-            justify-self: start;
-
-            margin-top: 0.4rem;
-        }
-    }
-
-    &__image {
-        height: 3.5rem;
-
-        width: auto;
-        @include respond(phone) {
-            height: 3rem;
-            width: auto;
-        }
-    }
-}
-
-.collapsing-burger {
-    &-box {
-        justify-self: end;
-        margin-right: 2rem;
-        @include respond(phone) {
-            margin-right: 1rem;
-        }
-    }
-    border: 1px solid $color-grey-dark-2;
-    width: 3.5em;
-    height: 3.5em;
-    border-radius: 7px;
-    position: relative;
-    transition: 0.2s;
-
-    z-index: 50;
-
-    @include respond(phone) {
-        height: 3rem;
-        width: 3rem;
-    }
-    &__icon {
-        margin: 50%;
-        transform: translate(-50%, -50%);
-
-        &,
-        &::before,
-        &::after {
-            width: 1.5rem;
-            height: 2px;
-            background-color: $color-grey-dark-2;
-            display: inline-block;
-            border-radius: 3px;
+    &-elem {
+        &--1 {
+            width: 100px;
         }
 
-        &::before,
-        &::after {
-            content: '';
-            position: absolute;
+        &--2 {
+            width: 100px;
         }
 
-        &::before {
-            top: -0.5rem;
-        }
-        &::after {
-            top: 0.5rem;
-        }
-
-        &--active {
-            &,
-            &::before,
-            &::after {
-                background-color: white;
-            }
-        }
-    }
-    @include respond(desktops) {
-        &:hover {
-            background-color: $color-grey-dark-2;
-
-            .collapsing-burger__icon,
-            .collapsing-burger__icon::after,
-            .collapsing-burger__icon::before {
-                background-color: white;
-            }
-        }
-    }
-}
-
-#burger-checkbox {
-    display: none;
-}
-
-// #burger-checkbox:checked ~ .burger-label {
-//     .collapsing-burger {
-//         background-color: $color-grey-dark-2;
-
-//         .collapsing-burger__icon,
-//         .collapsing-burger__icon::before,
-//         .collapsing-burger__icon::after {
-//             background-color: white;
-//         }
-//     }
-// }
-
-.menu-list {
-    color: $color-white;
-    padding: 3rem 1rem;
-    list-style: none;
-    padding: 5rem;
-    @include respond(phone) {
-        padding: 2rem;
-    }
-    &__item {
-        transition: 0.2s;
-        font-size: 1.2rem;
-        padding: 0.3rem;
-        &:hover {
-            font-weight: bolder;
+        h3:hover {
+            color: $color-primary-1;
+            transition: 0.1s;
             cursor: pointer;
-
-            transform: scale(1.1);
-            // .menu-list:not(:hover) {
-            //     transform: scale(0.8);
-            // }
-        }
-
-        @include respond(phone) {
-            font-size: 1rem;
         }
     }
 
-    &__link {
-        &:link,
-        &:visited {
-            color: $color-white;
+    &-link {
+        a {
+            &:hover {
+                color: $color-primary-1;
+            }
+
+            &:visited:not(:active):not(:hover) {
+                color: $color-grey-dark-1;
+            }
         }
     }
+}
+
+.active {
+    color: $color-primary-1;
 }

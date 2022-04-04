@@ -7,12 +7,14 @@ import { IReduxState } from '../redux/reducers/rootReducer';
 export default function SpaceKeysPage(): JSX.Element {
     const { fetchSpacesForKeyControlSuccessResponse } = useSelector((state: IReduxState) => state.spaceStorage);
     const spacesForKeyControl = fetchSpacesForKeyControlSuccessResponse?.data;
-    const renderSpaceKeys = (): JSX.Element => {
-        const spaceKeys = spacesForKeyControl?.map((space: any, i: number) => {
-            return <SpaceKey />;
-        });
+    const renderSpaceKeys = (): JSX.Element | void => {
+        if (spacesForKeyControl) {
+            const spaceKeys = spacesForKeyControl.map((space: any, i: number) => {
+                return <SpaceKey space={space} />;
+            });
 
-        return <div className="space-keys">{spaceKeys}</div>;
+            return <div className="space-keys">{spaceKeys}</div>;
+        }
     };
     const renderDescriptionWhenNoKeys = (): JSX.Element => {
         return (

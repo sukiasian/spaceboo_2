@@ -6,27 +6,12 @@
     box-sizing: inherit;
 }
 
-// @include respond(phone) {
-//     *:hover {
-//         all: unset !important;
-//     }
-// }
-
-// @media (hover: none) {
-//     html *:hover {
-//         all: unset !important;
-//     }
-// }
-
-// html {
-//     font-size: 62.5;
-// }
-
 body {
     box-sizing: border-box;
-    // min-height: 100vh;
-    // display: flex;
-    // flex-direction: column;
+    @font-face {
+        font-family: SukhumvitSet-Medium;
+        src: url(../../assets/fonts/SukhumvitSet-Medium.ttf);
+    }
 }
 
 hmtl,

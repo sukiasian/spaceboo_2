@@ -1,0 +1,12 @@
+.city-picker {
+    &__search-results {
+        width: 500px;
+        height: 200px;
+        position: absolute;
+        padding: 1rem;
+        background-color: $color-white;
+        z-index: 10;
+        border-radius: $box-border-radius;
+        border: 1px solid rgba(109, 109, 109, 0.5);
+    }
+}

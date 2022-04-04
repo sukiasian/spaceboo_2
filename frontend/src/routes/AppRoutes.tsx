@@ -46,7 +46,7 @@ export default function AppRoutes(): JSX.Element {
                 <Route path="/spaces/:spaceId" element={<SpacePage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
-                <Route path="/provide-space" element={<ProvideSpacePage />} />
+                <Route path="/provide-space" element={<LoginPage />} />
                 <Route path="/for-inverstors" element={<ForInvestorsPage />} />
                 <Route path="/how-it-works" element={<HowItWorksPage />} />
                 <Route path="/about" element={<AboutUsPage />} />

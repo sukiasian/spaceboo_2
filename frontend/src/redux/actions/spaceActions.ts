@@ -48,6 +48,12 @@ export const fetchSpacesByUserUpcomingAppointmentsAction = (): IAction<SagaTask>
     };
 };
 
+export const fetchSpacesForKeyControlAction = (): IAction<SagaTask> => {
+    return {
+        type: SagaTask.FETCH_SPACES_FOR_KEY_CONTROL,
+    };
+};
+
 export const putEditSpaceAction = (payload: IEditSpacePayload): IAction<SagaTask> => {
     return {
         type: SagaTask.PUT_EDIT_SPACE,

@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     annualizeFoundBySearchPatternCitiesAction,
@@ -10,10 +10,13 @@ import { IComponentClassNameProps, TActiveTab } from '../types/types';
 
 type ICityPickerProps = TActiveTab & IComponentClassNameProps;
 
+// TODO добавить функционал outside click to close search results
 export default function CityPicker(props: ICityPickerProps): JSX.Element {
     const { handleActiveTab, mainDivClassName } = props;
     const [currentCity, setCurrentCity] = useState('Город');
     const [cityPickerBoxIsOpen, setCityPickerBoxIsOpen] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const findCityResultsRef = useRef<HTMLDivElement>(null);
     const { fetchCitiesByPatternSuccessResponse } = useSelector((state: IReduxState) => state.cityStorage);
     const dispatch = useDispatch();
     const getCurrentCityFromLocalStorage = (): void => {
@@ -25,6 +28,23 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
     };
     const applyEffectsOnInit = (): void => {
         getCurrentCityFromLocalStorage();
+    };
+    const closeFindCityResultsBoxOnOutsideClick = (e: MouseEvent): void => {
+        if (e.target !== findCityResultsRef.current) {
+            setCityPickerBoxIsOpen(false);
+        }
+    };
+    const applyEventListeners = (): (() => void) => {
+        document.addEventListener('click', closeFindCityResultsBoxOnOutsideClick);
+
+        return () => {
+            document.removeEventListener('click', closeFindCityResultsBoxOnOutsideClick);
+        };
+    };
+    const focusOnInputOpening = (): void => {
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
     };
     const toggleCityPickerBox = (): void => {
         setCityPickerBoxIsOpen(!cityPickerBoxIsOpen);
@@ -50,22 +70,37 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
             pickCurrentCity(city);
         };
     };
-    const renderFindCityResults = (): JSX.Element => {
-        return (
-            <>
-                {fetchCitiesByPatternSuccessResponse?.data.length !== 0
-                    ? fetchCitiesByPatternSuccessResponse?.data.map((city: any, i: number) => (
-                          <p
-                              className={`city-picker__search-results city-picker__search-results--${i}`}
-                              key={i}
-                              onClick={handlePickCity(city)}
-                          >
-                              {city.name}
-                          </p>
-                      ))
-                    : null}
-            </>
-        );
+    const renderFindCityResults = (): JSX.Element | void => {
+        // здесь должна быть проверка на то чтобы  input.value был пустым
+        const findCityResults =
+            fetchCitiesByPatternSuccessResponse?.data.length !== 0
+                ? fetchCitiesByPatternSuccessResponse?.data.map((city: any, i: number) => (
+                      <p
+                          className={`city-picker__search-result city-picker__search-result--${i}`}
+                          key={i}
+                          onClick={handlePickCity(city)}
+                      >
+                          {city.name}
+                      </p>
+                  ))
+                : null;
+
+        if (findCityResults) {
+            return (
+                <div className="city-picker__search-results" ref={findCityResultsRef}>
+                    {findCityResults}
+                </div>
+            );
+        }
+    };
+    const renderCurrentCity = (): JSX.Element | void => {
+        if (!cityPickerBoxIsOpen) {
+            return (
+                <h3 className="heading heading--tertiary" onClick={toggleCityPickerBox}>
+                    {currentCity}
+                </h3>
+            );
+        }
     };
     const renderCityPickerBox = (): JSX.Element | void => {
         if (cityPickerBoxIsOpen) {
@@ -78,8 +113,8 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
                             placeholder="Введите название города..."
                             onChange={handleFindCityInput}
                             autoComplete="off"
+                            ref={inputRef}
                         />
-                        {renderFindCityResults()}
                     </div>
                 </section>
             );
@@ -87,13 +122,14 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
     };
 
     useEffect(applyEffectsOnInit, []);
+    useEffect(focusOnInputOpening, [inputRef.current]);
+    useEffect(applyEventListeners);
 
     return (
-        <div className={mainDivClassName}>
-            <h3 className="heading--tertiary" onClick={toggleCityPickerBox}>
-                {currentCity}
-            </h3>
+        <div id="city-picker" className={mainDivClassName}>
+            {renderCurrentCity()}
             {renderCityPickerBox()}
+            {renderFindCityResults()}
         </div>
     );
 }

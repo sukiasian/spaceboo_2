@@ -12,9 +12,9 @@ export default function UserAvatarOrInitials(props: IUserAvatarOrInitialsProps):
 
     return (
         <>
-            <div className="user-image-or-initials">
+            <div className="user-avatar-or-initials">
                 {userData?.avatarUrl ? (
-                    <div className="user-image">
+                    <div className="user-avatar">
                         <img
                             src={`/${userData.avatarUrl}`}
                             alt="Пользователь"
@@ -23,12 +23,9 @@ export default function UserAvatarOrInitials(props: IUserAvatarOrInitialsProps):
                         {children}
                     </div>
                 ) : (
-                    <div className="user-no-image">
-                        <div
-                            className="user-initials"
-                            style={{ width: '50px', height: '50px', borderRadius: '100px', border: '1px solid blue' }}
-                        >
-                            <p className="user-initials__last-name">
+                    <div className="user-no-avatar">
+                        <div className="user-initials">
+                            <p className="paragraph user-initials__letters">
                                 {userData?.name?.[0]}
                                 {userData?.surname?.[0] as string}
                             </p>

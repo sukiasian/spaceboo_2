@@ -2,3 +2,15 @@
     border-top: 1px solid black;
     width: 100%;
 }
+
+.user-drop-down-menu {
+    position: absolute;
+    margin-top: 2px;
+    padding: 1.5rem;
+    right: 0;
+    z-index: 10;
+    background-color: $color-white;
+    border: 1px solid $box-border-color;
+    border-radius: $box-border-radius;
+    box-shadow: $box-shadow;
+}

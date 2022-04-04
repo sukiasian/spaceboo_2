@@ -16,14 +16,14 @@
         }
     }
 
-    @if $breakpoint == big-desktop {
-        @media only screen and (min-width: 112.5em) {
+    @if $breakpoint == desktop {
+        @media only screen and (min-width: 75em) {
             @content;
         }
     }
 
-    @if $breakpoint == desktops {
-        @media only screen and (min-width: 75em) {
+    @if $breakpoint == big-desktop {
+        @media only screen and (min-width: 112.5em) {
             @content;
         }
     }
