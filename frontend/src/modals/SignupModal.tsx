@@ -31,7 +31,7 @@ export default function SignupModal(props: ISignupModalProps): JSX.Element {
     const renderSingupModalBox = (): JSX.Element | void => {
         if (signupModalIsOpen) {
             return (
-                <div className="signup-modal">
+                <div className="modal signup-modal">
                     <Titles
                         mainDivClassName="login-modal__title"
                         heading="Приветствуем Вас!"

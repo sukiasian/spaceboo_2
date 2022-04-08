@@ -159,9 +159,7 @@ export default function Slider(props: ISliderProps): JSX.Element {
         );
     };
 
-    /* eslint-disable-next-line */
     useEffect(applyEffectsOnInit, []);
-    /* eslint-disable-next-line */
     useEffect(changeSliderImage, [indexOfActiveImage]);
 
     return (

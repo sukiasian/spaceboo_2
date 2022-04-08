@@ -37,11 +37,11 @@ function App(): JSX.Element {
 
     return (
         <div className="App">
-            <section className="section-navbar">
+            <section className="navbar-section">
                 <Navbar />
             </section>
             <Routes />
-            <section className="section-footer">
+            <section className="footer-section">
                 <Footer />
             </section>
         </div>

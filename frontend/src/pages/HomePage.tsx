@@ -46,9 +46,11 @@ export function HomePage() {
     };
     const renderSpaces = (): JSX.Element => {
         if (checkIfSpacesExistToRender()) {
-            return fetchSpacesSuccessResponse!.data.map((space: any, i: number) => {
+            const spaces = fetchSpacesSuccessResponse!.data.map((space: any, i: number) => {
                 return <Space space={space} index={i} key={i} />;
             });
+
+            return <div className="spaces">{spaces}</div>;
         }
 
         return <></>;

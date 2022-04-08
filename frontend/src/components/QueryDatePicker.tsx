@@ -12,7 +12,6 @@ interface IQueryDatePicker {
 }
 
 export default function QueryDatePicker(props: IQueryDatePicker): JSX.Element {
-    // const { queryData, setQueryData } = props;
     const { datesForRender, setDatesForRender } = props;
     const { fetchSpacesQueryData } = useSelector((state: IReduxState) => state.spaceStorage);
     const { datePickerDate } = useSelector((state: IReduxState) => state.commonStorage);

@@ -1,0 +1,40 @@
+.drop-down {
+    border-top: 1px solid black;
+    width: 100%;
+}
+
+.user-drop-down-menu {
+    position: absolute;
+    margin-top: 2px;
+    padding: 1.5rem;
+    right: 0;
+    z-index: 10;
+    background-color: $color-white;
+    border: 1px solid $box-border-color;
+    border-radius: $box-border-radius;
+    box-shadow: $box-shadow;
+}
+
+.filters__sort-by__drop-down-menu {
+    position: absolute;
+    // NOTE: instead of writing plenty of same code we  better use one util selector - .drop-down-menu. margins can be specified
+    // margin-top: 0.25rem;
+    // margin-left: -1rem;
+    border: 1px solid $box-border-color;
+    border-radius: $box-border-radius;
+    box-shadow: $box-shadow;
+}
+
+.filters__price-range__drop-down-menu {
+}
+
+.date-picker__control__choose-year-dropdown {
+    position: absolute;
+    height: 10rem;
+    z-index: 100;
+    padding: 1rem;
+    overflow-y: scroll;
+    border: 1px solid $box-border-color;
+    border-radius: $box-border-radius;
+    background-color: $color-white;
+}

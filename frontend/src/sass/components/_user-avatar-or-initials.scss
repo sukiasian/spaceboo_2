@@ -8,6 +8,17 @@
         height: 50px;
         border-radius: 100px;
         background-color: $color-primary-2;
+        border: 2px solid $color-primary-2;
+        box-shadow: 1px 2px 0 0 rgba(151, 151, 151, 0.3);
+        transition: 0.1s;
+
+        &:hover {
+            background-color: $color-white;
+
+            p {
+                color: $color-primary-2;
+            }
+        }
     }
 
     &-initials {

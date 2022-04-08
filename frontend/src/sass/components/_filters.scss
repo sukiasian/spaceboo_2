@@ -1,0 +1,35 @@
+.filters-section {
+    margin-top: 4rem;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.filter {
+    padding: 0.2rem 1.5rem;
+    color: $color-grey-light-3;
+    font-weight: 400;
+    border: 1px solid $box-border-color;
+    border-radius: 20px;
+}
+
+.filters {
+    &__sort-by {
+        max-height: 2.5rem;
+    }
+
+    &__price-range {
+        max-height: 2.5rem;
+    }
+
+    &__required-reservation-dates-picker {
+        width: 18.5rem;
+
+        &__content {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        &__calendar {
+        }
+    }
+}

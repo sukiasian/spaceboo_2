@@ -176,7 +176,7 @@ export default function Filters(): JSX.Element {
                     return (
                         <div
                             className={`filters__sort-by__drop-down-menu__${option.field}`}
-                            onClick={(e) => {
+                            onClick={() => {
                                 toggleFilterBoxIsOpen(FilterNames.SORT_BY);
                                 updateQueryDataSortBy(option.field);
                             }}
@@ -193,9 +193,9 @@ export default function Filters(): JSX.Element {
             return <div className="filters__sort-by__drop-down-menu">{sortByDropDownOptionsRender}</div>;
         }
     };
-    const renderPriceRangeInputs = (): JSX.Element[] | void => {
+    const renderPriceRangeInputs = (): JSX.Element | void => {
         if (priceRangeDropDownBoxIsOpen) {
-            return priceRangeInputs.map((priceRangeInput: IPriceRangeInput, i: number) => {
+            const inputs = priceRangeInputs.map((priceRangeInput: IPriceRangeInput, i: number) => {
                 return (
                     <InputWithLabel
                         mainDivClassName={priceRangeInput.mainDivClassName}
@@ -209,6 +209,8 @@ export default function Filters(): JSX.Element {
                     />
                 );
             });
+
+            return <div className="filters__price-range__drop-down-menu drop-down-menu">{inputs}</div>;
         }
     };
     const renderRequiredReservationDatesRange = (): JSX.Element | void => {
@@ -217,7 +219,7 @@ export default function Filters(): JSX.Element {
             : 'Выберите интересующие даты...';
 
         return (
-            <div>
+            <div className="dates-range">
                 <p className="paragraph paragraph--light paragraph--filters__reservation-date-picker">
                     {requiredReservationDates}
                 </p>
@@ -247,26 +249,28 @@ export default function Filters(): JSX.Element {
     };
 
     return (
-        <section className="filters-section" style={{ display: 'flex', flexDirection: 'row' }}>
-            <div className="filters__sort-by">
+        <section className="filters-section">
+            <div className="filter filters__sort-by">
                 <h3 className="heading heading--tertiary" onClick={toggleFilterBoxIsOpen(FilterNames.SORT_BY)}>
                     Сортировка<span className={defineFilterBoxArrowClassName(sortByDropDownBoxIsOpen)}>^</span>
                 </h3>
                 {renderSortByFilterDropDown()}
             </div>
-            <div className="filters__price-range">
+            <div className="filter filters__price-range">
                 <h3 className="heading heading--tertiary" onClick={toggleFilterBoxIsOpen(FilterNames.PRICE)}>
                     Цена<span className={defineFilterBoxArrowClassName(priceRangeDropDownBoxIsOpen)}>^</span>
                 </h3>
                 {renderPriceRangeInputs()}
             </div>
-            <div className="filters__required-reservation-dates-picker">
+            <div className="filter filters__required-reservation-dates-picker">
                 <div
-                    className="filters__required-reservation-dates-picker__content--"
+                    className="filters__required-reservation-dates-picker__content"
                     onClick={toggleFilterBoxIsOpen(FilterNames.RESERVATION_DATE_PICKER)}
                 >
                     {renderRequiredReservationDatesRange()}
-                    <FontAwesomeIcon icon={faCalendar} />
+                    <div className="filters__required-reservation-dates-picker__calendar">
+                        <FontAwesomeIcon icon={faCalendar} />
+                    </div>
                 </div>
                 {renderDatePicker()}
                 {renderNumberOfDaysRequired()}

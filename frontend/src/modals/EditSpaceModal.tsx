@@ -28,7 +28,7 @@ export default function EditSpaceModal(props: IEditSpaceModalProps): JSX.Element
 
     // плюс нужно переделать SpaceInputFieldsForCreateAndEdit под provideSpace и включить туда те поля которые не были включены из за  того что нужно было применяться еще и в edit space
     return (
-        <div className="edit-space-modal" ref={editSpaceModalRef}>
+        <div className="modal edit-space-modal" ref={editSpaceModalRef}>
             <CloseModalButton clickHandler={closeModalOnCloseButtonClick} />
             <EditSpaceForm />
         </div>

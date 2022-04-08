@@ -28,7 +28,7 @@ export default function LoginModal(props: ILoginModalProps) {
     const renderLoginModalBox = (): JSX.Element | void => {
         if (loginModalIsOpen) {
             return (
-                <div className="login-modal">
+                <div className="modal login-modal">
                     <Titles
                         mainDivClassName="login-modal__title"
                         heading="Мы рады вас видеть!"

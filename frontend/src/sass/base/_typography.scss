@@ -33,17 +33,12 @@ body {
 }
 
 .paragraph {
-    &--grey {
-        color: $color-grey-light-1;
+    &--white {
+        background-color: $color-white;
     }
 
-    &--footer-text {
-        color: white;
-        text-decoration: none;
-    }
-
-    &--inside-heading {
-        font-weight: normal;
+    &--large {
+        font-size: 1.5rem;
     }
 }
 

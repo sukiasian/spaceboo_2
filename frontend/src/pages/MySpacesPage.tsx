@@ -58,7 +58,7 @@ export default function MySpacesPage(): JSX.Element {
     return (
         <section className="my-spaces-page">
             <Titles heading="Мои пространства" />
-            <section className="spaces">
+            <section className="spaces-section">
                 {renderLoadingSpin()}
                 {/* below should be grid or flex */}
                 <div className="spaces">

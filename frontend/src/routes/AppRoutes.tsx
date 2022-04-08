@@ -29,7 +29,7 @@ export default function AppRoutes(): JSX.Element {
                 <Route path="/spaces" element={<ConfirmAccountPage />} />
                 <Route path="/spaces/:spaceId" element={<SpacePage />} />
                 <Route path="/provide-space" element={<ConfirmAccountPage />} />
-                <Route path="/for-inverstors" element={<ForInvestorsPage />} />
+                <Route path="/for-investors" element={<ForInvestorsPage />} />
                 <Route path="/how-it-works" element={<HowItWorksPage />} />
                 <Route path="/about" element={<AboutUsPage />} />
                 <Route path="/contact" element={<ContactUsPage />} />
@@ -46,8 +46,8 @@ export default function AppRoutes(): JSX.Element {
                 <Route path="/spaces/:spaceId" element={<SpacePage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
-                <Route path="/provide-space" element={<LoginPage />} />
-                <Route path="/for-inverstors" element={<ForInvestorsPage />} />
+                <Route path="/provide-space" element={<ProvideSpacePage />} />
+                <Route path="/for-investors" element={<ForInvestorsPage />} />
                 <Route path="/how-it-works" element={<HowItWorksPage />} />
                 <Route path="/about" element={<AboutUsPage />} />
                 <Route path="/contact" element={<ContactUsPage />} />
@@ -69,7 +69,7 @@ export default function AppRoutes(): JSX.Element {
             <Route path="/user/settings/*" element={<SettingsPage />} />
             <Route path="/about" element={<AboutUsPage />} />
             <Route path="/contact" element={<ContactUsPage />} />
-            <Route path="/for-inverstors" element={<ForInvestorsPage />} />
+            <Route path="/for-investors" element={<ForInvestorsPage />} />
             <Route path="/how-it-works" element={<HowItWorksPage />} />
             <Route path="*" element={<NotFoundPage />} />
         </Routes>

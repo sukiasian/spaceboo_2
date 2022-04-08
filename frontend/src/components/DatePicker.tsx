@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { monthStrings } from '../types/constants';
@@ -211,16 +211,21 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
 
         return tableRows;
     };
-    const renderMonthsWithYearsDropDownMenu = (): JSX.Element[] | void => {
+    const renderMonthsWithYearsDropDownMenu = (): JSX.Element | void => {
         if (monthsWithYearsDropDownMenuIsOpen) {
             const monthsWithYearsDropDownOptions: JSX.Element[] = new Array(amountOfMonthsAvailableToLookUp);
             const datesCounter: ICurrentDate = { ...currentDate };
+            const defineCurrentMonthClassName = (counterMonth: number): string => {
+                return counterMonth === datePickerDate.month ? 'active-month' : '';
+            };
 
             for (let i = 0; i < amountOfMonthsAvailableToLookUp; i++) {
                 if (datesCounter.month <= 11) {
                     monthsWithYearsDropDownOptions.push(
                         <div
-                            className={`date-picker__control__change-date date-picker__control__change-date--${i}`}
+                            className={`date-picker__control__change-date date-picker__control__change-date--${i} ${defineCurrentMonthClassName(
+                                datesCounter.month
+                            )}`}
                             onClick={updateDatePickerDateFromDropDownMenu(datesCounter.month, datesCounter.year)}
                             key={i}
                         >
@@ -235,7 +240,7 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
 
                     monthsWithYearsDropDownOptions.push(
                         <div
-                            className=""
+                            className={`${defineCurrentMonthClassName(datesCounter.month)}`}
                             onClick={updateDatePickerDateFromDropDownMenu(datesCounter.month, datesCounter.year)}
                             key={i}
                         >
@@ -247,7 +252,7 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
                 }
             }
 
-            return monthsWithYearsDropDownOptions;
+            return <div className="date-picker__control__choose-year-dropdown">{monthsWithYearsDropDownOptions}</div>;
         }
     };
 
@@ -262,12 +267,16 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
     return (
         <div className="date-picker">
             <div className="date-picker__control">
-                <FontAwesomeIcon icon={faAngleLeft} onClick={decreaseDatePickerMonth} />
+                <div className="date-picker__control__arrow date-picker__control__arrow--decrease">
+                    <FontAwesomeIcon icon={faAngleLeft} onClick={decreaseDatePickerMonth} />
+                </div>
                 <div className="date-picker__control__picked-month" onClick={toggleMonthsWithYearsDropDownMenu}>
                     {monthStrings[datePickerDate.month]}, {datePickerDate.year}
                 </div>
-                {renderMonthsWithYearsDropDownMenu()}
-                <FontAwesomeIcon icon={faAngleRight} onClick={increaseDatePickerMonth} />
+                {renderMonthsWithYearsDropDownMenu() as ReactNode}
+                <div className="date-picker__control__arrow date-picker__control__arrow--increase">
+                    <FontAwesomeIcon icon={faAngleRight} onClick={increaseDatePickerMonth} />
+                </div>
             </div>
             <table className="date-picker__table" cellSpacing={0}>
                 <tbody>

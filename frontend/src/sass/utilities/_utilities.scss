@@ -20,3 +20,12 @@
         margin-top: 4rem;
     }
 }
+
+.drop-down-menu {
+    position: absolute;
+    margin-top: 0.25rem;
+    margin-left: -1rem;
+    border: 1px solid $box-border-color;
+    border-radius: $box-border-radius;
+    box-shadow: $box-shadow;
+}
