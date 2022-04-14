@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { putEditUserAction, setEditUserData } from '../redux/actions/userActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { IEditUserData } from '../redux/reducers/userReducer';
-import { EventKey } from '../types/types';
+import { EventKey, IComponentClassNameProps } from '../types/types';
 
 interface IField {
     finalValue?: string;
@@ -150,8 +150,8 @@ export default function EditUserInputs(): JSX.Element {
     const renderUserEditFields = (): JSX.Element[] => {
         return fields.map((field, i: number) => {
             return (
-                <div className={`user-edit-field--${field.inputName}`} key={i}>
-                    <label className="user-edit-field__label">{field.label}</label>
+                <div className={`user-edit-field user-edit-field--${field.inputName}`} key={i}>
+                    <label className="label user-edit-field__label">{field.label}</label>
                     {openedInput === field.inputName ? (
                         <div className={`user-edit-field__input-container`}>
                             <input
@@ -164,15 +164,13 @@ export default function EditUserInputs(): JSX.Element {
                             />
                         </div>
                     ) : (
-                        <>
-                            <p
-                                className="paragraph user-edit-field-value"
-                                onClick={openFieldInput(field.inputName)}
-                                key={i}
-                            >
-                                {userData?.[field.inputName]}
-                            </p>
-                        </>
+                        <p
+                            className="paragraph user-edit-field-value"
+                            onClick={openFieldInput(field.inputName)}
+                            key={i}
+                        >
+                            {userData?.[field.inputName]}
+                        </p>
                     )}
                 </div>
             );
@@ -181,7 +179,7 @@ export default function EditUserInputs(): JSX.Element {
     const renderEmailField = (): JSX.Element => {
         return (
             <div className="user-edit-field--email">
-                <label>Эл. почта</label>
+                <label className="label user-edit-field--email__label">Эл. почта</label>
                 <p>{userData?.email}</p>
             </div>
         );
@@ -194,10 +192,10 @@ export default function EditUserInputs(): JSX.Element {
     useEffect(setPlaceholderForInput, [inputRef.current?.value]);
 
     return (
-        <div>
-            <div>{renderUserEditFields()}</div>
+        <>
+            {renderUserEditFields()}
             {renderEmailField()}
-        </div>
+        </>
     );
 }
 

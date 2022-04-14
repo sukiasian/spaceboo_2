@@ -95,16 +95,15 @@ export default function GeneralSettingsPage(): JSX.Element {
 
     // TODO: переделать в грид
     return (
-        <div className="general-settings">
+        <div className="settings-panel general-settings">
             <Titles heading="Основное" />
-            <div className="general-settings__left-column">
-                <div className="">
+            <div className="general-settings__fields">
+                <div className="general-settings__fields__avatar">
                     <UserAvatarOrInitials children={defineUserAvatarOrInitialsChildren()} />
                     <div className="add-user-avatar">
                         <label className="add-user-avatar__label">
                             {defineUploadLabel()}
                             <input
-                                style={{ display: 'none' }}
                                 name="userAvatar"
                                 className="add-user-avatar__input"
                                 type="file"
@@ -114,8 +113,6 @@ export default function GeneralSettingsPage(): JSX.Element {
                         </label>
                     </div>
                 </div>
-            </div>
-            <div className="">
                 <EditUserInputs />
             </div>
             {renderUploadAvatarAlert()}

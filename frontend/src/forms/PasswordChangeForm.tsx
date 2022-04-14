@@ -78,8 +78,10 @@ export function PasswordChangeForm(): JSX.Element {
     return (
         <form className="password-change-form" onSubmit={handleFormSubmit}>
             <div className="password-change-form__fields form-fields">{renderInputs()}</div>
-            <div>
-                <button onClick={changePassword}>Сменить пароль</button>
+            <div className="password-change-form__button-container">
+                <button className="button button--primary password-change-form__button" onClick={changePassword}>
+                    Сменить пароль
+                </button>
             </div>
         </form>
     );

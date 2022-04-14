@@ -140,7 +140,7 @@ export default function Navbar(): JSX.Element {
 
     // NOTE hereafter we will wrap a flex item in a div in order to be able to move without making position absolute
     return (
-        <nav className="navbar">
+        <nav id="navbar" className="navbar">
             <NavLink to={UrlPathname.HOME} className="navbar-link">
                 <object id="logo" data="/logo.svg" aria-labelledby={'logo'} />
             </NavLink>

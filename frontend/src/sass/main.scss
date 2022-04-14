@@ -16,8 +16,14 @@
 @import './components/city-picker';
 @import './components/user-avatar-or-initials';
 @import './components/space';
+@import './components/inputs';
 @import './components/filters';
 @import './components/modals';
+@import './components/banners';
+@import './components/navtabs';
+@import './components/titles';
+@import './components/sliders';
+@import './components/forms';
 
 @import './layout/flex';
 
@@ -27,4 +33,11 @@
 @import './pages/home';
 @import './pages/form';
 @import './pages/appointment';
+@import './pages/how-it-works';
+@import './pages/settings';
+@import './pages/contact';
+@import './pages/about';
+@import './pages/space';
+@import './pages/for-investors';
+@import './pages/provide-space';
 @import './pages/not-found';

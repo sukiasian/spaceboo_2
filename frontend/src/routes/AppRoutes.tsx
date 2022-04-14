@@ -1,8 +1,8 @@
 import { useSelector } from 'react-redux';
 import { Route, Routes } from 'react-router-dom';
-import AboutUsPage from '../pages/AboutUsPage';
+import AboutPage from '../pages/AboutPage';
 import ConfirmAccountPage from '../pages/ConfirmAccountPage';
-import ContactUsPage from '../pages/ContactUsPage';
+import ContactPage from '../pages/ContactPage';
 import ForInvestorsPage from '../pages/ForInvestorsPage';
 import { HomePage } from '../pages/HomePage';
 import HowItWorksPage from '../pages/HowItWorksPage';
@@ -30,9 +30,9 @@ export default function AppRoutes(): JSX.Element {
                 <Route path="/spaces/:spaceId" element={<SpacePage />} />
                 <Route path="/provide-space" element={<ConfirmAccountPage />} />
                 <Route path="/for-investors" element={<ForInvestorsPage />} />
-                <Route path="/how-it-works" element={<HowItWorksPage />} />
-                <Route path="/about" element={<AboutUsPage />} />
-                <Route path="/contact" element={<ContactUsPage />} />
+                <Route path="/how-it-works/*" element={<HowItWorksPage />} />
+                <Route path="/about/*" element={<AboutPage />} />
+                <Route path="/contact" element={<ContactPage />} />
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
         );
@@ -48,9 +48,9 @@ export default function AppRoutes(): JSX.Element {
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/provide-space" element={<ProvideSpacePage />} />
                 <Route path="/for-investors" element={<ForInvestorsPage />} />
-                <Route path="/how-it-works" element={<HowItWorksPage />} />
-                <Route path="/about" element={<AboutUsPage />} />
-                <Route path="/contact" element={<ContactUsPage />} />
+                <Route path="/how-it-works/*" element={<HowItWorksPage />} />
+                <Route path="/about/*" element={<AboutPage />} />
+                <Route path="/contact" element={<ContactPage />} />
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
         );
@@ -67,10 +67,10 @@ export default function AppRoutes(): JSX.Element {
             <Route path="/keys" element={<SpaceKeysPage />} />
             <Route path="/my-appointments/*" element={<MyAppointmentsPage />} />
             <Route path="/user/settings/*" element={<SettingsPage />} />
-            <Route path="/about" element={<AboutUsPage />} />
-            <Route path="/contact" element={<ContactUsPage />} />
+            <Route path="/about/*" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route path="/for-investors" element={<ForInvestorsPage />} />
-            <Route path="/how-it-works" element={<HowItWorksPage />} />
+            <Route path="/how-it-works/*" element={<HowItWorksPage />} />
             <Route path="*" element={<NotFoundPage />} />
         </Routes>
     );

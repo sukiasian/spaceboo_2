@@ -4,6 +4,7 @@ import { IReduxState } from '../redux/reducers/rootReducer';
 import SettingsPageRoutes from '../routes/SettingsPageRoutes';
 import { useEffect, useState } from 'react';
 import { ITab } from '../types/types';
+import { checkIfRouteNeedsRedirectingToChildRoute } from '../utils/utilFunctions';
 
 export default function SettingsPage(): JSX.Element {
     const settingsLinkableTabs: ITab[] = [
@@ -21,13 +22,15 @@ export default function SettingsPage(): JSX.Element {
     const userLoginState = fetchUserLoginStateSuccessResponse?.data;
     const pathname = window.location.pathname;
     const navigate = useNavigate();
-    const checkIfSettingsRouteIsNotSpecified = (): boolean => {
-        return pathname !== '/user/settings/security' && pathname !== '/user/settings/security/';
-    };
-    const applyEffectsOnInit = (): void => {
-        if (checkIfSettingsRouteIsNotSpecified()) {
+    const redirectIfRouteIsNotSpecifiedOnInit = (): void => {
+        const parentRoute = '/user/settings';
+
+        if (checkIfRouteNeedsRedirectingToChildRoute(pathname, parentRoute)) {
             navigate('/user/settings/general');
         }
+    };
+    const applyEffectsOnInit = (): void => {
+        redirectIfRouteIsNotSpecifiedOnInit();
     };
     const defineActiveClassForLink = (linkTo: string): string => {
         if (window.location.pathname.includes(linkTo)) {
@@ -49,15 +52,18 @@ export default function SettingsPage(): JSX.Element {
             );
         });
     };
+
     useEffect(applyEffectsOnInit, []);
 
     return (
-        <section className="settings-page">
-            <div className="settings-page__navigation-panel">
-                <div className="navigation-panel__title">
-                    <h3 className="heading heading--tertiary">Настройки</h3>
+        <section className="dashboard settings-page">
+            <div className="dashboard__navigation-panel settings-page__navigation-panel">
+                <div className="settings-page__navigation-panel__content">
+                    <div className="navigation-panel__title">
+                        <h3 className="heading heading--tertiary">Настройки</h3>
+                    </div>
+                    <div className="settings-page__linkable-tabs">{renderLinkableTabs()}</div>
                 </div>
-                {renderLinkableTabs()}
             </div>
             <div className="settings-page__interface">
                 <SettingsPageRoutes />

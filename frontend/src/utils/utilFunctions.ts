@@ -49,3 +49,7 @@ export const defineActiveClassName = (activeTab: string, tab: string): string =>
 
     return '';
 };
+
+export const checkIfRouteNeedsRedirectingToChildRoute = (actualPathname: string, parentRoute: string): boolean => {
+    return actualPathname === parentRoute || actualPathname === `${parentRoute}/`;
+};

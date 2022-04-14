@@ -20,3 +20,9 @@ export const toggleMyAppointmentsFinalLocationIsDefined = (): IAction<ReduxCommo
         type: ReduxCommonAction.SET_MY_APPOINTMENTS_FINAL_DESTINATION_IS_DEFINED,
     };
 };
+
+export const setTruthyHowItWorksStepsUserChosen = (): IAction<ReduxCommonAction> => {
+    return {
+        type: ReduxCommonAction.SET_HOW_IT_WORKS_STEPS_USER_CHOSEN,
+    };
+};

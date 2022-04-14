@@ -61,7 +61,7 @@ export function HomePage() {
     useEffect(requestSpaces, [fetchSpacesQueryData, dispatch]);
 
     return (
-        <section className="home-page-section">
+        <section className="page home-page-section">
             {renderSlider()}
             <Filters />
             <section className="spaces-section"> {renderSpaces()}</section>

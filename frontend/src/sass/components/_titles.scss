@@ -1,0 +1,20 @@
+.titles {
+    display: flex;
+    flex-direction: column;
+    margin-top: 2.8rem;
+    margin-bottom: 5rem;
+
+    &__heading {
+        &-container {
+            align-self: center;
+        }
+    }
+
+    &__paragraph {
+        color: $color-grey-light-1;
+        font-size: 1.2rem;
+
+        &-container {
+        }
+    }
+}

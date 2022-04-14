@@ -10,7 +10,7 @@ export default function SpaceKeysPage(): JSX.Element {
     const renderSpaceKeys = (): JSX.Element | void => {
         if (spacesForKeyControl) {
             const spaceKeys = spacesForKeyControl.map((space: any, i: number) => {
-                return <SpaceKey space={space} />;
+                return <SpaceKey space={space} key={i} />;
             });
 
             return <div className="space-keys">{spaceKeys}</div>;

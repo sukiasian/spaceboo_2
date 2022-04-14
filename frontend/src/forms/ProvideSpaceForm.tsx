@@ -190,8 +190,8 @@ export default function ProvideSpaceForm(): JSX.Element {
                     ? fetchCitiesByPatternSuccessResponse?.data?.map((city: any, i: number) => (
                           <p
                               className={`city-picker__search-results city-picker__search-results--${i}`}
-                              key={i}
                               onClick={handlePickCity(city)}
+                              key={i}
                           >
                               {`${city.region.name}, ${separateCityNameFromRegionIfCityNameContains(city.name)}`}
                           </p>

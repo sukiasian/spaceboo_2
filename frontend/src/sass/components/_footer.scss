@@ -1,18 +1,57 @@
-.footer-section {
-    margin-top: auto;
-}
-
 .footer {
     overflow: hidden;
-    padding: 1rem;
-    background-color: $color-primary-2;
     transition: 0.2s;
-
     @include respond(phone) {
         font-size: 0.7rem;
     }
 
-    &:hover {
-        font-weight: bolder;
+    &-content {
+        padding: 2rem;
+        background-color: $color-footer;
+    }
+
+    &-section {
+        margin-top: auto;
+
+        &-name {
+            color: $color-white;
+        }
+    }
+
+    &-link {
+        color: $color-white;
+
+        &:hover {
+            color: $color-primary-1-lightened;
+        }
+
+        &:active {
+            color: $color-primary-1;
+        }
+    }
+
+    &-links {
+        margin-left: 1rem;
+        margin-top: 1rem;
+    }
+
+    &-sections {
+        position: relative;
+        width: 500px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    &__corporate {
+        display: flex;
+        justify-content: center;
+        padding: 0.5rem;
+        background-color: $color-footer;
+        border-top: 0.01rem solid $color-white;
+
+        p {
+            color: $color-white;
+        }
     }
 }

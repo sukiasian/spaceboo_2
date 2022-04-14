@@ -28,7 +28,7 @@ export default function SecuritySettingsPage(): JSX.Element {
     useEffect(applyEffectsOnInit, []);
 
     return (
-        <div className="security-settings">
+        <div className="settings-panel security-settings">
             <Titles heading="Безопасность" />
             <section className="password-change">
                 <div className="password-change__title">

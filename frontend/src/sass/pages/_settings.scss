@@ -1,0 +1,87 @@
+// NOTE: can be generalized for all dashboard-type pages
+.settings-page {
+    &__content {
+        margin: 3rem 0 0 2rem;
+    }
+}
+
+.settings-panel {
+    margin: 3rem 0 0 4rem;
+}
+
+.general-settings {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &__fields {
+        display: grid;
+        grid-template-rows: repeat(2, 100px);
+        grid-template-columns: repeat(4, 200px);
+        grid-template-areas: 'a b c d' 'a e e e';
+
+        &__avatar {
+            .user-avatar-or-initials {
+                &:hover {
+                    .user-no-avatar {
+                        background-color: $color-primary-2;
+
+                        p {
+                            color: $color-white;
+                        }
+                    }
+
+                    cursor: default;
+                }
+            }
+        }
+
+        .user-edit-field {
+            &--surname {
+                grid-area: b;
+            }
+
+            &--name {
+                grid-area: c;
+            }
+
+            &--email {
+                grid-area: e;
+            }
+        }
+    }
+}
+
+.security-settings {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.password-change {
+    display: flex;
+    flex-direction: column;
+    margin-top: 3rem;
+
+    .password-change-form {
+        display: flex;
+        flex-direction: column;
+        width: 600px;
+        margin-top: 2rem;
+
+        &__fields {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        &__button {
+            width: 180px;
+            height: 2.5rem;
+            margin-top: 3rem;
+
+            &-container {
+                align-self: center;
+            }
+        }
+    }
+}

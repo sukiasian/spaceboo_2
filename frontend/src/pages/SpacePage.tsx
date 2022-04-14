@@ -120,7 +120,7 @@ export default function SpacePage(): JSX.Element {
     useEffect(applyModalEventListenersEffects, [editSpaceModalIsOpen]);
 
     return (
-        <section className="space-page-container">
+        <section className="page space-page-container">
             {renderSpaceOwnerMenu()}
             <div className="space-page__flows">
                 <div className="space-page__flows--left">

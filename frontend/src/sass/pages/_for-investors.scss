@@ -1,0 +1,11 @@
+.for-investors {
+    &-page a {
+        color: $color-primary-1-lightened;
+        font-weight: bolder;
+
+        &:hover {
+            color: $color-primary-1;
+            transition: 0.2s;
+        }
+    }
+}

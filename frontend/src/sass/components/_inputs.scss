@@ -1,6 +1,13 @@
 .required-field {
-    height: 0.7rem;
-    width: 0.7rem;
+    height: 0.3rem;
+    width: 0.3rem;
+    display: inline-block;
+    margin-left: 3px;
+    margin-bottom: 5px;
     background-color: $color-primary-2;
     border-radius: 100px;
+}
+
+.add-user-avatar__input {
+    display: none;
 }

@@ -1,0 +1,80 @@
+.contact {
+    &-page {
+        min-height: 82vh;
+    }
+
+    &-box {
+        display: flex;
+        justify-content: space-evenly;
+
+        &__data {
+            width: 35rem;
+            margin-left: 3rem;
+        }
+    }
+
+    &-data {
+        display: flex;
+        width: 14rem;
+        margin-top: 2rem;
+        margin-left: 1.5rem;
+        justify-content: space-between;
+
+        &__decoration {
+            width: 6px;
+            border-radius: 5px;
+            background-color: $color-primary-2;
+            justify-content: center;
+        }
+
+        &__fields {
+            align-self: center;
+            width: 200px;
+        }
+
+        &__field {
+            display: flex;
+            flex-direction: row;
+
+            .paragraph-container {
+                margin-left: 1rem;
+            }
+
+            p {
+                color: $color-grey-light-1;
+            }
+        }
+    }
+
+    &-topic-dropdown-menu {
+        position: relative;
+        width: 100%;
+
+        .active {
+            color: $color-primary-1;
+            font-weight: bolder;
+        }
+
+        p {
+            color: $color-grey-light-1;
+            cursor: pointer;
+
+            &:hover {
+                color: $color-primary-1-lightened;
+            }
+        }
+    }
+}
+
+.choose-topic {
+    min-width: 13rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid $box-border-color;
+    border-radius: $box-border-radius;
+    box-shadow: $box-shadow;
+    cursor: pointer;
+
+    p {
+        color: $color-grey-light-1;
+    }
+}

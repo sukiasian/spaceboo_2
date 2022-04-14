@@ -26,7 +26,7 @@ export default function LoginPage(): JSX.Element {
     useEffect(handleHistoryBack, [userLoginState]);
 
     return (
-        <div className="login-page-section">
+        <section className="page login-page">
             <div className="login-page__title">
                 <h2 className="heading heading--secondary login-page-title__heading">Выполните вход</h2>
             </div>
@@ -37,6 +37,6 @@ export default function LoginPage(): JSX.Element {
                 mainDivClassName="login"
                 navigateTo={UrlPathname.SIGNUP}
             />
-        </div>
+        </section>
     );
 }

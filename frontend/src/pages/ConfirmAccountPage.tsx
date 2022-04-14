@@ -89,7 +89,7 @@ export default function ConfirmAccountPage(): JSX.Element {
     useEffect(clearTimerOnUnmount, []);
 
     return (
-        <div className="account-confirmation">
+        <div className="page account-confirmation-page">
             <section className="account-confirmation__titles">
                 <div className="heading">
                     <h2 className="heading heading--secondary"> Последний шаг - подтвердите аккаунт. </h2>

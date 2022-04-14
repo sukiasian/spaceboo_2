@@ -1,0 +1,82 @@
+.how-it-works {
+    &__banner {
+        &__image {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                url(../../assets/how-it-works-doors.jpg);
+            background-color: rgba(96, 96, 96, 0.5);
+            width: 100vw;
+            height: 50vh;
+            background-size: contain;
+            z-index: 10;
+        }
+
+        &__content {
+            position: relative;
+            z-index: 100;
+        }
+    }
+
+    &-section {
+        padding: 2rem;
+    }
+    &__what-is-spaceboo {
+        &__image {
+            position: relative;
+            left: 100%;
+            transform: translate(-89%, 0);
+            background: url(../../assets/how-it-works-phone.jpg);
+            width: 300px;
+            height: 200px;
+            background-size: cover;
+            clip-path: polygon(29% 0, 100% 0%, 100% 100%, 0% 100%);
+        }
+    }
+
+    &__how-spaceboo-works {
+        &-section {
+            background-color: $color-background-2;
+        }
+
+        &__steps {
+            margin-top: 3rem;
+            margin-left: -0.5rem;
+            width: 40rem;
+            background-color: $color-white;
+            padding: 2rem;
+            border-radius: $box-border-radius;
+            box-shadow: $box-shadow;
+        }
+    }
+
+    &__user-steps {
+        margin-top: 1.5rem;
+
+        :not(:last-child) {
+            margin-bottom: 0.5rem;
+        }
+    }
+}
+
+.abcd {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.types-of-users {
+    display: flex;
+    width: 14rem;
+    justify-content: space-between;
+}
+
+.user-step {
+    display: flex;
+    align-items: center;
+
+    &__number {
+        color: $color-primary-2;
+        font-size: 2rem;
+        width: 40px;
+    }
+}

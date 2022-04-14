@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Alert from '../components/Alert';
+import Titles from '../components/Titles';
 import ProvideSpaceForm from '../forms/ProvideSpaceForm';
 import { fetchUserLoginStateAction } from '../redux/actions/authActions';
 import { annualizeProvideSpaceDataAction, annualizeProvideSpaceResponsesAction } from '../redux/actions/spaceActions';
@@ -57,12 +58,10 @@ export default function ProvideSpacePage(): JSX.Element {
     useEffect(redirectToMySpacesAfterProvideSpace, [postProvideSpaceSuccessResponse, dispatch, navigate]);
 
     return (
-        <section className="provide-space-section">
-            <div className="provide-space__title">
-                <h2 className="heading heading--secondary heading--provide-space__title">Предоставить пространство</h2>
-            </div>
+        <div className="page provide-space-page">
+            <Titles heading="Предоставить пространство" />
             <div className="provide-space__form-container">{renderProvideForm()}</div>
             {renderAlertOnSubmitError()}
-        </section>
+        </div>
     );
 }

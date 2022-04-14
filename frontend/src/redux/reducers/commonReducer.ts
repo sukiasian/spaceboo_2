@@ -9,6 +9,7 @@ export interface ICommonState {
     timerIsOn: boolean;
     datePickerDate: IDatePickerDate;
     myAppointmentsFinalLocationIsDefined: boolean;
+    howItWorksStepsUserChosen?: boolean;
 }
 
 const initialState: ICommonState = {
@@ -42,6 +43,12 @@ export const commonReducer = (state = initialState, action: IAction): ICommonSta
             return {
                 ...state,
                 myAppointmentsFinalLocationIsDefined: !state.myAppointmentsFinalLocationIsDefined,
+            };
+
+        case ReduxCommonAction.SET_HOW_IT_WORKS_STEPS_USER_CHOSEN:
+            return {
+                ...state,
+                howItWorksStepsUserChosen: true,
             };
 
         default:
