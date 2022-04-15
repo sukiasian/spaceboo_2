@@ -14,9 +14,17 @@
 	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 460 100"
 	 style="enable-background:new 0 0 460 100;" xml:space="preserve">
 <style type="text/css">
+	@font-face {
+		font-family: 'SukhumvitSet-Medium';
+		src: url('./fonts/SukhumvitSet-Medium.ttf');
+	}
+	@font-face { 
+		font-family: 'SukhumvitSet-SemiBold';
+		src: url('./fonts/SukhumvitSet-SemiBold.ttf');
+	}
 	.st0{fill:#2B2B2B;}
 	.st1{fill:none;}
-	.st2{font-family:'SukhumvitSet-Text';}
+	.st2{font-family:'SukhumvitSet-Medium';}
 	.st3{font-size:106px;}
 	.st4{fill:#FEC602;}
 	.st5{font-family:'SukhumvitSet-SemiBold';}

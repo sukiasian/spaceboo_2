@@ -1,13 +1,14 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faChevronLeft, faChevronRight, faEdit, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { fetchSpaceByIdAction, fetchUserSpacesAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import EditSpaceModal from '../modals/EditSpaceModal';
 import { toggleEditSpaceModalAction } from '../redux/actions/modalActions';
 import { EventListenerType } from '../types/types';
+import { updateDocumentTitle } from '../utils/utilFunctions';
 
 interface ISpaceInitialField {
     fieldName: string;
@@ -17,6 +18,7 @@ interface ISpaceInitialField {
 // вначале мы должны отправить запрос на получение всех спейсов пользователя. Если в массиве числитя params.spaceId то
 
 export default function SpacePage(): JSX.Element {
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
     const { fetchSpaceByIdSuccessResponse, fetchSpaceByIdFailureResponse } = useSelector(
         (state: IReduxState) => state.spaceStorage
     );
@@ -30,13 +32,18 @@ export default function SpacePage(): JSX.Element {
     const spaceInitialFields: ISpaceInitialField[] = [
         {
             fieldName: 'address',
-            fieldDescription: 'Расположение',
+            fieldDescription: 'РАСПОЛОЖЕНИЕ',
         },
         {
             fieldName: 'roomsNumber',
-            fieldDescription: 'Количество комнат',
+            fieldDescription: 'КОЛИЧЕСТВО КОМНАТ',
+        },
+        {
+            fieldName: 'bedsNumber',
+            fieldDescription: 'КОЛИЧЕСТВО СПАЛЬНЫХ МЕСТ',
         },
     ];
+    const amountOfImages = spaceData?.imagesUrl.length;
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const params = useParams();
@@ -47,9 +54,17 @@ export default function SpacePage(): JSX.Element {
     const requestUserSpaces = (): void => {
         dispatch(fetchUserSpacesAction());
     };
+    const handleDocumentTitle = (): void => {
+        const documentTitle = spaceData
+            ? `${spaceData.roomsNumber}-к. пространство на ${spaceData.address} | Spaceboo`
+            : 'Пространство | Spaceboo';
+
+        updateDocumentTitle(documentTitle);
+    };
     const applyEffectsOnInit = (): void => {
         requestSpaceById();
         requestUserSpaces();
+        handleDocumentTitle();
     };
     const closeModalOnOutsideClick = (e: MouseEvent) => {
         if (!editSpaceModalRef.current?.contains(e.target as HTMLDivElement)) {
@@ -76,6 +91,22 @@ export default function SpacePage(): JSX.Element {
     const toggleEditSpaceModal = (): void => {
         dispatch(toggleEditSpaceModalAction());
     };
+    const flipImageLeft = (): void => {
+        const defineShouldBePreviousImageOrLast = activeImageIndex > 0 ? activeImageIndex - 1 : amountOfImages - 1;
+
+        setActiveImageIndex(defineShouldBePreviousImageOrLast);
+    };
+    const flipImageRight = (): void => {
+        const defineShouldBeNextImageOrFirst = activeImageIndex === amountOfImages - 1 ? 0 : activeImageIndex + 1;
+
+        setActiveImageIndex(defineShouldBeNextImageOrFirst);
+
+        if (activeImageIndex) {
+            setActiveImageIndex((prev) => prev + 1);
+        } else {
+            setActiveImageIndex(0);
+        }
+    };
     const renderEditSpaceModal = (): JSX.Element | void => {
         if (editSpaceModalIsOpen) {
             return <EditSpaceModal editSpaceModalRef={editSpaceModalRef} />;
@@ -93,11 +124,25 @@ export default function SpacePage(): JSX.Element {
         }
     };
     const renderLockerConnectedStatus = (): JSX.Element => {
-        if (spaceData?.lockerConnected) {
-            return <>connected</>;
-        }
-
-        return <>not connected</>;
+        return spaceData?.lockerConnected ? (
+            <>
+                <div className="icon icon-connection icon-connection--connected">
+                    <FontAwesomeIcon icon={faCheckCircle} />
+                </div>
+                <div className="paragraph-container">
+                    <p className="paragraph">Доступно бесконтактное заселение</p>
+                </div>
+            </>
+        ) : (
+            <>
+                <div className="icon icon-connection icon-connection--not-connected">
+                    <FontAwesomeIcon icon={faTimesCircle} />
+                </div>
+                <div className="paragraph-container">
+                    <p className="paragraph">Владелец пока не подключился к бесконтактному заселению.</p>
+                </div>
+            </>
+        );
     };
     const renderSpaceInitialFields = (): JSX.Element[] => {
         return spaceInitialFields.map((initialField, i: number) => {
@@ -111,6 +156,9 @@ export default function SpacePage(): JSX.Element {
             );
         });
     };
+    const renderAppointment = (): JSX.Element => {
+        return <></>;
+    };
     const renderRemoveButton = (): JSX.Element => {
         return <div className="">{/* TODO */}</div>;
     };
@@ -118,14 +166,26 @@ export default function SpacePage(): JSX.Element {
     useEffect(applyEffectsOnInit, []);
     useEffect(redirectIfSpaceIsNotFound, [fetchSpaceByIdFailureResponse, navigate]);
     useEffect(applyModalEventListenersEffects, [editSpaceModalIsOpen]);
+    useEffect(handleDocumentTitle, [fetchSpaceByIdSuccessResponse]);
+    // календарик полоса с датами все нужно упаковать в один компонент
 
     return (
-        <section className="page space-page-container">
+        <div className="space-page">
             {renderSpaceOwnerMenu()}
             <div className="space-page__flows">
                 <div className="space-page__flows--left">
-                    <div className="space-page__image">
-                        <img src={`/${spaceData?.imagesUrl[0]}` || '/no-space-image.jpg'} alt="Пространство" />
+                    <div className="space__images">
+                        <div className="icon icon-arrow icon-arrow--right" onClick={flipImageLeft}>
+                            <FontAwesomeIcon icon={faChevronLeft} />
+                        </div>
+                        <img
+                            className="space-image"
+                            src={`/${spaceData?.imagesUrl[activeImageIndex]}` || '/no-space-image.jpg'}
+                            alt="Пространство"
+                        />
+                        <div className="icon icon-arrow icon-arrow--right" onClick={flipImageRight}>
+                            <FontAwesomeIcon icon={faChevronRight} />
+                        </div>
                     </div>
                     <div className="space-description-container">
                         <h3 className="heading heading--tertiary space-description-heading">Описание</h3>
@@ -135,12 +195,13 @@ export default function SpacePage(): JSX.Element {
                     </div>
                 </div>
                 <div className="space-page__flows--right">
-                    {renderLockerConnectedStatus()}
+                    <div className="locker-connection-status-bar">{renderLockerConnectedStatus()}</div>
                     {renderSpaceInitialFields()}
+                    {renderAppointment()}
                     {renderRemoveButton()}
                 </div>
             </div>
             {renderEditSpaceModal()}
-        </section>
+        </div>
     );
 }

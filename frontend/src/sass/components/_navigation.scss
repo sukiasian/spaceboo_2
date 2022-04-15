@@ -3,6 +3,11 @@
     width: 200px;
     height: 40px;
     margin-top: 0.9rem;
+    pointer-events: none;
+
+    text {
+        color: blue;
+    }
 }
 
 #city-picker {
@@ -52,6 +57,9 @@ svg {
                 color: $color-grey-dark-1;
             }
         }
+    }
+
+    a {
     }
 }
 

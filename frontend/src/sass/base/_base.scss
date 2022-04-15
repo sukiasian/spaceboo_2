@@ -8,12 +8,8 @@
 
 body {
     box-sizing: border-box;
-
-    @font-face {
-        font-family: SukhumvitSet-Medium;
-        src: url(../../assets/fonts/SukhumvitSet-Medium.ttf);
-    }
 }
+
 .App {
     display: flex;
     flex-direction: column;

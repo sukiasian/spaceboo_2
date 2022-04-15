@@ -8,11 +8,6 @@
 body {
   box-sizing: border-box; }
 
-@font-face {
-  body {
-    font-family: SukhumvitSet-Medium;
-    src: url(../../assets/fonts/SukhumvitSet-Medium.ttf); } }
-
 .App {
   display: flex;
   flex-direction: column;
@@ -68,7 +63,10 @@ a {
   align-self: flex-start;
   width: 200px;
   height: 40px;
-  margin-top: 0.9rem; }
+  margin-top: 0.9rem;
+  pointer-events: none; }
+  #logo text {
+    color: blue; }
 
 #city-picker {
   margin-left: -2rem; }
@@ -651,7 +649,6 @@ input::placeholder {
   flex-direction: column;
   align-items: center; }
   .general-settings__fields {
-    margin-top: 3rem;
     display: grid;
     grid-template-rows: repeat(2, 100px);
     grid-template-columns: repeat(4, 200px);
@@ -747,8 +744,62 @@ input::placeholder {
   .choose-topic p {
     color: #949494; }
 
-.about-page .navtabs {
-  margin-top: 4rem; }
+.about-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f8f8f8;
+  padding: 4rem;
+  margin-top: 2rem; }
+  .about-content__box {
+    width: 70%;
+    background-color: #fff;
+    border-left: 6px solid #fec602;
+    padding: 2rem 4rem;
+    border-radius: 2px;
+    box-shadow: 0 0 1px 3px rgba(209, 209, 209, 0.2); }
+
+.space-page {
+  padding: 2rem; }
+  .space-page__flows {
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 2fr 2fr;
+    grid-gap: 5rem; }
+
+.space__images {
+  display: flex;
+  align-items: center;
+  justify-content: space-around; }
+
+.space-image {
+  width: 60%;
+  height: 30vh;
+  user-select: none;
+  border-radius: 15px;
+  box-shadow: 0 0 1px 3px rgba(209, 209, 209, 0.2); }
+
+.icon-arrow svg {
+  font-size: 35px;
+  color: #b3b3b3; }
+  .icon-arrow svg:hover {
+    color: #ffda55; }
+  .icon-arrow svg:active {
+    color: #fec602;
+    transition: 0.2s; }
+
+.icon-connection--not-connected svg {
+  color: #1476b3; }
+
+.icon-connection---connected svg {
+  color: #fec602; }
+
+.locker-connection-status-bar {
+  display: flex; }
+  .locker-connection-status-bar .paragraph-container {
+    margin-left: 4px; }
+    .locker-connection-status-bar .paragraph-container p {
+      color: #b3b3b3; }
 
 .for-investors-page a {
   color: #ffda55;
