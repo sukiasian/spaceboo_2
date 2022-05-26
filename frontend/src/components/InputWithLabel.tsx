@@ -1,13 +1,13 @@
 import { ChangeEventHandler } from 'react';
 import { IComponentClassNameProps } from '../types/types';
 
-export enum InputTypes {
+export enum InputType {
     PASSWORD = 'password',
     EMAIL = 'email',
     TEXT = 'text',
     TEL = 'tel',
 }
-export enum InputAutoCompleteOptions {
+export enum InputAutoCompleteOption {
     ON = 'on',
     OFF = 'off',
     NEW_PASSWORD = 'new-password',
@@ -19,8 +19,8 @@ export interface IInputWithLableProps extends IComponentClassNameProps {
     inputClassName: string;
     onChange?: ChangeEventHandler<HTMLInputElement>;
     inputPlaceholder?: string;
-    inputType?: InputTypes;
-    inputAutoComplete?: InputAutoCompleteOptions;
+    inputType?: InputType;
+    inputAutoComplete?: InputAutoCompleteOption;
     isRequiredField?: boolean;
     dataTag?: string;
 }
@@ -32,15 +32,15 @@ export interface IFormInputs {
         inputClassName: string;
         inputPlaceholder?: string;
         value?: string;
-        inputAutoComplete?: InputAutoCompleteOptions;
-        inputType?: InputTypes;
-        isRequiredField?: true;
+        inputAutoComplete?: InputAutoCompleteOption;
+        inputType?: InputType;
+        isRequiredField?: boolean;
     };
 }
 
 export default function InputWithLabel(props: IInputWithLableProps) {
-    const inputType = props.inputType || InputTypes.TEXT;
-    const autoComplete = props.inputAutoComplete || InputAutoCompleteOptions.OFF;
+    const inputType = props.inputType || InputType.TEXT;
+    const autoComplete = props.inputAutoComplete || InputAutoCompleteOption.OFF;
     const renderRequiredField = (): JSX.Element | void => {
         if (props.isRequiredField) {
             return <span className="required-field">*</span>;

@@ -2,7 +2,7 @@ import { ChangeEventHandler, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import InputWithLabel, { InputAutoCompleteOptions, IFormInputs, InputTypes } from '../components/InputWithLabel';
+import InputWithLabel, { InputAutoCompleteOption, IFormInputs, InputType } from '../components/InputWithLabel';
 import Alert from '../components/Alert';
 import { handleFormSubmit } from '../utils/utilFunctions';
 import { postLoginUserAction } from '../redux/actions/authActions';
@@ -23,8 +23,8 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
             inputName: 'email',
             inputPlaceholder: 'Имя пользователя/Эл. почта...',
             inputClassName: 'email',
-            inputType: InputTypes.EMAIL,
-            inputAutoComplete: InputAutoCompleteOptions.ON,
+            inputType: InputType.EMAIL,
+            inputAutoComplete: InputAutoCompleteOption.ON,
             isRequiredField: true,
         },
         password: {
@@ -33,8 +33,8 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
             inputName: 'password',
             inputPlaceholder: 'Пароль...',
             inputClassName: 'password',
-            inputType: InputTypes.PASSWORD,
-            inputAutoComplete: InputAutoCompleteOptions.ON,
+            inputType: InputType.PASSWORD,
+            inputAutoComplete: InputAutoCompleteOption.ON,
             isRequiredField: true,
         },
     });

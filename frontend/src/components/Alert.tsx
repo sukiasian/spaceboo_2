@@ -24,12 +24,8 @@ export default function Alert(props: IAlertProps): JSX.Element {
     };
     const defineResponseDataForAlert = () => {
         if (successResponse) {
-            console.log(successResponse.message);
-
             setResponseData({ alertType: AlertType.SUCCESS, message: successResponse.message });
         } else if (failureResponse) {
-            console.log(failureResponse.message);
-
             setResponseData({ alertType: AlertType.FAILURE, message: failureResponse.message });
         }
     };

@@ -1,11 +1,13 @@
 // TODO: перенести все в файлы для каждой страницы. Здесь мы должны использовать только компоненты
 
 .drop-down {
+    position: absolute;
     margin: 1px 0 0 0;
     border: 1px solid $box-border-color;
     border-radius: $box-border-radius;
     box-shadow: $box-shadow;
     padding: 1.5rem;
+    background-color: $color-background-1;
 }
 
 .user-drop-down-menu {
@@ -18,19 +20,41 @@
     border: 1px solid $box-border-color;
     border-radius: $box-border-radius;
     box-shadow: $box-shadow;
+
+    & p,
+    &--item p {
+        color: $color-grey-dark-1;
+        cursor: pointer;
+
+        &:hover {
+            color: $color-primary-1-lightened;
+        }
+    }
+
+    &--item {
+        & p {
+        }
+    }
+
+    &-section {
+        margin: 0 -24px;
+        box-shadow: 0 1px 1px rgba(180, 180, 180, 0.2);
+    }
 }
 
-.filters__sort-by__drop-down-menu {
-    position: absolute;
-    // NOTE: instead of writing plenty of same code we  better use one util selector - .drop-down-menu. margins can be specified
-    // margin-top: 0.25rem;
-    // margin-left: -1rem;
-    border: 1px solid $box-border-color;
-    border-radius: $box-border-radius;
-    box-shadow: $box-shadow;
+#user-drop-down-menu-section-0 {
+    padding: 0px 20px 10px;
+    border-bottom: 1px solid rgba(180, 180, 180, 0.1);
 }
 
-.filters__price-range__drop-down-menu {
+#user-drop-down-menu-section-1 {
+    padding: 10px 20px;
+    border-bottom: 1px solid rgba(180, 180, 180, 0.1);
+}
+
+#user-drop-down-menu-section-2 {
+    padding: 10px 20px 0;
+    box-shadow: 1px 0 rgba(180, 180, 180, 0.2);
 }
 
 .date-picker__control__choose-year-dropdown {

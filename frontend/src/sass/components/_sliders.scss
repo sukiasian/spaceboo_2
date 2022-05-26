@@ -1,3 +1,79 @@
 .slider {
-    margin-top: 2px;
+    width: 97vw;
+    align-self: center;
+    margin-top: 1rem;
+    border-radius: $box-border-radius;
+
+    &__image {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(../../assets/how-it-works-doors.jpg);
+        background-color: rgba(96, 96, 96, 0.5);
+        border-radius: $box-border-radius;
+        box-shadow: $box-shadow;
+        &__content {
+            position: relative;
+            width: 60%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+            &__buttons {
+                display: flex;
+                width: 80%;
+                margin: 0 auto;
+                position: relative;
+                justify-content: space-evenly;
+                margin-top: 2rem;
+            }
+
+            &__button {
+                background-color: transparent;
+                border: 1px solid $color-white;
+
+                &:hover {
+                    background-color: $color-white !important;
+                    color: rgba(0, 0, 0, 0.5) !important;
+                }
+            }
+        }
+    }
+
+    &__move-status {
+        &__active {
+            transform: scale(1.2);
+            background-color: $color-grey-light-2 !important;
+            opacity: 0.8 !important;
+        }
+
+        &-bar {
+            justify-content: center;
+            margin-top: 3rem;
+
+            &-elem {
+                width: 8px;
+                height: 8px;
+                background-color: rgba(255, 255, 255, 0.9);
+                opacity: 0.2;
+                border: 1px $color-grey-dark-1;
+                border-radius: 100px;
+                margin: 5px;
+
+                .active {
+                    opacity: 1;
+                    transform: translate(1, 1);
+                }
+
+                &:hover:not(.active) {
+                    background-color: $color-grey-light-2 !important;
+                    opacity: 0.5 !important;
+                    transition: 0.2s;
+                }
+            }
+        }
+    }
+}
+
+.slider__text {
+    color: $color-white;
+    user-select: none;
+    text-align: center;
 }

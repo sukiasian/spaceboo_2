@@ -2,7 +2,7 @@ import { ChangeEventHandler, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import InputWithLabel, { IFormInputs, InputAutoCompleteOptions, InputTypes } from '../components/InputWithLabel';
+import InputWithLabel, { IFormInputs, InputAutoCompleteOption, InputType } from '../components/InputWithLabel';
 import { postSendVerificationCodeAction } from '../redux/actions/emailVerificationActions';
 import { EmailPurpose, IPostSendVerificationEmailPayload } from '../redux/reducers/emailVerificationReducer';
 import { LocalStorageItem } from '../types/types';
@@ -50,7 +50,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
             inputName: 'email',
             inputPlaceholder: 'Имя пользователя/Эл. почта...',
             inputClassName: 'email',
-            inputType: InputTypes.EMAIL,
+            inputType: InputType.EMAIL,
             isRequiredField: true,
         },
         password: {
@@ -59,8 +59,8 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
             inputName: 'password',
             inputPlaceholder: 'Пароль...',
             inputClassName: 'password',
-            inputType: InputTypes.PASSWORD,
-            inputAutoComplete: InputAutoCompleteOptions.NEW_PASSWORD,
+            inputType: InputType.PASSWORD,
+            inputAutoComplete: InputAutoCompleteOption.NEW_PASSWORD,
             isRequiredField: true,
         },
         passwordConfirmation: {
@@ -69,7 +69,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
             inputName: 'passwordConfirmation',
             inputPlaceholder: 'Подтверждение пароля...',
             inputClassName: 'password',
-            inputType: InputTypes.PASSWORD,
+            inputType: InputType.PASSWORD,
             isRequiredField: true,
         },
     });

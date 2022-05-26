@@ -1,28 +1,27 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import NavTabs, { INavTab } from '../components/NavTabs';
+import Titles from '../components/Titles';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import MyAppointmentsPageRoutes from '../routes/MyAppointmentsPageRoutes';
-import { ITab } from '../types/types';
-import { defineActiveClassName } from '../utils/utilFunctions';
 
 export default function MyAppointmentsPage(): JSX.Element {
-    const a = useSelector((state: IReduxState) => state.commonStorage);
-    const appointmentsClassificationLinkableTabs: ITab[] = [
+    const appointmentsClassificationLinkableTabs: INavTab[] = [
         {
-            tabName: 'Прошедшие',
+            name: 'Прошедшие',
             linkTo: 'outdated',
         },
         {
-            tabName: 'Активные',
+            name: 'Активные',
             linkTo: 'active',
         },
         {
-            tabName: 'Предстоящие',
+            name: 'Предстоящие',
             linkTo: 'upcoming',
         },
     ];
-    const [activeTab, setActiveTab] = useState(appointmentsClassificationLinkableTabs[1].tabName);
+    const [activeTab, setActiveTab] = useState(appointmentsClassificationLinkableTabs[1].name);
     const { myAppointmentsFinalLocationIsDefined } = useSelector((state: IReduxState) => state.commonStorage);
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -42,27 +41,17 @@ export default function MyAppointmentsPage(): JSX.Element {
             setActiveTab(tab);
         };
     };
-    const renderTabsBar = (): JSX.Element[] => {
-        return appointmentsClassificationLinkableTabs.map((tab, i: number) => {
-            return (
-                <NavLink to={tab.linkTo!} key={i}>
-                    <div
-                        className={defineActiveClassName(activeTab, tab.tabName)}
-                        onClick={handleActiveTab(tab.tabName)}
-                    >
-                        <p className="paragraph">{tab.tabName}</p>
-                    </div>
-                </NavLink>
-            );
-        });
+    const renderTabsBar = (): JSX.Element => {
+        return <NavTabs tabs={appointmentsClassificationLinkableTabs} />;
     };
 
     useEffect(applyEffectsOnInit, []);
 
     return (
-        <section className="my-appointments-page-section">
+        <div className="page my-appointments-page">
+            <Titles heading="Мои бронирования" paragraph="Здесь можно управлять бронированиями." />
             <div className="type-of-appointments-tabs-bar">{renderTabsBar()}</div>
             <MyAppointmentsPageRoutes />
-        </section>
+        </div>
     );
 }

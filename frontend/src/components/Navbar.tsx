@@ -29,12 +29,15 @@ export default function Navbar(): JSX.Element {
 
         return UrlPathname.PROVIDE_SPACE;
     };
-    const defineActiveClassName = (tab: string): string => {
+    const defineActiveClassNameForTab = (tab: string): string => {
         if (activeTab === tab) {
             return 'active';
         }
 
         return '';
+    };
+    const defineActiveClassNameForUserAvatarOrInitials = (): string => {
+        return userDropdownMenuIsOpen ? 'active' : '';
     };
     const handleActiveTab = (tab: string): (() => void) => {
         return (): void => {
@@ -55,6 +58,13 @@ export default function Navbar(): JSX.Element {
             handleToggleUserDropdownMenu();
         }
     };
+    const closeUserDropdownMenuWhenClickingOutside = () => {
+        document.onclick = (e) => {
+            if (userDropdownMenuIsOpen && e.target !== userDropdownMenuRef.current) {
+                handleToggleUserDropdownMenu();
+            }
+        };
+    };
     // TODO: решить где это будет - всплывающее уведомление как отдельный тип уведомлений.
     const renderAuthTabsOpeningModals = (): JSX.Element | void => {
         if (!userLoginState?.loggedIn) {
@@ -62,7 +72,7 @@ export default function Navbar(): JSX.Element {
                 <>
                     <LoginModal
                         mainDivClassName="navbar__login navbar-elem navbar-elem--4"
-                        defineActiveClassName={defineActiveClassName}
+                        defineActiveClassName={defineActiveClassNameForTab}
                         handleActiveTab={handleActiveTab}
                     />
                     <div className="navbar__separator navbar-elem navbar-elem--5">
@@ -70,7 +80,7 @@ export default function Navbar(): JSX.Element {
                     </div>
                     <SignupModal
                         mainDivClassName="navbar__signup navbar-elem navbar-elem--6"
-                        defineActiveClassName={defineActiveClassName}
+                        defineActiveClassName={defineActiveClassNameForTab}
                         handleActiveTab={handleActiveTab}
                     />
                 </>
@@ -86,7 +96,7 @@ export default function Navbar(): JSX.Element {
                 <>
                     <NavLink to={UrlPathname.LOGIN} className="navbar-link">
                         <div
-                            className={`heading heading--tertiary ${defineActiveClassName('login')}`}
+                            className={`heading heading--tertiary ${defineActiveClassNameForTab('login')}`}
                             onClick={handleActiveTab('login')}
                         >
                             Войти
@@ -97,7 +107,7 @@ export default function Navbar(): JSX.Element {
                     </div>
                     <NavLink to={UrlPathname.SIGNUP} className="navbar-link">
                         <div
-                            className={`heading heading--tertiary ${defineActiveClassName('signup')}`}
+                            className={`heading heading--tertiary ${defineActiveClassNameForTab('signup')}`}
                             onClick={handleActiveTab('signup')}
                         >
                             Зарегистрируйтесь
@@ -111,7 +121,7 @@ export default function Navbar(): JSX.Element {
         if (userLoginState?.loggedIn) {
             return (
                 <div
-                    className="navbar__user navbar-elem navbar-elem--4"
+                    className={`navbar__user navbar-elem navbar-elem--4 ${defineActiveClassNameForUserAvatarOrInitials()}`}
                     onClick={handleToggleUserDropdownMenu}
                     ref={userDropdownMenuRef}
                 >
@@ -125,13 +135,6 @@ export default function Navbar(): JSX.Element {
         if (userDropdownMenuIsOpen) {
             return <UserDropdownMenu />;
         }
-    };
-    const closeUserDropdownMenuWhenClickingOutside = () => {
-        document.onclick = (e) => {
-            if (userDropdownMenuIsOpen && e.target !== userDropdownMenuRef.current) {
-                handleToggleUserDropdownMenu();
-            }
-        };
     };
 
     useEffect(refreshUserLoggedInAfterLogout, [fetchLogoutUserSuccessResponse, dispatch]);
@@ -147,7 +150,7 @@ export default function Navbar(): JSX.Element {
             <div className="navbar__city-picker navbar-elem navbar-elem--1">
                 <CityPicker
                     mainDivClassName=""
-                    defineActiveClassName={defineActiveClassName}
+                    defineActiveClassName={defineActiveClassNameForTab}
                     handleActiveTab={handleActiveTab}
                 />
             </div>

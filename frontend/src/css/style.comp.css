@@ -97,6 +97,15 @@ svg {
     color: #fec602; }
   .navbar-link a:visited:not(:active):not(:hover) {
     color: #2b2b2b; }
+  .navbar__user {
+    width: 50px;
+    height: 50px; }
+    .navbar__user.active {
+      outline: 2px solid #1476b3;
+      border-radius: 100px; }
+    .navbar__user:hover:not(.active) {
+      outline: 2px solid rgba(20, 118, 179, 0.3);
+      border-radius: 100px; }
 
 .active {
   color: #fec602; }
@@ -244,11 +253,13 @@ svg {
   font-weight: 700; }
 
 .drop-down {
+  position: absolute;
   margin: 1px 0 0 0;
   border: 1px solid rgba(208, 208, 208, 0.4);
   border-radius: 15px;
   box-shadow: 0 0 1px 3px rgba(209, 209, 209, 0.2);
-  padding: 1.5rem; }
+  padding: 1.5rem;
+  background-color: #fff; }
 
 .user-drop-down-menu {
   position: absolute;
@@ -260,12 +271,28 @@ svg {
   border: 1px solid rgba(208, 208, 208, 0.4);
   border-radius: 15px;
   box-shadow: 0 0 1px 3px rgba(209, 209, 209, 0.2); }
+  .user-drop-down-menu p,
+  .user-drop-down-menu--item p {
+    color: #2b2b2b;
+    cursor: pointer; }
+    .user-drop-down-menu p:hover,
+    .user-drop-down-menu--item p:hover {
+      color: #ffda55; }
+  .user-drop-down-menu-section {
+    margin: 0 -24px;
+    box-shadow: 0 1px 1px rgba(180, 180, 180, 0.2); }
 
-.filters__sort-by__drop-down-menu {
-  position: absolute;
-  border: 1px solid rgba(208, 208, 208, 0.4);
-  border-radius: 15px;
-  box-shadow: 0 0 1px 3px rgba(209, 209, 209, 0.2); }
+#user-drop-down-menu-section-0 {
+  padding: 0px 20px 10px;
+  border-bottom: 1px solid rgba(180, 180, 180, 0.1); }
+
+#user-drop-down-menu-section-1 {
+  padding: 10px 20px;
+  border-bottom: 1px solid rgba(180, 180, 180, 0.1); }
+
+#user-drop-down-menu-section-2 {
+  padding: 10px 20px 0;
+  box-shadow: 1px 0 rgba(180, 180, 180, 0.2); }
 
 .date-picker__control__choose-year-dropdown {
   position: absolute;
@@ -288,7 +315,9 @@ svg {
   border: 1px solid rgba(109, 109, 109, 0.5); }
 
 .user-avatar-or-initials {
-  cursor: pointer; }
+  cursor: pointer;
+  width: 50px;
+  height: 50px; }
 
 .user-no-avatar {
   width: 50px;
@@ -310,8 +339,9 @@ svg {
   top: 50%;
   left: 50%;
   color: #fff;
-  font-size: 1.5rem;
-  letter-spacing: 1px; }
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+  margin-top: -2px; }
   .user-initials__letters {
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -356,26 +386,48 @@ svg {
 .filters-section {
   margin-top: 4rem;
   display: flex;
-  justify-content: space-evenly; }
+  justify-content: space-evenly;
+  width: 90%; }
 
 .filter {
-  padding: 0.2rem 1.5rem;
-  color: #b3b3b3;
+  color: #1476b3;
   font-weight: 400;
-  border: 1px solid rgba(208, 208, 208, 0.4);
-  border-radius: 20px; }
+  border: 1px solid #2b99dd;
+  border-radius: 20px;
+  padding: 0.2rem 1.5rem;
+  cursor: pointer;
+  user-select: none; }
+  .filter:hover {
+    border: 1px solid #1476b3;
+    transition: 0.2s; }
+  .filter .date-picker {
+    width: 22rem;
+    margin-top: 5px;
+    color: #2b2b2b; }
 
 .filters__sort-by {
-  max-height: 2.5rem; }
+  max-height: 2.5rem;
+  max-width: 150px; }
+  .filters__sort-by__drop-down {
+    min-width: max-content;
+    margin: 5px 0 0 -4rem;
+    z-index: 1000;
+    color: #2b2b2b; }
 
 .filters__price-range {
-  max-height: 2.5rem; }
+  max-height: 2.5rem;
+  max-width: 100px; }
+  .filters__price-range__drop-down {
+    min-width: max-content;
+    margin: 5px 0 0 -6.4rem;
+    color: #2b2b2b; }
+
+.filters__required-reservation-dates-picker__content {
+  display: flex;
+  justify-content: space-between; }
 
 .filters__required-reservation-dates-picker {
-  width: 18.5rem; }
-  .filters__required-reservation-dates-picker__content {
-    display: flex;
-    justify-content: space-between; }
+  min-width: 350px; }
 
 .modal {
   position: absolute;
@@ -410,7 +462,8 @@ svg {
   display: flex;
   flex-direction: column;
   margin-top: 2.8rem;
-  margin-bottom: 5rem; }
+  margin-bottom: 5rem;
+  align-items: center; }
   .titles__heading-container {
     align-self: center; }
   .titles__paragraph {
@@ -418,7 +471,61 @@ svg {
     font-size: 1.2rem; }
 
 .slider {
-  margin-top: 2px; }
+  width: 97vw;
+  align-self: center;
+  margin-top: 1rem;
+  border-radius: 15px; }
+  .slider__image {
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(../../assets/how-it-works-doors.jpg);
+    background-color: rgba(96, 96, 96, 0.5);
+    border-radius: 15px;
+    box-shadow: 0 0 1px 3px rgba(209, 209, 209, 0.2); }
+    .slider__image__content {
+      position: relative;
+      width: 60%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%); }
+      .slider__image__content__buttons {
+        display: flex;
+        width: 80%;
+        margin: 0 auto;
+        position: relative;
+        justify-content: space-evenly;
+        margin-top: 2rem; }
+      .slider__image__content__button {
+        background-color: transparent;
+        border: 1px solid #fff; }
+        .slider__image__content__button:hover {
+          background-color: #fff !important;
+          color: rgba(0, 0, 0, 0.5) !important; }
+  .slider__move-status__active {
+    transform: scale(1.2);
+    background-color: #faf9f9 !important;
+    opacity: 0.8 !important; }
+  .slider__move-status-bar {
+    justify-content: center;
+    margin-top: 3rem; }
+    .slider__move-status-bar-elem {
+      width: 8px;
+      height: 8px;
+      background-color: rgba(255, 255, 255, 0.9);
+      opacity: 0.2;
+      border: 1px #2b2b2b;
+      border-radius: 100px;
+      margin: 5px; }
+      .slider__move-status-bar-elem .active {
+        opacity: 1;
+        transform: translate(1, 1); }
+      .slider__move-status-bar-elem:hover:not(.active) {
+        background-color: #faf9f9 !important;
+        opacity: 0.5 !important;
+        transition: 0.2s; }
+
+.slider__text {
+  color: #fff;
+  user-select: none;
+  text-align: center; }
 
 .row {
   display: flex;

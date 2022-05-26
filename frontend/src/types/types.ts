@@ -1,5 +1,10 @@
 import { MouseEventHandler } from 'react';
 
+interface HTMLIdentityAttributes {
+    className?: string;
+    id?: string;
+}
+
 export interface IResIsoDatesReserved {
     beginningDate: string;
     beginningTime: string;
@@ -29,10 +34,9 @@ export interface ITimeUnits {
     seconds?: number;
 }
 
-export interface ITab {
+export interface ITab extends HTMLIdentityAttributes {
     tabName: string;
     linkTo?: string;
-    className?: string;
     onClick?: (...props: any) => MouseEventHandler | void;
 }
 

@@ -17,6 +17,18 @@ type TSlide = {
     buttons: ISlideButton[];
 };
 
+// TODO:  проблему с мерцанием при открытии вкладки со spaceboo после других вкладок
+// вероятно можно решить если установить слушатель событий который при
+// смене вкладки удалит все интервалы и наоборот
+/* 
+document.addEventListener("visibilitychange", (event) => {
+  if (document.visibilityState == "visible") {
+    console.log("tab is active") -- добавить интервал (начать все заново)
+  } else {
+    console.log("tab is inactive") -- удалить интервал
+  }
+});
+*/
 export default function Slider(props: ISliderProps): JSX.Element {
     const buttonToHowItWorks: ISlideButton = {
         to: UrlPathname.HOW_IT_WORKS,
@@ -35,7 +47,7 @@ export default function Slider(props: ISliderProps): JSX.Element {
             ],
         },
         {
-            imageUrl: '12.jpg',
+            imageUrl: 'flats.jpg',
             message:
                 'Заселяйтесь в жилье в любое время, не дожидаясь, пока вам привезут ключи. Бесконтактно. Безопасно.',
             buttons: [
@@ -55,13 +67,10 @@ export default function Slider(props: ISliderProps): JSX.Element {
     const sliderIntervalRef = useRef<NodeJS.Timeout>();
     const opacityChangeRef = useRef<NodeJS.Timeout>();
     const applyEffectsOnInit = (): (() => void) => {
-        // NOTE возможно из за того что мы диспатчим в App-е мы получаем несколько ререндеров здесь прежде чем страница загрузится.
-        // Посему мы можем в App.tsx создать переменную в редакс которая будет хранить в себе appIsMounted: boolean;
-
         if (!sliderIntervalIsOn && slides.length !== 1) {
             sliderIntervalRef.current = setInterval(() => {
                 setIndexOfActiveImage((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
-            }, 7000);
+            }, 14000);
 
             setSliderIntervalIsOn(true);
         }
@@ -73,8 +82,8 @@ export default function Slider(props: ISliderProps): JSX.Element {
     };
 
     const changeSliderImage = (): void => {
-        sliderImageRef.current!.style.backgroundImage = `url('/images/slider/${slides[indexOfActiveImage].imageUrl}')`;
-        sliderImageRef.current!.style.width = `${window.screen.width}px`;
+        sliderImageRef.current!.style.background = `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/images/slider/${slides[indexOfActiveImage].imageUrl}')`;
+        sliderImageRef.current!.style.backgroundColor = 'rgba(96, 96, 96, 0.5)';
         sliderImageRef.current!.style.height = '400px';
 
         let opacity = 0.5;
@@ -96,7 +105,7 @@ export default function Slider(props: ISliderProps): JSX.Element {
                 clearInterval(sliderIntervalRef.current!);
                 sliderIntervalRef.current = setInterval(() => {
                     setIndexOfActiveImage((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
-                }, 7000);
+                }, 15000);
 
                 setIndexOfActiveImage(i);
             }
@@ -113,16 +122,10 @@ export default function Slider(props: ISliderProps): JSX.Element {
         const statusBar = slides.map((slide: TSlide, i: number) => {
             return (
                 <div
-                    className={`slider__move-status-bar__elem slider__move-status-bar__elem--${i} ${defineSliderActiveImageClassName(
+                    className={`slider__move-status-bar-elem slider__move-status-bar__elem--${i} ${defineSliderActiveImageClassName(
                         i
                     )}`}
                     onClick={handleSliderImageFromMoveStatusBarOnClick(i)}
-                    style={{
-                        width: '30px',
-                        height: '30px',
-                        backgroundColor: 'blue',
-                        margin: '5px',
-                    }}
                     key={i}
                 ></div>
             );
@@ -140,7 +143,7 @@ export default function Slider(props: ISliderProps): JSX.Element {
                 <NavLink to={button.to} key={i}>
                     <AltButton
                         buttonText={button.buttonText}
-                        additionalClassNames="slider__image__content__buttons--i"
+                        additionalClassNames={`slider__image__content__button slider__image__content__button--${i}`}
                     />
                 </NavLink>
             );
@@ -148,13 +151,14 @@ export default function Slider(props: ISliderProps): JSX.Element {
 
         return (
             <div className="slider__image__content">
-                <h1
-                    className="slider__image__content__message heading heading--primary"
+                <h2
+                    className="heading heading--secondary slider__text heading heading--primary"
                     ref={sliderImageContentMessageRef}
                 >
                     {slides[indexOfActiveImage].message}
-                </h1>
+                </h2>
                 <div className="slider__image__content__buttons">{buttons}</div>
+                {renderSliderMoveStatusBar()}
             </div>
         );
     };
@@ -165,9 +169,9 @@ export default function Slider(props: ISliderProps): JSX.Element {
     return (
         <section className="slider-section">
             <div className="slider">
-                <div className="slider__image" ref={sliderImageRef}></div>
-                {renderSlideContent()}
-                {renderSliderMoveStatusBar()}
+                <div className="slider__image" ref={sliderImageRef}>
+                    {renderSlideContent() as JSX.Element}
+                </div>
             </div>
         </section>
     );

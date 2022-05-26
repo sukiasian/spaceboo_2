@@ -33,15 +33,28 @@ export default function UserDropdownMenu(): JSX.Element {
         },
         {
             tabName: 'Мои ключи',
-            className: 'with-lower-border',
+            className: 'with-lower-border needs-separator',
             linkTo: '/keys',
-        },
-        {
-            tabName: 'Настройки',
-            className: 'with-lower-border',
-            linkTo: '/user/settings/general',
+            id: 'user-dropdown-menu__my-keys',
         },
     ];
+    const addSeparators = (): void => {
+        const userFullName = document.getElementById('user-dropdown-menu__full-name');
+        const myKeysDiv = document.getElementById('user-dropdown-menu__my-keys');
+        const separator = document.createElement('div');
+
+        separator.classList.add('something');
+        separator.style.width = '200px';
+        separator.style.height = '5px';
+        separator.style.marginLeft = '-20px';
+        separator.style.backgroundColor = 'red';
+        separator.style.marginRight = '-20px';
+        separator.style.border = '1px solid red';
+        console.log(userFullName);
+
+        myKeysDiv?.insertBefore(separator.cloneNode(true), null);
+        userFullName?.insertBefore(separator.cloneNode(true), null);
+    };
     const handleLogout = (): void => {
         dispatch(postLogoutUserAction());
     };
@@ -59,7 +72,8 @@ export default function UserDropdownMenu(): JSX.Element {
                     className={`user-drop-down-menu__option user-drop-down-menu__option--${i + 1} ${
                         linkableTab.className
                     }`}
-                    onClick={linkableTab.onClick}
+                    onClick={linkableTab.onClick ?? undefined}
+                    id={linkableTab.id ?? undefined}
                     key={i}
                 >
                     <p className="paragraph">{linkableTab.tabName}</p>
@@ -68,24 +82,40 @@ export default function UserDropdownMenu(): JSX.Element {
         });
     };
 
+    // useEffect(addSeparators, []);
     useEffect(refreshUserLoggedInAfterLogout, [fetchLogoutUserSuccessResponse, dispatch]);
 
     return (
         <div className="user-drop-down-menu">
-            <div
-                className="user-drop-down-menu__option user-drop-down-menu__option--0 with-lower-border"
-                onClick={(e) => {
-                    e.stopPropagation();
-                }}
-            >
-                <p>{userFullName}</p>
+            <div className="user-drop-down-menu-section">
+                <NavLink to="/user/settings/general">
+                    <div
+                        id="user-drop-down-menu-section-0"
+                        className="user-drop-down-menu__option user-drop-down-menu__option--0 with-lower-border"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                        }}
+                    >
+                        <p className="paragraph">{userFullName}</p>
+                    </div>
+                </NavLink>
             </div>
-            {renderTabs()}
             <div
-                className={`user-drop-down-menu__item user-drop-down-menu__item--${dropdownLinkableTabs.length}`}
-                onClick={handleLogout}
+                id="user-drop-down-menu-section-1"
+                className="user-drop-down-menu-section user-drop-down-menu-section--1"
             >
-                <p className="paragraph">Выход</p>
+                {renderTabs()}
+            </div>
+            <div
+                id="user-drop-down-menu-section-2"
+                className="user-drop-down-menu-section user-drop-down-menu-section--2"
+            >
+                <div
+                    className={`user-drop-down-menu__item user-drop-down-menu__item--${dropdownLinkableTabs.length}`}
+                    onClick={handleLogout}
+                >
+                    <p className="paragraph">Выход</p>
+                </div>
             </div>
         </div>
     );

@@ -11,11 +11,11 @@ class UserController extends Singleton {
 
     public editUser = UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const { id: userId } = req.user;
-        const { userEditData } = req.body;
 
         // TODO чтобы решить проблему раздвоения методов (пароль можно изменить и с помощью даного метода и с помощью )
         // кстати при смене пароля нужно учитывать старый пароль
-        await this.dao.editUser(userId, userEditData);
+        await this.dao.editUser(userId, req.body);
+        console.log(req.body);
 
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.DATA_UPDATED);
     });

@@ -1,7 +1,7 @@
 import { ChangeEventHandler, MouseEventHandler, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faTimes } from '@fortawesome/free-solid-svg-icons';
-import InputWithLabel, { IInputWithLableProps, InputTypes } from './InputWithLabel';
+import InputWithLabel, { IInputWithLableProps, InputType } from './InputWithLabel';
 import { useDispatch, useSelector } from 'react-redux';
 import QueryDatePicker from './QueryDatePicker';
 import { setFetchSpacesQueryDataAction } from '../redux/actions/spaceActions';
@@ -74,7 +74,7 @@ export default function Filters(): JSX.Element {
         },
     ];
     const { fetchSpacesQueryData } = useSelector((state: IReduxState) => state.spaceStorage);
-    const annualizeDatesIconRef = useRef<HTMLSpanElement>(null);
+    const annualizeDatesIconRef = useRef<HTMLDivElement>(null);
     const priceRangeInputs: IPriceRangeInput[] = [
         {
             inputLabel: 'От',
@@ -190,7 +190,7 @@ export default function Filters(): JSX.Element {
                 }
             );
 
-            return <div className="filters__sort-by__drop-down-menu">{sortByDropDownOptionsRender}</div>;
+            return <div className="drop-down filters__sort-by__drop-down">{sortByDropDownOptionsRender}</div>;
         }
     };
     const renderPriceRangeInputs = (): JSX.Element | void => {
@@ -202,7 +202,7 @@ export default function Filters(): JSX.Element {
                         inputClassName={priceRangeInput.inputClassName}
                         inputLabel={priceRangeInput.inputLabel}
                         inputName={priceRangeInput.inputName}
-                        inputType={InputTypes.TEL}
+                        inputType={InputType.TEL}
                         onChange={updateQueryDataPriceRange}
                         dataTag={priceRangeInput.priceRangeQueryDataReference}
                         key={i}
@@ -210,7 +210,7 @@ export default function Filters(): JSX.Element {
                 );
             });
 
-            return <div className="filters__price-range__drop-down-menu drop-down-menu">{inputs}</div>;
+            return <div className="drop-down filters__price-range__drop-down">{inputs}</div>;
         }
     };
     const renderRequiredReservationDatesRange = (): JSX.Element | void => {
@@ -220,13 +220,15 @@ export default function Filters(): JSX.Element {
 
         return (
             <div className="dates-range">
-                <p className="paragraph paragraph--light paragraph--filters__reservation-date-picker">
-                    {requiredReservationDates}
-                </p>
+                <div className="paragraph-container">
+                    <p className="paragraph paragraph--light paragraph--filters__reservation-date-picker">
+                        {requiredReservationDates}
+                    </p>
+                </div>
                 {datesForRender ? (
-                    <span ref={annualizeDatesIconRef}>
+                    <div ref={annualizeDatesIconRef}>
                         <FontAwesomeIcon icon={faTimes} onClick={annualizeRequiredReservationDatesRangeFilter} />
-                    </span>
+                    </div>
                 ) : null}
             </div>
         );
@@ -251,15 +253,19 @@ export default function Filters(): JSX.Element {
     return (
         <section className="filters-section">
             <div className="filter filters__sort-by">
-                <h3 className="heading heading--tertiary" onClick={toggleFilterBoxIsOpen(FilterNames.SORT_BY)}>
-                    Сортировка<span className={defineFilterBoxArrowClassName(sortByDropDownBoxIsOpen)}>^</span>
-                </h3>
+                <div className="heading-container">
+                    <h3 className="heading heading--tertiary" onClick={toggleFilterBoxIsOpen(FilterNames.SORT_BY)}>
+                        Сортировка<span className={defineFilterBoxArrowClassName(sortByDropDownBoxIsOpen)}>^</span>
+                    </h3>
+                </div>
                 {renderSortByFilterDropDown()}
             </div>
             <div className="filter filters__price-range">
-                <h3 className="heading heading--tertiary" onClick={toggleFilterBoxIsOpen(FilterNames.PRICE)}>
-                    Цена<span className={defineFilterBoxArrowClassName(priceRangeDropDownBoxIsOpen)}>^</span>
-                </h3>
+                <div className="heading-container">
+                    <h3 className="heading heading--tertiary" onClick={toggleFilterBoxIsOpen(FilterNames.PRICE)}>
+                        Цена<span className={defineFilterBoxArrowClassName(priceRangeDropDownBoxIsOpen)}>^</span>
+                    </h3>
+                </div>
                 {renderPriceRangeInputs()}
             </div>
             <div className="filter filters__required-reservation-dates-picker">

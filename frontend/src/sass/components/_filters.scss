@@ -2,28 +2,55 @@
     margin-top: 4rem;
     display: flex;
     justify-content: space-evenly;
+    width: 90%;
 }
 
 .filter {
-    padding: 0.2rem 1.5rem;
-    color: $color-grey-light-3;
+    color: $color-primary-2;
     font-weight: 400;
-    border: 1px solid $box-border-color;
+    border: 1px solid $color-primary-2-lightened;
     border-radius: 20px;
+    padding: 0.2rem 1.5rem;
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+        border: 1px solid $color-primary-2;
+        transition: 0.2s;
+    }
+
+    .date-picker {
+        width: 22rem;
+        margin-top: 5px;
+        color: $color-grey-dark-1;
+    }
 }
 
 .filters {
     &__sort-by {
         max-height: 2.5rem;
+        max-width: 150px;
+
+        &__drop-down {
+            min-width: max-content;
+            margin: 5px 0 0 -4rem;
+            z-index: 1000;
+            color: $color-grey-dark-1;
+        }
     }
 
     &__price-range {
         max-height: 2.5rem;
+        max-width: 100px;
+
+        &__drop-down {
+            min-width: max-content;
+            margin: 5px 0 0 -6.4rem;
+            color: $color-grey-dark-1;
+        }
     }
 
     &__required-reservation-dates-picker {
-        width: 18.5rem;
-
         &__content {
             display: flex;
             justify-content: space-between;
@@ -31,5 +58,9 @@
 
         &__calendar {
         }
+    }
+
+    &__required-reservation-dates-picker {
+        min-width: 350px;
     }
 }

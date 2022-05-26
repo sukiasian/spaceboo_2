@@ -1,6 +1,6 @@
 import { ChangeEventHandler, MouseEventHandler, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { putEditUserAction, setEditUserData } from '../redux/actions/userActions';
+import { fetchCurrentUserAction, putEditUserAction, setEditUserData } from '../redux/actions/userActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { IEditUserData } from '../redux/reducers/userReducer';
 import { EventKey, IComponentClassNameProps } from '../types/types';
@@ -21,9 +21,8 @@ interface IField {
 export default function EditUserInputs(): JSX.Element {
     const [openedInput, setOpenedInput] = useState<keyof IEditUserData | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
-    const { fetchCurrentUserSuccessResponse, fetchCurrentUserFailureResponse } = useSelector(
-        (state: IReduxState) => state.userStorage
-    );
+    const { fetchCurrentUserSuccessResponse, fetchCurrentUserFailureResponse, putEditUserSuccessResponse } =
+        useSelector((state: IReduxState) => state.userStorage);
     const { editUserData } = useSelector((state: IReduxState) => state.userStorage);
     const fields: IField[] = [
         {
@@ -42,6 +41,7 @@ export default function EditUserInputs(): JSX.Element {
             placeholder: 'Отчество...',
         },
     ];
+
     const userData = fetchCurrentUserSuccessResponse?.data;
     const setPlaceholderForInput = (): void => {
         if (inputRef.current?.value.length === 0) {
@@ -58,7 +58,8 @@ export default function EditUserInputs(): JSX.Element {
     };
     const saveInputValueOnOutsideClick = (e: MouseEvent): any => {
         if (checkIfClickedOutside(e.target!) && openedInput) {
-            // dispatch to edit user
+            console.log(editUserData);
+
             dispatch(putEditUserAction(editUserData!));
             closeInput();
         }
@@ -66,6 +67,7 @@ export default function EditUserInputs(): JSX.Element {
     const saveInputValueOnEnter = (e: KeyboardEvent): any => {
         if (openedInput && e.key === EventKey.ENTER) {
             // dispatch to edit user
+            dispatch(putEditUserAction(editUserData!));
             closeInput();
         }
     };
@@ -147,6 +149,11 @@ export default function EditUserInputs(): JSX.Element {
             throw new Error();
         }
     };
+    const updateUserData = (): void => {
+        console.log(11111);
+
+        dispatch(fetchCurrentUserAction());
+    };
     const renderUserEditFields = (): JSX.Element[] => {
         return fields.map((field, i: number) => {
             return (
@@ -190,6 +197,7 @@ export default function EditUserInputs(): JSX.Element {
     useEffect(focusOnInput);
     useEffect(applyOpenedInputEventListenersEffects, [openedInput]);
     useEffect(setPlaceholderForInput, [inputRef.current?.value]);
+    console.log(putEditUserSuccessResponse);
 
     return (
         <>
@@ -203,5 +211,15 @@ export default function EditUserInputs(): JSX.Element {
 
 Задача 1: при нажатии на элемент изначальное значение должно равняться значению 
 Задача 2: при нажатии на элемент 
+
+*/
+/* 
+
+Как мы можем поступить 
+
+при нажатии outside либо enter происходит input change (инпут записывается в editUserData)
+При изменении editUserData происходит эффект - отправляется запрос на изменение. Валидаторы должны быть на фронте - 
+они не допустят отправки запроса (когда отправляются новые данные но приходит отказ
+    а страница сама с новыми данными)
 
 */
