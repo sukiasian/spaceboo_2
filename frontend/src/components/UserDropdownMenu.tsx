@@ -38,23 +38,6 @@ export default function UserDropdownMenu(): JSX.Element {
             id: 'user-dropdown-menu__my-keys',
         },
     ];
-    const addSeparators = (): void => {
-        const userFullName = document.getElementById('user-dropdown-menu__full-name');
-        const myKeysDiv = document.getElementById('user-dropdown-menu__my-keys');
-        const separator = document.createElement('div');
-
-        separator.classList.add('something');
-        separator.style.width = '200px';
-        separator.style.height = '5px';
-        separator.style.marginLeft = '-20px';
-        separator.style.backgroundColor = 'red';
-        separator.style.marginRight = '-20px';
-        separator.style.border = '1px solid red';
-        console.log(userFullName);
-
-        myKeysDiv?.insertBefore(separator.cloneNode(true), null);
-        userFullName?.insertBefore(separator.cloneNode(true), null);
-    };
     const handleLogout = (): void => {
         dispatch(postLogoutUserAction());
     };

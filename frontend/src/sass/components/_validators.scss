@@ -1,0 +1,8 @@
+.validator {
+    &--allowed {
+        outline: 1px solid green;
+    }
+    &--disallowed {
+        outline: 1px solid red;
+    }
+}

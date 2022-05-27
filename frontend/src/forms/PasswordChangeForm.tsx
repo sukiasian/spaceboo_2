@@ -64,12 +64,15 @@ export function PasswordChangeForm(): JSX.Element {
                         </label>
                         <RequiredField />
                     </div>
-                    <input
-                        placeholder={`${input.label}...`}
-                        type="password"
-                        autoComplete="true"
-                        onChange={input.handleChange}
-                    />
+                    <div className="inputs-container password-change__input-container">
+                        <input
+                            className="input password-change__input"
+                            placeholder={`${input.label}...`}
+                            type="password"
+                            autoComplete="true"
+                            onChange={input.handleChange}
+                        />
+                    </div>
                 </div>
             );
         });

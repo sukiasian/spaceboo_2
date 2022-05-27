@@ -1,12 +1,49 @@
 // NOTE: can be generalized for all dashboard-type pages
 .settings-page {
+    &__linkable-tabs {
+        margin-top: 1rem;
+
+        a {
+            color: $color-white;
+
+            &:visited {
+                text-decoration: none;
+            }
+        }
+    }
+
     &__content {
         margin: 3rem 0 0 2rem;
+    }
+
+    &__navigation-panel {
+        &__content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 2.5rem;
+            height: 100%;
+        }
+    }
+}
+
+.tab {
+    &--active {
+        & h3 {
+            color: $color-primary-1;
+        }
     }
 }
 
 .settings-panel {
     margin: 3rem 0 0 4rem;
+}
+
+.navigation-panel__title {
+    & h3 {
+        font-size: 1.5rem;
+        color: $color-white;
+    }
 }
 
 .general-settings {
@@ -19,8 +56,14 @@
         grid-template-rows: repeat(2, 100px);
         grid-template-columns: repeat(4, 200px);
         grid-template-areas: 'a b c d' 'a e e e';
+        grid-column-gap: 2rem;
 
         &__avatar {
+            display: flex;
+            flex-direction: column;
+            width: 50px;
+            align-items: center;
+
             .user-avatar-or-initials {
                 &:hover {
                     .user-no-avatar {
@@ -61,7 +104,6 @@
 .password-change {
     display: flex;
     flex-direction: column;
-    margin-top: 3rem;
 
     .password-change-form {
         display: flex;

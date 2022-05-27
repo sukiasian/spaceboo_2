@@ -1,4 +1,7 @@
 .user {
+    &-avatar {
+    }
+
     &-avatar-or-initials {
         cursor: pointer;
         width: 50px;
@@ -42,5 +45,37 @@
             -o-user-select: none;
             user-select: none;
         }
+    }
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 100px;
+
+    &-label {
+        cursor: pointer;
+    }
+}
+
+.remove-avatar-container {
+    position: absolute;
+    margin: -65px 0 0 35px;
+    width: 20px;
+    height: 20px;
+    border-radius: 100px;
+    background-color: $color-primary-1-lightened;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &:hover {
+        background-color: $color-primary-1;
+    }
+
+    & .icon {
+        font-size: small;
     }
 }

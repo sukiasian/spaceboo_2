@@ -15,11 +15,7 @@ export default function UserAvatarOrInitials(props: IUserAvatarOrInitialsProps):
             <div className="user-avatar-or-initials">
                 {userData?.avatarUrl ? (
                     <div className="user-avatar">
-                        <img
-                            src={`/${userData.avatarUrl}`}
-                            alt="Пользователь"
-                            style={{ width: '50px', height: '50px', borderRadius: '100px' }}
-                        />
+                        <img className="avatar" src={`/${userData.avatarUrl}`} alt="Пользователь" />
                         {children}
                     </div>
                 ) : (

@@ -69,7 +69,11 @@ export default function GeneralSettingsPage(): JSX.Element {
     // NOTE: should only be rendered 1 alert at a time - so if we upload a photo and then change user data then we need to have only  user data change alert
     const defineUserAvatarOrInitialsChildren = (): JSX.Element | undefined => {
         if (userData?.avatarUrl) {
-            return <RemoveIcon handleClick={handleDeleteUserAvatar} />;
+            return (
+                <div className="remove-avatar-container" onClick={handleDeleteUserAvatar}>
+                    <RemoveIcon />
+                </div>
+            );
         }
     };
     const renderUploadAvatarAlert = (): JSX.Element | void => {
@@ -101,7 +105,7 @@ export default function GeneralSettingsPage(): JSX.Element {
                 <div className="general-settings__fields__avatar">
                     <UserAvatarOrInitials children={defineUserAvatarOrInitialsChildren()} />
                     <div className="add-user-avatar">
-                        <label className="add-user-avatar__label">
+                        <label className="avatar-label add-user-avatar__label">
                             {defineUploadLabel()}
                             <input
                                 name="userAvatar"

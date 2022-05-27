@@ -1,3 +1,21 @@
+.input {
+    margin-left: -16px;
+    font-size: medium;
+    padding: 0.6rem 1rem;
+    border: 1px solid rgba(189, 189, 189, 0.4);
+    border-radius: $box-border-radius;
+    box-shadow: $box-shadow;
+    box-sizing: border-box;
+    width: 170px;
+    outline: 2px solid $color-primary-2;
+}
+
+.inputs {
+    &-container {
+        margin: 1rem 16px 0;
+    }
+}
+
 .required-field {
     height: 0.3rem;
     width: 0.3rem;
@@ -8,6 +26,28 @@
     border-radius: 100px;
 }
 
-.add-user-avatar__input {
-    display: none;
+.add-user-avatar {
+    &__label {
+        font-size: 0.8rem;
+    }
+
+    &__input {
+        display: none;
+    }
+}
+
+.user-edit-field {
+    &-value {
+        padding: 0.3rem 1rem;
+        margin-left: -16px;
+        font-size: medium;
+        width: 170px;
+
+        &:hover {
+            border: 1px solid $box-border-color;
+            border-radius: $box-border-radius;
+            box-shadow: $box-shadow;
+            transition: 0.5ms;
+        }
+    }
 }

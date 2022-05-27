@@ -49,6 +49,7 @@ export enum ResponseStatus {
 export enum EventKey {
     ENTER = 'Enter',
     ESCAPE = 'Escape',
+    TAB = 'Tab',
 }
 
 export enum HttpStatus {

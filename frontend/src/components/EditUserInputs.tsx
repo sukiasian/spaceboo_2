@@ -1,9 +1,10 @@
-import { ChangeEventHandler, MouseEventHandler, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, ChangeEventHandler, MouseEventHandler, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCurrentUserAction, putEditUserAction, setEditUserData } from '../redux/actions/userActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { IEditUserData } from '../redux/reducers/userReducer';
-import { EventKey, IComponentClassNameProps } from '../types/types';
+import { AlertType, EventKey } from '../types/types';
+import ValidationAlert from './ValidationAlert';
 
 interface IField {
     finalValue?: string;
@@ -14,12 +15,14 @@ interface IField {
     className?: string;
     type?: string;
     handleInputChange?: ChangeEventHandler<HTMLInputElement> | ((...props: any) => any);
+    validator?: ChangeEventHandler<HTMLInputElement>;
 }
 
 // TODO: На каждый failure response выкидывать ошибку!
 
 export default function EditUserInputs(): JSX.Element {
     const [openedInput, setOpenedInput] = useState<keyof IEditUserData | null>(null);
+    const [validationError, setValidationError] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const { fetchCurrentUserSuccessResponse, fetchCurrentUserFailureResponse, putEditUserSuccessResponse } =
         useSelector((state: IReduxState) => state.userStorage);
@@ -29,20 +32,58 @@ export default function EditUserInputs(): JSX.Element {
             label: 'Фамилия',
             inputName: 'surname',
             placeholder: 'Фамилия...',
+            validator: (e) => {
+                // TODO вынести проверку на кириллицу в качестве утил функции
+                cleanValidateClassNamesBeforeValidation(e);
+                cleanValidationErrorBeforeValidation();
+
+                if (e.target.value.length < 3) {
+                    e.target.classList.add('validator--disallowed');
+                    setValidationError('Имя должно состоять не менее 3-х символов.');
+
+                    return;
+                } else if (e.target.value.search(/[^а-яА-Я]/) !== -1) {
+                    e.target.classList.add('validator--disallowed');
+                    setValidationError('Имя должно быть на кириллице и не содержать знаков и символов.');
+                }
+
+                e.target.classList.add('validator--allowed');
+            },
         },
         {
             label: 'Имя',
             inputName: 'name',
             placeholder: 'Имя...',
+            validator: (e) => {
+                cleanValidateClassNamesBeforeValidation(e);
+
+                if (e.target.value.length < 3 || e.target.value.search(/[^а-яА-Я]/) !== -1) {
+                    e.target.classList.add('validator--disallowed');
+                } else {
+                    e.target.classList.add('validator--allowed');
+                }
+            },
         },
         {
             label: 'Отчество',
             inputName: 'middleName',
             placeholder: 'Отчество...',
+            validator: (e) => {
+                cleanValidateClassNamesBeforeValidation(e);
+
+                if (e.target.value.length < 5 || e.target.value.search(/[^а-яА-Я]/) !== -1) {
+                    e.target.classList.add('validator--disallowed');
+
+                    return;
+                }
+
+                e.target.classList.add('validator--allowed');
+            },
         },
     ];
 
     const userData = fetchCurrentUserSuccessResponse?.data;
+    const dispatch = useDispatch();
     const setPlaceholderForInput = (): void => {
         if (inputRef.current?.value.length === 0) {
             const inputIndex = parseInt(inputRef.current.dataset['index'] as string, 10);
@@ -56,19 +97,28 @@ export default function EditUserInputs(): JSX.Element {
     const checkIfClickedOutside = (target: EventTarget): boolean => {
         return inputRef.current && target !== inputRef.current ? true : false;
     };
+    const changeUserEditFieldValueAndCloseInput = (): void => {
+        const { value } = inputRef.current!;
+        const inputName = inputRef.current!.name as keyof IEditUserData;
+
+        if (checkIfInputValueIsDifferentFromCurrentUserData(value, inputName)) {
+            const newEditUserData: IEditUserData = { ...editUserData };
+
+            newEditUserData[inputName] = uppercaseFieldFirstLetter(value);
+
+            dispatch(setEditUserData(newEditUserData));
+        }
+
+        closeInput();
+    };
     const saveInputValueOnOutsideClick = (e: MouseEvent): any => {
         if (checkIfClickedOutside(e.target!) && openedInput) {
-            console.log(editUserData);
-
-            dispatch(putEditUserAction(editUserData!));
-            closeInput();
+            changeUserEditFieldValueAndCloseInput();
         }
     };
     const saveInputValueOnEnter = (e: KeyboardEvent): any => {
         if (openedInput && e.key === EventKey.ENTER) {
-            // dispatch to edit user
-            dispatch(putEditUserAction(editUserData!));
-            closeInput();
+            changeUserEditFieldValueAndCloseInput();
         }
     };
     const cancelEditingFieldByKeydown = (e: KeyboardEvent): any => {
@@ -81,17 +131,30 @@ export default function EditUserInputs(): JSX.Element {
             closeInput();
         }
     };
-    const dispatch = useDispatch();
-
+    const changeActiveInputFieldOnTabPress = (e: KeyboardEvent) => {
+        if (e.key === EventKey.TAB) {
+            fields.forEach((field, i) => {
+                if (field.inputName === openedInput) {
+                    if (i < fields.length - 1 && field.inputName === openedInput) {
+                        setOpenedInput(fields[i + 1].inputName);
+                    } else if (i === fields.length - 1) {
+                        e.preventDefault();
+                        setOpenedInput(fields[0].inputName);
+                    }
+                }
+            });
+        }
+    };
     // NOTE: если нажат escape то просто возвращается в исходное положение. также это можно сделать если очистить поле и нажать на любое место на экране. либо через клавишу escape.
     // NOTE!!! как быть с мобильными устройствами???
     const applyEffectsOnInit = (): void => {};
     const applyOpenedInputEventListenersEffects = (): (() => void) => {
         if (openedInput) {
             document.addEventListener('keydown', cancelEditingFieldByKeydown);
+            document.addEventListener('click', cancelEditingFieldWhenEmptyByOutsideClick);
             document.addEventListener('keydown', saveInputValueOnEnter);
             document.addEventListener('click', saveInputValueOnOutsideClick);
-            document.addEventListener('click', cancelEditingFieldWhenEmptyByOutsideClick);
+            document.addEventListener('keydown', changeActiveInputFieldOnTabPress);
 
             if (inputRef.current) {
                 inputRef.current.value = userData?.[inputRef.current.name];
@@ -100,9 +163,10 @@ export default function EditUserInputs(): JSX.Element {
 
         return () => {
             document.removeEventListener('keydown', cancelEditingFieldByKeydown);
+            document.removeEventListener('click', cancelEditingFieldWhenEmptyByOutsideClick);
             document.removeEventListener('keydown', saveInputValueOnEnter);
             document.removeEventListener('click', saveInputValueOnOutsideClick);
-            document.removeEventListener('click', cancelEditingFieldWhenEmptyByOutsideClick);
+            document.removeEventListener('keydown', changeActiveInputFieldOnTabPress);
         };
     };
     const openFieldInput = (inputName: keyof IEditUserData): MouseEventHandler => {
@@ -119,28 +183,35 @@ export default function EditUserInputs(): JSX.Element {
     const closeInput = (): void => {
         setOpenedInput(null);
     };
-    const validateInput = () => {};
+    // const validatorForNameAndSurname = (i: number): string | void => {
+    //     // return value?.length < 3 ? 'validator--allowed' : 'validator--disallowed';
+    //     if (value && value.length < 3) {
+    //         fields[i].className = 'validator--allowed'
+    //     }
+    // };
+    const cleanValidateClassNamesBeforeValidation = (e: ChangeEvent): void => {
+        const disallowedClassName = 'validator--disallowed';
+        const allowedClassName = 'validator--allowed';
+
+        if (e.target.classList.contains(disallowedClassName)) {
+            e.target.classList.remove(disallowedClassName);
+        } else if (e.target.classList.contains(allowedClassName)) {
+            e.target.classList.remove(allowedClassName);
+        }
+    };
+    const cleanValidationErrorBeforeValidation = (): void => {
+        if (validationError) {
+            setValidationError(null);
+        }
+    };
+    const uppercaseFieldFirstLetter = (value: string): string => {
+        return `${value[0].toUpperCase()}${value.substring(1).toLowerCase()}`;
+    };
     const checkIfInputValueIsDifferentFromCurrentUserData = (
         value: string,
         inputName: keyof IEditUserData
     ): boolean => {
         return value !== fetchCurrentUserSuccessResponse!.data[inputName] ? true : false;
-    };
-    const changeUserEditFieldValue = (fieldIndex: number): ChangeEventHandler<HTMLInputElement> => {
-        return (e) => {
-            validateInput();
-
-            const { value } = e.target;
-            const inputName = fields[fieldIndex].inputName;
-
-            if (checkIfInputValueIsDifferentFromCurrentUserData(value, inputName)) {
-                const newEditUserData: IEditUserData = { ...editUserData };
-
-                newEditUserData[inputName] = value;
-
-                dispatch(setEditUserData(newEditUserData));
-            }
-        };
     };
     const handleErrors = () => {
         if (fetchCurrentUserFailureResponse) {
@@ -150,8 +221,9 @@ export default function EditUserInputs(): JSX.Element {
         }
     };
     const updateUserData = (): void => {
-        console.log(11111);
-
+        dispatch(putEditUserAction(editUserData!));
+    };
+    const updateCurrentUser = (): void => {
         dispatch(fetchCurrentUserAction());
     };
     const renderUserEditFields = (): JSX.Element[] => {
@@ -162,11 +234,11 @@ export default function EditUserInputs(): JSX.Element {
                     {openedInput === field.inputName ? (
                         <div className={`user-edit-field__input-container`}>
                             <input
-                                className={`user-edit-field__input`}
+                                className={`input user-edit-field__input`}
                                 name={field.inputName}
-                                onChange={changeUserEditFieldValue(i)}
                                 value={field.currentValue}
                                 data-index={i}
+                                onChange={field.validator}
                                 ref={inputRef}
                             />
                         </div>
@@ -191,35 +263,25 @@ export default function EditUserInputs(): JSX.Element {
             </div>
         );
     };
+    const renderErrorNotificationAlert = (): JSX.Element | void => {
+        if (validationError) {
+            return <ValidationAlert alertType={AlertType.FAILURE} message={validationError} />;
+        }
+    };
 
     useEffect(applyEffectsOnInit, []);
     useEffect(handleErrors, [fetchCurrentUserFailureResponse]);
     useEffect(focusOnInput);
     useEffect(applyOpenedInputEventListenersEffects, [openedInput]);
     useEffect(setPlaceholderForInput, [inputRef.current?.value]);
-    console.log(putEditUserSuccessResponse);
+    useEffect(updateUserData, [editUserData]);
+    useEffect(updateCurrentUser, [putEditUserSuccessResponse]);
 
     return (
         <>
             {renderUserEditFields()}
             {renderEmailField()}
+            {renderErrorNotificationAlert()}
         </>
     );
 }
-
-/* 
-
-Задача 1: при нажатии на элемент изначальное значение должно равняться значению 
-Задача 2: при нажатии на элемент 
-
-*/
-/* 
-
-Как мы можем поступить 
-
-при нажатии outside либо enter происходит input change (инпут записывается в editUserData)
-При изменении editUserData происходит эффект - отправляется запрос на изменение. Валидаторы должны быть на фронте - 
-они не допустят отправки запроса (когда отправляются новые данные но приходит отказ
-    а страница сама с новыми данными)
-
-*/

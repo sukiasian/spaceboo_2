@@ -350,6 +350,30 @@ svg {
     -o-user-select: none;
     user-select: none; }
 
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 100px; }
+  .avatar-label {
+    cursor: pointer; }
+
+.remove-avatar-container {
+  position: absolute;
+  margin: -65px 0 0 35px;
+  width: 20px;
+  height: 20px;
+  border-radius: 100px;
+  background-color: #ffda55;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer; }
+  .remove-avatar-container:hover {
+    background-color: #fec602; }
+  .remove-avatar-container .icon {
+    font-size: small; }
+
 .spaces {
   margin-top: 6rem;
   display: grid;
@@ -371,6 +395,20 @@ svg {
   .space-card--price {
     position: relative; }
 
+.input {
+  margin-left: -16px;
+  font-size: medium;
+  padding: 0.6rem 1rem;
+  border: 1px solid rgba(189, 189, 189, 0.4);
+  border-radius: 15px;
+  box-shadow: 0 0 1px 3px rgba(209, 209, 209, 0.2);
+  box-sizing: border-box;
+  width: 170px;
+  outline: 2px solid #1476b3; }
+
+.inputs-container {
+  margin: 1rem 16px 0; }
+
 .required-field {
   height: 0.3rem;
   width: 0.3rem;
@@ -380,8 +418,22 @@ svg {
   background-color: #1476b3;
   border-radius: 100px; }
 
+.add-user-avatar__label {
+  font-size: 0.8rem; }
+
 .add-user-avatar__input {
   display: none; }
+
+.user-edit-field-value {
+  padding: 0.3rem 1rem;
+  margin-left: -16px;
+  font-size: medium;
+  width: 170px; }
+  .user-edit-field-value:hover {
+    border: 1px solid rgba(208, 208, 208, 0.4);
+    border-radius: 15px;
+    box-shadow: 0 0 1px 3px rgba(209, 209, 209, 0.2);
+    transition: 0.5ms; }
 
 .filters-section {
   margin-top: 4rem;
@@ -461,8 +513,7 @@ svg {
 .titles {
   display: flex;
   flex-direction: column;
-  margin-top: 2.8rem;
-  margin-bottom: 5rem;
+  margin-bottom: 3rem;
   align-items: center; }
   .titles__heading-container {
     align-self: center; }
@@ -526,6 +577,15 @@ svg {
   color: #fff;
   user-select: none;
   text-align: center; }
+
+.validator--allowed {
+  outline: 1px solid green; }
+
+.validator--disallowed {
+  outline: 1px solid red; }
+
+.icon {
+  color: #2b2b2b; }
 
 .row {
   display: flex;
@@ -745,11 +805,32 @@ input::placeholder {
     font-size: 2rem;
     width: 40px; }
 
+.settings-page__linkable-tabs {
+  margin-top: 1rem; }
+  .settings-page__linkable-tabs a {
+    color: #fff; }
+    .settings-page__linkable-tabs a:visited {
+      text-decoration: none; }
+
 .settings-page__content {
   margin: 3rem 0 0 2rem; }
 
+.settings-page__navigation-panel__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2.5rem;
+  height: 100%; }
+
+.tab--active h3 {
+  color: #fec602; }
+
 .settings-panel {
   margin: 3rem 0 0 4rem; }
+
+.navigation-panel__title h3 {
+  font-size: 1.5rem;
+  color: #fff; }
 
 .general-settings {
   display: flex;
@@ -759,13 +840,19 @@ input::placeholder {
     display: grid;
     grid-template-rows: repeat(2, 100px);
     grid-template-columns: repeat(4, 200px);
-    grid-template-areas: 'a b c d' 'a e e e'; }
-    .general-settings__fields__avatar .user-avatar-or-initials:hover {
-      cursor: default; }
-      .general-settings__fields__avatar .user-avatar-or-initials:hover .user-no-avatar {
-        background-color: #1476b3; }
-        .general-settings__fields__avatar .user-avatar-or-initials:hover .user-no-avatar p {
-          color: #fff; }
+    grid-template-areas: 'a b c d' 'a e e e';
+    grid-column-gap: 2rem; }
+    .general-settings__fields__avatar {
+      display: flex;
+      flex-direction: column;
+      width: 50px;
+      align-items: center; }
+      .general-settings__fields__avatar .user-avatar-or-initials:hover {
+        cursor: default; }
+        .general-settings__fields__avatar .user-avatar-or-initials:hover .user-no-avatar {
+          background-color: #1476b3; }
+          .general-settings__fields__avatar .user-avatar-or-initials:hover .user-no-avatar p {
+            color: #fff; }
     .general-settings__fields .user-edit-field--surname {
       grid-area: b; }
     .general-settings__fields .user-edit-field--name {
@@ -780,8 +867,7 @@ input::placeholder {
 
 .password-change {
   display: flex;
-  flex-direction: column;
-  margin-top: 3rem; }
+  flex-direction: column; }
   .password-change .password-change-form {
     display: flex;
     flex-direction: column;
