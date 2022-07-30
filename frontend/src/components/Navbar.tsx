@@ -167,7 +167,9 @@ export default function Navbar(): JSX.Element {
             </div>
             <div className="navbar__create-space navbar-elem navbar-elem--3">
                 <NavLink to={getLinkForProvideSpaceButton()} className="navbar-link">
-                    <AltButton mainDivClassName="primary" buttonText="Предоставить пространство" />
+                    <button className="button button--primary navbar-provide-space-button">
+                        Предоставить пространство
+                    </button>
                 </NavLink>
             </div>
             {renderAuthTabsOpeningModals()}

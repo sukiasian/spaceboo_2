@@ -15,6 +15,12 @@ export const putEditUserAction = (payload: IEditUserData): IAction<SagaTask, IEd
     };
 };
 
+export const annualizeEditUserResponsesAction = (): IAction<ReduxUserAction> => {
+    return {
+        type: ReduxUserAction.ANNUALIZE_EDIT_USER_RESPONSES,
+    };
+};
+
 export const setFetchCurrentUserSuccessResponseAction = (
     payload: IServerResponse
 ): IAction<ReduxUserAction, IServerResponse> => {

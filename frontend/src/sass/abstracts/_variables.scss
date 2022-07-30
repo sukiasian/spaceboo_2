@@ -1,6 +1,5 @@
 $color-primary-1: #fec602;
 $color-primary-2: #1476b3;
-$color-primary-5: #7b0fff;
 
 $color-primary-1-lightened: #ffda55;
 $color-primary-2-lightened: #2b99dd;
@@ -16,6 +15,14 @@ $color-white: #fff;
 
 $color-background-1: #fff;
 $color-background-2: #f8f8f8;
+
+$color-alert-success-border: rgb(58, 165, 63);
+$color-alert-success-background: rgba(53, 214, 61, 0.4);
+$color-alert-failure-border: rgb(182, 52, 52);
+$color-alert-failure-background: rgba(255, 103, 82, 0.405);
+
+$color-validator-allowed: rgb(58, 165, 63);
+$color-validator-disallowed: rgb(182, 52, 52);
 
 $color-footer: #0d4c73;
 

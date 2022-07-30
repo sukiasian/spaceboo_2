@@ -6,17 +6,17 @@ const city_model_1 = require("../models/city.model");
 describe('City (e2e)', () => {
     let app;
     let server;
-    let applicationInstance;
+    let appConfig;
     let db;
     let city;
     let cityModel;
     beforeAll(async () => {
         dotenv.config({ path: '../test.env' });
-        applicationInstance = lib_1.createApplicationInstance();
-        app = applicationInstance.app;
-        db = applicationInstance.sequelize;
+        appConfig = lib_1.createAppConfig();
+        app = appConfig.app;
+        db = appConfig.sequelize;
         cityModel = city_model_1.City;
-        server = (await lib_1.openTestEnv(applicationInstance)).server;
+        server = (await lib_1.openTestEnv(appConfig)).server;
         city = await cityModel.findOne({ raw: true });
     });
     beforeEach(async () => { });

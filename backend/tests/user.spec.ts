@@ -19,7 +19,6 @@ import { Appointment } from '../models/appointment.model';
 import { City } from '../models/city.model';
 import { StorageUploadFilenames } from '../configurations/storage.config';
 import { userSequelizeDao, UserSequelizeDao } from '../daos/user.sequelize.dao';
-import { fake } from 'faker';
 
 describe('User (e2e)', () => {
     let app: express.Express;

@@ -15,7 +15,7 @@ export default function OutdatedAppointmentsPage(): JSX.Element {
         fetchSpacesByUserOutdatedAppointmentsFailureResponse,
     } = useSelector((state: IReduxState) => state.spaceStorage);
     const { myAppointmentsFinalLocationIsDefined } = useSelector((state: IReduxState) => state.commonStorage);
-    const spaces = fetchSpacesByUserOutdatedAppointmentsFailureResponse?.data;
+    const spaces = fetchSpacesByUserOutdatedAppointmentsFailureResponse?.data || [];
     const dispatch = useDispatch();
     const fetchSpacesForUserUpcomingAppointments = (): void => {
         dispatch(fetchSpacesByUserUpcomingAppointmentsAction());
@@ -32,6 +32,11 @@ export default function OutdatedAppointmentsPage(): JSX.Element {
     const handleRefreshButton = (): void => {
         dispatch(annualizeFetchSpacesForUserOutdatedAppointmentsResponsesAction());
         fetchSpacesForUserUpcomingAppointments();
+    };
+    const renderNoSpacesAppointedMessage = (): JSX.Element | void => {
+        if (spaces?.length === 0) {
+            return <p>Нет бронирований.</p>;
+        }
     };
     const renderSpaces = (): JSX.Element[] => {
         return spaces?.map((space: any, i: number) => {
@@ -53,7 +58,10 @@ export default function OutdatedAppointmentsPage(): JSX.Element {
     return (
         <div className="upcoming-appointments">
             <div className="spaces-by-appointments">
-                <div className="spaces-with-outdated-appointments">{renderSpaces()}</div>
+                <div className="spaces-with-outdated-appointments">
+                    {renderNoSpacesAppointedMessage()}
+                    {renderSpaces()}
+                </div>
             </div>
             {renderReloadOnError()}
         </div>

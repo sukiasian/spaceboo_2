@@ -1,0 +1,14 @@
+.code-verification {
+    display: flex;
+    width: 400px;
+    justify-content: space-evenly;
+
+    input {
+        width: 50px;
+        border: transparent;
+        border-bottom: 2px solid $color-primary-2;
+        border-radius: 0;
+        outline: none;
+        text-align: center;
+    }
+}

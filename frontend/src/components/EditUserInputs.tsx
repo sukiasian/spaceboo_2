@@ -23,6 +23,7 @@ interface IField {
 export default function EditUserInputs(): JSX.Element {
     const [openedInput, setOpenedInput] = useState<keyof IEditUserData | null>(null);
     const [validationError, setValidationError] = useState<string | null>(null);
+    const [validationErrorIsActive, setValidationErrorIsActive] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const { fetchCurrentUserSuccessResponse, fetchCurrentUserFailureResponse, putEditUserSuccessResponse } =
         useSelector((state: IReduxState) => state.userStorage);
@@ -45,8 +46,14 @@ export default function EditUserInputs(): JSX.Element {
                 } else if (e.target.value.search(/[^а-яА-Я]/) !== -1) {
                     e.target.classList.add('validator--disallowed');
                     setValidationError('Имя должно быть на кириллице и не содержать знаков и символов.');
+
+                    return;
                 }
 
+                setTimeout(() => {
+                    setValidationErrorIsActive(false);
+                    console.log(111111);
+                }, 3000);
                 e.target.classList.add('validator--allowed');
             },
         },
@@ -183,12 +190,6 @@ export default function EditUserInputs(): JSX.Element {
     const closeInput = (): void => {
         setOpenedInput(null);
     };
-    // const validatorForNameAndSurname = (i: number): string | void => {
-    //     // return value?.length < 3 ? 'validator--allowed' : 'validator--disallowed';
-    //     if (value && value.length < 3) {
-    //         fields[i].className = 'validator--allowed'
-    //     }
-    // };
     const cleanValidateClassNamesBeforeValidation = (e: ChangeEvent): void => {
         const disallowedClassName = 'validator--disallowed';
         const allowedClassName = 'validator--allowed';
@@ -264,8 +265,8 @@ export default function EditUserInputs(): JSX.Element {
         );
     };
     const renderErrorNotificationAlert = (): JSX.Element | void => {
-        if (validationError) {
-            return <ValidationAlert alertType={AlertType.FAILURE} message={validationError} />;
+        if (validationErrorIsActive) {
+            return <ValidationAlert alertType={AlertType.FAILURE} message={validationError!} />;
         }
     };
 
@@ -276,6 +277,18 @@ export default function EditUserInputs(): JSX.Element {
     useEffect(setPlaceholderForInput, [inputRef.current?.value]);
     useEffect(updateUserData, [editUserData]);
     useEffect(updateCurrentUser, [putEditUserSuccessResponse]);
+    useEffect(() => {
+        if (validationError) {
+            setValidationErrorIsActive(true);
+        }
+    }, [validationError]);
+    // useEffect(() => {
+    //     if (validationErrorIsActive) {
+    //         console.log('since validation error is active we create a timeoutww');
+
+    //         // setTimeout(() => setValidationErrorIsActive(false), 3000);
+    //     }
+    // }, [validationErrorIsActive]);
 
     return (
         <>

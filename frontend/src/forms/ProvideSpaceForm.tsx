@@ -1,4 +1,12 @@
-import { ChangeEvent, ChangeEventHandler, useEffect, useRef } from 'react';
+import React, {
+    ChangeEvent,
+    ChangeEventHandler,
+    MouseEventHandler,
+    ReactNode,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -9,15 +17,28 @@ import {
 import { postProvideSpaceAction, setPostProvideSpaceDataAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { IProvideSpaceData, SpaceType } from '../redux/reducers/spaceReducer';
-import { handleFormSubmit, valueIsNumeric } from '../utils/utilFunctions';
+import { handleFormSubmit, separateCityNameFromRegionIfCityNameContains, valueIsNumeric } from '../utils/utilFunctions';
 import RequiredField from '../components/RequiredField';
 import Checkbox from '../components/Checkbox';
+import ValidationOkIcon from '../icons/ValidationOkIcon';
 
 interface ITypeOfSpaceInputData {
     spaceType: SpaceType;
 }
 
+/* 
+
+1. При выборе города если он выбран из города то должна появляться галочка.
+Если не все поля заполнены кнопка предоставить пространство должна быть деактивирована.
+
+Для этого должна быть проверка на все поля provideSpaceData.
+
+Город может устанавливаться (.cityId) только при нажатии на какой нибудь из результатов
+
+*/
+
 export default function ProvideSpaceForm(): JSX.Element {
+    const [imagesAmountExceeded, setImagesAmountExceeded] = useState(false);
     const findCityRef = useRef<HTMLInputElement>(null);
     const { provideSpaceData } = useSelector((state: IReduxState) => state.spaceStorage);
     const { fetchCitiesByPatternSuccessResponse } = useSelector((state: IReduxState) => state.cityStorage);
@@ -33,6 +54,9 @@ export default function ProvideSpaceForm(): JSX.Element {
             spaceType: SpaceType.HOUSE,
         },
     ];
+    const imagesAmountAllowed = 5;
+    const validatorAllowedClassName = 'validator--allowed';
+    const validatorDisallowedClassName = 'validator--disallowed';
     const applyDropdownValuesToFormDataOnInit = (): void => {
         const newFormData: IProvideSpaceData = { ...provideSpaceData };
 
@@ -43,6 +67,39 @@ export default function ProvideSpaceForm(): JSX.Element {
     };
     const applyEffectsOnInit = (): void => {
         applyDropdownValuesToFormDataOnInit();
+    };
+    const defineAddImageIconClassName = (): string => {
+        return imagesAmountExceeded ? 'button--inactive add-button-icon--inactive' : '';
+    };
+    const cleanValidateClassNamesBeforeValidation = (e: ChangeEvent): void => {
+        if (e.target.classList.contains(validatorDisallowedClassName)) {
+            e.target.classList.remove(validatorDisallowedClassName);
+        } else if (e.target.classList.contains(validatorAllowedClassName)) {
+            e.target.classList.remove(validatorAllowedClassName);
+        }
+    };
+    const validateInputByLength = (length: number, e: ChangeEvent<HTMLInputElement>): void => {
+        cleanValidateClassNamesBeforeValidation(e);
+
+        if (e.target.value.length < length) {
+            e.target.classList.add(validatorDisallowedClassName);
+
+            e.target.style.background = 'none';
+        } else {
+            e.target.classList.add(validatorAllowedClassName);
+
+            e.target.style.background = 'url(/images/icon-done.png) calc(100% - 5px) 50% no-repeat';
+            e.target.style.backgroundSize = '16px';
+        }
+    };
+    const applyDisallowedValidatorOnInputChangeForCityInput: ChangeEventHandler<HTMLInputElement> = (e) => {
+        if (e.currentTarget.classList.contains(validatorAllowedClassName)) {
+            e.currentTarget.classList.remove(validatorAllowedClassName);
+        }
+
+        e.currentTarget.classList.add(validatorDisallowedClassName);
+
+        e.currentTarget.style.background = 'none';
     };
     const handleTypeOfSpaceBoxCheckingBySpaceType = (spaceType: SpaceType): (() => void) => {
         return () => {
@@ -62,7 +119,7 @@ export default function ProvideSpaceForm(): JSX.Element {
     };
     const handleInputChangeByFormDataProperty = (
         formDataProp: keyof IProvideSpaceData
-    ): ChangeEventHandler<HTMLInputElement> => {
+    ): ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement> => {
         return (e) => {
             const newFormData: IProvideSpaceData = { ...provideSpaceData };
 
@@ -109,18 +166,40 @@ export default function ProvideSpaceForm(): JSX.Element {
             findCityRef.current!.value = city.name;
 
             annualizeFoundBySearchPatternCities();
+
+            findCityRef.current!.classList.remove(validatorDisallowedClassName);
+            findCityRef.current!.classList.add(validatorAllowedClassName);
+
+            findCityRef.current!.style.background = 'url(/images/icon-done.png) calc(100% - 5px) 50% no-repeat';
+            findCityRef.current!.style.backgroundSize = '16px';
         };
     };
     const handleUploadSpaceImages: ChangeEventHandler<HTMLInputElement> = (e) => {
         const newFormData: IProvideSpaceData = { ...provideSpaceData };
 
         if (e.target.files) {
-            const spaceImages = transformSpaceImagesFileListIntoArray(e.target.files);
+            const { files } = e.target;
+            const spaceImages = transformSpaceImagesFileListIntoArray(files);
 
-            newFormData.spaceImages = [...(newFormData.spaceImages || []), ...spaceImages];
+            if (
+                provideSpaceData?.spaceImages &&
+                provideSpaceData.spaceImages.length + files.length > imagesAmountAllowed
+            ) {
+                newFormData.spaceImages = [...newFormData.spaceImages!, ...spaceImages].splice(-imagesAmountAllowed);
+            } else if (e.target.files.length > imagesAmountAllowed) {
+                const imagesToUpload = spaceImages.splice(-5);
+
+                newFormData.spaceImages = [...imagesToUpload];
+            } else {
+                newFormData.spaceImages = [...(newFormData.spaceImages || []), ...spaceImages];
+            }
+
+            if (newFormData.spaceImages.length === 5) {
+                setImagesAmountExceeded(true);
+            }
+
+            dispatch(setPostProvideSpaceDataAction(newFormData));
         }
-
-        dispatch(setPostProvideSpaceDataAction(newFormData));
     };
     // NOTE: probably can be an utilfunction
     const transformSpaceImagesFileListIntoArray = (spaceImagesFileList: FileList): Array<any> => {
@@ -142,15 +221,19 @@ export default function ProvideSpaceForm(): JSX.Element {
             newFormData.spaceImages = newSpaceImagesList;
 
             dispatch(setPostProvideSpaceDataAction(newFormData));
-        };
-    };
-    const separateCityNameFromRegionIfCityNameContains = (cityName: string) => {
-        const cityNameValuesSeparately = cityName.split(' ');
 
-        return cityNameValuesSeparately[0];
+            if (imagesAmountExceeded) {
+                setImagesAmountExceeded(false);
+            }
+        };
     };
     const handleSubmitButton = (): void => {
         dispatch(postProvideSpaceAction(provideSpaceData!));
+    };
+    const deactivateAddButtonOnOverload: MouseEventHandler<HTMLInputElement> = (e) => {
+        if (imagesAmountExceeded) {
+            e.preventDefault();
+        }
     };
     const renderTypeOfSpaceCheckboxes = (): JSX.Element[] => {
         return typeOfSpaceInputsData.map((typeOfSpaceInputData: ITypeOfSpaceInputData, i: number) => {
@@ -158,13 +241,13 @@ export default function ProvideSpaceForm(): JSX.Element {
 
             return (
                 <div
-                    className="type-of-space__checkbox"
+                    className={`type-of-space__checkbox type-of-space__checkbox--${i}`}
                     onClick={handleTypeOfSpaceBoxCheckingBySpaceType(typeOfSpaceInputData.spaceType)}
                     key={i}
                 >
                     <Checkbox isChecked={checkboxIsChecked} />
                     <div className="type-of-space__checkbox__label">
-                        <label> {typeOfSpaceInputData.spaceType} </label>
+                        <label className="type-of-space-label"> {typeOfSpaceInputData.spaceType} </label>
                     </div>
                 </div>
             );
@@ -200,7 +283,7 @@ export default function ProvideSpaceForm(): JSX.Element {
             </>
         );
     };
-    const renderUploadedFiles = (): JSX.Element[] | void => {
+    const renderUploadedFiles = (): ReactNode | void => {
         const spaceImages = provideSpaceData?.spaceImages;
 
         if (spaceImages) {
@@ -209,9 +292,15 @@ export default function ProvideSpaceForm(): JSX.Element {
 
                 return (
                     <div className="images-to-upload-container" key={i}>
-                        <img className="image-to-upload" src={src} alt="Загруженное изображение" />
+                        <img
+                            className="image-to-upload"
+                            src={src}
+                            alt="Загруженное изображение"
+                            onMouseDown={() => {}}
+                            onMouseUp={() => {}}
+                        />
                         <div className="remove-image-to-upload" onClick={removeSpaceImageFromList(file)}>
-                            <FontAwesomeIcon icon={faTimes} />
+                            <FontAwesomeIcon icon={faTimes} className="icon--remove" />
                         </div>
                     </div>
                 );
@@ -220,139 +309,142 @@ export default function ProvideSpaceForm(): JSX.Element {
             return spaces;
         }
     };
+    const renderImagesOverloadAlert = (): JSX.Element => {
+        return <></>;
+    };
 
     useEffect(applyEffectsOnInit, []);
 
     return (
         <form className="provide-space__form" onSubmit={handleFormSubmit} encType="multipart/form-data">
-            <div className="space-input-fields--type-of-space">
-                <div className="type-of-space__label-container">
-                    <label className="label label--type-of-space">Тип пространства</label>
-                    <RequiredField />
-                </div>
-                <div className="type-of-space__checkboxes">{renderTypeOfSpaceCheckboxes()}</div>
+            <div className="type-of-space__label-container">
+                <label className="label label--type-of-space">Тип пространства</label>
+                <RequiredField />
             </div>
-            <div className="space-input-fields--rooms-number">
-                <div className="rooms-number__label-container">
-                    <label className="label label--rooms-number">Количество комнат</label>
-                    <RequiredField />
-                </div>
+            <div className="checkboxes">{renderTypeOfSpaceCheckboxes()}</div>
+            <div className="rooms-number__label-container">
+                <label className="label label--rooms-number">Количество комнат</label>
+                <RequiredField />
                 {/*  NOTE if here we use select tag then in dropdown menus we should also use that in other places and vice versa*/}
-                <div className="rooms-number__dropdown-container">
-                    <select
-                        className="rooms-number__dropdown"
-                        onChange={handleRoomsNumberDropDownSelect}
-                        defaultValue={initialRoomsNumber}
-                    >
-                        {renderDropdownNumericalOptions()}
-                    </select>
-                </div>
             </div>
-            <div className="space-input-fields--description">
-                <div className="description__label-container">
-                    <label className="label label--description">Описание</label>
-                </div>
-                <div className="description__input-container">
-                    <input
-                        className="description__input"
-                        type="text"
-                        placeholder="Добавьте описание..."
-                        onChange={handleInputChangeByFormDataProperty('description')}
-                    />
-                </div>
+            <div className="rooms-number__dropdown-container">
+                <select
+                    className="rooms-number__dropdown"
+                    onChange={handleRoomsNumberDropDownSelect}
+                    defaultValue={initialRoomsNumber}
+                >
+                    {renderDropdownNumericalOptions()}
+                </select>
             </div>
-            <div className="space-input-fields--beds-number">
-                <div className="beds-number__label-container">
-                    <label className="label label--rooms-number">Количество спальных мест</label>
-                    <RequiredField />
-                </div>
-                <div className="beds-number__dropdown-container">
-                    <select
-                        className="beds-number__dropdown"
-                        onChange={handleRoomsNumberDropDownSelect}
-                        defaultValue={initialRoomsNumber}
-                    >
-                        {renderDropdownNumericalOptions()}
-                    </select>
-                </div>
+            <div className="description__label-container">
+                <label className="label label--description">Описание</label>
             </div>
-            <div className="space-input-fields--address">
-                <div className="address__label-container">
-                    <label className="label label--address">Адрес</label>
-                    <RequiredField />
-                </div>
-                <div className="address__input-container">
-                    <input
-                        className="address__input"
-                        type="text"
-                        placeholder="Введите адрес..."
-                        onChange={handleInputChangeByFormDataProperty('address')}
-                    />
-                </div>
+            <div className="description__textarea-container">
+                <textarea
+                    className="description__textarea"
+                    placeholder="Добавьте описание..."
+                    onChange={handleInputChangeByFormDataProperty('description')}
+                />
             </div>
-            <div className="space-input-fields--price-per-night">
-                <div className="label-container">
-                    <label className="label label--price-per-night">Цена за 1 ночь</label>
-                    <RequiredField />
-                </div>
-                <div className="price-per-night__input-container">
-                    <input
-                        className="price-per-night__input"
-                        type="tel"
-                        placeholder="Укажите цену за 1 ночь..."
-                        onChange={handlePriceInput}
-                    />
-                </div>
+            <div className="beds-number__label-container">
+                <label className="label label--rooms-number">Количество спальных мест</label>
+                <RequiredField />
+            </div>
+            <div className="beds-number__dropdown-container">
+                <select
+                    className="beds-number__dropdown"
+                    onChange={handleRoomsNumberDropDownSelect}
+                    defaultValue={initialRoomsNumber}
+                >
+                    {renderDropdownNumericalOptions()}
+                </select>
+            </div>
+            <div className="address__label-container">
+                <label className="label label--address">Адрес</label>
+                <RequiredField />
+            </div>
+            <div className="address__input-container">
+                <input
+                    className="address__input"
+                    type="text"
+                    placeholder="Введите адрес..."
+                    name="address"
+                    onChange={(e) => {
+                        validateInputByLength(5, e);
+                        handleInputChangeByFormDataProperty('address');
+                    }}
+                />
+                <ValidationOkIcon identifier="address" />
+            </div>
+            <div className="price-per-night__label-container">
+                <label className="label label--price-per-night">Цена за 1 ночь</label>
+                <RequiredField />
+            </div>
+            <div className="price-per-night__input-container">
+                <input
+                    className="price-per-night__input"
+                    name="price-per-night"
+                    type="tel"
+                    placeholder="Укажите цену за 1 ночь..."
+                    onChange={(e) => {
+                        validateInputByLength(3, e);
+                        handlePriceInput(e);
+                    }}
+                />
+                <ValidationOkIcon identifier="price-per-night" />
+            </div>
+            <div className="city__label-container">
+                <label className="label label--city">Город</label>
+                <RequiredField />
             </div>
             <div className="city-picker__search">
                 <input
                     ref={findCityRef}
                     className="city-picker__input"
-                    name="city-picker__input"
+                    id="city-picker__input"
+                    name="city-picker"
                     placeholder="Введите название города..."
-                    onChange={handleFindCityInput}
+                    onChange={(e) => {
+                        applyDisallowedValidatorOnInputChangeForCityInput(e);
+                        handleFindCityInput(e);
+                    }}
                     autoComplete="off"
                 />
+                <ValidationOkIcon identifier="city-picker" />
                 {renderFindCityResults()}
             </div>
-            <div className="space-input-fields--photos">
-                <div className="photos__label-and-label-description-container">
-                    <div className="label-container">
-                        <label className="label label--address">Адрес</label>
-                        <RequiredField />
-                    </div>
-                    <div className="label-description-container">
-                        <p className="paragraph paragraph--light paragraph--label-description">До 5 фотографий</p>
-                    </div>
+            <div className="photos__label-and-label-description-container">
+                <div className="label-container">
+                    <label className="label label--photos">Фотографии</label>
+                    <RequiredField />
                 </div>
-                <div className="address__input-container">
-                    {renderUploadedFiles()}
-                    <label
-                        className="add-button-icon"
-                        // TODO: this is a working  example to go with in css
-                        style={{
-                            display: 'block',
-                            width: '45px',
-                            height: '45px',
-                            background: 'url(/images/icons/icon-add.png)',
-                            backgroundSize: 'cover',
-                        }}
-                    >
-                        <input
-                            style={{ display: 'none' }}
-                            name="spaceImages"
-                            className="photos__input"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleUploadSpaceImages}
-                            multiple
-                        />
-                    </label>
+                <div className="label-description-container">
+                    <p className="paragraph paragraph--light paragraph--label-description">До 5 фотографий</p>
                 </div>
             </div>
-            <button className="button button--provide-space" onClick={handleSubmitButton}>
-                Предоставить пространство
-            </button>
+            <div className="photos__input-container">
+                <div className="uploaded-files-container">
+                    {renderUploadedFiles() as ReactNode}
+                    <div className="add-photo">
+                        <label className={`add-button-icon add-photo-icon ${defineAddImageIconClassName()}`}>
+                            <input
+                                name="spaceImages"
+                                className="photos__input"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleUploadSpaceImages}
+                                multiple
+                                onClick={deactivateAddButtonOnOverload}
+                            />
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div className="provide-space-button-container">
+                <button className="button button--primary button--provide-space" onClick={handleSubmitButton}>
+                    Предоставить пространство
+                </button>
+            </div>
         </form>
     );
 }

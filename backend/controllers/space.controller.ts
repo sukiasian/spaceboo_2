@@ -15,6 +15,10 @@ export class SpaceController extends Singleton {
             throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.SPACE_IMAGES_ARE_NOT_PROVIDED);
         }
 
+        if (!req.body.cityId) {
+            throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.PICK_CITY_FROM_THE_LIST);
+        }
+
         const space = await this.dao.provideSpace({ ...req.body, userId }, req.files);
 
         res.locals.spaceId = space.id;

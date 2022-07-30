@@ -1,6 +1,8 @@
 import { BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import { Optional } from 'sequelize';
 import { Region } from './region.model';
+import AppError from '../utils/AppError';
+import { HttpStatus } from '../types/enums';
 
 interface ICityAttributes {
     id: number;
@@ -15,7 +17,9 @@ export interface ICityCreationAttributes extends Optional<ICityAttributes, 'id'>
 @Table({ timestamps: false })
 export class City extends Model<ICityAttributes, ICityCreationAttributes> implements ICityAttributes {
     @PrimaryKey
-    @Column({ type: DataType.INTEGER })
+    @Column({
+        type: DataType.INTEGER,
+    })
     public id: number;
 
     @ForeignKey(() => Region)

@@ -30,8 +30,6 @@ export default function ProvideSpacePage(): JSX.Element {
             dispatch(annualizeProvideSpaceDataAction());
         };
     };
-    console.log(postProvideSpaceFailureResponse);
-
     const redirectByLoginStateCondition = (): void => {
         if (userLoginState?.isLoaded) {
             if (!userLoginState?.loggedIn && !userLoginState?.confirmed) {
@@ -46,12 +44,6 @@ export default function ProvideSpacePage(): JSX.Element {
             navigate(UrlPathname.SPACES);
         }
     };
-    const renderProvideForm = (): JSX.Element => {
-        return <ProvideSpaceForm />;
-    };
-    const renderAlertOnSubmitError = (): JSX.Element => {
-        return <Alert failureResponse={postProvideSpaceFailureResponse} />;
-    };
 
     useEffect(applyEffectsOnInit, [dispatch]);
     useEffect(redirectByLoginStateCondition, [userLoginState, navigate]);
@@ -60,8 +52,8 @@ export default function ProvideSpacePage(): JSX.Element {
     return (
         <div className="page provide-space-page">
             <Titles heading="Предоставить пространство" />
-            <div className="provide-space__form-container">{renderProvideForm()}</div>
-            {renderAlertOnSubmitError()}
+            <ProvideSpaceForm />
+            <Alert failureResponse={postProvideSpaceFailureResponse} />
         </div>
     );
 }

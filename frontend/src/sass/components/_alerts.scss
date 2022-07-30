@@ -1,0 +1,15 @@
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: $box-border-radius;
+    margin-bottom: 1rem;
+
+    &--success {
+        border: 1px solid $color-alert-success-border;
+        background-color: $color-alert-success-background;
+    }
+
+    &--failure {
+        border: 1px solid $color-alert-failure-border;
+        background-color: $color-alert-failure-background;
+    }
+}

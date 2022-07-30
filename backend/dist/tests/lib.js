@@ -1,19 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.closeTestEnv = exports.openTestEnv = exports.createTokenAndSign = exports.createSpaceData = exports.testUserValidationByMessages = exports.createInvalidUserData = exports.createUserData = exports.createApplicationInstance = exports.clearDb = exports.closeDb = exports.closeServer = exports.startDb = exports.startServer = void 0;
+exports.closeTestEnv = exports.openTestEnv = exports.createTokenAndSign = exports.createAppoinmentData = exports.createPathToSpaceImagesDir = exports.createPathToUserAvatarDir = exports.createSpaceData = exports.testUserValidationByMessages = exports.createInvalidUserData = exports.createUserData = exports.createNodeCronFunctions = exports.createAppConfig = exports.clearDbAndStorage = exports.clearStorage = exports.clearDb = exports.closeDb = exports.closeServer = exports.startDb = exports.startServer = void 0;
 const faker = require("faker");
 const jwt = require("jsonwebtoken");
-const util_1 = require("util");
-const App_1 = require("../App");
+const path = require("path");
+const AppConfig_1 = require("../AppConfig");
 const connectToDb_1 = require("../database/connectToDb");
 const Singleton_1 = require("../utils/Singleton");
 const dotenv = require("dotenv");
 const enums_1 = require("../types/enums");
 const space_model_1 = require("../models/space.model");
+const UtilFunctions_1 = require("../utils/UtilFunctions");
+const logger_1 = require("../loggers/logger");
+const NodeCronFunctions_1 = require("../utils/NodeCronFunctions");
 dotenv.config({ path: '../test.env' });
 const startServer = (app) => {
     return app.listen(process.env.PORT, () => {
-        console.log('Test server is listening');
+        logger_1.default.info('Test server is listening');
     });
 };
 exports.startServer = startServer;
@@ -27,43 +30,63 @@ const closeServer = async (server) => {
 exports.closeServer = closeServer;
 const closeDb = async (sequelize) => {
     await sequelize.close();
-    console.log('Database connection is closed');
+    logger_1.default.info('Database connection is closed');
 };
 exports.closeDb = closeDb;
 const clearDb = (sequelize) => {
     Promise.all(Object.values(sequelize.models).map(async (model) => {
-        if (model.name !== enums_1.ModelNames.CITY) {
+        if (model.name !== enums_1.ModelNames.DISTRICT &&
+            model.name !== enums_1.ModelNames.REGION &&
+            model.name !== enums_1.ModelNames.CITY) {
             await model.destroy({ truncate: true, cascade: true });
         }
     }));
 };
 exports.clearDb = clearDb;
-const createApplicationInstance = () => {
-    return Singleton_1.SingletonFactory.produce(App_1.Application);
+const clearStorage = () => {
+    const dirPaths = [path.resolve('assets', 'images', 'users'), path.resolve('assets', 'images', 'spaces')];
+    Promise.all(dirPaths.map(async (dirPath) => {
+        await UtilFunctions_1.default.removeDirectory(dirPath, { recursive: true });
+        await UtilFunctions_1.default.makeDirectory(dirPath);
+    }));
 };
-exports.createApplicationInstance = createApplicationInstance;
+exports.clearStorage = clearStorage;
+const clearDbAndStorage = async (sequelize) => {
+    exports.clearDb(sequelize);
+    exports.clearStorage();
+};
+exports.clearDbAndStorage = clearDbAndStorage;
+const createAppConfig = () => {
+    return Singleton_1.SingletonFactory.produce(AppConfig_1.AppConfig);
+};
+exports.createAppConfig = createAppConfig;
+const createNodeCronFunctions = () => {
+    return Singleton_1.SingletonFactory.produce(NodeCronFunctions_1.NodeCronFunctions);
+};
+exports.createNodeCronFunctions = createNodeCronFunctions;
 const createUserData = () => {
     return {
-        name: faker.name.firstName(),
-        middleName: faker.name.firstName(),
-        surname: faker.name.lastName(),
-        email: 'testuser@gmail.com',
+        name: 'Иван',
+        middleName: 'Иванов',
+        surname: 'Иванович',
+        email: faker.internet.email(),
         password: 'TestUser123',
         passwordConfirmation: 'TestUser123',
+        confirmed: true,
     };
 };
 exports.createUserData = createUserData;
 const createInvalidUserData = () => {
     return {
-        nameShort: 'a',
-        nameExceeding: 'hugenameconsistingofmorethantwentyfive',
-        nameWithDigits: 'testName7',
-        middleNameShort: 'a',
-        middleNameExceeding: 'hugenameconsistingofmorethantwentyfive',
-        middleNameWithDigits: 'testMiddleName7',
-        surnameShort: 'a',
-        surnameExceeding: 'hugenameconsistingofmorethantwentyfive',
-        surnnameWithDigits: 'testSurname7',
+        nameShort: 'а',
+        nameExceeding: 'Ааааааааааааааааааааааааааааааааааааа',
+        nameWithDigits: 'Иван1',
+        middleNameShort: 'а',
+        middleNameExceeding: 'Петровиииииииииииииииииииииииич',
+        middleNameWithDigits: 'Петрович1',
+        surnameShort: 'а',
+        surnameExceeding: 'Иванооооооооооооооооооооов',
+        surnnameWithDigits: 'Иванов1',
         email: 'invalid email',
         passwordShort: '6digit',
         passwordExceeding: 'twentyfivedigitpassword25passcode',
@@ -79,11 +102,13 @@ const testUserValidationByMessages = async (model, userData, message, expect) =>
     }
 };
 exports.testUserValidationByMessages = testUserValidationByMessages;
-const createSpaceData = (userId, cityId) => {
+const createSpaceData = (userId, cityId, pricePerNight = 1000) => {
     return {
         address: faker.address.streetAddress(),
+        pricePerNight,
         type: space_model_1.SpaceType.FLAT,
         roomsNumber: 2,
+        bedsNumber: 2,
         imagesUrl: ['/public/images/space/1.jpg'],
         lockerConnected: false,
         facilities: ['TV'],
@@ -93,44 +118,31 @@ const createSpaceData = (userId, cityId) => {
     };
 };
 exports.createSpaceData = createSpaceData;
-// export const createDatesToReserve = (beginningDate: string, endingDate: string, space: Space): TDatesReserved => {
-//     return [
-//         { inclusive: true, value: createCustomDate(beginningDate, space['city.timezone']) },
-//         { inclusive: false, value: createCustomDate(endingDate, space['city.timezone']) },
-//     ];
-// };
-// const timeValueToDoubleDigitParser = (value) => {
-//     return value > 9 ? `${value}` : `0${value}`;
-// };
-// export const createCustomDate = (dateRawValue: string, timezone: string): string => {
-//     const date = new Date(dateRawValue);
-//     const year = date.getFullYear();
-//     const month = timeValueToDoubleDigitParser(date.getMonth() + 1);
-//     const day = timeValueToDoubleDigitParser(date.getDate());
-//     const hours = timeValueToDoubleDigitParser(date.getHours());
-//     const minutes = timeValueToDoubleDigitParser(date.getMinutes());
-//     const seconds = timeValueToDoubleDigitParser(date.getSeconds());
-//     let milliseconds: any = date.getMilliseconds() / 1000;
-//     milliseconds = Math.floor(milliseconds.toFixed(2) * 100);
-//     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}${UtilFunctions.timezoneParser(
-//         timezone
-//     )}`;
-// };
-const createTokenAndSign = async (payload) => {
-    const signToken = util_1.promisify(jwt.sign);
-    switch (typeof payload) {
-        case 'string':
-            return signToken(payload, process.env.JWT_SECRET_KEY);
-        case 'object':
-            return signToken(payload, process.env.JWT_SECRET_KEY);
-    }
+const createPathToUserAvatarDir = (userId) => {
+    return path.resolve('assets', 'images', 'users', userId);
+};
+exports.createPathToUserAvatarDir = createPathToUserAvatarDir;
+const createPathToSpaceImagesDir = (spaceId) => {
+    return path.resolve('assets', 'images', 'spaces', spaceId);
+};
+exports.createPathToSpaceImagesDir = createPathToSpaceImagesDir;
+const createAppoinmentData = (isoDatesReserved, spaceId, userId) => {
+    return {
+        isoDatesReserved,
+        userId,
+        spaceId,
+    };
+};
+exports.createAppoinmentData = createAppoinmentData;
+const createTokenAndSign = (payload) => {
+    return jwt.sign(payload, process.env.JWT_SECRET_KEY);
 };
 exports.createTokenAndSign = createTokenAndSign;
-const openTestEnv = async (applicationInstance) => {
-    applicationInstance.setupPassport();
-    applicationInstance.configureApp();
-    await exports.startDb(applicationInstance.sequelize);
-    const server = exports.startServer(applicationInstance.app); // NOTE
+const openTestEnv = async (appConfig) => {
+    appConfig.setupPassport();
+    appConfig.configureApp();
+    await exports.startDb(appConfig.sequelize);
+    const server = exports.startServer(appConfig.app);
     return {
         server,
     };

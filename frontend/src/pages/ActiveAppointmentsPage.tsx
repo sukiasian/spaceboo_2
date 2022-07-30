@@ -45,6 +45,11 @@ export default function ActiveAppointmentsPage(): JSX.Element {
         dispatch(annualizeFetchSpacesForUserActiveAppointmentsResponsesAction());
         fetchSpacesForUserActiveAppointments();
     };
+    const renderNoSpacesAppointedMessage = (): JSX.Element | void => {
+        if (spaces?.length === 0) {
+            return <p>Нет бронирований.</p>;
+        }
+    };
     const renderReloadOnError = (): JSX.Element | void => {
         if (fetchSpacesByUserActiveAppointmentsFailureResponse) {
             return <RefreshButton handleClick={handleRefreshButton} />;
@@ -67,7 +72,10 @@ export default function ActiveAppointmentsPage(): JSX.Element {
     return (
         <div className="upcoming-appointments">
             <div className="spaces-by-appointments">
-                <div className="spaces-with-active-appointments">{renderSpaces()}</div>
+                <div className="spaces-with-active-appointments">
+                    {renderNoSpacesAppointedMessage()}
+                    {renderSpaces()}
+                </div>
             </div>
             <div className="upcoming-appointments__reload"> {renderReloadOnError()}</div>
         </div>

@@ -5,7 +5,7 @@ export default function Footer() {
         <footer className="footer">
             <div className="footer-content">
                 <div className="footer-sections">
-                    <div className="footer__main">
+                    <div className="footer-part footer__main">
                         <div className="footer__main__description-container">
                             <h2 className="heading heading--secondary footer-section-name  footer__main__description">
                                 SPACEBOO
@@ -33,7 +33,7 @@ export default function Footer() {
                             </div>
                         </div>
                     </div>
-                    <div className="footer__spaces">
+                    <div className="footer-part footer__spaces">
                         <div className="footer__spaces__description-container">
                             <h2 className="heading heading--secondary footer-section-name footer__spaces__description">
                                 ПРОСТРАНСТВА
@@ -57,7 +57,6 @@ export default function Footer() {
                         </div>
                     </div>
                 </div>
-                <div className="footer__social-media"></div>
             </div>
             <div className="footer__corporate">
                 <p className="paragraph"> Spaceboo © 2022 </p>

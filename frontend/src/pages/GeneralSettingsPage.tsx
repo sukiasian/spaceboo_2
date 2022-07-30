@@ -8,7 +8,7 @@ import {
     deleteUserAvatarAction,
     postUploadUserAvatarAction,
 } from '../redux/actions/imageActions';
-import { fetchCurrentUserAction } from '../redux/actions/userActions';
+import { annualizeEditUserResponsesAction, fetchCurrentUserAction } from '../redux/actions/userActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import RemoveIcon from '../icons/RemoveIcon';
 import Alert from '../components/Alert';
@@ -16,7 +16,9 @@ import EditUserInputs from '../components/EditUserInputs';
 
 // NOTE: how to handle mobile version? through styles or through here? probably through here.
 export default function GeneralSettingsPage(): JSX.Element {
-    const { fetchCurrentUserSuccessResponse } = useSelector((state: IReduxState) => state.userStorage);
+    const { fetchCurrentUserSuccessResponse, putEditUserSuccessResponse, putEditUserFailureResponse } = useSelector(
+        (state: IReduxState) => state.userStorage
+    );
     const {
         postUploadUserAvatarSuccessResponse,
         postUploadUserAvatarFailureResponse,
@@ -28,6 +30,7 @@ export default function GeneralSettingsPage(): JSX.Element {
     const annualizeComponentResponses = (): void => {
         dispatch(annualizePostUploadUserAvatarResponsesAction());
         dispatch(annualizeDeleteUserAvatarResponsesAction());
+        dispatch(annualizeEditUserResponsesAction());
     };
     const applyEffectsOnInit = (): (() => void) => {
         return () => {
@@ -92,6 +95,9 @@ export default function GeneralSettingsPage(): JSX.Element {
             />
         );
     };
+    const renderEditUserDataAlert = (): JSX.Element | void => {
+        return <Alert successResponse={putEditUserSuccessResponse} failureResponse={putEditUserFailureResponse} />;
+    };
 
     useEffect(applyEffectsOnInit, []);
     useEffect(handleAfterSuccessfulAvatarUpload, [postUploadUserAvatarSuccessResponse]);
@@ -121,6 +127,7 @@ export default function GeneralSettingsPage(): JSX.Element {
             </div>
             {renderUploadAvatarAlert()}
             {renderDeleteAvatarAlert()}
+            {renderEditUserDataAlert()}
         </div>
     );
 }

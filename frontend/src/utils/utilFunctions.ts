@@ -53,3 +53,9 @@ export const defineActiveClassName = (activeTab: string, tab: string): string =>
 export const checkIfRouteNeedsRedirectingToChildRoute = (actualPathname: string, parentRoute: string): boolean => {
     return actualPathname === parentRoute || actualPathname === `${parentRoute}/`;
 };
+
+export const separateCityNameFromRegionIfCityNameContains = (cityName: string) => {
+    const cityNameValuesSeparately = cityName.split(' ');
+
+    return cityNameValuesSeparately[0];
+};

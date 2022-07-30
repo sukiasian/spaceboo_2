@@ -1,10 +1,12 @@
 import { useSelector } from 'react-redux';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, Route, Routes, useNavigate } from 'react-router-dom';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import SettingsPageRoutes from '../routes/SettingsPageRoutes';
 import { useEffect, useState } from 'react';
 import { ITab } from '../types/types';
 import { checkIfRouteNeedsRedirectingToChildRoute } from '../utils/utilFunctions';
+import SecuritySettingsPage from './SecuritySettingsPage';
+import GeneralSettingsPage from './GeneralSettingsPage';
 
 export default function SettingsPage(): JSX.Element {
     const settingsLinkableTabs: ITab[] = [
@@ -26,7 +28,7 @@ export default function SettingsPage(): JSX.Element {
         const parentRoute = '/user/settings';
 
         if (checkIfRouteNeedsRedirectingToChildRoute(pathname, parentRoute)) {
-            navigate('/user/settings/general');
+            navigate(`${parentRoute}/general`);
         }
     };
     const applyEffectsOnInit = (): void => {

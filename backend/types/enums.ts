@@ -142,6 +142,8 @@ export enum ErrorMessages {
     WAIT_BEFORE_GETTING_EMAIL = 'Получить код повторно можно только по истечении 2 минут.',
     EXPIRED_REQUEST = 'Срок действия кода истек. Повторите попытку.',
     VERIFY_ACCOUNT = 'Пожалуйста, подтвердите ваш аккаунт.',
+    INVALID_TYPE_OF_SPACE = 'Введите действительный тип жилья.',
+    PICK_CITY_FROM_THE_LIST = 'Выберите город из списка.',
 }
 
 export enum Environment {

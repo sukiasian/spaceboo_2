@@ -2,18 +2,24 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.router = void 0;
 const express_1 = require("express");
-const auth_controller_1 = require("../controllers/auth.controller");
+const passport = require("passport");
 const user_controller_1 = require("../controllers/user.controller");
+const enums_1 = require("../types/enums");
 const Singleton_1 = require("../utils/Singleton");
 class UserRouter extends Singleton_1.Singleton {
     constructor() {
         super(...arguments);
-        this.authController = auth_controller_1.authController;
-        this.userController = user_controller_1.userController;
         this.router = express_1.Router();
-        this.prepareRouter = function () {
-            this.router.route('/').post(this.userController.findUserById);
-            this.router.route('/').post(this.authController.signUpLocal);
+        this.passport = passport;
+        this.userController = user_controller_1.userController;
+        this.prepareRouter = () => {
+            this.router
+                .route('/')
+                .put(this.passport.authenticate(enums_1.PassportStrategies.JWT, { session: false }), this.userController.editUser);
+            this.router
+                .route('/current')
+                .get(this.passport.authenticate(enums_1.PassportStrategies.JWT, { session: false }), this.userController.getCurrentUser);
+            this.router.route('/:userId').get(this.userController.getUserById);
         };
     }
 }

@@ -37,6 +37,10 @@ __decorate([
     __metadata("design:type", String)
 ], Appointment.prototype, "userId", void 0);
 __decorate([
+    sequelize_typescript_1.Column({ defaultValue: false }),
+    __metadata("design:type", Boolean)
+], Appointment.prototype, "archived", void 0);
+__decorate([
     sequelize_typescript_1.BelongsTo(() => space_model_1.Space),
     __metadata("design:type", space_model_1.Space)
 ], Appointment.prototype, "space", void 0);

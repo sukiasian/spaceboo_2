@@ -13,6 +13,7 @@ const user_model_1 = require("../models/user.model");
 const enums_1 = require("../types/enums");
 const logger_1 = require("../loggers/logger");
 const user_sequelize_dao_1 = require("../daos/user.sequelize.dao");
+const AppError_1 = require("../utils/AppError");
 class PassportConfig extends Singleton_1.Singleton {
     constructor() {
         super(...arguments);
@@ -24,22 +25,29 @@ class PassportConfig extends Singleton_1.Singleton {
         return this.passport.initialize();
     }
     configurePassport() {
+        const tokenExtractorFromCookie = (req) => {
+            let token;
+            if (req && req.cookies) {
+                token = req.cookies['jwt'];
+            }
+            return token;
+        };
         this.passport.use(new passport_local_1.Strategy({ usernameField: 'email', passwordField: 'password', session: false }, async (email, password, done) => {
             try {
                 let user;
                 user = await this.userModel.scope(user_model_1.UserScopes.WITH_PASSWORD).findOne({ where: { email } });
                 if (!user) {
-                    return done(null, false);
+                    return done(new AppError_1.default(enums_1.HttpStatus.UNAUTHORIZED, enums_1.ErrorMessages.USERNAME_OR_PASSWORD_INCORRECT), false);
                 }
                 if (!(await user.verifyPassword(user)(password))) {
-                    return done(null);
+                    return done(new AppError_1.default(enums_1.HttpStatus.UNAUTHORIZED, enums_1.ErrorMessages.USERNAME_OR_PASSWORD_INCORRECT));
                 }
                 user = await this.userModel.findOne({ raw: true, where: { email } });
                 return done(null, { id: user.id });
             }
             catch (err) {
                 done(err);
-                logger_1.default.log({ level: enums_1.LoggerLevels.ERROR, message: err });
+                logger_1.default.error(err);
             }
         }));
         this.passport.use(new passport_facebook_1.Strategy({
@@ -77,14 +85,25 @@ class PassportConfig extends Singleton_1.Singleton {
             });
         }));
         this.passport.use(new passport_jwt_1.Strategy({
-            jwtFromRequest: passport_jwt_2.ExtractJwt.fromAuthHeaderAsBearerToken(),
+            jwtFromRequest: passport_jwt_2.ExtractJwt.fromExtractors([
+                tokenExtractorFromCookie,
+                passport_jwt_2.ExtractJwt.fromAuthHeaderAsBearerToken(),
+            ]),
             secretOrKey: process.env.JWT_SECRET_KEY,
             // issuer: 'spaceboo',
             // audience: 'www.spaceboo.com',
         }, async (jwt_payload, done) => {
             try {
-                const user = await this.userModel.findOne({ where: { id: jwt_payload }, raw: true });
-                return user ? done(null, { id: user.id }) : done(null, false);
+                const user = await this.userModel
+                    .scope(user_model_1.UserScopes.WITH_CONFIRMED)
+                    .findOne({ where: { id: jwt_payload.id }, raw: true });
+                if (!user) {
+                    return done(new AppError_1.default(enums_1.HttpStatus.FORBIDDEN, enums_1.ErrorMessages.USER_NOT_FOUND), false);
+                }
+                else if (!user.confirmed) {
+                    return done(new AppError_1.default(enums_1.HttpStatus.FORBIDDEN, enums_1.ErrorMessages.USER_NOT_CONFIRMED), false);
+                }
+                return done(null, { id: user.id });
             }
             catch (err) {
                 return done(err, false);

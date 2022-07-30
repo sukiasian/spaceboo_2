@@ -4,6 +4,7 @@ import { City } from './city.model';
 import { Appointment } from './appointment.model';
 import { User } from './user.model';
 import { ErrorMessages } from '../types/enums';
+import { validate } from 'node-cron';
 
 interface ISpaceAttributes {
     id: string;
@@ -62,7 +63,17 @@ export class Space extends Model<ISpaceAttributes, ISpaceCreationAttributes> imp
     @Column({ allowNull: false })
     public pricePerNight: number;
 
-    @Column({ allowNull: false, type: DataType.STRING })
+    @Column({
+        allowNull: false,
+        type: DataType.STRING,
+        validate: {
+            isCorrect(value) {
+                if (value !== SpaceType.FLAT && value !== SpaceType.HOUSE) {
+                    throw new Error(ErrorMessages.INVALID_TYPE_OF_SPACE);
+                }
+            },
+        },
+    })
     public type: SpaceType;
 
     @Column({ allowNull: false, type: DataType.SMALLINT })

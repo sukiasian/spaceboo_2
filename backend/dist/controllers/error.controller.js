@@ -1,10 +1,28 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const logger_1 = require("../loggers/logger");
 const enums_1 = require("../types/enums");
 class ErrorController {
 }
-ErrorController.sendErrorDevAndTest = (err, res) => {
-    console.log(err, enums_1.ErrorMessages.APPLICATION_ERROR);
+ErrorController.logger = logger_1.default;
+ErrorController.sendErrorProd = (err, res) => {
+    if (err.isOperational) {
+        this.logger.error(`${err}, ${enums_1.ErrorMessages.APPLICATION_ERROR}`);
+        res.status(err.statusCode).json({
+            status: err.status,
+            message: err.message,
+        });
+    }
+    else {
+        this.logger.error(`${err}, ${enums_1.ErrorMessages.UNKNOWN_ERROR}`);
+        res.status(err.statusCode).json({
+            status: err.status,
+            message: enums_1.ErrorMessages.UNKNOWN_ERROR,
+        });
+    }
+};
+ErrorController.sendErrorDev = (err, res) => {
+    this.logger.error(`${err}`);
     res.status(err.statusCode).json({
         status: err.status,
         error: err,
@@ -12,32 +30,18 @@ ErrorController.sendErrorDevAndTest = (err, res) => {
         stack: err.stack,
     });
 };
-ErrorController.sendErrorProd = (err, res) => {
-    if (err.isOperational) {
-        console.error('ERR', err);
-        res.status(err.statusCode).json({
-            status: err.status,
-            message: err.message,
-        });
-    }
-    else {
-        console.error(err, enums_1.ErrorMessages.APPLICATION_ERROR);
-        res.status(err.statusCode).json({
-            status: err.status,
-            message: enums_1.ErrorMessages.UNKNOWN_ERROR,
-        });
-    }
-};
 ErrorController.sendErrorTest = (err, res) => {
-    if (!err.isOperational) {
+    if (err.isOperational) {
+        this.logger.error(`${err}, ${enums_1.ErrorMessages.APPLICATION_ERROR}`);
         res.status(err.statusCode).json({
-            status: err.status,
-            message: enums_1.ErrorMessages.UNKNOWN_ERROR,
+            message: err.message,
         });
     }
     else {
+        this.logger.error(`${err}, ${enums_1.ErrorMessages.UNKNOWN_ERROR}`);
         res.status(err.statusCode).json({
-            message: err.message,
+            status: err.status,
+            message: enums_1.ErrorMessages.UNKNOWN_ERROR,
         });
     }
 };
@@ -46,7 +50,7 @@ ErrorController.globalErrorController = (err, req, res, next) => {
     err.message = err.message || enums_1.ErrorMessages.UNKNOWN_ERROR;
     switch (process.env.NODE_ENV) {
         case enums_1.Environment.DEVELOPMENT:
-            ErrorController.sendErrorDevAndTest(err, res);
+            ErrorController.sendErrorDev(err, res);
             break;
         case enums_1.Environment.TEST:
             ErrorController.sendErrorTest(err, res);

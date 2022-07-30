@@ -19,6 +19,7 @@ enum DateFormat {
 
 class UtilFunctions {
     private static readonly signToken = jwt.sign;
+    private static readonly logger = logger;
 
     public static defineResponseStatus = (httpStatus: number): ResponseStatus => {
         if (httpStatus >= HttpStatus.OK && httpStatus < HttpStatus.FORBIDDEN) {
@@ -199,7 +200,9 @@ class UtilFunctions {
         const checkIfFileExists = await UtilFunctions.checkIfExists(pathToFile);
 
         if (!checkIfFileExists) {
-            throw new AppError(HttpStatus.NOT_FOUND, ErrorMessages.NO_IMAGE_FOUND);
+            this.logger.error(ErrorMessages.NO_IMAGE_FOUND);
+
+            return;
         }
 
         await UtilFunctions.removeFile(pathToFile);

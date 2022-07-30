@@ -46,6 +46,11 @@ export default function UpcomingAppointmentsPage(): JSX.Element {
     const handleRefreshButton = (): void => {
         dispatch(annualizeFetchSpacesForUserUpcomingAppointmentsResponsesAction());
     };
+    const renderNoSpacesAppointedMessage = (): JSX.Element | void => {
+        if (spaces?.length === 0) {
+            return <p>Нет бронирований.</p>;
+        }
+    };
     const renderReloadOnError = (): JSX.Element | void => {
         if (fetchSpacesByUserUpcomingAppointmentsFailureResponse) {
             return (
@@ -74,6 +79,7 @@ export default function UpcomingAppointmentsPage(): JSX.Element {
             <div className="spaces-by-appointments">
                 <div className="spaces-with-upcoming-appointments">{renderSpaces()}</div>
             </div>
+            {renderNoSpacesAppointedMessage()}
             {renderReloadOnError()}
         </div>
     );

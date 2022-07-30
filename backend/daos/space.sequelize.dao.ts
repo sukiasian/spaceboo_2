@@ -39,10 +39,9 @@ export class SpaceSequelizeDao extends Dao {
         return this.spaceModel;
     }
 
-    // NOTE аутентификация - протекция роута (только для авторизованных пользователей)
     public provideSpace = async (data: ISpaceCreate, files: Express.Multer.File[]): Promise<Space> => {
         try {
-            return await this.model.create(data);
+            return this.model.create(data);
         } catch (err) {
             await this.findUploadedImagesAndRemove(data.userId, files);
 

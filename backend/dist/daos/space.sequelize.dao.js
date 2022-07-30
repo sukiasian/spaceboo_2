@@ -1,126 +1,189 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.spaceSequelizeDao = exports.SpaceSequelizeDao = void 0;
-const sequelize_1 = require("sequelize");
+exports.spaceSequelizeDao = exports.SpaceSequelizeDao = exports.SpaceQuerySortFields = void 0;
 const dao_config_1 = require("../configurations/dao.config");
-const appointment_model_1 = require("../models/appointment.model");
-const city_model_1 = require("../models/city.model");
 const space_model_1 = require("../models/space.model");
 const enums_1 = require("../types/enums");
 const Singleton_1 = require("../utils/Singleton");
 const UtilFunctions_1 = require("../utils/UtilFunctions");
-const city_sequelize_dao_1 = require("./city.sequelize.dao");
-const sequelize = require("sequelize");
+const AppConfig_1 = require("../AppConfig");
+const city_model_1 = require("../models/city.model");
 var SpaceQuerySortFields;
 (function (SpaceQuerySortFields) {
     SpaceQuerySortFields["PRICEUP"] = "priceup";
     SpaceQuerySortFields["PRICEDOWN"] = "pricedown";
     SpaceQuerySortFields["OLDEST"] = "oldest";
     SpaceQuerySortFields["NEWEST"] = "newest";
-})(SpaceQuerySortFields || (SpaceQuerySortFields = {}));
+})(SpaceQuerySortFields = exports.SpaceQuerySortFields || (exports.SpaceQuerySortFields = {}));
 var SpaceSortFields;
 (function (SpaceSortFields) {
-    SpaceSortFields["PRICE"] = "price";
+    SpaceSortFields["PRICE"] = "pricePerNight";
     SpaceSortFields["DATE_OF_CREATION"] = "createdAt";
 })(SpaceSortFields || (SpaceSortFields = {}));
 class SpaceSequelizeDao extends dao_config_1.Dao {
     constructor() {
         super(...arguments);
         this.spaceModel = space_model_1.Space;
-        this.cityModel = city_model_1.City;
-        this.appointmentModel = appointment_model_1.Appointment;
-        this.cityDao = city_sequelize_dao_1.citySequelizeDao;
+        this.utilFunctions = UtilFunctions_1.default;
         // NOTE аутентификация - протекция роута (только для авторизованных пользователей)
-        this.createSpace = async (data) => {
-            return this.model.create(data);
-        };
-        this.getSpacesByQuery = async (queryStr) => {
+        this.provideSpace = async (data, files) => {
             try {
-                let { page, limit, sortBy, datesToReserveQuery, timesToReserveQuery, city } = queryStr;
-                let isoDatesRange;
-                page = page ? page * 1 : undefined;
-                limit = limit ? limit * 1 : undefined;
-                if (datesToReserveQuery && timesToReserveQuery) {
-                    datesToReserveQuery = datesToReserveQuery.split(',');
-                    timesToReserveQuery = timesToReserveQuery.split(',');
-                    isoDatesRange = UtilFunctions_1.default.createIsoDatesRangeToFindAppointments(datesToReserveQuery[0], timesToReserveQuery[0], datesToReserveQuery[1], timesToReserveQuery[1]);
-                }
-                const offset = (page - 1) * limit + 1;
-                const query = {
-                    order: sortBy
-                        ? [this.defineSortOrder(sortBy)]
-                        : [[SpaceSortFields.DATE_OF_CREATION, enums_1.QuerySortDirection.DESC]],
-                    limit: limit || 20,
-                    offset: offset || 0,
-                    nest: true,
-                    include: [],
-                };
-                let cityIncludable;
-                let appointmentsIncludable;
-                if (city) {
-                    cityIncludable = {
-                        model: this.cityModel,
-                        required: true,
-                        where: {
-                            city,
-                        },
-                    };
-                    query.include.push(cityIncludable);
-                }
-                if (datesToReserveQuery) {
-                    // appointmentsIncludable = {
-                    //     model: Appointment,
-                    //     as: 'appointments',
-                    //     // required: false,
-                    //     // duplicating: true,
-                    //     // @ts-ignore
-                    //     // where: {
-                    //     // isoDatesReserved: {
-                    //     //     [Op.overlap]: sequelize.cast(isoDatesRange, 'tstzrange'),
-                    //     // },
-                    //     // },
-                    // };
-                    // (query.include as Includeable[]).push(appointmentsIncludable);
-                }
-                const spaces = await this.model.findAll({
-                    include: [{ model: appointment_model_1.Appointment, required: true }, city_model_1.City],
-                    where: {
-                        // @ts-ignore
-                        [sequelize_1.Op.not]: {
-                            ['$appointments.isoDatesReserved$']: {
-                                [sequelize_1.Op.overlap]: sequelize.cast(isoDatesRange, 'tstzrange'),
-                            },
-                        },
-                    },
-                });
-                return spaces;
+                return await this.model.create(data);
             }
             catch (err) {
-                console.log(err, 'errrrrr');
+                await this.findUploadedImagesAndRemove(data.userId, files);
+                throw err;
             }
         };
-        // NOTE аутентификация
-        this.editSpaceById = async (spaceId, userId, data) => {
-            const space = (await this.findById(spaceId, true));
-            await space.update(data);
+        this.getSpacesByQuery = async (queryStr) => {
+            let { page, limit, sortBy, datesToReserveQuery, timesToReserveQuery, cityId, priceRange } = queryStr;
+            let isoDatesRange;
+            let pricesFromAndTo;
+            if (datesToReserveQuery) {
+                datesToReserveQuery = datesToReserveQuery.split(',');
+                timesToReserveQuery = timesToReserveQuery ? timesToReserveQuery.split(',') : ['14:00', '12:00'];
+                isoDatesRange = UtilFunctions_1.default.createIsoDatesRangeToFindAppointments(datesToReserveQuery[0], timesToReserveQuery[0], datesToReserveQuery[1], timesToReserveQuery[1]);
+            }
+            // NOTE priceRange - если нет, то from должно быть от 0 - либо его вообще может не быть. но также может не быть to - как тогда быть ?
+            if (priceRange) {
+                priceRange = priceRange.split(',');
+                priceRange = priceRange.map((price) => parseInt(price, 10));
+                if (priceRange.length === 2) {
+                    pricesFromAndTo = {
+                        from: priceRange[0],
+                        to: priceRange[1],
+                    };
+                }
+                else {
+                    pricesFromAndTo = {
+                        from: priceRange[0],
+                    };
+                }
+            }
+            page = page ? page * 1 : 1;
+            limit = limit ? limit * 1 : 20;
+            const offset = (page - 1) * limit;
+            const order = sortBy
+                ? this.defineSortOrder(sortBy)
+                : `"${SpaceSortFields.DATE_OF_CREATION}" ${enums_1.QuerySortDirection.DESC}`;
+            const queryFromParts = this.spacesQueryGeneratorByParts(order, limit, offset, isoDatesRange, cityId, pricesFromAndTo);
+            return this.utilFunctions.createSequelizeRawQuery(AppConfig_1.appConfig.sequelize, queryFromParts);
         };
-        // NOTE аутентификация и проверка на то что
-        this.deleteSpaceById = async () => { };
+        this.getSpaceById = async (spaceId) => {
+            return this.model.findOne({
+                where: {
+                    id: spaceId,
+                },
+                include: [city_model_1.City],
+            });
+        };
+        this.getUserSpaces = async (userId) => {
+            return this.model.findAll({
+                where: {
+                    userId,
+                },
+            });
+        };
+        this.getSpacesForUserOutdatedAppointmentsIds = async (userId) => {
+            const now = new Date().toISOString();
+            const getOutdatedAppointmentsRawQuery = `SELECT * FROM "Appointments" a WHERE a."userId" = '${userId}' AND UPPER(a."isoDatesReserved") < '${now}';`;
+            const userOutdatedAppointments = (await this.utilFunctions.createSequelizeRawQuery(AppConfig_1.appConfig.sequelize, getOutdatedAppointmentsRawQuery));
+            const spacesForUserOutdatedAppointments = await Promise.all(userOutdatedAppointments.map(async (appointment) => {
+                const getSpaceForUserOutdatedAppointment = `SELECT * FROM "Appointments" a JOIN "Spaces" s ON a."spaceId" = s."id" WHERE a."id" = '${appointment.id}';`;
+                return this.utilFunctions.createSequelizeRawQuery(AppConfig_1.appConfig.sequelize, getSpaceForUserOutdatedAppointment, { plain: true });
+            }));
+            return spacesForUserOutdatedAppointments;
+        };
+        this.getSpacesForUserActiveAppointmentsIds = async (userId) => {
+            const now = new Date().toISOString();
+            const getActiveAppointmentsRawQuery = `SELECT * FROM "Appointments" a WHERE a."userId" = '${userId}' AND a."isoDatesReserved" @> '${now}'::timestamptz;`;
+            const userActiveAppointments = (await this.utilFunctions.createSequelizeRawQuery(AppConfig_1.appConfig.sequelize, getActiveAppointmentsRawQuery));
+            const spacesForUserActiveAppointments = await Promise.all(userActiveAppointments.map(this.getSpaceByAppointment));
+            return spacesForUserActiveAppointments;
+        };
+        this.getSpacesForUserUpcomingAppointmentsIds = async (userId) => {
+            const now = new Date().toISOString();
+            const getUpcomingAppointmentsRawQuery = `SELECT * FROM "Appointments" a WHERE a."userId" = '${userId}' AND LOWER(a."isoDatesReserved") > '${now}';`;
+            const userUpcomingAppointments = (await this.utilFunctions.createSequelizeRawQuery(AppConfig_1.appConfig.sequelize, getUpcomingAppointmentsRawQuery));
+            const spacesForUserUpcomingAppointments = await Promise.all(userUpcomingAppointments.map(this.getSpaceByAppointment));
+            return spacesForUserUpcomingAppointments;
+        };
+        this.getSpaceByAppointment = async (appointment) => {
+            const getSpaceForUserOutdatedAppointment = `SELECT * FROM "Appointments" a JOIN "Spaces" s ON a."spaceId" = s."id" WHERE a."id" = '${appointment.id}';`;
+            return (await this.utilFunctions.createSequelizeRawQuery(AppConfig_1.appConfig.sequelize, getSpaceForUserOutdatedAppointment, { plain: true }));
+        };
+        this.getSpacesForKeyControl = async (userId) => {
+            const now = new Date().toISOString();
+            const getUserActiveAppointmentsForLockConnectedSpacesRawQuery = `SELECT * FROM "Appointments" a WHERE a."userId" = '${userId}' AND "lockerConnected" = 'true' AND a."isoDatesReserved" @> '${now}'::timestamptz;`;
+            const userActiveAppointments = (await this.utilFunctions.createSequelizeRawQuery(AppConfig_1.appConfig.sequelize, getUserActiveAppointmentsForLockConnectedSpacesRawQuery));
+            const spacesForUserActiveAppointments = await Promise.all(userActiveAppointments.map(this.getSpaceByAppointment));
+            return spacesForUserActiveAppointments;
+        };
+        this.editSpaceById = async (userId, spaceId, spaceEditData, files) => {
+            try {
+                const space = await this.model.findOne({ where: { id: spaceId } });
+                await space.update(spaceEditData, { fields: space_model_1.spaceEditFields });
+            }
+            catch (err) {
+                await this.findUploadedImagesAndRemove(userId, files);
+                throw err;
+            }
+        };
+        this.deleteSpaceById = async (spaceId) => {
+            const space = await this.model.findOne({ where: { id: spaceId } });
+            await space.destroy();
+        };
+        this.updateSpaceImagesInDb = async (userId, spaceId, spaceImagesToRemove, uploadedFiles) => {
+            // NOTE SELECT array_cat(ARRAY[1,2,3], ARRAY[4,5]);
+            const actualSpaceImagesUrls = (await this.findById(spaceId)).imagesUrl || [];
+            let spaceImagesUrlsAfterRemoval = actualSpaceImagesUrls;
+            for (const spaceImageToRemove of spaceImagesToRemove) {
+                spaceImagesUrlsAfterRemoval = spaceImagesUrlsAfterRemoval.filter((el) => el !== spaceImageToRemove);
+            }
+            const spaceImagesToAddUrls = uploadedFiles.map((file) => {
+                return `${userId}/${file.filename}`;
+            });
+            const newSpaceImagesUrlsFromRemainingAndNewOnes = [...spaceImagesUrlsAfterRemoval, ...spaceImagesToAddUrls];
+            const newSpaceImagesUrlsFromRemainingAndNewOnesJoined = newSpaceImagesUrlsFromRemainingAndNewOnes.join(', ');
+            const updateRawQuery = `UPDATE "Spaces" SET "imagesUrl" = ARRAY_CAT("imagesUrl", '{${newSpaceImagesUrlsFromRemainingAndNewOnesJoined}}') WHERE id = '${spaceId}';`;
+            await this.utilFunctions.createSequelizeRawQuery(AppConfig_1.appConfig.sequelize, updateRawQuery);
+        };
+        this.removeSpaceImagesFromDb = async (spaceId, spaceImagesToDelete) => {
+            let rawRemoveQueries = '';
+            spaceImagesToDelete.forEach((spaceImageToDelete) => {
+                rawRemoveQueries += `UPDATE "Spaces" SET "imagesUrl" = ARRAY_REMOVE("imagesUrl", '${spaceImageToDelete}') WHERE id = '${spaceId}';`;
+            });
+            await this.utilFunctions.createSequelizeRawQuery(AppConfig_1.appConfig.sequelize, rawRemoveQueries);
+        };
         this.defineSortOrder = (sortBy) => {
             switch (sortBy) {
                 case SpaceQuerySortFields.PRICEUP:
-                    return [SpaceSortFields.PRICE, enums_1.QuerySortDirection.ASC];
+                    return `"${SpaceSortFields.PRICE}" ${enums_1.QuerySortDirection.ASC}`;
                 case SpaceQuerySortFields.PRICEDOWN:
-                    return [SpaceSortFields.PRICE, enums_1.QuerySortDirection.DESC];
+                    return `"${SpaceSortFields.PRICE}" ${enums_1.QuerySortDirection.DESC}`;
                 case SpaceQuerySortFields.NEWEST:
-                    return [SpaceSortFields.DATE_OF_CREATION, enums_1.QuerySortDirection.ASC];
+                    return `"${SpaceSortFields.DATE_OF_CREATION}" ${enums_1.QuerySortDirection.DESC}`;
                 case SpaceQuerySortFields.OLDEST:
-                    return [SpaceSortFields.DATE_OF_CREATION, enums_1.QuerySortDirection.DESC];
+                    return `"${SpaceSortFields.DATE_OF_CREATION}" ${enums_1.QuerySortDirection.ASC}`;
             }
         };
-        // private datesToReserveQueryParser = (datesToReserveQuery: string): TDatesReserved => {
-        //     const datesToReserve: string[] = datesToReserveQuery.split(',');
-        // };
+        this.spacesQueryGeneratorByParts = (order, limit, offset, isoDatesRange, cityId, priceRange) => {
+            // NOTE 1. we can use separate functions  2. при отсутствии datesToReservePartialQuery возможна ошибка т.к. будет отсутствовать WHERE constraint. хотя тест проходит
+            const cityPartialQuery = cityId ? `AND c."cityId" = ${cityId}` : '';
+            const datesToReservePartialQuery = isoDatesRange
+                ? `WHERE NOT EXISTS
+        (SELECT 1 FROM "Appointments" a WHERE a."spaceId" = s."id"
+        AND a."isoDatesReserved" && '${isoDatesRange}')`
+                : '';
+            const priceRangeFromPartialQuery = priceRange && priceRange.from !== undefined ? `AND s."pricePerNight" >= ${priceRange.from}` : '';
+            const priceRangeToPartialQuery = priceRange && priceRange.to !== undefined ? `AND s."pricePerNight" <= ${priceRange.to}` : '';
+            return `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", "regionId", name FROM "Cities") c ON s."cityId" = c."cityId" ${cityPartialQuery} ${datesToReservePartialQuery} ${priceRangeFromPartialQuery} ${priceRangeToPartialQuery} ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
+        };
+        this.findUploadedImagesAndRemove = (userId, files) => {
+            return Promise.all(files.map(async (file) => {
+                await this.utilFunctions.findAndRemoveImage(userId, file.filename);
+            }));
+        };
     }
     get model() {
         return this.spaceModel;
@@ -128,21 +191,4 @@ class SpaceSequelizeDao extends dao_config_1.Dao {
 }
 exports.SpaceSequelizeDao = SpaceSequelizeDao;
 exports.spaceSequelizeDao = Singleton_1.SingletonFactory.produce(SpaceSequelizeDao);
-/*
-
-Решение смотреть выше:
-
-сначала мы находим все спейсы которые есть (но что делать с лимитацией  и пагинацией?) на каждую страницу отправлять новый запрос и выполнять query
-- выдавая в качестве response-а каждую последующую двадцатку результатов, соответствующих времени.
-
-NOTE возможно то что мы прописали это дорогая операция, поэтому если сити предопределен в queryStr, то лучше тогда
-задать отдельную логику. Это вариант один.
-Вариант второй, как мы делали до этого , использовать переменную query, и  если city определен
-то query.city = { where: { city }}. Минус этого подхода в том что нам придется проворачивать крайне дорогую операцию -
-лучше этого избежать.
-Также,у нас есть 2  условия выше - это if datesToReserve === true и city === true. С этим тоже нужно что то
-сделать чтобы упростить код.
-
-Последний момент - нам нужно улучшить все парсеры и проработать условия. Код будет работать.
-*/
 //# sourceMappingURL=space.sequelize.dao.js.map

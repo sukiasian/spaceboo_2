@@ -9,16 +9,29 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Space = exports.SpaceType = void 0;
+exports.Space = exports.spaceEditFields = exports.SpaceType = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const city_model_1 = require("./city.model");
 const appointment_model_1 = require("./appointment.model");
 const user_model_1 = require("./user.model");
+const enums_1 = require("../types/enums");
 var SpaceType;
 (function (SpaceType) {
     SpaceType["FLAT"] = "\u041A\u0432\u0430\u0440\u0442\u0438\u0440\u0430";
     SpaceType["HOUSE"] = "\u0416\u0438\u043B\u043E\u0439 \u0434\u043E\u043C";
 })(SpaceType = exports.SpaceType || (exports.SpaceType = {}));
+exports.spaceEditFields = [
+    'address',
+    'type',
+    'description',
+    'roomsNumber',
+    'bedsNumber',
+    'cityId',
+    'userId',
+    'facilities',
+    'imagesUrl',
+];
+// TODO do we need paranoid or no? paranoid just 'mutes', hides
 let Space = class Space extends sequelize_typescript_1.Model {
 };
 __decorate([
@@ -27,17 +40,25 @@ __decorate([
     __metadata("design:type", String)
 ], Space.prototype, "id", void 0);
 __decorate([
-    sequelize_typescript_1.Column,
+    sequelize_typescript_1.Column({ allowNull: false }),
     __metadata("design:type", String)
 ], Space.prototype, "address", void 0);
 __decorate([
-    sequelize_typescript_1.Column({ type: sequelize_typescript_1.DataType.STRING }),
+    sequelize_typescript_1.Column({ allowNull: false }),
+    __metadata("design:type", Number)
+], Space.prototype, "pricePerNight", void 0);
+__decorate([
+    sequelize_typescript_1.Column({ allowNull: false, type: sequelize_typescript_1.DataType.STRING }),
     __metadata("design:type", String)
 ], Space.prototype, "type", void 0);
 __decorate([
-    sequelize_typescript_1.Column({ type: sequelize_typescript_1.DataType.SMALLINT }),
+    sequelize_typescript_1.Column({ allowNull: false, type: sequelize_typescript_1.DataType.SMALLINT }),
     __metadata("design:type", Number)
 ], Space.prototype, "roomsNumber", void 0);
+__decorate([
+    sequelize_typescript_1.Column({ allowNull: false, type: sequelize_typescript_1.DataType.SMALLINT }),
+    __metadata("design:type", Number)
+], Space.prototype, "bedsNumber", void 0);
 __decorate([
     sequelize_typescript_1.ForeignKey(() => city_model_1.City),
     sequelize_typescript_1.Column({ allowNull: false }),
@@ -61,7 +82,16 @@ __decorate([
     __metadata("design:type", user_model_1.User)
 ], Space.prototype, "user", void 0);
 __decorate([
-    sequelize_typescript_1.Column({ type: sequelize_typescript_1.DataType.ARRAY(sequelize_typescript_1.DataType.STRING) }),
+    sequelize_typescript_1.Column({
+        type: sequelize_typescript_1.DataType.ARRAY(sequelize_typescript_1.DataType.STRING),
+        validate: {
+            isSpecificLength(value) {
+                if (value.length > 10) {
+                    throw new Error(enums_1.ErrorMessages.SPACE_IMAGES_VALIDATE);
+                }
+            },
+        },
+    }),
     __metadata("design:type", Array)
 ], Space.prototype, "imagesUrl", void 0);
 __decorate([
@@ -77,7 +107,7 @@ __decorate([
     __metadata("design:type", Array)
 ], Space.prototype, "appointments", void 0);
 Space = __decorate([
-    sequelize_typescript_1.Table({ timestamps: true })
+    sequelize_typescript_1.Table({ timestamps: true, paranoid: false })
 ], Space);
 exports.Space = Space;
 //# sourceMappingURL=space.model.js.map

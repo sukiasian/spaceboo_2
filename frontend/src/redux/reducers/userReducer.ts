@@ -48,6 +48,13 @@ export const userReducer = (state = initialState, action: IAction): IUserState =
                 putEditUserFailureResponse: action.payload,
             };
 
+        case ReduxUserAction.ANNUALIZE_EDIT_USER_RESPONSES:
+            return {
+                ...state,
+                putEditUserSuccessResponse: undefined,
+                putEditUserFailureResponse: undefined,
+            };
+
         default:
             return {
                 ...state,

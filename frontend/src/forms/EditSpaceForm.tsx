@@ -452,7 +452,7 @@ export default function EditSpaceForm(): JSX.Element {
                 <div className="city-picker__search">
                     <input
                         ref={openedInputRef}
-                        className="city-picker__input"
+                        className="city-picker"
                         name="cityId"
                         placeholder="Введите название города..."
                         onChange={handleFindCityInput}

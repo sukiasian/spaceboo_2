@@ -1,38 +1,74 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.spaceController = exports.SpaceController = void 0;
-const dotenv = require("dotenv");
 const Singleton_1 = require("../utils/Singleton");
 const space_sequelize_dao_1 = require("../daos/space.sequelize.dao");
 const UtilFunctions_1 = require("../utils/UtilFunctions");
 const enums_1 = require("../types/enums");
-dotenv.config();
+const AppError_1 = require("../utils/AppError");
 class SpaceController extends Singleton_1.Singleton {
     constructor() {
         super(...arguments);
         this.dao = space_sequelize_dao_1.spaceSequelizeDao;
-        this.createSpace = UtilFunctions_1.default.catchAsync(async (req, res, next) => {
-            const space = await this.dao.createSpace(req.body);
-            UtilFunctions_1.default.sendResponse(res)(enums_1.HttpStatus.CREATED, enums_1.ResponseMessages.SPACE_CREATED, space);
+        this.utilFunctions = UtilFunctions_1.default;
+        this.provideSpace = this.utilFunctions.catchAsync(async (req, res, next) => {
+            const { id: userId } = req.user;
+            if (!req.files || req.files.length === 0) {
+                throw new AppError_1.default(enums_1.HttpStatus.FORBIDDEN, enums_1.ErrorMessages.SPACE_IMAGES_ARE_NOT_PROVIDED);
+            }
+            const space = await this.dao.provideSpace(Object.assign(Object.assign({}, req.body), { userId }), req.files);
+            res.locals.spaceId = space.id;
+            this.utilFunctions.sendResponse(res)(enums_1.HttpStatus.CREATED, enums_1.ResponseMessages.SPACE_PROVIDED, space);
+            next();
         });
-        this.getSpaceById = UtilFunctions_1.default.catchAsync(async (req, res, next) => {
-            const space = await this.dao.findById(req.params.id);
-            UtilFunctions_1.default.sendResponse(res)(enums_1.HttpStatus.OK, null, space);
+        this.getSpaceById = this.utilFunctions.catchAsync(async (req, res, next) => {
+            const space = await this.dao.getSpaceById(req.params.spaceId);
+            if (!space) {
+                throw new AppError_1.default(enums_1.HttpStatus.NOT_FOUND, enums_1.ErrorMessages.SPACE_NOT_FOUND);
+            }
+            this.utilFunctions.sendResponse(res)(enums_1.HttpStatus.OK, null, space);
         });
-        // TODO pagination, limitation, sorting продумать логику как это будет работать
-        this.getSpacesByQuery = UtilFunctions_1.default.catchAsync(async (req, res, next) => {
+        this.getSpacesByQuery = this.utilFunctions.catchAsync(async (req, res, next) => {
             const spaces = await this.dao.getSpacesByQuery(req.query);
-            UtilFunctions_1.default.sendResponse(res)(enums_1.HttpStatus.OK, null, spaces);
+            this.utilFunctions.sendResponse(res)(enums_1.HttpStatus.OK, null, spaces);
         });
-        this.editSpaceById = UtilFunctions_1.default.catchAsync(async (req, res, next) => {
-            // const space = await this.dao.editSpaceById(req.params.id, req.body);
-            const space = await this.dao.editSpaceById(req.params.spaceId, req.user.id, req.body);
-            UtilFunctions_1.default.sendResponse(res)(enums_1.HttpStatus.OK, null);
+        this.getSpacesByUserId = this.utilFunctions.catchAsync(async (req, res, next) => {
+            const spaces = await this.dao.getUserSpaces(req.user.id);
+            this.utilFunctions.sendResponse(res)(enums_1.HttpStatus.OK, null, spaces);
         });
-        this.deleteSpaceById = UtilFunctions_1.default.catchAsync(async (req, res, next) => { });
-        // NOTE
-        this.updateImages = UtilFunctions_1.default.catchAsync(async (req, res, next) => { });
-        this.removeImages = UtilFunctions_1.default.catchAsync(async (req, res, next) => { });
+        this.getSpacesForUserOutdatedAppointmentsIds = this.utilFunctions.catchAsync(async (req, res, next) => {
+            const { id: userId } = req.user;
+            const spacesForOutdatedAppointments = await this.dao.getSpacesForUserOutdatedAppointmentsIds(userId);
+            this.utilFunctions.sendResponse(res)(enums_1.HttpStatus.OK, null, spacesForOutdatedAppointments);
+        });
+        this.getSpacesForUserActiveAppointmentsIds = this.utilFunctions.catchAsync(async (req, res, next) => {
+            const { id: userId } = req.user;
+            const spacesForActiveAppointments = await this.dao.getSpacesForUserActiveAppointmentsIds(userId);
+            this.utilFunctions.sendResponse(res)(enums_1.HttpStatus.OK, null, spacesForActiveAppointments);
+        });
+        this.getSpacesForUserUpcomingAppointmentsIds = this.utilFunctions.catchAsync(async (req, res, next) => {
+            const { id: userId } = req.user;
+            const spacesForUpcomingAppointments = await this.dao.getSpacesForUserUpcomingAppointmentsIds(userId);
+            this.utilFunctions.sendResponse(res)(enums_1.HttpStatus.OK, null, spacesForUpcomingAppointments);
+        });
+        this.getSpacesForKeyControl = this.utilFunctions.catchAsync(async (req, res, next) => {
+            const { id: userId } = req.user;
+            const spacesForKeyControl = await this.dao.getSpacesForKeyControl(userId);
+            this.utilFunctions.sendResponse(res)(enums_1.HttpStatus.OK, null, spacesForKeyControl);
+        });
+        this.editSpaceById = this.utilFunctions.catchAsync(async (req, res, next) => {
+            const { id: userId } = req.user;
+            const { spaceId } = req.params;
+            const { spaceEditData } = req.body;
+            await this.dao.editSpaceById(userId, spaceId, spaceEditData, req.files);
+            this.utilFunctions.sendResponse(res)(enums_1.HttpStatus.OK, enums_1.ResponseMessages.DATA_UPDATED);
+            next();
+        });
+        this.deleteSpaceById = this.utilFunctions.catchAsync(async (req, res, next) => {
+            const { spaceId } = req.params;
+            await this.dao.deleteSpaceById(spaceId);
+            this.utilFunctions.sendResponse(res)(enums_1.HttpStatus.OK, enums_1.ResponseMessages.SPACE_DELETED);
+        });
     }
 }
 exports.SpaceController = SpaceController;

@@ -112,5 +112,5 @@ export default function SixDigitVerification(): JSX.Element {
     useEffect(checkCodeToConfirmAccount, [digitInputs, dispatch]);
     useEffect(updateUserInformationAfterCheckingCode, [postCheckVerificationCodeSuccessResponse, dispatch]);
 
-    return <form className="code-verificaion"> {renderDigitInputs()} </form>;
+    return <form className="code-verification"> {renderDigitInputs()} </form>;
 }

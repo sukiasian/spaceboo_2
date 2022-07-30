@@ -16,6 +16,7 @@ import ProvideSpacePage from '../pages/ProvideSpacePage';
 import MyAppointmentsPage from '../pages/MyAppointmentsPage';
 import MySpacesPage from '../pages/MySpacesPage';
 import SpaceKeysPage from '../pages/SpaceKeysPage';
+import GeneralSettingsPage from '../pages/GeneralSettingsPage';
 
 // FIXME много повторяющегося кода
 export default function AppRoutes(): JSX.Element {

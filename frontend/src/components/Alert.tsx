@@ -36,6 +36,6 @@ export default function Alert(props: IAlertProps): JSX.Element {
     return (successResponse || failureResponse) && responseData ? (
         <div className={`alert alert--${responseData?.alertType?.toLowerCase()}`}>{responseData.message}</div>
     ) : (
-        <> </>
+        <>{responseData?.message}</>
     );
 }

@@ -1,6 +1,7 @@
 .footer {
     overflow: hidden;
     transition: 0.2s;
+
     @include respond(phone) {
         font-size: 0.7rem;
     }
@@ -36,11 +37,15 @@
     }
 
     &-sections {
-        position: relative;
-        width: 500px;
-        margin: 0 auto;
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
+        align-content: center;
+        padding: 1rem;
+    }
+
+    &-part {
+        width: 350px;
+        padding: 0 2rem;
     }
 
     &__corporate {

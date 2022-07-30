@@ -6,22 +6,31 @@ const passport = require("passport");
 const auth_controller_1 = require("../controllers/auth.controller");
 const logger_1 = require("../loggers/logger");
 const enums_1 = require("../types/enums");
+const RouteProtector_1 = require("../utils/RouteProtector");
 const Singleton_1 = require("../utils/Singleton");
 class AuthRouter extends Singleton_1.Singleton {
     constructor() {
         super(...arguments);
         this.authController = auth_controller_1.authController;
+        this.routeProtector = RouteProtector_1.RouteProtector;
         this.passport = passport;
         this.router = express_1.Router();
-        // FIXME this as argument
-        this.prepareRouter = function () {
+        this.prepareRouter = () => {
             this.router
                 .route('/login')
                 .post(this.passport.authenticate(enums_1.PassportStrategies.LOCAL, { session: false }), this.authController.signInLocal);
             this.router.route('/signup').post(this.authController.signUpLocal);
             this.router
+                .route('/passwordRecovery')
+                .put(this.routeProtector.passwordRecoveryProtector, this.authController.editUserPassword);
+            this.router
+                .route('/passwordChange')
+                .put(this.passport.authenticate(enums_1.PassportStrategies.JWT, { session: false }), this.authController.editUserPassword);
+            this.router.get('/userLoginState', this.authController.getUserLoginState);
+            this.router.get('/logout', this.authController.logout);
+            this.router
                 .route('/facebook')
-                .get(this.passport.authenticate(enums_1.PassportStrategies.FACEBOOK), () => logger_1.default.log({ level: enums_1.LoggerLevels.INFO, message: 'signed up in Facebook' }));
+                .get(this.passport.authenticate(enums_1.PassportStrategies.FACEBOOK), () => logger_1.default.info('signed up in Facebook'));
             this.router.route('/facebook/callback').get((req, res) => {
                 res.redirect('/');
                 console.log('redirected');
@@ -29,7 +38,6 @@ class AuthRouter extends Singleton_1.Singleton {
         };
     }
 }
-// export const router = AuthRouter.getInstance<AuthRouter>(AuthRouter).prepareRouter();
 const authRouter = Singleton_1.SingletonFactory.produce(AuthRouter);
 authRouter.prepareRouter();
 exports.router = authRouter.router;

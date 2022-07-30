@@ -54,7 +54,7 @@ svg {
             }
 
             &:visited:not(:active):not(:hover) {
-                color: $color-grey-dark-1;
+                text-decoration: none;
             }
         }
     }
@@ -77,4 +77,8 @@ svg {
 
 .active {
     color: $color-primary-1;
+}
+
+.navbar-provide-space-button {
+    padding: 0.4rem 1.2rem;
 }

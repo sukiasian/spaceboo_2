@@ -7,6 +7,7 @@ import {
 import { fetchSpacesAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { IComponentClassNameProps, TActiveTab } from '../types/types';
+import { separateCityNameFromRegionIfCityNameContains } from '../utils/utilFunctions';
 
 type ICityPickerProps = TActiveTab & IComponentClassNameProps;
 
@@ -14,7 +15,7 @@ type ICityPickerProps = TActiveTab & IComponentClassNameProps;
 export default function CityPicker(props: ICityPickerProps): JSX.Element {
     const { handleActiveTab, mainDivClassName } = props;
     const [currentCity, setCurrentCity] = useState('Город');
-    const [cityPickerBoxIsOpen, setCityPickerBoxIsOpen] = useState(false);
+    const [cityPickerInputIsOpen, setCityPickerInputIsOpen] = useState<boolean>();
     const inputRef = useRef<HTMLInputElement>(null);
     const findCityResultsRef = useRef<HTMLDivElement>(null);
     const { fetchCitiesByPatternSuccessResponse } = useSelector((state: IReduxState) => state.cityStorage);
@@ -26,12 +27,17 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
             setCurrentCity(currentCity);
         }
     };
-    const applyEffectsOnInit = (): void => {
+    const applyEffectsOnInit = (): (() => void) => {
         getCurrentCityFromLocalStorage();
+
+        return () => {
+            annualizeFoundBySearchPatternCities();
+        };
     };
     const closeFindCityResultsBoxOnOutsideClick = (e: MouseEvent): void => {
-        if (e.target !== findCityResultsRef.current) {
-            setCityPickerBoxIsOpen(false);
+        if (cityPickerInputIsOpen && e.target !== findCityResultsRef.current && e.target !== inputRef.current) {
+            setCityPickerInputIsOpen(false);
+            annualizeFoundBySearchPatternCities();
         }
     };
     const applyEventListeners = (): (() => void) => {
@@ -47,7 +53,7 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
         }
     };
     const toggleCityPickerBox = (): void => {
-        setCityPickerBoxIsOpen(!cityPickerBoxIsOpen);
+        setCityPickerInputIsOpen(true);
     };
     const handleFindCityInput = (e: ChangeEvent<{ value: string }>): void => {
         dispatch(fetchCitiesBySearchPatternAction(e.target.value));
@@ -56,9 +62,10 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
         dispatch(annualizeFoundBySearchPatternCitiesAction());
     };
     const pickCurrentCity = (city: any): void => {
-        setCityPickerBoxIsOpen(false);
+        setCityPickerInputIsOpen(false);
         setCurrentCity(city.name);
         annualizeFoundBySearchPatternCities();
+
         localStorage.setItem('currentCity', city.name);
         localStorage.setItem('currentCityId', city.id.toString());
 
@@ -80,12 +87,12 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
                           key={i}
                           onClick={handlePickCity(city)}
                       >
-                          {city.name}
+                          {`${city.region.name}, ${separateCityNameFromRegionIfCityNameContains(city.name)}`}
                       </p>
                   ))
                 : null;
 
-        if (findCityResults) {
+        if (cityPickerInputIsOpen && findCityResults) {
             return (
                 <div className="city-picker__search-results" ref={findCityResultsRef}>
                     {findCityResults}
@@ -94,7 +101,7 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
         }
     };
     const renderCurrentCity = (): JSX.Element | void => {
-        if (!cityPickerBoxIsOpen) {
+        if (!cityPickerInputIsOpen) {
             return (
                 <h3 className="heading heading--tertiary" onClick={toggleCityPickerBox}>
                     {currentCity}
@@ -102,14 +109,14 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
             );
         }
     };
-    const renderCityPickerBox = (): JSX.Element | void => {
-        if (cityPickerBoxIsOpen) {
+    const renderCityPickerInput = (): JSX.Element | void => {
+        if (cityPickerInputIsOpen) {
             return (
                 <section className="city-picker">
                     <div className="city-picker__search">
                         <input
                             className="city-picker__input"
-                            name="city-picker__input"
+                            name="city-picker"
                             placeholder="Введите название города..."
                             onChange={handleFindCityInput}
                             autoComplete="off"
@@ -122,13 +129,13 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
     };
 
     useEffect(applyEffectsOnInit, []);
-    useEffect(focusOnInputOpening, [inputRef.current]);
+    useEffect(focusOnInputOpening);
     useEffect(applyEventListeners);
 
     return (
         <div id="city-picker" className={mainDivClassName}>
             {renderCurrentCity()}
-            {renderCityPickerBox()}
+            {renderCityPickerInput()}
             {renderFindCityResults()}
         </div>
     );

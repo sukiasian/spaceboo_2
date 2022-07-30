@@ -76,7 +76,7 @@ export default function UserDropdownMenu(): JSX.Element {
                         id="user-drop-down-menu-section-0"
                         className="user-drop-down-menu__option user-drop-down-menu__option--0 with-lower-border"
                         onClick={(e) => {
-                            e.stopPropagation();
+                            // e.stopPropagation();
                         }}
                     >
                         <p className="paragraph">{userFullName}</p>
