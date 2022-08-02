@@ -395,22 +395,17 @@ svg {
   margin-top: 6rem;
   display: grid;
   grid-template-rows: 1fr;
-  grid-template-columns: repeat(3, 300px);
-  grid-auto-rows: 1fr;
-  grid-auto-columns: repeat(3, 300px);
-  gap: 3rem;
-  justify-content: center;
-  justify-items: center; }
+  grid-template-columns: repeat(3, max-content);
+  gap: 3rem; }
 
-.space-card {
-  width: 25rem;
-  height: 10rem; }
-  .space-card__image {
-    width: 15rem;
-    height: 200px;
-    border-radius: 15px; }
-  .space-card--price {
-    position: relative; }
+.space-card__image {
+  width: 24rem;
+  height: 20rem;
+  border-radius: 15px;
+  object-fit: cover; }
+
+.space-card--price {
+  position: relative; }
 
 input {
   padding: 0.5rem;
@@ -642,6 +637,9 @@ select {
     outline: none;
     text-align: center; }
 
+.page {
+  background-color: #f8f8f8; }
+
 .row {
   display: flex;
   flex-direction: row; }
@@ -859,6 +857,14 @@ input::placeholder {
     color: #1476b3;
     font-size: 2rem;
     width: 40px; }
+
+.banner__navbar {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 50px; }
+
+.logo--white {
+  background: url("../../assets/new-logo-white-4.svg") no-repeat; }
 
 .settings-page__linkable-tabs {
   margin-top: 1rem; }

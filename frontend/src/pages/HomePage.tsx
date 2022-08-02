@@ -23,6 +23,9 @@ export function HomePage() {
 
         updateDocumentTitle(documentTitle);
     };
+    const increasePage = (): void => {
+        dispatch(setFetchSpacesQueryDataAction({ ...fetchSpacesQueryData, page: fetchSpacesQueryData.page + 1 }));
+    };
     const updateFetchSpacesQueryDataCityIdOnInit = (): void => {
         const newFetchSpacesQueryData = { ...fetchSpacesQueryData };
 
@@ -30,8 +33,11 @@ export function HomePage() {
 
         dispatch(setFetchSpacesQueryDataAction(newFetchSpacesQueryData));
     };
+    const handleScrollForFetchingSpaces = (): void => {};
     const applyEffectsOnInit = (): (() => void) => {
         updateFetchSpacesQueryDataCityIdOnInit();
+
+        window.addEventListener('scroll', handleScrollForFetchingSpaces);
 
         return () => {};
     };

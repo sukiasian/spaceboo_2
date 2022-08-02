@@ -81,3 +81,13 @@
         width: 40px;
     }
 }
+
+.banner__navbar {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 50px;
+}
+
+.logo--white {
+    background: url('../../assets/new-logo-white-4.svg') no-repeat;
+}

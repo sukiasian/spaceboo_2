@@ -32,11 +32,11 @@ export interface IEditSpacePayload {
 }
 export interface ISpaceState {
     isLoaded: boolean;
+    fetchSpacesQueryData: IQueryData;
     provideSpaceData?: IProvideSpaceData;
     editSpaceData?: IEditSpaceData;
     postProvideSpaceSuccessResponse?: IServerResponse;
     postProvideSpaceFailureResponse?: IServerResponse;
-    fetchSpacesQueryData?: IQueryData;
     fetchSpacesSuccessResponse?: IServerResponse;
     fetchSpacesFailureResponse?: IServerResponse;
     fetchSpaceByIdSuccessResponse?: IServerResponse;
@@ -66,10 +66,13 @@ const initialProvideSpaceData = {
     bedsNumber: 2,
     lockerConnected: false,
 };
-
+const initialFetchSpacesQueryData: IQueryData = {
+    page: 0,
+};
 const initialState: ISpaceState = {
     isLoaded: false,
     provideSpaceData: initialProvideSpaceData,
+    fetchSpacesQueryData: initialFetchSpacesQueryData,
 };
 
 export const spaceReducer = (state = initialState, action: IAction): ISpaceState => {
@@ -191,7 +194,7 @@ export const spaceReducer = (state = initialState, action: IAction): ISpaceState
         case ReduxSpaceAction.SET_PUT_EDIT_SPACE_SUCCESS_RESPONSE:
             return {
                 ...state,
-                putEditSpaceSuccessResponse: action.payload,
+                putEditSpaceSuccessResponse: [ initialStateaction.payload,
             };
 
         case ReduxSpaceAction.SET_PUT_EDIT_SPACE_FAILURE_RESPONSE:

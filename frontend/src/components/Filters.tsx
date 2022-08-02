@@ -24,7 +24,7 @@ export interface IDatesRange {
     endingDate?: string;
 }
 export interface IQueryData extends IDatesRange {
-    page?: string | number;
+    page: number;
     limit?: string | number;
     sortBy?: SpaceQuerySortFields;
     priceFrom?: string | number;
@@ -113,7 +113,7 @@ export default function Filters(): JSX.Element {
         return filterBoxIsOpen ? 'filters__arrow--rotated' : 'filters__arrow--straight';
     };
     const updateQueryDataSortBy = (sortByOption: SpaceQuerySortFields): void => {
-        const newQueryData: IQueryData = { ...fetchSpacesQueryData };
+        const newQueryData: IQueryData = { ...fetchSpacesQueryData! };
 
         newQueryData.sortBy = sortByOption;
 
