@@ -118,16 +118,15 @@ export default function ProvideSpaceForm(): JSX.Element {
         dispatch(setPostProvideSpaceDataAction(newFormData));
     };
     const handleInputChangeByFormDataProperty = (
-        formDataProp: keyof IProvideSpaceData
-    ): ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement> => {
-        return (e) => {
-            const newFormData: IProvideSpaceData = { ...provideSpaceData };
+        formDataProp: keyof IProvideSpaceData,
+        e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+    ): void => {
+        const newFormData: IProvideSpaceData = { ...provideSpaceData };
 
-            // @ts-ignore
-            newFormData[formDataProp] = e.target.value as string;
+        // @ts-ignore
+        newFormData[formDataProp] = e.target.value as string;
 
-            dispatch(setPostProvideSpaceDataAction(newFormData));
-        };
+        dispatch(setPostProvideSpaceDataAction(newFormData));
     };
     const handlePriceInput: ChangeEventHandler<HTMLInputElement> = (e) => {
         const newFormData: IProvideSpaceData = { ...provideSpaceData };
@@ -343,7 +342,7 @@ export default function ProvideSpaceForm(): JSX.Element {
                 <textarea
                     className="description__textarea"
                     placeholder="Добавьте описание..."
-                    onChange={handleInputChangeByFormDataProperty('description')}
+                    onChange={(e) => handleInputChangeByFormDataProperty('description', e)}
                 />
             </div>
             <div className="beds-number__label-container">
@@ -371,7 +370,7 @@ export default function ProvideSpaceForm(): JSX.Element {
                     name="address"
                     onChange={(e) => {
                         validateInputByLength(5, e);
-                        handleInputChangeByFormDataProperty('address');
+                        handleInputChangeByFormDataProperty('address', e);
                     }}
                 />
                 <ValidationOkIcon identifier="address" />

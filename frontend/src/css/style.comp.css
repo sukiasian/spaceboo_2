@@ -246,24 +246,47 @@ svg {
     background-color: rgba(255, 103, 82, 0.405); }
 
 .date-picker {
-  position: absolute;
   border: 1px solid rgba(208, 208, 208, 0.4);
   border-radius: 15px;
-  width: 17.7rem;
-  z-index: 10;
-  margin-top: 0.5rem;
-  margin-left: -1.5rem;
   background-color: #fff;
-  box-shadow: 0 0 1px 3px rgba(209, 209, 209, 0.2); }
+  box-shadow: 0 0 1px 3px rgba(209, 209, 209, 0.2);
+  padding: 0.6rem; }
   .date-picker__control {
     display: flex;
     flex-direction: row;
     align-content: center;
     justify-content: space-evenly;
-    margin-top: 1rem; }
-    .date-picker__control__arrow:hover {
-      color: #fec602;
-      transition: 0.2s; }
+    margin-top: 0.5rem; }
+  .date-picker__table {
+    display: flex;
+    justify-content: center;
+    margin-top: 0.7rem; }
+    .date-picker__table .weekdays {
+      cursor: auto; }
+    .date-picker__table .picked-day {
+      background-color: #fec602; }
+    .date-picker__table .table-cell {
+      padding: 0.4rem 0.6rem;
+      text-align: center;
+      border-radius: 15px; }
+      .date-picker__table .table-cell--today {
+        outline: 1px solid #1476b3;
+        border-radius: 15px; }
+        .date-picker__table .table-cell--today:hover {
+          outline: none;
+          background-color: #2b99dd; }
+      .date-picker__table .table-cell--past {
+        color: #949494; }
+      .date-picker__table .table-cell--out-of-month {
+        color: #c9c9c9; }
+      .date-picker__table .table-cell:hover:not(.table-cell--past):not(.table-cell--today):not(.picked-day) {
+        background-color: #ffda55; }
+
+.drop-down.query-date-picker.date-picker {
+  position: absolute;
+  min-width: 370px;
+  z-index: 10;
+  margin-left: -23px; }
 
 .active-month {
   color: #fec602;
@@ -271,7 +294,7 @@ svg {
 
 .drop-down {
   position: absolute;
-  margin: 1px 0 0 0;
+  margin-top: 7px;
   border: 1px solid rgba(208, 208, 208, 0.4);
   border-radius: 15px;
   box-shadow: 0 0 1px 3px rgba(209, 209, 209, 0.2);
@@ -323,13 +346,22 @@ svg {
 
 .city-picker__search-results {
   width: 500px;
-  height: 200px;
+  height: 400px;
   position: absolute;
-  padding: 1rem;
+  padding: 2rem;
   background-color: #fff;
   z-index: 10;
   border-radius: 15px;
-  border: 1px solid rgba(109, 109, 109, 0.5); }
+  border: 1px solid rgba(109, 109, 109, 0.5);
+  overflow-y: scroll; }
+
+.city-picker__search-result {
+  cursor: pointer;
+  padding: 3px; }
+  .city-picker__search-result:hover {
+    color: #ffda55; }
+  .city-picker__search-result:active {
+    color: #fec602; }
 
 .user-avatar-or-initials {
   cursor: pointer;
@@ -394,18 +426,75 @@ svg {
 .spaces {
   margin-top: 6rem;
   display: grid;
-  grid-template-rows: 1fr;
-  grid-template-columns: repeat(3, max-content);
-  gap: 3rem; }
+  grid-template-rows: max-content;
+  grid-template-columns: repeat(3, 23rem);
+  gap: 3rem;
+  padding-bottom: 2rem;
+  min-height: 22rem; }
 
 .space-card__image {
-  width: 24rem;
-  height: 20rem;
+  width: 20rem;
+  height: 16rem;
   border-radius: 15px;
   object-fit: cover; }
 
-.space-card--price {
-  position: relative; }
+.space-card__price {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.55);
+  padding: 0.1rem 0.5rem;
+  border-radius: 15px; }
+  .space-card__price-container {
+    position: relative; }
+  .space-card__price p {
+    color: white;
+    font-weight: bold; }
+
+.space-card-link {
+  justify-self: center;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  color: inherit; }
+  .space-card-link:hover {
+    border-radius: 15px;
+    box-shadow: 10px 10px 21px #d3d3d6, -10px -10px 21px #fff; }
+  .space-card-link:active {
+    transform: scale(1.01); }
+  .space-card-link:visited {
+    text-decoration: none;
+    color: inherit; }
+  .space-card-link .space-card-image {
+    position: absolute; }
+
+.space-card .rooms-and-city {
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: 30% 20% 50%; }
+  .space-card .rooms-and-city p {
+    color: #949494; }
+  .space-card .rooms-and-city .rooms-and-city__rooms-container {
+    margin-left: 30%; }
+  .space-card .rooms-and-city .rooms-and-city__city-icon-container {
+    margin-left: 70%;
+    color: #949494; }
+
+.space-card .address-container {
+  display: flex;
+  justify-content: center;
+  width: 20rem;
+  margin-top: 0.5rem; }
+  .space-card .address-container p {
+    font-size: 18px;
+    text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden; }
 
 input {
   padding: 0.5rem;
@@ -488,8 +577,6 @@ select {
     border: 1px solid #1476b3;
     transition: 0.2s; }
   .filter .date-picker {
-    width: 22rem;
-    margin-top: 5px;
     color: #2b2b2b; }
 
 .filters__sort-by {
@@ -509,12 +596,30 @@ select {
     margin: 5px 0 0 -6.4rem;
     color: #2b2b2b; }
 
-.filters__required-reservation-dates-picker__content {
-  display: flex;
-  justify-content: space-between; }
-
 .filters__required-reservation-dates-picker {
-  min-width: 350px; }
+  min-width: 300px; }
+  .filters__required-reservation-dates-picker .filters-content {
+    min-height: 50px;
+    display: grid;
+    grid-template-columns: 300px 20px;
+    grid-template-rows: 1fr;
+    grid-template-areas: 'a b'; }
+    .filters__required-reservation-dates-picker .filters-content .calendar-icon-container {
+      grid-area: b;
+      align-self: center;
+      justify-self: center; }
+    .filters__required-reservation-dates-picker .filters-content .dates-range {
+      grid-area: a;
+      align-self: center; }
+      .filters__required-reservation-dates-picker .filters-content .dates-range__data {
+        display: grid;
+        grid-template-columns: 5fr 1fr;
+        grid-template-rows: repeat(2, 25px);
+        grid-template-areas: 'a1 b1' 'a2 a2'; }
+        .filters__required-reservation-dates-picker .filters-content .dates-range__data .paragraph-container-picked-dates {
+          grid-area: a1; }
+        .filters__required-reservation-dates-picker .filters-content .dates-range__data .remove-icon-container {
+          grid-area: b1; }
 
 .modal {
   position: absolute;
@@ -624,6 +729,18 @@ select {
 
 .icon {
   color: #2b2b2b; }
+  .icon--remove:hover {
+    color: #2b99dd; }
+  .icon--remove:active {
+    color: #1476b3; }
+
+.arrow:hover {
+  color: #fec602; }
+
+.arrow--inactive {
+  color: #c9c9c9; }
+  .arrow--inactive:hover {
+    color: #c9c9c9; }
 
 .code-verification {
   display: flex;

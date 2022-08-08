@@ -1,7 +1,7 @@
 import { PutEffect, ForkEffect, CallEffect, call, put, takeEvery } from '@redux-saga/core/effects';
 import { AnyAction } from 'redux';
 import { IQueryData } from '../../components/Filters';
-import { IServerResponse, ApiUrl, SagaTask } from '../../types/types';
+import { IServerResponse, ApiUrl, SagaTask, QueryDefaultValue } from '../../types/types';
 import { httpRequester } from '../../utils/HttpRequest';
 import { serverResponseIsSuccessful } from '../../utils/utilFunctions';
 import { IAction } from '../actions/ActionTypes';
@@ -46,8 +46,10 @@ const fetchSpaces = async (queryData?: IQueryData): Promise<IServerResponse> => 
         `${ApiUrl.SPACES}/?cityId=${
             queryData?.cityId || ''
         }&priceRange=${priceRangeQueryString}&datesToReserveQuery=${datesToReserveQueryString}&page=${
-            queryData?.page || ''
-        }&sortBy=${queryData?.sortBy || ''}&limit=${queryData?.limit || ''}&offset=12`
+            queryData?.page || QueryDefaultValue.PAGE
+        }&sortBy=${queryData?.sortBy || ''}&limit=${queryData?.limit || QueryDefaultValue.LIMIT}&offset=${
+            queryData?.offset || QueryDefaultValue.OFFSET
+        }`
     );
 };
 
@@ -56,7 +58,7 @@ function* fetchSpacesWorker(action: IAction): Generator<CallEffect<IServerRespon
         const response = yield call(fetchSpaces, action.payload);
 
         if (serverResponseIsSuccessful(response as IServerResponse)) {
-            yield put(setFetchSpacesSuccessResponseAction(response as IServerResponse));
+            yield put(setFetchSpacesSuccessResponseAction((response as IServerResponse).data));
         } else {
             throw response;
         }

@@ -1,44 +1,44 @@
-import { MutableRefObject, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Filters from '../components/Filters';
-import LoadingSpin from '../components/LoadingSpin';
-import Slider from '../components/Slider';
-import Space from '../components/Space';
-import Spaces from '../components/Spaces';
+import { IReduxState } from '../redux/reducers/rootReducer';
+import { QueryDefaultValue } from '../types/types';
+import Space from './Space';
 import {
     annualizeFetchSpacesQueryDataAction,
     annualizeFetchSpacesResponsesAction,
     fetchSpacesAction,
     setFetchSpacesQueryDataAction,
 } from '../redux/actions/spaceActions';
-import { IReduxState } from '../redux/reducers/rootReducer';
-import { QueryDefaultValue } from '../types/types';
-import { updateDocumentTitle } from '../utils/utilFunctions';
+import LoadingSpin from './LoadingSpin';
 
-export function HomePage() {
+export default function Spaces(): JSX.Element {
     const [spacesAreRequested, setSpacesAreRequested] = useState(false);
-    const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
     const { fetchSpacesQueryData, fetchSpacesSuccessResponse: fetchedSpaces } = useSelector(
         (state: IReduxState) => state.spaceStorage
     );
-    const spacesRef = useRef<HTMLDivElement>(null);
-    const userLoginState = fetchUserLoginStateSuccessResponse?.data;
-    const sliderIntervalRef = useRef<NodeJS.Timeout>();
     const dispatch = useDispatch();
-    const handleDocumentTitle = () => {
-        let documentTitle: string;
-        userLoginState
-            ? (documentTitle = 'Spaceboo | Пространства бесконтактно')
-            : (documentTitle = 'Spaceboo | Добро пожаловать');
+    const spacesRef = useRef<HTMLDivElement>(null);
+    const applyEffectsOnInit = (): (() => void) => {
+        return () => {
+            annualizeSpacesAndQueryData();
 
-        updateDocumentTitle(documentTitle);
-    };
-    const increasePage = (): void => {
-        dispatch(setFetchSpacesQueryDataAction({ ...fetchSpacesQueryData, page: fetchSpacesQueryData.page! + 1 }));
+            window.onscroll = null;
+        };
     };
     const annualizeSpacesAndQueryData = (): void => {
         dispatch(annualizeFetchSpacesResponsesAction());
         dispatch(annualizeFetchSpacesQueryDataAction());
+    };
+    const checkIfSpacesExistToRender = (): boolean => {
+        return fetchedSpaces && fetchedSpaces.length !== 0 ? true : false;
+    };
+    const increasePage = (): void => {
+        dispatch(setFetchSpacesQueryDataAction({ ...fetchSpacesQueryData, page: fetchSpacesQueryData.page! + 1 }));
+    };
+    const requestSpaces = (): void => {
+        dispatch(fetchSpacesAction(fetchSpacesQueryData));
+
+        setSpacesAreRequested(false);
     };
     const handleScrollForFetchingSpaces = (): void => {
         if (fetchedSpaces) {
@@ -68,32 +68,32 @@ export function HomePage() {
             };
         }
     };
-    const checkIfSpacesExistToRender = (): boolean => {
-        return fetchedSpaces && fetchedSpaces.length !== 0 ? true : false;
-    };
-    const renderSpaces = (): JSX.Element => {
+
+    const renderSpaces = (): JSX.Element[] | JSX.Element => {
         if (checkIfSpacesExistToRender()) {
-            const spaces = fetchedSpaces!.map((space: any, i: number) => {
+            return fetchedSpaces!.map((space: any, i: number) => {
                 return <Space space={space} index={i} key={i} />;
             });
-
-            return (
-                <div className="spaces" ref={spacesRef}>
-                    {spaces}
-                </div>
-            );
         }
 
         return <></>;
     };
+    const renderLoadingSpinnerForSpaces = (): JSX.Element | void => {
+        if (spacesAreRequested) {
+            return <LoadingSpin />;
+        }
+    };
 
-    useEffect(handleDocumentTitle, [userLoginState]);
+    useEffect(applyEffectsOnInit, []);
+    useEffect(requestSpaces, [fetchSpacesQueryData]);
+    useEffect(handleScrollForFetchingSpaces, [fetchedSpaces]);
 
     return (
-        <section className="page home-page-section">
-            <Slider sliderIntervalRef={sliderIntervalRef as MutableRefObject<NodeJS.Timeout>} />
-            <Filters />
-            <Spaces />
+        <section className="spaces-section">
+            <div className="spaces" ref={spacesRef}>
+                {renderSpaces()}
+            </div>
+            {renderLoadingSpinnerForSpaces()}
         </section>
     );
 }

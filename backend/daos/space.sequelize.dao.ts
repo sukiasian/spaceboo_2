@@ -287,7 +287,7 @@ export class SpaceSequelizeDao extends Dao {
         const priceRangeToPartialQuery =
             priceRange && priceRange.to !== undefined ? `AND s."pricePerNight" <= ${priceRange.to}` : '';
 
-        return `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", "regionId", name FROM "Cities") c ON s."cityId" = c."cityId" ${cityPartialQuery} ${datesToReservePartialQuery} ${priceRangeFromPartialQuery} ${priceRangeToPartialQuery} ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
+        return `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", "regionId", name as "cityName" FROM "Cities") c ON s."cityId" = c."cityId" ${cityPartialQuery} ${datesToReservePartialQuery} ${priceRangeFromPartialQuery} ${priceRangeToPartialQuery} ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
     };
 
     private findUploadedImagesAndRemove = (userId: string, files: Express.Multer.File[]): Promise<void[]> => {

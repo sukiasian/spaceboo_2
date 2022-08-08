@@ -259,6 +259,16 @@ export const annualizeProvideSpaceResponsesAction = (): IAction<ReduxSpaceAction
     };
 };
 
+export const annualizeFetchSpacesResponsesAction = (): IAction<ReduxSpaceAction> => {
+    return {
+        type: ReduxSpaceAction.ANNUALIZE_FETCH_SPACES_RESPONSES,
+    };
+};
+export const annualizeFetchSpacesQueryDataAction = (): IAction<ReduxSpaceAction> => {
+    return {
+        type: ReduxSpaceAction.ANNUALIZE_FETCH_SPACES_QUERY_DATA,
+    };
+};
 export const annualizeFetchSpacesForUserOutdatedAppointmentsResponsesAction = (): IAction<ReduxSpaceAction> => {
     return {
         type: ReduxSpaceAction.ANNUALIZE_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_RESPONSES,

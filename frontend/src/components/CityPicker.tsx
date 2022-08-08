@@ -4,7 +4,11 @@ import {
     annualizeFoundBySearchPatternCitiesAction,
     fetchCitiesBySearchPatternAction,
 } from '../redux/actions/cityActions';
-import { fetchSpacesAction } from '../redux/actions/spaceActions';
+import {
+    annualizeFetchSpacesQueryDataAction,
+    annualizeFetchSpacesResponsesAction,
+    fetchSpacesAction,
+} from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { IComponentClassNameProps, TActiveTab } from '../types/types';
 import { separateCityNameFromRegionIfCityNameContains } from '../utils/utilFunctions';
@@ -56,20 +60,32 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
         setCityPickerInputIsOpen(true);
     };
     const handleFindCityInput = (e: ChangeEvent<{ value: string }>): void => {
-        dispatch(fetchCitiesBySearchPatternAction(e.target.value));
+        if (e.target.value.length >= 3) {
+            dispatch(fetchCitiesBySearchPatternAction(e.target.value));
+        } else {
+            dispatch(annualizeFoundBySearchPatternCitiesAction());
+        }
     };
     const annualizeFoundBySearchPatternCities = (): void => {
         dispatch(annualizeFoundBySearchPatternCitiesAction());
     };
+    const annualizeFetchedSpaces = (): void => {
+        dispatch(annualizeFetchSpacesResponsesAction());
+    };
+    const annualizeFetchSpacesQueryData = (): void => {
+        dispatch(annualizeFetchSpacesQueryDataAction());
+    };
     const pickCurrentCity = (city: any): void => {
         setCityPickerInputIsOpen(false);
-        setCurrentCity(city.name);
-        annualizeFoundBySearchPatternCities();
 
         localStorage.setItem('currentCity', city.name);
         localStorage.setItem('currentCityId', city.id.toString());
 
-        dispatch(fetchSpacesAction({ cityId: city.id }));
+        annualizeFoundBySearchPatternCities();
+        annualizeFetchedSpaces();
+        annualizeFetchSpacesQueryData();
+
+        setCurrentCity(city.name);
     };
     const handlePickCity = (city: any): (() => void) => {
         return () => {

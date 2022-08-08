@@ -1,12 +1,16 @@
-import { ChangeEventHandler, MouseEventHandler, useRef, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendar, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { ChangeEventHandler, MouseEventHandler, useEffect, useRef, useState } from 'react';
 import InputWithLabel, { IInputWithLableProps, InputType } from './InputWithLabel';
 import { useDispatch, useSelector } from 'react-redux';
 import QueryDatePicker from './QueryDatePicker';
-import { setFetchSpacesQueryDataAction } from '../redux/actions/spaceActions';
+import {
+    annualizeFetchSpacesQueryDataAction,
+    annualizeFetchSpacesResponsesAction,
+    setFetchSpacesQueryDataAction,
+} from '../redux/actions/spaceActions';
 import { valueIsNumeric } from '../utils/utilFunctions';
 import { IReduxState } from '../redux/reducers/rootReducer';
+import RemoveIcon from '../icons/RemoveIcon';
+import CalendarIcon from '../icons/CalendarIcon';
 
 interface IFilterRange<T> {
     from: T;
@@ -24,8 +28,9 @@ export interface IDatesRange {
     endingDate?: string;
 }
 export interface IQueryData extends IDatesRange {
-    page: number;
+    page?: number;
     limit?: string | number;
+    offset?: number;
     sortBy?: SpaceQuerySortFields;
     priceFrom?: string | number;
     priceTo?: string | number;
@@ -74,6 +79,9 @@ export default function Filters(): JSX.Element {
         },
     ];
     const { fetchSpacesQueryData } = useSelector((state: IReduxState) => state.spaceStorage);
+    const sortByRef = useRef<HTMLDivElement>(null);
+    const priceRangeRef = useRef<HTMLDivElement>(null);
+    const datePickerRef = useRef<HTMLDivElement>(null);
     const annualizeDatesIconRef = useRef<HTMLDivElement>(null);
     const priceRangeInputs: IPriceRangeInput[] = [
         {
@@ -92,19 +100,54 @@ export default function Filters(): JSX.Element {
         },
     ];
     const dispatch = useDispatch();
+    const applyCloseSortByEvents = (): (() => void) => {
+        if (sortByDropDownBoxIsOpen) {
+            document.addEventListener('click', closeSortByOnOutsideClick);
+        }
+
+        return () => {
+            document.removeEventListener('click', closeSortByOnOutsideClick);
+        };
+    };
+    const applyClosePriceRangeEvents = (): (() => void) => {
+        if (priceRangeDropDownBoxIsOpen) {
+            document.addEventListener('click', closePriceRangeOnOutsideClick);
+        }
+
+        return () => {
+            document.removeEventListener('click', closePriceRangeOnOutsideClick);
+        };
+    };
+    const applyCloseDatePickerEvents = (): (() => void) => {
+        if (requiredReservationDatesPickerIsOpen) {
+            document.addEventListener('click', closeDatePickerOnOutsideClick);
+        }
+
+        return () => {
+            document.removeEventListener('click', closeDatePickerOnOutsideClick);
+        };
+    };
+    const annualizeSpacesAndQueryData = (): void => {
+        dispatch(annualizeFetchSpacesResponsesAction());
+        dispatch(annualizeFetchSpacesQueryDataAction());
+    };
+
     const toggleFilterBoxIsOpen = (filter: FilterNames): MouseEventHandler => {
         return (e): void => {
             switch (filter) {
                 case FilterNames.SORT_BY:
                     setSortByDropDownBoxIsOpen((prev) => !prev);
+
                     break;
 
                 case FilterNames.PRICE:
                     setPriceRangeDropDownBoxIsOpen((prev) => !prev);
+
                     break;
 
                 case FilterNames.RESERVATION_DATE_PICKER:
                     setRequiredReservationDatesPickerIsOpen((prev) => !prev);
+
                     break;
             }
         };
@@ -113,6 +156,8 @@ export default function Filters(): JSX.Element {
         return filterBoxIsOpen ? 'filters__arrow--rotated' : 'filters__arrow--straight';
     };
     const updateQueryDataSortBy = (sortByOption: SpaceQuerySortFields): void => {
+        annualizeSpacesAndQueryData();
+
         const newQueryData: IQueryData = { ...fetchSpacesQueryData! };
 
         newQueryData.sortBy = sortByOption;
@@ -169,14 +214,30 @@ export default function Filters(): JSX.Element {
         dispatch(setFetchSpacesQueryDataAction(newQueryData));
         setDatesForRender(undefined);
     };
+    const closeSortByOnOutsideClick = (e: MouseEvent): void => {
+        if (sortByDropDownBoxIsOpen && e.target !== sortByRef.current) {
+            setSortByDropDownBoxIsOpen(false);
+        }
+    };
+    const closePriceRangeOnOutsideClick = (e: MouseEvent): void => {
+        if (priceRangeDropDownBoxIsOpen && e.target !== priceRangeRef.current) {
+            setPriceRangeDropDownBoxIsOpen(false);
+        }
+    };
+    const closeDatePickerOnOutsideClick = (e: MouseEvent): void => {
+        if (requiredReservationDatesPickerIsOpen && e.target !== datePickerRef.current) {
+            setRequiredReservationDatesPickerIsOpen(false);
+        }
+    };
     const renderSortByFilterDropDown = (): JSX.Element | void => {
         if (sortByDropDownBoxIsOpen) {
             const sortByDropDownOptionsRender = sortByDropDownOptions.map(
                 (option: ISortByDropDownOptions, i: number) => {
                     return (
                         <div
-                            className={`filters__sort-by__drop-down-menu__${option.field}`}
-                            onClick={() => {
+                            className={`sort-by-option--${option.field}`}
+                            onClick={(e) => {
+                                e.stopPropagation();
                                 toggleFilterBoxIsOpen(FilterNames.SORT_BY);
                                 updateQueryDataSortBy(option.field);
                             }}
@@ -210,76 +271,95 @@ export default function Filters(): JSX.Element {
                 );
             });
 
-            return <div className="drop-down filters__price-range__drop-down">{inputs}</div>;
-        }
-    };
-    const renderRequiredReservationDatesRange = (): JSX.Element | void => {
-        const requiredReservationDates = datesForRender
-            ? `С ${datesForRender.beginningDate} до ${datesForRender.endingDate}`
-            : 'Выберите интересующие даты...';
-
-        return (
-            <div className="dates-range">
-                <div className="paragraph-container">
-                    <p className="paragraph paragraph--light paragraph--filters__reservation-date-picker">
-                        {requiredReservationDates}
-                    </p>
-                </div>
-                {datesForRender ? (
-                    <div ref={annualizeDatesIconRef}>
-                        <FontAwesomeIcon icon={faTimes} onClick={annualizeRequiredReservationDatesRangeFilter} />
-                    </div>
-                ) : null}
-            </div>
-        );
-    };
-    const renderDatePicker = (): JSX.Element | void => {
-        if (requiredReservationDatesPickerIsOpen) {
-            return <QueryDatePicker datesForRender={datesForRender} setDatesForRender={setDatesForRender} />;
-        }
-    };
-    const renderNumberOfDaysRequired = (): JSX.Element | void => {
-        if (datesForRender) {
-            const numberOfDays = calculateNumberOfDaysRequired();
-
             return (
-                <div className="date-picker__number-of-days-required">
-                    {formatNumberOfDaysByRussianGrammarCases(numberOfDays)}
+                <div className="drop-down filters__price-range__drop-down" onClick={(e) => e.stopPropagation()}>
+                    {inputs}
                 </div>
             );
         }
     };
+    const renderPickDatesMessage = (): JSX.Element | void => {
+        if (!datesForRender) {
+            return (
+                <div className="dates-range__message">
+                    <p className={'paragraph paragraph--light pick-dates-message'}>Выберите интересующие даты...</p>
+                </div>
+            );
+        }
+    };
+    const renderRequiredReservationData = (): JSX.Element | void => {
+        if (datesForRender) {
+            const numberOfDays = calculateNumberOfDaysRequired();
+
+            return (
+                <div className="dates-range__data">
+                    <div className="paragraph-container paragraph-container-picked-dates">
+                        <p className={'paragraph paragraph--light picked-dates'}>
+                            С {datesForRender.beginningDate} до {datesForRender.endingDate}
+                        </p>
+                    </div>
+                    <RemoveIcon
+                        handleClick={annualizeRequiredReservationDatesRangeFilter}
+                        innerRef={annualizeDatesIconRef}
+                    />
+                    <div className="number-of-nights-container">
+                        <p className="paragraph">{formatNumberOfDaysByRussianGrammarCases(numberOfDays)}</p>
+                    </div>
+                </div>
+            );
+        }
+    };
+    const renderDatePicker = (): JSX.Element | void => {
+        if (requiredReservationDatesPickerIsOpen) {
+            return (
+                <QueryDatePicker
+                    datesForRender={datesForRender}
+                    setDatesForRender={setDatesForRender}
+                    innerRef={datePickerRef}
+                />
+            );
+        }
+    };
+
+    useEffect(applyCloseSortByEvents, [sortByDropDownBoxIsOpen]);
+    useEffect(applyClosePriceRangeEvents, [priceRangeDropDownBoxIsOpen]);
+    useEffect(applyCloseDatePickerEvents, [requiredReservationDatesPickerIsOpen]);
 
     return (
         <section className="filters-section">
-            <div className="filter filters__sort-by">
+            <div
+                className="filter filters__sort-by"
+                onClick={toggleFilterBoxIsOpen(FilterNames.SORT_BY)}
+                ref={sortByRef}
+            >
                 <div className="heading-container">
-                    <h3 className="heading heading--tertiary" onClick={toggleFilterBoxIsOpen(FilterNames.SORT_BY)}>
+                    <h3 className="heading heading--tertiary">
                         Сортировка<span className={defineFilterBoxArrowClassName(sortByDropDownBoxIsOpen)}>^</span>
                     </h3>
                 </div>
                 {renderSortByFilterDropDown()}
             </div>
-            <div className="filter filters__price-range">
+            <div
+                className="filter filters__price-range"
+                onClick={toggleFilterBoxIsOpen(FilterNames.PRICE)}
+                ref={priceRangeRef}
+            >
                 <div className="heading-container">
-                    <h3 className="heading heading--tertiary" onClick={toggleFilterBoxIsOpen(FilterNames.PRICE)}>
+                    <h3 className="heading heading--tertiary">
                         Цена<span className={defineFilterBoxArrowClassName(priceRangeDropDownBoxIsOpen)}>^</span>
                     </h3>
                 </div>
                 {renderPriceRangeInputs()}
             </div>
             <div className="filter filters__required-reservation-dates-picker">
-                <div
-                    className="filters__required-reservation-dates-picker__content"
-                    onClick={toggleFilterBoxIsOpen(FilterNames.RESERVATION_DATE_PICKER)}
-                >
-                    {renderRequiredReservationDatesRange()}
-                    <div className="filters__required-reservation-dates-picker__calendar">
-                        <FontAwesomeIcon icon={faCalendar} />
+                <div className="filters-content" onClick={toggleFilterBoxIsOpen(FilterNames.RESERVATION_DATE_PICKER)}>
+                    <div className="dates-range">
+                        {renderPickDatesMessage()}
+                        {renderRequiredReservationData()}
                     </div>
+                    <CalendarIcon />
                 </div>
                 {renderDatePicker()}
-                {renderNumberOfDaysRequired()}
             </div>
         </section>
     );

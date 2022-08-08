@@ -1,4 +1,15 @@
-import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import {
+    BeforeCreate,
+    BeforeUpdate,
+    BelongsTo,
+    Column,
+    DataType,
+    ForeignKey,
+    HasMany,
+    Model,
+    PrimaryKey,
+    Table,
+} from 'sequelize-typescript';
 import { Optional } from 'sequelize';
 import { City } from './city.model';
 import { Appointment } from './appointment.model';
@@ -122,4 +133,10 @@ export class Space extends Model<ISpaceAttributes, ISpaceCreationAttributes> imp
 
     @HasMany(() => Appointment)
     public appointments?: Appointment[];
+
+    @BeforeCreate
+    @BeforeUpdate
+    static uppercaseAddress(instance: Space) {
+        instance.address = `${instance.address[0].toUpperCase()}${instance.address.slice(1)}`;
+    }
 }

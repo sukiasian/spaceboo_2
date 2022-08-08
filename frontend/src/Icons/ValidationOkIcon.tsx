@@ -8,5 +8,9 @@ interface ValidationOkIconProps {
 export default function ValidationOkIcon(props: ValidationOkIconProps): JSX.Element {
     const { identifier } = props;
 
-    return <FontAwesomeIcon icon={faChevronCircleDown} id={`validation-ok-${identifier}`} className="validation-ok" />;
+    return (
+        <div className="icon icon-container">
+            <FontAwesomeIcon icon={faChevronCircleDown} id={`validation-ok-${identifier}`} className="validation-ok" />
+        </div>
+    );
 }

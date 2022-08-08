@@ -1,3 +1,27 @@
 .icon {
     color: $color-grey-dark-1;
+
+    &--remove {
+        &:hover {
+            color: $color-primary-2-lightened;
+        }
+
+        &:active {
+            color: $color-primary-2;
+        }
+    }
+}
+
+.arrow {
+    &:hover {
+        color: $color-primary-1;
+    }
+
+    &--inactive {
+        color: $color-grey-light-4;
+
+        &:hover {
+            color: $color-grey-light-4;
+        }
+    }
 }

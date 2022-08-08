@@ -1,12 +1,14 @@
+import { faMapMarker } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { NavLink } from 'react-router-dom';
 import { IComponentClassNameProps, UrlPathname } from '../types/types';
 
 interface ISpace {
     id: string;
     imagesUrl: string[];
-    price: number;
+    pricePerNight: number;
     roomsNumber: number;
-    city: string;
+    cityName: Record<any, any>;
     address: string;
 }
 interface ISpaceProps extends IComponentClassNameProps {
@@ -16,12 +18,14 @@ interface ISpaceProps extends IComponentClassNameProps {
 
 export default function Space(props: ISpaceProps): JSX.Element {
     const { index, space, children } = props;
-    const { id, imagesUrl, price, roomsNumber, city, address } = space;
+    const { id, imagesUrl, pricePerNight, roomsNumber, cityName, address } = space;
     const mainImageUrl = imagesUrl[0];
     const renderPrice = (): JSX.Element => {
         return (
-            <div className={`space-card__price space-card--${index}`}>
-                <p className="paragraph paragraph--price">₽{price}</p>
+            <div className="space-card__price-container">
+                <div className={`space-card__price space-card--${index}`}>
+                    <p className="paragraph paragraph--price">₽{pricePerNight}</p>
+                </div>
             </div>
         );
     };
@@ -39,31 +43,25 @@ export default function Space(props: ISpaceProps): JSX.Element {
                     {renderPrice()}
                 </div>
                 <div className={`space-card__under-image space-card__under-image--${index}`}>
-                    <div className="space-card__under-image__row space-card__under-image__row--1">
-                        <div className="space-card__under-image__row--1__rooms-number-container">
+                    <div className="rooms-and-city">
+                        <div className="rooms-and-city__rooms-container">
                             <p className="paragraph paragraph--light space-card__under-image__row--1__rooms-number">
                                 {roomsNumber} комн.
                             </p>
                         </div>
-                        <div className="space-card__under-image__row--1__city">
-                            <div className="space-card__under-image__row--1__city-icon-container">
-                                <i className="city-icon" />
-                            </div>
-                            <div className="space-card__under-image__row--1__city-name-container">
-                                <p className="paragraph paragraph--light paragraph--space-card__under-image__row--1__city-name">
-                                    {city}
-                                </p>
-                            </div>
+                        <div className="rooms-and-city__city-icon-container">
+                            <FontAwesomeIcon icon={faMapMarker} />
                         </div>
-                        <div className="space-card__under-image__row space-card__under-image__row--2">
-                            <div className="space-card__under-image__row--2__address-container">
-                                <h3 className="heading heading--tertiary space-card__under-image__row--2__address">
-                                    {address}
-                                </h3>
-                            </div>
+                        <div className="rooms-and-city__city-name-container">
+                            <p className="paragraph paragraph--light paragraph--space-card__under-image__row--1__city-name">
+                                {cityName}
+                            </p>
                         </div>
-                        {renderChildren()}
                     </div>
+                    <div className="address-container">
+                        <p className="paragraph address-paragraph">{address.toUpperCase()}</p>
+                    </div>
+                    {renderChildren()}
                 </div>
             </div>
         </NavLink>

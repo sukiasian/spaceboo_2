@@ -20,8 +20,6 @@
     }
 
     .date-picker {
-        width: 22rem;
-        margin-top: 5px;
         color: $color-grey-dark-1;
     }
 }
@@ -51,16 +49,40 @@
     }
 
     &__required-reservation-dates-picker {
-        &__content {
-            display: flex;
-            justify-content: space-between;
-        }
+        min-width: 300px;
 
-        &__calendar {
-        }
-    }
+        .filters-content {
+            min-height: 50px;
+            display: grid;
+            grid-template-columns: 300px 20px;
+            grid-template-rows: 1fr;
+            grid-template-areas: 'a b';
 
-    &__required-reservation-dates-picker {
-        min-width: 350px;
+            .calendar-icon-container {
+                grid-area: b;
+                align-self: center;
+                justify-self: center;
+            }
+
+            .dates-range {
+                grid-area: a;
+                align-self: center;
+
+                &__data {
+                    display: grid;
+                    grid-template-columns: 5fr 1fr;
+                    grid-template-rows: repeat(2, 25px);
+                    grid-template-areas: 'a1 b1' 'a2 a2';
+
+                    .paragraph-container-picked-dates {
+                        grid-area: a1;
+                    }
+
+                    .remove-icon-container {
+                        grid-area: b1;
+                    }
+                }
+            }
+        }
     }
 }

@@ -1,20 +1,102 @@
 .spaces {
     margin-top: 6rem;
     display: grid;
-    grid-template-rows: 1fr;
-    grid-template-columns: repeat(3, max-content);
+    grid-template-rows: max-content;
+    grid-template-columns: repeat(3, 23rem);
     gap: 3rem;
+    padding-bottom: 2rem;
+    min-height: 22rem;
 }
 
 .space-card {
     &__image {
-        width: 24rem;
-        height: 20rem;
+        width: 20rem;
+        height: 16rem;
         border-radius: $box-border-radius;
         object-fit: cover;
     }
 
-    &--price {
-        position: relative;
+    &__price {
+        &-container {
+            position: relative;
+        }
+
+        position: absolute;
+        top: -50px;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.55);
+        padding: 0.1rem 0.5rem;
+        border-radius: $box-border-radius;
+
+        p {
+            color: white;
+            font-weight: bold;
+        }
+    }
+
+    &-link {
+        justify-self: center;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -o-user-select: none;
+        user-select: none;
+
+        color: inherit;
+
+        &:hover {
+            // outline: 1px solid rgba(209, 209, 209, 0.4);
+            border-radius: 15px;
+            box-shadow: 10px 10px 21px #d3d3d6, -10px -10px 21px #fff;
+        }
+
+        &:active {
+            transform: scale(1.01);
+        }
+
+        &:visited {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        & .space-card-image {
+            position: absolute;
+        }
+    }
+
+    .rooms-and-city {
+        display: grid;
+        grid-template-rows: 1fr;
+        grid-template-columns: 30% 20% 50%;
+
+        p {
+            color: $color-grey-light-1;
+        }
+
+        .rooms-and-city__rooms-container {
+            margin-left: 30%;
+        }
+
+        .rooms-and-city__city-icon-container {
+            margin-left: 70%;
+            color: $color-grey-light-1;
+        }
+    }
+
+    .address-container {
+        display: flex;
+        justify-content: center;
+        width: 20rem;
+        margin-top: 0.5rem;
+
+        p {
+            font-size: 18px;
+            text-overflow: ellipsis;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
     }
 }

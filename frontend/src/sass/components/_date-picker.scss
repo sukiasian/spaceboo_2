@@ -1,28 +1,66 @@
 .date-picker {
-    position: absolute;
     border: 1px solid $box-border-color;
     border-radius: $box-border-radius;
-    width: 17.7rem;
-    z-index: 10;
-    margin-top: 0.5rem;
-    margin-left: -1.5rem;
     background-color: $color-white;
     box-shadow: $box-shadow;
+    padding: 0.6rem;
 
     &__control {
         display: flex;
         flex-direction: row;
         align-content: center;
         justify-content: space-evenly;
-        margin-top: 1rem;
+        margin-top: 0.5rem;
+    }
 
-        &__arrow {
-            &:hover {
-                color: $color-primary-1;
-                transition: 0.2s;
+    &__table {
+        display: flex;
+        justify-content: center;
+        margin-top: 0.7rem;
+
+        .weekdays {
+            cursor: auto;
+        }
+
+        .picked-day {
+            background-color: $color-primary-1;
+        }
+
+        .table-cell {
+            padding: 0.4rem 0.6rem;
+            text-align: center;
+            border-radius: $box-border-radius;
+
+            &--today {
+                outline: 1px solid $color-primary-2;
+                border-radius: $box-border-radius;
+
+                &:hover {
+                    outline: none;
+                    background-color: $color-primary-2-lightened;
+                }
+            }
+
+            &--past {
+                color: $color-grey-light-1;
+            }
+
+            &--out-of-month {
+                color: #c9c9c9;
+            }
+
+            &:hover:not(.table-cell--past):not(.table-cell--today):not(.picked-day) {
+                background-color: $color-primary-1-lightened;
             }
         }
     }
+}
+
+.drop-down.query-date-picker.date-picker {
+    position: absolute;
+    min-width: 370px;
+    z-index: 10;
+    margin-left: -23px;
 }
 
 .active-month {

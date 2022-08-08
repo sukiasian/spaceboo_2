@@ -135,6 +135,8 @@ export enum ReduxSpaceAction {
     ANNUALIZE_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_RESPONSES = 'ANNUALIZE_FETCH_SPACES_BY_USER_OUTDATED_APPOINTMENTS_RESPONSES',
     ANNUALIZE_FETCH_SPACES_BY_USER_ACTIVE_APPOINTMENTS_RESPONSES = 'ANNUALIZE_FETCH_SPACES_BY_USER_ACTIVE_APPOINTMENTS_RESPONSES',
     ANNUALIZE_FETCH_SPACES_BY_USER_UPCOMING_APPOINTMENTS_RESPONSES = 'ANNUALIZE_FETCH_SPACES_BY_USER_UPCOMING_APPOINTMENTS_RESPONSES',
+    ANNUALIZE_FETCH_SPACES_RESPONSES = 'ANNUALIZE_FETCH_SPACES_RESPONSES',
+    ANNUALIZE_FETCH_SPACES_QUERY_DATA = 'ANNUALIZE_FETCH_SPACES_QUERY_DATA',
 }
 
 export enum ReduxLockerAction {
@@ -279,7 +281,18 @@ export enum UrlPathname {
     SPACES = '/spaces',
 }
 
+export enum QueryDefaultValue {
+    PAGE = 1,
+    LIMIT = 12,
+    OFFSET = 12,
+}
+
 export type TActiveTab = {
     defineActiveClassName: (url: string) => string | undefined;
     handleActiveTab: (url: string) => void;
 };
+
+export interface IArrowIconProps {
+    combinedClassNames?: string;
+    handleClick?: (...props: any) => any;
+}

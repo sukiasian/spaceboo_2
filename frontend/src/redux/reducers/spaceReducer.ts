@@ -1,5 +1,5 @@
 import { IQueryData } from '../../components/Filters';
-import { IServerResponse, ReduxSpaceAction } from '../../types/types';
+import { IServerResponse, QueryDefaultValue, ReduxSpaceAction } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 
 export interface IProvideSpaceData {
@@ -37,7 +37,7 @@ export interface ISpaceState {
     editSpaceData?: IEditSpaceData;
     postProvideSpaceSuccessResponse?: IServerResponse;
     postProvideSpaceFailureResponse?: IServerResponse;
-    fetchSpacesSuccessResponse?: IServerResponse;
+    fetchSpacesSuccessResponse?: any[];
     fetchSpacesFailureResponse?: IServerResponse;
     fetchSpaceByIdSuccessResponse?: IServerResponse;
     fetchSpaceByIdFailureResponse?: IServerResponse;
@@ -67,8 +67,12 @@ const initialProvideSpaceData = {
     lockerConnected: false,
 };
 const initialFetchSpacesQueryData: IQueryData = {
-    page: 0,
+    page: QueryDefaultValue.PAGE,
+    limit: QueryDefaultValue.LIMIT,
+    offset: QueryDefaultValue.OFFSET,
+    cityId: localStorage.getItem('currentCityId') || '',
 };
+
 const initialState: ISpaceState = {
     isLoaded: false,
     provideSpaceData: initialProvideSpaceData,
@@ -92,7 +96,14 @@ export const spaceReducer = (state = initialState, action: IAction): ISpaceState
         case ReduxSpaceAction.SET_FETCH_SPACES_SUCCESS_RESPONSE:
             return {
                 ...state,
-                fetchSpacesSuccessResponse: action.payload,
+                fetchSpacesSuccessResponse: [...(state.fetchSpacesSuccessResponse || []), ...action.payload],
+            };
+
+        case ReduxSpaceAction.ANNUALIZE_FETCH_SPACES_RESPONSES:
+            return {
+                ...state,
+                fetchSpacesSuccessResponse: [],
+                fetchSpacesFailureResponse: undefined,
             };
 
         case ReduxSpaceAction.SET_FETCH_SPACES_FAILURE_RESPONSE:
@@ -194,7 +205,7 @@ export const spaceReducer = (state = initialState, action: IAction): ISpaceState
         case ReduxSpaceAction.SET_PUT_EDIT_SPACE_SUCCESS_RESPONSE:
             return {
                 ...state,
-                putEditSpaceSuccessResponse: [ initialStateaction.payload,
+                putEditSpaceSuccessResponse: action.payload,
             };
 
         case ReduxSpaceAction.SET_PUT_EDIT_SPACE_FAILURE_RESPONSE:
@@ -235,6 +246,17 @@ export const spaceReducer = (state = initialState, action: IAction): ISpaceState
                 ...state,
                 fetchSpacesByUserUpcomingAppointmentsSuccessResponse: undefined,
                 fetchSpacesByUserUpcomingAppointmentsFailureResponse: undefined,
+            };
+
+        case ReduxSpaceAction.ANNUALIZE_FETCH_SPACES_QUERY_DATA:
+            return {
+                ...state,
+                fetchSpacesQueryData: {
+                    page: QueryDefaultValue.PAGE,
+                    limit: QueryDefaultValue.LIMIT,
+                    offset: QueryDefaultValue.OFFSET,
+                    cityId: localStorage.getItem('currentCityId') || '',
+                },
             };
 
         default: {
