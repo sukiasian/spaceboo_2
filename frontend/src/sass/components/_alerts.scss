@@ -12,4 +12,8 @@
         border: 1px solid $color-alert-failure-border;
         background-color: $color-alert-failure-background;
     }
+
+    &--disappearing {
+        position: absolute;
+    }
 }

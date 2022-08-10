@@ -1,6 +1,6 @@
 import { IQueryData } from '../../components/Filters';
 import { IServerResponse, ReduxSpaceAction, SagaTask } from '../../types/types';
-import { IEditSpaceData, IEditSpacePayload, IProvideSpaceData } from '../reducers/spaceReducer';
+import { IDeleteSpacePayload, IEditSpaceData, IEditSpacePayload, IProvideSpaceData } from '../reducers/spaceReducer';
 import { IAction } from './ActionTypes';
 
 export const postProvideSpaceAction = (payload: IProvideSpaceData): IAction<SagaTask, IProvideSpaceData> => {
@@ -57,6 +57,13 @@ export const fetchSpacesForKeyControlAction = (): IAction<SagaTask> => {
 export const putEditSpaceAction = (payload: IEditSpacePayload): IAction<SagaTask> => {
     return {
         type: SagaTask.PUT_EDIT_SPACE,
+        payload,
+    };
+};
+
+export const deleteSpaceAction = (payload: IDeleteSpacePayload): IAction<SagaTask> => {
+    return {
+        type: SagaTask.DELETE_SPACE,
         payload,
     };
 };
@@ -243,6 +250,24 @@ export const setPutEditSpaceFailureResponseAction = (
 ): IAction<ReduxSpaceAction, IServerResponse> => {
     return {
         type: ReduxSpaceAction.SET_PUT_EDIT_SPACE_FAILURE_RESPONSE,
+        payload,
+    };
+};
+
+export const setDeleteSpaceSuccessResponseAction = (
+    payload: IServerResponse
+): IAction<ReduxSpaceAction, IServerResponse> => {
+    return {
+        type: ReduxSpaceAction.SET_DELETE_SPACE_SUCCESS_RESPONSE,
+        payload,
+    };
+};
+
+export const setDeleteSpaceFailureResponseAction = (
+    payload: IServerResponse
+): IAction<ReduxSpaceAction, IServerResponse> => {
+    return {
+        type: ReduxSpaceAction.SET_DELETE_SPACE_FAILURE_RESPONSE,
         payload,
     };
 };

@@ -8,11 +8,6 @@
 body {
   box-sizing: border-box; }
 
-.App {
-  display: flex;
-  flex-direction: column;
-  height: 100vh; }
-
 hmtl,
 body {
   max-width: 100vw;
@@ -244,13 +239,16 @@ svg {
   .alert--failure {
     border: 1px solid #b63434;
     background-color: rgba(255, 103, 82, 0.405); }
+  .alert--disappearing {
+    position: absolute; }
 
 .date-picker {
   border: 1px solid rgba(208, 208, 208, 0.4);
   border-radius: 15px;
   background-color: #fff;
   box-shadow: 0 0 1px 3px rgba(209, 209, 209, 0.2);
-  padding: 0.6rem; }
+  padding: 0.6rem;
+  cursor: auto; }
   .date-picker__control {
     display: flex;
     flex-direction: row;
@@ -268,7 +266,8 @@ svg {
     .date-picker__table .table-cell {
       padding: 0.4rem 0.6rem;
       text-align: center;
-      border-radius: 15px; }
+      border-radius: 15px;
+      cursor: pointer; }
       .date-picker__table .table-cell--today {
         outline: 1px solid #1476b3;
         border-radius: 15px; }
@@ -276,7 +275,8 @@ svg {
           outline: none;
           background-color: #2b99dd; }
       .date-picker__table .table-cell--past {
-        color: #949494; }
+        color: #949494;
+        cursor: auto; }
       .date-picker__table .table-cell--out-of-month {
         color: #c9c9c9; }
       .date-picker__table .table-cell:hover:not(.table-cell--past):not(.table-cell--today):not(.picked-day) {
@@ -734,6 +734,13 @@ select {
   .icon--remove:active {
     color: #1476b3; }
 
+.remove-icon-container {
+  cursor: pointer; }
+  .remove-icon-container:hover {
+    color: #2b99dd; }
+  .remove-icon-container:active {
+    color: #1476b3; }
+
 .arrow:hover {
   color: #fec602; }
 
@@ -756,6 +763,40 @@ select {
 
 .page {
   background-color: #f8f8f8; }
+
+.confirm-dialog {
+  position: fixed;
+  padding: 1rem;
+  min-width: 40vw;
+  background-color: white;
+  z-index: 2000;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 15px;
+  box-shadow: 0 0 1px 3px rgba(209, 209, 209, 0.2);
+  user-select: none; }
+  .confirm-dialog .remove-icon-container {
+    margin-left: 95%; }
+  .confirm-dialog .question-container {
+    display: flex;
+    justify-content: center; }
+  .confirm-dialog .answers-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center; }
+  .confirm-dialog .confirm-answer {
+    cursor: pointer; }
+    .confirm-dialog .confirm-answer--positive {
+      padding: 0.4rem 1rem;
+      border-radius: 15px;
+      background-color: #b63434;
+      color: white;
+      cursor: pointer; }
+    .confirm-dialog .confirm-answer--negative {
+      color: #2b99dd; }
+      .confirm-dialog .confirm-answer--negative:hover, .confirm-dialog .confirm-answer--negative:active {
+        color: #1476b3; }
 
 .row {
   display: flex;

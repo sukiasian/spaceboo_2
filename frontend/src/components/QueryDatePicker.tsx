@@ -1,14 +1,10 @@
-import React, { RefObject } from 'react';
+import React, { RefObject, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-    annualizeFetchSpacesResponsesAction,
-    annualizeProvideSpaceDataAction,
-    setFetchSpacesQueryDataAction,
-} from '../redux/actions/spaceActions';
+import { annualizeFetchSpacesResponsesAction, setFetchSpacesQueryDataAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { formatSingleDigitUnitToTwoDigitString } from '../utils/utilFunctions';
 import DatePicker from './DatePicker';
-import { IDatesRange, IQueryData } from './Filters';
+import { IDatesRange } from './Filters';
 
 interface IQueryDatePicker {
     datesForRender: IDatesRange | undefined;
@@ -18,6 +14,7 @@ interface IQueryDatePicker {
 
 export default function QueryDatePicker(props: IQueryDatePicker): JSX.Element {
     const { datesForRender, setDatesForRender, innerRef } = props;
+    const [datesForQuery, setDatesForQuery] = useState<IDatesRange>();
     const { fetchSpacesQueryData } = useSelector((state: IReduxState) => state.spaceStorage);
     const { datePickerDate } = useSelector((state: IReduxState) => state.commonStorage);
     const dispatch = useDispatch();
@@ -59,7 +56,7 @@ export default function QueryDatePicker(props: IQueryDatePicker): JSX.Element {
         return new Date(d1) > new Date(d2);
     };
     const pickDate = (day: number) => {
-        const newQueryData: IQueryData = { ...fetchSpacesQueryData };
+        const newDatesForQuery: IDatesRange = { ...datesForQuery };
         const newDatesForRender: IDatesRange = { ...datesForRender };
 
         const pickedDate = generateQueryDateString(datePickerDate.year, datePickerDate.month, day);
@@ -76,11 +73,11 @@ export default function QueryDatePicker(props: IQueryDatePicker): JSX.Element {
         if (datePickerDate.month === currentDate.month && day < currentDate.day) {
             return;
         } else {
-            if (newQueryData.beginningDate && newQueryData.endingDate) {
+            if (newDatesForQuery.beginningDate && newDatesForQuery.endingDate) {
                 // if you click on chosen one
-                if (newQueryData.beginningDate === pickedDate || newQueryData.endingDate === pickedDate) {
-                    newQueryData.beginningDate = pickedDate;
-                    newQueryData.endingDate = generateQueryDateString(
+                if (newDatesForQuery.beginningDate === pickedDate || newDatesForQuery.endingDate === pickedDate) {
+                    newDatesForQuery.beginningDate = pickedDate;
+                    newDatesForQuery.endingDate = generateQueryDateString(
                         datePickerDate.year,
                         datePickerDate.month,
                         day + 1,
@@ -95,18 +92,18 @@ export default function QueryDatePicker(props: IQueryDatePicker): JSX.Element {
                     );
                 }
                 // if you first click on high value then on lower value
-                else if (firstDateIsGreaterThanSecond(newQueryData.beginningDate, pickedDate)) {
-                    newQueryData.endingDate = newQueryData.beginningDate;
-                    newQueryData.beginningDate = pickedDate;
+                else if (firstDateIsGreaterThanSecond(newDatesForQuery.beginningDate, pickedDate)) {
+                    newDatesForQuery.endingDate = newDatesForQuery.beginningDate;
+                    newDatesForQuery.beginningDate = pickedDate;
                     newDatesForRender.endingDate = newDatesForRender.beginningDate;
                     newDatesForRender.beginningDate = pickedDateForRender;
                 } else {
-                    newQueryData.endingDate = pickedDate;
+                    newDatesForQuery.endingDate = pickedDate;
                     newDatesForRender.endingDate = pickedDateForRender;
                 }
             } else {
-                newQueryData.beginningDate = pickedDate;
-                newQueryData.endingDate = generateQueryDateString(
+                newDatesForQuery.beginningDate = pickedDate;
+                newDatesForQuery.endingDate = generateQueryDateString(
                     datePickerDate.year,
                     datePickerDate.month,
                     day + 1,
@@ -122,9 +119,8 @@ export default function QueryDatePicker(props: IQueryDatePicker): JSX.Element {
             }
         }
 
-        dispatch(annualizeProvideSpaceDataAction());
-        dispatch(annualizeFetchSpacesResponsesAction());
-        dispatch(setFetchSpacesQueryDataAction(newQueryData));
+        setDatesForQuery(newDatesForQuery);
+
         setDatesForRender({
             beginningDate: newDatesForRender.beginningDate,
             endingDate: newDatesForRender.endingDate,
@@ -136,8 +132,6 @@ export default function QueryDatePicker(props: IQueryDatePicker): JSX.Element {
             const beginningDate = new Date(fetchSpacesQueryData.beginningDate as string);
             const endingDate = new Date(fetchSpacesQueryData.endingDate as string);
 
-            // если день является крайним и он не является последним в выбранных днях, то его углы
-            // должны быть прямыми.
             if (dateForCurrentDay >= beginningDate && beginningDate >= dateForCurrentDay) {
                 return 'picked-day table-cell--at-border--left';
             } else if (dateForCurrentDay >= endingDate && endingDate >= dateForCurrentDay) {
@@ -152,6 +146,20 @@ export default function QueryDatePicker(props: IQueryDatePicker): JSX.Element {
     const combinePresentMonthDaysClassNames = (day: number): string => {
         return `${definePickedDaysClassName(day)}`;
     };
+    const prepareNewFetchSpacesQueryDataForApplyingDateRangeFilter = (): void => {
+        if (datesForQuery?.beginningDate && datesForQuery?.endingDate) {
+            const newFetchSpacesQueryData = { ...fetchSpacesQueryData };
+
+            newFetchSpacesQueryData.page = 1;
+            newFetchSpacesQueryData.beginningDate = datesForQuery?.beginningDate;
+            newFetchSpacesQueryData.endingDate = datesForQuery?.endingDate;
+
+            dispatch(annualizeFetchSpacesResponsesAction());
+            dispatch(setFetchSpacesQueryDataAction(newFetchSpacesQueryData));
+        }
+    };
+
+    useEffect(prepareNewFetchSpacesQueryDataForApplyingDateRangeFilter, [datesForQuery]);
 
     return (
         <DatePicker

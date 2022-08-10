@@ -1,0 +1,49 @@
+.confirm-dialog {
+    position: fixed;
+    padding: 1rem;
+    min-width: 40vw;
+    background-color: white;
+    z-index: 2000;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: $box-border-radius;
+    box-shadow: $box-shadow;
+    user-select: none;
+
+    .remove-icon-container {
+        margin-left: 95%;
+    }
+
+    .question-container {
+        display: flex;
+        justify-content: center;
+    }
+
+    .answers-container {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    .confirm-answer {
+        cursor: pointer;
+
+        &--positive {
+            padding: 0.4rem 1rem;
+            border-radius: $box-border-radius;
+            background-color: $color-red;
+            color: white;
+            cursor: pointer;
+        }
+
+        &--negative {
+            color: $color-primary-2-lightened;
+
+            &:hover,
+            &:active {
+                color: $color-primary-2;
+            }
+        }
+    }
+}

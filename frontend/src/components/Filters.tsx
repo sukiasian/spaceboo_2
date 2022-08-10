@@ -2,19 +2,15 @@ import { ChangeEventHandler, MouseEventHandler, useEffect, useRef, useState } fr
 import InputWithLabel, { IInputWithLableProps, InputType } from './InputWithLabel';
 import { useDispatch, useSelector } from 'react-redux';
 import QueryDatePicker from './QueryDatePicker';
-import {
-    annualizeFetchSpacesQueryDataAction,
-    annualizeFetchSpacesResponsesAction,
-    setFetchSpacesQueryDataAction,
-} from '../redux/actions/spaceActions';
+import { annualizeFetchSpacesResponsesAction, setFetchSpacesQueryDataAction } from '../redux/actions/spaceActions';
 import { valueIsNumeric } from '../utils/utilFunctions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import RemoveIcon from '../icons/RemoveIcon';
 import CalendarIcon from '../icons/CalendarIcon';
 
-interface IFilterRange<T> {
-    from: T;
-    to: T;
+interface IPriceRange {
+    priceFrom?: string;
+    priceTo?: string;
 }
 interface ISortByDropDownOptions {
     field: SpaceQuerySortFields;
@@ -57,6 +53,8 @@ enum PriceRangeQueryDataReferences {
 
 export default function Filters(): JSX.Element {
     const [datesForRender, setDatesForRender] = useState<IDatesRange>();
+    const [sortByQueryOption, setSortByQueryOption] = useState<SpaceQuerySortFields>();
+    const [priceRange, setPriceRange] = useState<IPriceRange>();
     const [sortByDropDownBoxIsOpen, setSortByDropDownBoxIsOpen] = useState(false);
     const [priceRangeDropDownBoxIsOpen, setPriceRangeDropDownBoxIsOpen] = useState(false);
     const [requiredReservationDatesPickerIsOpen, setRequiredReservationDatesPickerIsOpen] = useState(false);
@@ -127,11 +125,16 @@ export default function Filters(): JSX.Element {
             document.removeEventListener('click', closeDatePickerOnOutsideClick);
         };
     };
-    const annualizeSpacesAndQueryData = (): void => {
-        dispatch(annualizeFetchSpacesResponsesAction());
-        dispatch(annualizeFetchSpacesQueryDataAction());
-    };
+    const prepareNewFetchSpacesQueryDataForApplyingSortByFilter = () => {
+        if (sortByQueryOption) {
+            const newQueryData: IQueryData = { ...fetchSpacesQueryData! };
 
+            newQueryData.page = 1;
+            newQueryData.sortBy = sortByQueryOption;
+
+            dispatch(setFetchSpacesQueryDataAction(newQueryData));
+        }
+    };
     const toggleFilterBoxIsOpen = (filter: FilterNames): MouseEventHandler => {
         return (e): void => {
             switch (filter) {
@@ -156,31 +159,35 @@ export default function Filters(): JSX.Element {
         return filterBoxIsOpen ? 'filters__arrow--rotated' : 'filters__arrow--straight';
     };
     const updateQueryDataSortBy = (sortByOption: SpaceQuerySortFields): void => {
-        annualizeSpacesAndQueryData();
-
-        const newQueryData: IQueryData = { ...fetchSpacesQueryData! };
-
-        newQueryData.sortBy = sortByOption;
-
-        dispatch(setFetchSpacesQueryDataAction(newQueryData));
+        if (sortByQueryOption !== sortByOption) {
+            dispatch(annualizeFetchSpacesResponsesAction());
+            setSortByQueryOption(sortByOption);
+        }
     };
     const updateQueryDataPriceRange: ChangeEventHandler<HTMLInputElement> = (e) => {
         const newQueryData: any = { ...fetchSpacesQueryData };
         const { value } = e.currentTarget;
         const priceRangeQueryDataReference = e.currentTarget.getAttribute('data-tag');
 
-        newQueryData[priceRangeQueryDataReference as string] = value;
+        // newQueryData[priceRangeQueryDataReference as string] = value;
+        const newPriceRange: IPriceRange = { ...priceRange };
+
+        newPriceRange[priceRangeQueryDataReference as keyof IPriceRange] = value;
 
         if (value.length >= 1) {
-            if (!valueIsNumeric(e.target.value)) {
+            if (!valueIsNumeric(value)) {
                 e.target.value = '';
 
                 return;
             }
 
-            dispatch(setFetchSpacesQueryDataAction(newQueryData));
+            // dispatch(setFetchSpacesQueryDataAction(newQueryData));
         }
+
+        dispatch(annualizeFetchSpacesResponsesAction());
+        setPriceRange(newPriceRange);
     };
+
     const calculateNumberOfDaysRequired = (): number => {
         const beginningDateInMs = new Date(fetchSpacesQueryData!.beginningDate!).getTime();
         const endingDateInMs = new Date(fetchSpacesQueryData!.endingDate!).getTime();
@@ -324,6 +331,24 @@ export default function Filters(): JSX.Element {
     useEffect(applyCloseSortByEvents, [sortByDropDownBoxIsOpen]);
     useEffect(applyClosePriceRangeEvents, [priceRangeDropDownBoxIsOpen]);
     useEffect(applyCloseDatePickerEvents, [requiredReservationDatesPickerIsOpen]);
+    useEffect(prepareNewFetchSpacesQueryDataForApplyingSortByFilter, [sortByQueryOption]);
+    useEffect(() => {
+        if (priceRange?.priceFrom) {
+            const newQueryData: IQueryData = { ...fetchSpacesQueryData! };
+
+            newQueryData.page = 1;
+            newQueryData.priceFrom = priceRange.priceFrom;
+
+            dispatch(setFetchSpacesQueryDataAction(newQueryData));
+        } else if (priceRange?.priceTo) {
+            const newQueryData: IQueryData = { ...fetchSpacesQueryData! };
+
+            newQueryData.page = 1;
+            newQueryData.priceTo = priceRange.priceTo;
+
+            dispatch(setFetchSpacesQueryDataAction(newQueryData));
+        }
+    }, [priceRange]);
 
     return (
         <section className="filters-section">

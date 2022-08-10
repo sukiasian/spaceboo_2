@@ -1,30 +1,36 @@
-import { useEffect, useRef, useState } from 'react';
+import { MouseEventHandler, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faChevronLeft, faChevronRight, faEdit, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
-import { fetchSpaceByIdAction, fetchUserSpacesAction } from '../redux/actions/spaceActions';
+import { deleteSpaceAction, fetchSpaceByIdAction, fetchUserSpacesAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import EditSpaceModal from '../modals/EditSpaceModal';
 import { toggleEditSpaceModalAction } from '../redux/actions/modalActions';
 import { EventListenerType } from '../types/types';
 import { updateDocumentTitle } from '../utils/utilFunctions';
+import RemoveIcon from '../icons/RemoveIcon';
+import ConfirmDialog from '../components/ConfirmDialog';
+import { IDeleteSpacePayload } from '../redux/reducers/spaceReducer';
+import DisappearingAlert from '../components/DisappearingAlert';
+import AppointmentDatePicker from '../components/AppointmentDatePicker';
 
 interface ISpaceInitialField {
     fieldName: string;
     fieldDescription: string;
 }
 
-// вначале мы должны отправить запрос на получение всех спейсов пользователя. Если в массиве числитя params.spaceId то
-
 export default function SpacePage(): JSX.Element {
     const [activeImageIndex, setActiveImageIndex] = useState(0);
-    const { fetchSpaceByIdSuccessResponse, fetchSpaceByIdFailureResponse } = useSelector(
-        (state: IReduxState) => state.spaceStorage
-    );
-    const { fetchCurrentUserSuccessResponse, fetchCurrentUserFailureResponse } = useSelector(
-        (state: IReduxState) => state.userStorage
-    );
+    const [removeSpaceConfirmIsOpen, setRemoveSpaceConfirmIsOpen] = useState(false);
+    const [datePickerIsOpen, setDatePickerIsOpen] = useState(false);
+    const {
+        fetchSpaceByIdSuccessResponse,
+        fetchSpaceByIdFailureResponse,
+        deleteSpaceSuccessResponse,
+        deleteSpaceFailureResponse,
+    } = useSelector((state: IReduxState) => state.spaceStorage);
+    const { fetchCurrentUserSuccessResponse } = useSelector((state: IReduxState) => state.userStorage);
     const { editSpaceModalIsOpen } = useSelector((state: IReduxState) => state.modalStorage);
     const editSpaceModalRef = useRef<HTMLDivElement>(null);
     const spaceData = fetchSpaceByIdSuccessResponse?.data;
@@ -61,10 +67,20 @@ export default function SpacePage(): JSX.Element {
 
         updateDocumentTitle(documentTitle);
     };
-    const applyEffectsOnInit = (): void => {
+    const applyEffectsOnInit = (): (() => void) => {
         requestSpaceById();
         requestUserSpaces();
         handleDocumentTitle();
+
+        return () => {
+            // annualizeDelete if is defined
+        };
+    };
+    const toggleDatePicker: MouseEventHandler = () => {
+        setDatePickerIsOpen((prev) => !prev);
+    };
+    const toggleRemoveSpaceConfirm: MouseEventHandler = (): void => {
+        setRemoveSpaceConfirmIsOpen((prev) => !prev);
     };
     const closeModalOnOutsideClick = (e: MouseEvent) => {
         if (!editSpaceModalRef.current?.contains(e.target as HTMLDivElement)) {
@@ -81,8 +97,16 @@ export default function SpacePage(): JSX.Element {
         };
     };
     const redirectIfSpaceIsNotFound = (): void => {
+        // TODO: maybe better throw error ?
         if (fetchSpaceByIdFailureResponse) {
             navigate('/not-found');
+        }
+    };
+    const redirectIfSpaceIsDeleted = (): void => {
+        if (deleteSpaceSuccessResponse) {
+            setTimeout(() => {
+                navigate('/');
+            }, 2000);
         }
     };
     const checkIfSpaceBelongsToUser = (): boolean => {
@@ -115,10 +139,11 @@ export default function SpacePage(): JSX.Element {
     const renderSpaceOwnerMenu = (): JSX.Element | void => {
         if (checkIfSpaceBelongsToUser()) {
             return (
-                <div className="space-owner-menu" onClick={toggleEditSpaceModal}>
-                    <div className="space-owner-menu__edit">
+                <div className="space-owner-menu">
+                    <div className="space-owner-menu__edit" onClick={toggleEditSpaceModal}>
                         <FontAwesomeIcon icon={faEdit} />
                     </div>
+                    <RemoveIcon handleClick={toggleRemoveSpaceConfirm} />
                 </div>
             );
         }
@@ -156,52 +181,92 @@ export default function SpacePage(): JSX.Element {
             );
         });
     };
-    const renderAppointment = (): JSX.Element => {
-        return <></>;
+    const renderImages = (): JSX.Element => {
+        return (
+            <div className="space__images">
+                <div className="icon icon-arrow icon-arrow--right" onClick={flipImageLeft}>
+                    <FontAwesomeIcon icon={faChevronLeft} />
+                </div>
+                <img
+                    className="space-image"
+                    src={`/${spaceData?.imagesUrl[activeImageIndex]}` || '/no-space-image.jpg'}
+                    alt="Пространство"
+                />
+                <div className="icon icon-arrow icon-arrow--right" onClick={flipImageRight}>
+                    <FontAwesomeIcon icon={faChevronRight} />
+                </div>
+            </div>
+        );
     };
-    const renderRemoveButton = (): JSX.Element => {
-        return <div className="">{/* TODO */}</div>;
+    const renderAppointmentButton = (): JSX.Element => {
+        return (
+            <div className="button appointment-button" onClick={toggleDatePicker}>
+                Забронировать
+            </div>
+        );
+    };
+    const renderDatePicker = (): JSX.Element | void => {
+        if (datePickerIsOpen) {
+            return <AppointmentDatePicker />;
+        }
+    };
+    const renderRemoveSpacePrompt = (): JSX.Element | void => {
+        if (removeSpaceConfirmIsOpen) {
+            const handlePositiveClick: MouseEventHandler = (): void => {
+                const deleteSpacePayload: IDeleteSpacePayload = {
+                    spaceId: spaceId!,
+                };
+
+                dispatch(deleteSpaceAction(deleteSpacePayload));
+            };
+
+            return (
+                <ConfirmDialog
+                    question={'Удалить пространство?'}
+                    positive={'Да'}
+                    negative={'Отмена'}
+                    handlePositiveClick={handlePositiveClick}
+                    handleNegativeClick={toggleRemoveSpaceConfirm}
+                    handleCloseButtonClick={toggleRemoveSpaceConfirm}
+                />
+            );
+        }
+    };
+    const renderDisappearingAlertOnDeleteError = (): JSX.Element | void => {
+        if (deleteSpaceFailureResponse) {
+            return <DisappearingAlert failureResponse={deleteSpaceFailureResponse} />;
+        }
     };
 
     useEffect(applyEffectsOnInit, []);
+    useEffect(handleDocumentTitle, [fetchSpaceByIdSuccessResponse]);
     useEffect(redirectIfSpaceIsNotFound, [fetchSpaceByIdFailureResponse, navigate]);
     useEffect(applyModalEventListenersEffects, [editSpaceModalIsOpen]);
-    useEffect(handleDocumentTitle, [fetchSpaceByIdSuccessResponse]);
-    // календарик полоса с датами все нужно упаковать в один компонент
+    useEffect(redirectIfSpaceIsDeleted, [deleteSpaceSuccessResponse]);
 
     return (
         <div className="space-page">
             {renderSpaceOwnerMenu()}
             <div className="space-page__flows">
                 <div className="space-page__flows--left">
-                    <div className="space__images">
-                        <div className="icon icon-arrow icon-arrow--right" onClick={flipImageLeft}>
-                            <FontAwesomeIcon icon={faChevronLeft} />
-                        </div>
-                        <img
-                            className="space-image"
-                            src={`/${spaceData?.imagesUrl[activeImageIndex]}` || '/no-space-image.jpg'}
-                            alt="Пространство"
-                        />
-                        <div className="icon icon-arrow icon-arrow--right" onClick={flipImageRight}>
-                            <FontAwesomeIcon icon={faChevronRight} />
-                        </div>
-                    </div>
+                    {renderImages()}
                     <div className="space-description-container">
                         <h3 className="heading heading--tertiary space-description-heading">Описание</h3>
                         <div className="space-description-paragraph-container">
-                            <p className="paragraph space-description-paragraph"> </p>
+                            <p className="paragraph space-description-paragraph">{spaceData?.description}</p>
                         </div>
                     </div>
                 </div>
                 <div className="space-page__flows--right">
                     <div className="locker-connection-status-bar">{renderLockerConnectedStatus()}</div>
                     {renderSpaceInitialFields()}
-                    {renderAppointment()}
-                    {renderRemoveButton()}
+                    {renderAppointmentButton()}
+                    {renderDatePicker()}
                 </div>
             </div>
             {renderEditSpaceModal()}
+            {renderRemoveSpacePrompt()}
+            {renderDisappearingAlertOnDeleteError()}
         </div>
     );
 }

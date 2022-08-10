@@ -12,6 +12,18 @@
     }
 }
 
+.remove-icon-container {
+    cursor: pointer;
+
+    &:hover {
+        color: $color-primary-2-lightened;
+    }
+
+    &:active {
+        color: $color-primary-2;
+    }
+}
+
 .arrow {
     &:hover {
         color: $color-primary-1;

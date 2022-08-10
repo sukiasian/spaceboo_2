@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { RefObject, useEffect, useState } from 'react';
 import { AlertType, CustomResponseMessage, HttpStatus, IServerResponse } from '../types/types';
 
-interface IAlertProps {
+export interface IAlertProps {
     successResponse?: IServerResponse;
     failureResponse?: IServerResponse;
+    innerRef?: RefObject<HTMLDivElement>;
+    combinedClassNames?: string;
 }
 interface IResponseDataForAlert {
     alertType: AlertType;
@@ -11,7 +13,7 @@ interface IResponseDataForAlert {
 }
 
 export default function Alert(props: IAlertProps): JSX.Element {
-    const { successResponse, failureResponse } = props;
+    const { successResponse, failureResponse, combinedClassNames } = props;
     const [responseData, setResponseData] = useState<IResponseDataForAlert>();
     const defineErrorMessageOnInternalServerError = () => {
         if (failureResponse) {
@@ -34,8 +36,10 @@ export default function Alert(props: IAlertProps): JSX.Element {
     useEffect(defineErrorMessageOnInternalServerError, [failureResponse, responseData]);
 
     return (successResponse || failureResponse) && responseData ? (
-        <div className={`alert alert--${responseData?.alertType?.toLowerCase()}`}>{responseData.message}</div>
+        <div className={`alert alert--${responseData?.alertType?.toLowerCase()} ${combinedClassNames}`}>
+            {responseData.message}
+        </div>
     ) : (
-        <>{responseData?.message}</>
+        <div className="alert">{responseData?.message} hello</div>
     );
 }

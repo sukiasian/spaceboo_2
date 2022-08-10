@@ -30,6 +30,11 @@ export interface IEditSpacePayload {
     spaceId: string;
     spaceImagesToRemove?: string[];
 }
+
+export interface IDeleteSpacePayload {
+    spaceId: string;
+}
+
 export interface ISpaceState {
     isLoaded: boolean;
     fetchSpacesQueryData: IQueryData;
@@ -53,6 +58,8 @@ export interface ISpaceState {
     fetchSpacesForKeyControlFailureResponse?: IServerResponse;
     putEditSpaceSuccessResponse?: IServerResponse;
     putEditSpaceFailureResponse?: IServerResponse;
+    deleteSpaceSuccessResponse?: IServerResponse;
+    deleteSpaceFailureResponse?: IServerResponse;
 }
 
 export enum SpaceType {
@@ -97,6 +104,18 @@ export const spaceReducer = (state = initialState, action: IAction): ISpaceState
             return {
                 ...state,
                 fetchSpacesSuccessResponse: [...(state.fetchSpacesSuccessResponse || []), ...action.payload],
+            };
+
+        case ReduxSpaceAction.SET_DELETE_SPACE_SUCCESS_RESPONSE:
+            return {
+                ...state,
+                deleteSpaceSuccessResponse: action.payload,
+            };
+
+        case ReduxSpaceAction.SET_DELETE_SPACE_FAILURE_RESPONSE:
+            return {
+                ...state,
+                deleteSpaceFailureResponse: action.payload,
             };
 
         case ReduxSpaceAction.ANNUALIZE_FETCH_SPACES_RESPONSES:
