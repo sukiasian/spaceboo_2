@@ -1,4 +1,4 @@
-import { MouseEventHandler } from 'react';
+import { MouseEventHandler, RefObject } from 'react';
 import RemoveIcon from '../icons/RemoveIcon';
 
 interface IConfirmDialogProps {
@@ -8,13 +8,14 @@ interface IConfirmDialogProps {
     handlePositiveClick: MouseEventHandler;
     handleNegativeClick: MouseEventHandler;
     handleCloseButtonClick: MouseEventHandler;
+    innerRef?: RefObject<HTMLDivElement>;
 }
 
 export default function ConfirmDialog(props: IConfirmDialogProps): JSX.Element {
     const { question, positive, negative, handlePositiveClick, handleNegativeClick, handleCloseButtonClick } = props;
 
     return (
-        <div className="confirm-dialog">
+        <div className="confirm-dialog" onClick={(e) => e.stopPropagation()}>
             <RemoveIcon handleClick={handleCloseButtonClick} />
             <div className="question-container">
                 <p className="paragraph">{question}</p>

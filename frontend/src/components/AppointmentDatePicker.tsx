@@ -1,9 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import NextIcon from '../icons/NextIcon';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import DatePicker from './DatePicker';
 
 export default function AppointmentDatePicker(): JSX.Element {
+    const [dateIsPicked, setDateIsPicked] = useState(false);
     const { datePickerDate } = useSelector((state: IReduxState) => state.commonStorage);
     // useSelector unavailableDays saga
     const getUnavailableDaysForMonth = (): void => {
@@ -22,11 +24,15 @@ export default function AppointmentDatePicker(): JSX.Element {
         // get currentMonth
         // диспатч отправить запрос на эндпоинт /appointments/:spaceId ?month='5'&year='2022'
     };
+    const renderNextStepsIcon = (): JSX.Element | null => {
+        if (dateIsPicked) {
+            return <NextIcon handleClick={() => {}} />;
+        }
+
+        return null;
+    };
 
     useEffect(applyEffectsOnInit, []);
-    return (
-        <>
-            <DatePicker handlePickDate={() => {}} presentMonthDaysClassNamesCombined={() => ''} />
-        </>
-    );
+
+    return <div className="appointment-date-picker"></div>;
 }

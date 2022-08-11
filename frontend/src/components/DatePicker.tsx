@@ -1,6 +1,4 @@
 import { ReactNode, RefObject, useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { monthStrings } from '../types/constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { setDatePickerDateAction } from '../redux/actions/commonActions';
@@ -19,11 +17,12 @@ interface IDatePickerProps {
     handlePickDate: (...props: any) => any;
     componentClassNames?: string;
     innerRef?: RefObject<HTMLDivElement>;
+    children?: JSX.Element | null;
     presentMonthDaysClassNamesCombined?: (day: number) => string;
 }
 
 export default function DatePicker(props: IDatePickerProps): JSX.Element {
-    const { handlePickDate, componentClassNames, innerRef } = props;
+    const { handlePickDate, componentClassNames, innerRef, children } = props;
     const { presentMonthDaysClassNamesCombined } = props;
     const [currentDate, setCurrentDate] = useState<ICurrentDate>({
         year: 0,
@@ -318,6 +317,7 @@ export default function DatePicker(props: IDatePickerProps): JSX.Element {
                     {renderDayCells()}
                 </tbody>
             </table>
+            {children}
         </div>
     );
 }
