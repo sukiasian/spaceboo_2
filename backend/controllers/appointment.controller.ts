@@ -9,6 +9,7 @@ export class AppointmentController extends Singleton {
 
     public createAppointment = this.utilFunctions.catchAsync(async (req, res, next) => {
         // TODO check if the date is not in the past !!!
+        // NOTE проверяется ли доступность аппоинтмента?
         //  --> создать объект даты исходя из resIsoDatesToReserve.beginningDate, и сверить его с датой сейчас - если меньше то отбой если же больше то ок
         const { resIsoDatesToReserve, spaceId } = req.body;
         const userId = req.user.id;

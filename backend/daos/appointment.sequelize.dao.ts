@@ -47,13 +47,16 @@ export class AppointmentSequelizeDao extends Dao {
         // NOTE: здесь нет проблемы с sql injection
 
         // isoDatesReserved должно быть больше Date.now()
-        const findUserAppointmentsRawQuery = `SELECT * FROM "Appointments" WHERE "spaceId" = ${userId} AND "isoDatesReserved" && `;
+        const findUserAppointmentsRawQuery = `SELECT * FROM "Appointments" WHERE "userId" = ${userId} AND "isoDatesReserved" && `;
 
         return Appointment.findAll();
     };
 
-    public checkAvailability = async (spaceId: string, isoDatesToReserve: string): Promise<boolean> => {
+    // NOTE возможно public - для того чтобы запрашивать загруженность спейса на период
+    private checkAvailability = async (spaceId: string, isoDatesToReserve: string): Promise<boolean> => {
         // FIXME: здесь может быть проблема с SQLInjection так как spaceId исходит либо из req.params либо из req.body. Лучше использовать regexp.
+        // или же можно проверить существует ли такой spaceId в базах и если да то продолжить.
+        // но этот sql injection вряд ли сможет навредить - можно будет только узнать сколько спейсов имеют appointment на выбранную isoDatesToReserve
         const findAppointmentRawQuery = `SELECT COUNT(*) FROM "Appointments" WHERE "spaceId" = '${spaceId}' AND "isoDatesReserved" && '${isoDatesToReserve}';`;
         const appointmentCount = await this.utilFunctions.createSequelizeRawQuery(
             appConfig.sequelize,

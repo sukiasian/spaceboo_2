@@ -12,6 +12,29 @@ interface IQueryDatePicker {
     innerRef?: RefObject<HTMLDivElement>;
 }
 
+/* как только месяц выбран (а он выбирается в начале либо при переключении месяца) 
+мы должны получать дни которые заняты.
+
+Как это должно будет делаться? 
+
+1) 
+у нас будет стринг. нам нужно отпарсить этот стринг: 
+
+2022-03-03:T20:00:00, 2022-03-04:T21:00:00
+
+
+
+Разбиваем массив (или строку) на 2 части. 
+
+Затем исходя из ТЕКУЩЕГО месяца мы должны каждую дату проверить на то больше она или меньше 
+
+
+2) написать эндпоинт который будет выдавать на текущий месяц.
+Допустим получили 5 бронирований.
+
+Мы должны 
+*/
+
 export default function QueryDatePicker(props: IQueryDatePicker): JSX.Element {
     const { datesForRender, setDatesForRender, innerRef } = props;
     const [datesForQuery, setDatesForQuery] = useState<IDatesRange>();
