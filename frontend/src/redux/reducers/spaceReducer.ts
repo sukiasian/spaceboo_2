@@ -62,6 +62,11 @@ export interface ISpaceState {
     deleteSpaceFailureResponse?: IServerResponse;
 }
 
+export interface IFetchAppointmentsForMonthPayload {
+    spaceId: string;
+    requiredDates: string;
+}
+
 export enum SpaceType {
     FLAT = 'Квартира',
     HOUSE = 'Жилой дом',

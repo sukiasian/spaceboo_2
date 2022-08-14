@@ -23,6 +23,7 @@ import { watchDeleteCancelAppointment } from './deleteCancelAppointmentSaga';
 import { watchFetchSpacesForKeyControl } from './fetchSpacesForKeyControlSaga';
 import { watchToggleLocker } from './toggleLockerSaga';
 import { watchDeleteSpaceSaga } from './deleteSpaceSaga';
+import { watchFetchAppointmentsForMonthWorker } from './fetchAppointmentsForMonth';
 
 export function* rootSaga() {
     yield all([
@@ -50,5 +51,6 @@ export function* rootSaga() {
         watchDeleteUserAvatar(),
         watchDeleteCancelAppointment(),
         watchDeleteSpaceSaga(),
+        watchFetchAppointmentsForMonthWorker(),
     ]);
 }

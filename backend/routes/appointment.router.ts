@@ -16,7 +16,8 @@ class AppointmentRouter extends Singleton implements IRouter {
             .post(
                 this.passport.authenticate(PassportStrategies.JWT, { session: false }),
                 this.appointmentController.createAppointment
-            );
+            )
+            .get(this.appointmentController.getAppointmentsByRequiredDates);
     };
 }
 

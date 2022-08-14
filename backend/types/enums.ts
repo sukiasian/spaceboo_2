@@ -144,6 +144,9 @@ export enum ErrorMessages {
     VERIFY_ACCOUNT = 'Пожалуйста, подтвердите ваш аккаунт.',
     INVALID_TYPE_OF_SPACE = 'Введите действительный тип жилья.',
     PICK_CITY_FROM_THE_LIST = 'Выберите город из списка.',
+    DATES_SHOULD_BE_PRESENT = 'Даты должны быть в настоящем.',
+    REQUIRED_DATES_ARE_MISSING = 'Пожалуйста, укажите интересующие даты',
+    SPACE_ID_IS_MISSING = 'Укажите ID пространства.',
 }
 
 export enum Environment {

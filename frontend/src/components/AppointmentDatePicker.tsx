@@ -1,11 +1,15 @@
-import { ReactNode, RefObject, useEffect, useState } from 'react';
+import { ReactNode, RefObject, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import DecreaseArrow from '../icons/DecreaseArrow';
 import IncreaseArrow from '../icons/IncreaseArrow';
 import NextIcon from '../icons/NextIcon';
+import { fetchAppointmentsForMonthAction } from '../redux/actions/appointmentActions';
 import { setDatePickerDateAction } from '../redux/actions/commonActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { monthStrings } from '../types/constants';
+import { createDateRangeWithTimestamp, formatSingleDigitUnitToTwoDigitString } from '../utils/utilFunctions';
+import { IDatesRange } from './Filters';
 
 interface IDatePickerDate {
     year: number;
@@ -15,26 +19,29 @@ interface ICurrentDate extends IDatePickerDate {
     day: number;
 }
 interface IDatePickerProps {
-    handlePickDate: (...props: any) => any;
-    componentClassNames?: string;
+    datesForRender: IDatesRange | undefined;
+    setDatesForRender: React.Dispatch<React.SetStateAction<IDatesRange | undefined>>;
     innerRef?: RefObject<HTMLDivElement>;
+    componentClassNames?: string;
     children?: JSX.Element | null;
     presentMonthDaysClassNamesCombined?: (day: number) => string;
 }
 
+interface IAppointmentParsed {
+    beginningDateWithTimestamp: string;
+    endingDateWithTimestamp: string;
+}
+
+interface IAppointmentsParsedAndOrganized {
+    [key: string]: IAppointmentParsed[];
+}
+
 export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Element {
-    const [dateIsPicked, setDateIsPicked] = useState(false);
-    const { datePickerDate } = useSelector((state: IReduxState) => state.commonStorage);
-    const renderNextStepsIcon = (): JSX.Element | null => {
-        if (dateIsPicked) {
-            return <NextIcon handleClick={() => {}} />;
-        }
-
-        return null;
-    };
-
-    const { handlePickDate, componentClassNames, innerRef, children } = props;
+    // NOTE probably we dont need datesForRender since we do not render anything
+    const { componentClassNames, innerRef, children, datesForRender, setDatesForRender } = props;
     const { presentMonthDaysClassNamesCombined } = props;
+    const [datesForAppointment, setDatesForAppointment] = useState<IDatesRange>();
+    const [dateIsPicked, setDateIsPicked] = useState(false);
     const [currentDate, setCurrentDate] = useState<ICurrentDate>({
         year: 0,
         month: 0,
@@ -47,7 +54,12 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
     });
     const [monthsWithYearsDropDownMenuIsOpen, setMonthsWithYearsDropDownMenuIsOpen] = useState(false);
     const [outOfCurrentMonthDayPicked, setOutOfCurrentMonthDayPicked] = useState<number | undefined>();
+    const [parsedAppointmentsList, setParsedAppointmentsList] = useState<IAppointmentsParsedAndOrganized>({});
+    const { datePickerDate } = useSelector((state: IReduxState) => state.commonStorage);
+    const { fetchAppointmentsForMonthSuccessResponse } = useSelector((state: IReduxState) => state.appointmentStorage);
     const dispatch = useDispatch();
+    const { spaceId } = useParams();
+    const appointments = fetchAppointmentsForMonthSuccessResponse?.data;
     const amountOfMonthsAvailableToLookUp = 12;
     const getDatePickerDateFromTodayDate = (date: Date): IDatePickerDate => {
         const year = date.getFullYear();
@@ -71,9 +83,67 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
     const applyEffectsOnInit = (): void => {
         defineCurrentDateAndPickOnInit();
     };
+    const createPropertyForParsedAppointmentsByYearAndMonth = (): string => {
+        return `${datePickerDate.year}, ${datePickerDate.month}`;
+    };
+    const parseAppointments = (): void => {
+        if (appointments) {
+            appointments.forEach((appointment: string) => {
+                const dates = appointment.split(',');
+                const beginningDateWithTimestamp = dates[0].slice(1);
+                const endingDateWithTimestamp = dates[1].slice(1, dates[1].length - 1);
+
+                const newParsedAppointmentsList: IAppointmentsParsedAndOrganized = { ...parsedAppointmentsList };
+
+                newParsedAppointmentsList[createPropertyForParsedAppointmentsByYearAndMonth()] = [
+                    ...newParsedAppointmentsList[createPropertyForParsedAppointmentsByYearAndMonth()],
+                    {
+                        beginningDateWithTimestamp: beginningDateWithTimestamp,
+                        endingDateWithTimestamp: endingDateWithTimestamp,
+                    },
+                ];
+
+                setParsedAppointmentsList(newParsedAppointmentsList);
+            });
+        }
+    };
+    const requestAppointmentsOnMonthChange = (): void => {
+        if (datePickerDate.year !== 0 && datePickerData.lastDayOfCurrentMonth > 0) {
+            const requiredDates = createDateRangeWithTimestamp(
+                datePickerDate.year,
+                datePickerDate.month,
+                datePickerData.lastDayOfCurrentMonth
+            );
+
+            dispatch(fetchAppointmentsForMonthAction({ spaceId: spaceId!, requiredDates }));
+        }
+    };
+    const dayIsAppointed = (day: number): boolean | void => {
+        const appointmentsForMonth = parsedAppointmentsList?.[createPropertyForParsedAppointmentsByYearAndMonth()];
+
+        if (appointmentsForMonth) {
+            for (const monthAppointments of appointmentsForMonth) {
+                const beginningDate = new Date(monthAppointments.beginningDateWithTimestamp);
+                const endingDate = new Date(monthAppointments.endingDateWithTimestamp);
+
+                if (day >= beginningDate.getUTCDate() || day < endingDate.getUTCDate()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    };
+    const defineAppointedDayClassName = (day: number): string => {
+        if (!dayIsInThePast(day)) {
+            return dayIsAppointed(day) ? 'table-cell--appointed' : 'table-cell--available';
+        }
+
+        return '';
+    };
     const switchToCorrespondingMonthThroughOutOfCurrentMonthClickEffect = (): void => {
         if (outOfCurrentMonthDayPicked) {
-            handlePickDate(outOfCurrentMonthDayPicked);
+            pickDate(outOfCurrentMonthDayPicked);
             setOutOfCurrentMonthDayPicked(undefined);
         }
     };
@@ -89,6 +159,88 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
                 lastDayOfPreviousMonth: new Date(year, month, 0).getDate(),
             });
         }
+    };
+    const generateAppointmentDateString = (year: number, month: number, day: number, isEnding = false): string => {
+        const dateFromArgs = new Date(year, month + 1, 0);
+
+        if (isEnding && day === dateFromArgs.getDate() + 1 && month !== 11) {
+            return `${year}-${formatSingleDigitUnitToTwoDigitString(month + 2)}-${formatSingleDigitUnitToTwoDigitString(
+                1
+            )}`;
+        } else if (isEnding && day === dateFromArgs.getDate() + 1 && month === 11) {
+            return `${year + 1}-${formatSingleDigitUnitToTwoDigitString(1)}-${formatSingleDigitUnitToTwoDigitString(
+                1
+            )}`;
+        }
+
+        return `${year}-${formatSingleDigitUnitToTwoDigitString(month + 1)}-${formatSingleDigitUnitToTwoDigitString(
+            day
+        )}`;
+    };
+    const generateRenderDateString = (year: number, month: number, day: number, isEnding = false): string => {
+        const dateFromArgs = new Date(year, month + 1, 0);
+
+        if (isEnding && day === dateFromArgs.getDate() + 1 && month !== 11) {
+            return `${formatSingleDigitUnitToTwoDigitString(1)}/${formatSingleDigitUnitToTwoDigitString(
+                month + 2
+            )}/${year}`;
+        } else if (isEnding && day === dateFromArgs.getDate() + 1 && month === 11) {
+            return `${formatSingleDigitUnitToTwoDigitString(1)}/${formatSingleDigitUnitToTwoDigitString(1)}/${
+                year + 1
+            }`;
+        }
+
+        return `${formatSingleDigitUnitToTwoDigitString(day)}/${formatSingleDigitUnitToTwoDigitString(
+            month + 1
+        )}/${year}`;
+    };
+    const firstDateIsGreaterThanSecond = (d1: string, d2: string): boolean => {
+        return new Date(d1) > new Date(d2);
+    };
+    const pickDate = (day: number) => {
+        const newDatesForQuery: IDatesRange = { ...datesForAppointment };
+        const newDatesForRender: IDatesRange = { ...datesForRender };
+        const pickedDate = generateAppointmentDateString(datePickerDate.year, datePickerDate.month, day);
+
+        //  if a day is in the past
+        if (dayIsInThePast(day)) {
+            return;
+        } else {
+            if (newDatesForQuery.beginningDate && newDatesForQuery.endingDate) {
+                // if you click on chosen one
+                if (newDatesForQuery.beginningDate === pickedDate || newDatesForQuery.endingDate === pickedDate) {
+                    newDatesForQuery.beginningDate = pickedDate;
+                    newDatesForQuery.endingDate = generateAppointmentDateString(
+                        datePickerDate.year,
+                        datePickerDate.month,
+                        day + 1,
+                        true
+                    );
+                }
+                // if you first click on high value then on lower value
+                else if (firstDateIsGreaterThanSecond(newDatesForQuery.beginningDate, pickedDate)) {
+                    newDatesForQuery.endingDate = newDatesForQuery.beginningDate;
+                    newDatesForQuery.beginningDate = pickedDate;
+                } else {
+                    newDatesForQuery.endingDate = pickedDate;
+                }
+            } else {
+                newDatesForQuery.beginningDate = pickedDate;
+                newDatesForQuery.endingDate = generateAppointmentDateString(
+                    datePickerDate.year,
+                    datePickerDate.month,
+                    day + 1,
+                    true
+                );
+            }
+        }
+
+        setDatesForAppointment(newDatesForQuery);
+
+        setDatesForRender({
+            beginningDate: newDatesForRender.beginningDate,
+            endingDate: newDatesForRender.endingDate,
+        });
     };
     const toggleMonthsWithYearsDropDownMenu = (): void => {
         setMonthsWithYearsDropDownMenuIsOpen((prev) => !prev);
@@ -136,8 +288,10 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
     };
     const handleAfterCurrentMonthDaysClick = (day: number): (() => void) => {
         return () => {
-            increaseDatePickerMonth();
-            setOutOfCurrentMonthDayPicked(day);
+            if (!datesForAppointment?.beginningDate) {
+                increaseDatePickerMonth();
+                setOutOfCurrentMonthDayPicked(day);
+            }
         };
     };
     const handleBeforeCurrentMonthDaysClick = (day: number): (() => void) => {
@@ -158,8 +312,33 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
 
         return '';
     };
+    const definePickedDaysClassName = (day: number): string => {
+        if (datesForAppointment?.beginningDate && datesForAppointment?.endingDate) {
+            const dateForCurrentDay = new Date(
+                generateAppointmentDateString(datePickerDate.year, datePickerDate.month, day)
+            );
+            const beginningDate = new Date(datesForAppointment.beginningDate as string);
+            const endingDate = new Date(datesForAppointment.endingDate as string);
+
+            if (dateForCurrentDay >= beginningDate && beginningDate >= dateForCurrentDay) {
+                return 'picked-day table-cell--at-border--left';
+            } else if (dateForCurrentDay >= endingDate && endingDate >= dateForCurrentDay) {
+                return 'picked-day table-cell--at-border--right';
+            } else if (dateForCurrentDay > beginningDate && dateForCurrentDay < endingDate) {
+                return 'picked-day table-cell--picked';
+            }
+        }
+
+        return '';
+    };
+    const defineUnclickableDaysForUpcomingMonthClassName = (): string => {
+        return datesForAppointment?.beginningDate ? 'table-cell--unclickable' : '';
+    };
+    const dayIsInThePast = (day: number): boolean => {
+        return datePickerDate.month === currentDate.month && day < currentDate.day;
+    };
     const defineCurrentMonthPastDaysClassName = (day: number): string => {
-        if (datePickerDate.month === currentDate.month && day < currentDate.day) {
+        if (dayIsInThePast(day)) {
             return 'table-cell table-cell--past';
         }
 
@@ -201,7 +380,7 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
 
                     tableCells.push(
                         <td
-                            className={`table-cell table-cell--out-of-month table-cell--${j} `}
+                            className={`table-cell table-cell--out-of-month table-cell--${j} ${defineUnclickableDaysForUpcomingMonthClassName()}`}
                             onClick={handleAfterCurrentMonthDaysClick(day)}
                             key={i * j}
                         >
@@ -213,13 +392,49 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
                         <td
                             className={`table-cell table-cell--${j} ${defineTodayClassName(
                                 dayCorrespondingToCalendar
-                            )} ${defineCurrentMonthPastDaysClassName(dayCorrespondingToCalendar)} ${
+                            )} ${defineCurrentMonthPastDaysClassName(
+                                dayCorrespondingToCalendar
+                            )} ${definePickedDaysClassName(dayCorrespondingToCalendar)} ${defineAppointedDayClassName(
+                                dayCorrespondingToCalendar
+                            )}  ${
                                 presentMonthDaysClassNamesCombined
                                     ? presentMonthDaysClassNamesCombined!(dayCorrespondingToCalendar)
                                     : ''
                             }`}
                             onClick={() => {
-                                handlePickDate(dayCorrespondingToCalendar);
+                                // const date = new Date(
+                                //     generateAppointmentDateString(
+                                //         datePickerDate.year,
+                                //         datePickerDate.month,
+                                //         dayCorrespondingToCalendar
+                                //     )
+                                // );
+                                // parsedAppointmentsList.current.forEach((appointment: IAppointmentParsed) => {
+                                //     if (
+                                //         date >= new Date(appointment.beginningDateWithTimestamp) &&
+                                //         date < new Date(appointment.endingDateWithTimestamp)
+                                //     ) {
+                                //         return;
+                                //     }
+                                // });
+                                // pickDate(dayCorrespondingToCalendar);
+                            }}
+                            onMouseEnter={(e) => {
+                                if (datesForAppointment?.beginningDate) {
+                                    const dateForCurrentDay = new Date(
+                                        generateAppointmentDateString(
+                                            datePickerDate.year,
+                                            datePickerDate.month,
+                                            dayCorrespondingToCalendar
+                                        )
+                                    );
+                                    const beginningDate = new Date(datesForAppointment.beginningDate as string);
+                                    
+
+                                    // встает проблема как быть с parsedAppointments - они
+                                    // меняются при каждом изменении месяца.
+                                    // Подтягивать каждый раз новые?
+                                }
                             }}
                             key={i * j}
                         >
@@ -297,14 +512,36 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
             </div>
         );
     };
+    const renderNextStepsIcon = (): JSX.Element | null => {
+        if (dateIsPicked) {
+            return <NextIcon handleClick={() => {}} />;
+        }
+
+        return null;
+    };
 
     useEffect(applyEffectsOnInit, []);
     useEffect(updateDatePickerData, [datePickerDate]);
     useEffect(switchToCorrespondingMonthThroughOutOfCurrentMonthClickEffect, [
         datePickerDate,
-        handlePickDate,
         outOfCurrentMonthDayPicked,
     ]);
+    useEffect(requestAppointmentsOnMonthChange, [datePickerDate, datePickerData]);
+    useEffect(parseAppointments, [fetchAppointmentsForMonthSuccessResponse]);
+    useEffect(() => {}, [appointments]);
+
+    /*  
+    
+    Как проверять при наведении?
+
+    То есть как только выбрана первая дата, при наведении мы должны пройтись по всем датам от начала 
+    до наведенной даты и проверить входят ли они в parsedAppointments или нет.
+
+    
+
+    
+    
+    */
 
     return (
         <div
@@ -325,6 +562,7 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
                         <th className="weekday weekday--sunday">Вс</th>
                     </tr>
                     {renderDayCells()}
+                    {renderNextStepsIcon()}
                 </tbody>
             </table>
             {children}

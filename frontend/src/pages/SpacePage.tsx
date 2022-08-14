@@ -21,6 +21,7 @@ import { IDeleteSpacePayload } from '../redux/reducers/spaceReducer';
 import DisappearingAlert from '../components/DisappearingAlert';
 import AppointmentDatePicker from '../components/AppointmentDatePicker';
 import TextButton from '../buttons/TextButton';
+import { IDatesRange } from '../components/Filters';
 
 interface ISpaceInitialField {
     fieldName: string;
@@ -29,6 +30,7 @@ interface ISpaceInitialField {
 
 export default function SpacePage(): JSX.Element {
     const [activeImageIndex, setActiveImageIndex] = useState(0);
+    const [datesForRender, setDatesForRender] = useState<IDatesRange>();
     const [deleteSpaceConfirmIsOpen, setDeleteSpaceConfirmIsOpen] = useState(false);
     const [datePickerIsOpen, setDatePickerIsOpen] = useState(false);
     const {
@@ -259,7 +261,7 @@ export default function SpacePage(): JSX.Element {
     };
     const renderDatePicker = (): JSX.Element | void => {
         if (datePickerIsOpen) {
-            return <AppointmentDatePicker />;
+            return <AppointmentDatePicker datesForRender={datesForRender} setDatesForRender={setDatesForRender} />;
         }
     };
     const renderCancelAppointmentButton = (): JSX.Element | void => {

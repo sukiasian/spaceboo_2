@@ -1,8 +1,9 @@
 import { appConfig } from '../AppConfig';
 import { Dao } from '../configurations/dao.config';
-import { IResIsoDatesReserved } from '../../frontend/src/types/types';
+
 import { Appointment, IAppointment } from '../models/appointment.model';
 import { ErrorMessages, HttpStatus } from '../types/enums';
+import { IRequiredDates } from '../types/interfaces';
 import AppError from '../utils/AppError';
 import { SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
@@ -16,7 +17,7 @@ export class AppointmentSequelizeDao extends Dao {
     }
 
     public createAppointment = async (
-        resIsoDatesToReserve: IResIsoDatesReserved,
+        resIsoDatesToReserve: IRequiredDates,
         spaceId: string,
         userId: string
     ): Promise<Appointment> => {
@@ -50,6 +51,14 @@ export class AppointmentSequelizeDao extends Dao {
         const findUserAppointmentsRawQuery = `SELECT * FROM "Appointments" WHERE "userId" = ${userId} AND "isoDatesReserved" && `;
 
         return Appointment.findAll();
+    };
+
+    public getAppointmentsByRequiredDates = async (spaceId: string, requiredDates: string): Promise<Appointment[]> => {
+        const findAppointmentsRawQuery = `SELECT * FROM "Appointments" WHERE "spaceId" = '${spaceId}' AND "isoDatesReserved" && '${requiredDates}'::tstzrange`;
+
+        return this.utilFunctions.createSequelizeRawQuery(appConfig.sequelize, findAppointmentsRawQuery) as Promise<
+            Appointment[]
+        >;
     };
 
     // NOTE возможно public - для того чтобы запрашивать загруженность спейса на период

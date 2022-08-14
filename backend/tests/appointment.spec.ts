@@ -167,4 +167,23 @@ describe('Appointment (e2e)', () => {
             { inclusive: false, value: '2020-12-20T12:00:00.000Z' },
         ]);
     });
+
+    it('POST /appointments should check if date is not in the past', async () => {});
+
+    it('GET /appointments should get appointments by required dates', async () => {
+        await request(app)
+            .post(`${ApiRoutes.APPOINTMENTS}`)
+            .send({
+                resIsoDatesToReserve,
+                spaceId: space.id,
+            })
+            .set('Authorization', `Bearer ${token}`);
+
+        const res = await request(app)
+            .get(`${ApiRoutes.APPOINTMENTS}`)
+            .send({
+                requiredDates: "'[2020-12-01, 2020-12-31]'",
+            })
+            .set('Authorization', `Bearer ${token}`);
+    });
 });

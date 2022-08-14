@@ -59,3 +59,22 @@ export const separateCityNameFromRegionIfCityNameContains = (cityName: string) =
 
     return cityNameValuesSeparately[0];
 };
+
+interface IBeginningDate {
+    year: string;
+    month: string;
+}
+
+interface IEndingDate {
+    year: string;
+    month: string;
+    lastDayOfMonth: string;
+}
+
+export const createDateRangeWithTimestamp = (year: number, month: number, lastDayOfMonth: number): string => {
+    if (month < 10) {
+        return `[${year}-0${month}-01T14:00:00.000Z, ${year}-0${month}-${lastDayOfMonth}T14:00:00.000Z]`;
+    }
+
+    return `[${year}-${month}-01T14:00:00.000Z, ${year}-${month}-${lastDayOfMonth}T14:00:00.000Z]`;
+};

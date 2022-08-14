@@ -6,7 +6,6 @@
             "request": "launch",
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
-            "disableOptimisticBPs": true,
             "program": "${workspaceFolder}/backend",
             "cwd": "${workspaceFolder}/backend",
             "args": ["--no-cache", "--detectOpenHandles", "--watchAll=false"]
