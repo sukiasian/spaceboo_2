@@ -311,3 +311,9 @@ export const annualizeFetchSpacesForUserUpcomingAppointmentsResponsesAction = ()
         type: ReduxSpaceAction.ANNUALIZE_FETCH_SPACES_BY_USER_UPCOMING_APPOINTMENTS_RESPONSES,
     };
 };
+
+export const annualizeDeleteSpaceResponsesAction = (): IAction<ReduxSpaceAction> => {
+    return {
+        type: ReduxSpaceAction.ANNUALIZE_DELETE_SPACE_RESPONSES,
+    };
+};

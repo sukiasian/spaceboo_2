@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import AltButton from '../components/AltButton';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import HowItWorksRoutes from '../routes/HowItWorksRoutes';
@@ -8,6 +8,9 @@ import { updateDocumentTitle } from '../utils/utilFunctions';
 
 export default function HowItWorksPage(): JSX.Element {
     const { howItWorksStepsUserChosen } = useSelector((state: IReduxState) => state.commonStorage);
+
+    const navigate = useNavigate();
+
     const handleDocumentTitle = (): void => {
         updateDocumentTitle('Spaceboo | Как это работает?');
     };
@@ -29,6 +32,11 @@ export default function HowItWorksPage(): JSX.Element {
             returnMainNavbarWhenLeaving();
         };
     };
+
+    const navigateToHome = (): void => {
+        navigate('/');
+    };
+
     const renderHintToChooseTypeOfUser = (): JSX.Element | void => {
         if (!howItWorksStepsUserChosen) {
             return (
@@ -45,27 +53,31 @@ export default function HowItWorksPage(): JSX.Element {
         <div className="how-it-works-page">
             <section className="banner how-it-works__banner">
                 <div className="how-it-works__banner__image">
+                    <header className="banner__navbar">
+                        <div className="logo--white" onClick={navigateToHome} />
+                        <NavLink to="/about">О нас</NavLink>
+                        <NavLink to="/for-investors">Инвесторам</NavLink>
+                    </header>
                     <div className="how-it-works__banner__content">
-                        <header className="banner__navbar">
-                            <div className="logo--white" />
-                            <NavLink to="/about">О нас</NavLink>
-                            <NavLink to="/for-investors">Инвесторам</NavLink>
-                        </header>
-                        <div className="abcd">
-                            <div className="banner__texts">
+                        <div className="banner__texts">
+                            <div className="main">
                                 <h1 className="heading heading--primary banner__texts__main">
                                     Где можно заселиться в любое время.
                                 </h1>
+                            </div>
+                            <div className="additional">
                                 <p className="paragraph paragraph--large paragraph--white banner__texts__additional">
                                     Там, где Spaceboo делает за вас всю работу.
                                 </p>
                             </div>
-                            <div className="calls-to-action">
+                        </div>
+                        <div className="calls-to-action">
+                            <NavLink to={'/'}>
                                 <AltButton mainDivClassName="white" buttonText="Открыть пространства" />
-                                <NavLink to="/provide-space">
-                                    <AltButton mainDivClassName="white" buttonText="Предоставить пространство" />
-                                </NavLink>
-                            </div>
+                            </NavLink>
+                            <NavLink to="/provide-space">
+                                <AltButton mainDivClassName="white" buttonText="Предоставить пространство" />
+                            </NavLink>
                         </div>
                     </div>
                 </div>

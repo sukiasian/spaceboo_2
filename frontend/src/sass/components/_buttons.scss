@@ -1,18 +1,97 @@
 .button {
     padding: 0.7rem 1.4rem;
-    border: 2px solid $color-primary-1;
     border-radius: $button-border-radius;
     font-weight: bold;
     box-shadow: 0 0 2px 2px rgba(140, 140, 140, 0.2);
+    cursor: pointer;
+    user-select: none;
 
     &--primary {
         background-color: $color-primary-1;
         color: $color-white;
+        border: 2px solid $color-primary-1;
 
         &:hover:not(:active) {
             background-color: transparent;
             color: $color-primary-1;
             transition: 0.3s;
         }
+    }
+
+    &--secondary {
+        background-color: $color-primary-2;
+        color: $color-white;
+        border: 2px solid $color-primary-2;
+
+        &:hover:not(:active) {
+            background-color: transparent;
+            color: $color-primary-2;
+            transition: 0.3s;
+        }
+    }
+
+    &--white {
+        background-color: white;
+        border: none;
+
+        color: blue;
+
+        a,
+        a:visited {
+            color: blue;
+        }
+
+        &:hover {
+        }
+    }
+
+    &--unavailable {
+        color: white;
+        background-color: $color-grey-light-4;
+        border: none;
+        cursor: default;
+    }
+}
+
+.button-with-icon {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.edit-button {
+}
+
+.delete-button {
+    background-color: $color-red;
+    color: white;
+
+    svg {
+        color: $color-white;
+    }
+    &:hover:not(:active) {
+        background-color: transparent;
+        color: $color-red;
+
+        svg {
+            color: $color-red;
+        }
+    }
+}
+
+.triple-dot-button {
+    width: 24px;
+    height: 24px;
+    background: url(../../assets/icons/icon-more.png) no-repeat;
+
+    &:hover:not(:active) {
+        background: url(../../assets/icons/icon-more-hover.png) no-repeat;
+    }
+
+    &--vertical {
+        transform: rotate(90deg);
+    }
+
+    &--active {
+        background: url(../../assets/icons/icon-more-active.png) no-repeat;
     }
 }

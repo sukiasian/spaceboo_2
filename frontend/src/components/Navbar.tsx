@@ -7,7 +7,6 @@ import SignupModal from '../modals/SignupModal';
 import { annualizeFetchLogoutResponseAction, fetchUserLoginStateAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { UrlPathname } from '../types/types';
-import AltButton from './AltButton';
 import CityPicker from './CityPicker';
 import UserAvatarOrInitials from './UserAvatarOrInitials';
 import UserDropdownMenu from './UserDropdownMenu';
@@ -143,38 +142,40 @@ export default function Navbar(): JSX.Element {
 
     // NOTE hereafter we will wrap a flex item in a div in order to be able to move without making position absolute
     return (
-        <nav id="navbar" className="navbar">
-            <NavLink to={UrlPathname.HOME} className="navbar-link">
-                <object id="logo" data="/logo.svg" aria-labelledby={'logo'} />
-            </NavLink>
-            <div className="navbar__city-picker navbar-elem navbar-elem--1">
-                <CityPicker
-                    mainDivClassName=""
-                    defineActiveClassName={defineActiveClassNameForTab}
-                    handleActiveTab={handleActiveTab}
-                />
-            </div>
-            <div className="navbar__how-it-works navbar-elem navbar-elem--2">
-                <div id="how-it-works">
-                    <NavLink
-                        to={UrlPathname.HOW_IT_WORKS}
-                        className={`navbar-link`}
-                        onClick={handleActiveTab('how-it-works')}
-                    >
-                        Как это работает?
+        <section className="navbar-section">
+            <nav id="navbar" className="navbar">
+                <NavLink to={UrlPathname.HOME} className="navbar-link">
+                    <object id="logo" data="/logo.svg" aria-labelledby={'logo'} />
+                </NavLink>
+                <div className="navbar__city-picker navbar-elem navbar-elem--1">
+                    <CityPicker
+                        mainDivClassName=""
+                        defineActiveClassName={defineActiveClassNameForTab}
+                        handleActiveTab={handleActiveTab}
+                    />
+                </div>
+                <div className="navbar__how-it-works navbar-elem navbar-elem--2">
+                    <div id="how-it-works">
+                        <NavLink
+                            to={UrlPathname.HOW_IT_WORKS}
+                            className={`navbar-link`}
+                            onClick={handleActiveTab('how-it-works')}
+                        >
+                            Как это работает?
+                        </NavLink>
+                    </div>
+                </div>
+                <div className="navbar__create-space navbar-elem navbar-elem--3">
+                    <NavLink to={getLinkForProvideSpaceButton()} className="navbar-link">
+                        <button className="button button--primary navbar-provide-space-button">
+                            Предоставить пространство
+                        </button>
                     </NavLink>
                 </div>
-            </div>
-            <div className="navbar__create-space navbar-elem navbar-elem--3">
-                <NavLink to={getLinkForProvideSpaceButton()} className="navbar-link">
-                    <button className="button button--primary navbar-provide-space-button">
-                        Предоставить пространство
-                    </button>
-                </NavLink>
-            </div>
-            {renderAuthTabsOpeningModals()}
-            {renderAuthTabsLeadingToPages()}
-            {renderUserAvatarOrInitals()}
-        </nav>
+                {renderAuthTabsOpeningModals()}
+                {renderAuthTabsLeadingToPages()}
+                {renderUserAvatarOrInitals()}
+            </nav>
+        </section>
     );
 }

@@ -29,17 +29,18 @@ export default function Space(props: ISpaceProps): JSX.Element {
             </div>
         );
     };
-    const renderChildren = (): JSX.Element | void => {
-        if (children) {
-            return children;
-        }
-    };
 
     return (
-        <NavLink to={`${UrlPathname.SPACES}/${id}`} className={`space-card-link space-card-link--${index}`}>
+        <NavLink
+            to={`${UrlPathname.SPACES}/${id}`}
+            className={`space-card-link space-card-link--${index}`}
+            onClick={(e) => {
+                e.stopPropagation();
+            }}
+        >
             <div className="space-card">
                 <div className={`space-card__content space-card--${index}`}>
-                    <img className="space-card__image" src={mainImageUrl || '/no-image.src'} alt="Пространство" />
+                    <img className="space-card__image" src={`/${mainImageUrl}` || '/no-image.src'} alt="Пространство" />
                     {renderPrice()}
                 </div>
                 <div className={`space-card__under-image space-card__under-image--${index}`}>
@@ -61,7 +62,7 @@ export default function Space(props: ISpaceProps): JSX.Element {
                     <div className="address-container">
                         <p className="paragraph address-paragraph">{address.toUpperCase()}</p>
                     </div>
-                    {renderChildren()}
+                    {children}
                 </div>
             </div>
         </NavLink>

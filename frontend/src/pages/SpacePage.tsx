@@ -2,8 +2,9 @@ import { MouseEventHandler, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle, faChevronLeft, faChevronRight, faEdit, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faChevronLeft, faChevronRight, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import {
+    annualizeDeleteSpaceResponsesAction,
     deleteSpaceAction,
     fetchSpaceByIdAction,
     fetchSpacesByUserActiveAppointmentsAction,
@@ -15,13 +16,15 @@ import EditSpaceModal from '../modals/EditSpaceModal';
 import { toggleEditSpaceModalAction } from '../redux/actions/modalActions';
 import { EventListenerType } from '../types/types';
 import { updateDocumentTitle } from '../utils/utilFunctions';
-import RemoveIcon from '../icons/RemoveIcon';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { IDeleteSpacePayload } from '../redux/reducers/spaceReducer';
 import DisappearingAlert from '../components/DisappearingAlert';
 import AppointmentDatePicker from '../components/AppointmentDatePicker';
 import TextButton from '../buttons/TextButton';
 import { IDatesRange } from '../components/Filters';
+import AltButton from '../components/AltButton';
+import EditButton from '../buttons/EditButton';
+import DeleteButton from '../buttons/DeleteButton';
 
 interface ISpaceInitialField {
     fieldName: string;
@@ -93,13 +96,18 @@ export default function SpacePage(): JSX.Element {
         requestUserActiveAppointments();
 
         return () => {
-            // annualizeDelete if is defined
+            if (deleteSpaceSuccessResponse) {
+                annualizeDeleteSpaceResponses();
+            }
         };
     };
     const closeConfirmDialogOnOutsideClick = (e: MouseEvent) => {
         if (e.target !== confirmDialogRef.current) {
             toggleDeleteSpaceConfirm();
         }
+    };
+    const annualizeDeleteSpaceResponses = (): void => {
+        dispatch(annualizeDeleteSpaceResponsesAction());
     };
     const applyConfirmDialogEvents = (): (() => void) => {
         if (deleteSpaceConfirmIsOpen) {
@@ -139,12 +147,13 @@ export default function SpacePage(): JSX.Element {
     const redirectIfSpaceIsDeleted = (): void => {
         if (deleteSpaceSuccessResponse) {
             setTimeout(() => {
+                annualizeDeleteSpaceResponses();
                 navigate('/');
             }, 2000);
         }
     };
     const spaceBelongsToUser = (): boolean => {
-        return spaceData?.userId === currentUserData?.id ? true : false;
+        return spaceData && spaceData?.userId === currentUserData?.id ? true : false;
     };
     const userHasActiveAppointments = (): boolean => {
         return fetchSpacesByUserActiveAppointmentsSuccessResponse?.data.length > 0;
@@ -189,10 +198,11 @@ export default function SpacePage(): JSX.Element {
         if (spaceBelongsToUser()) {
             return (
                 <div className="space-owner-menu">
-                    <div className="space-owner-menu__edit" onClick={toggleEditSpaceModal}>
+                    {/* <div className="space-owner-menu__edit" onClick={toggleEditSpaceModal}>
                         <FontAwesomeIcon icon={faEdit} />
-                    </div>
-                    <RemoveIcon handleClick={toggleDeleteSpaceConfirm} />
+                    </div> */}
+                    <EditButton handleClick={toggleEditSpaceModal} />
+                    <DeleteButton handleClick={toggleDeleteSpaceConfirm} />{' '}
                 </div>
             );
         }
@@ -232,7 +242,7 @@ export default function SpacePage(): JSX.Element {
     };
     const renderImages = (): JSX.Element => {
         return (
-            <div className="space__images">
+            <div className="page-box space__images">
                 <div className="icon icon-arrow icon-arrow--right" onClick={flipImageLeft}>
                     <FontAwesomeIcon icon={faChevronLeft} />
                 </div>
@@ -248,11 +258,15 @@ export default function SpacePage(): JSX.Element {
         );
     };
     const renderAppointmentButton = (): JSX.Element | null => {
+        const activeClassName = datePickerIsOpen ? 'appointment-button--active' : '';
         // проверить есть ли активные бронирования у пользователя
         if (!spaceBelongsToUser()) {
             return (
-                <div className="button appointment-button" onClick={toggleDatePicker}>
-                    Забронировать
+                <div
+                    className={`button button--secondary appointment-button ${activeClassName}`}
+                    onClick={toggleDatePicker}
+                >
+                    Бронирование
                 </div>
             );
         }
@@ -271,7 +285,18 @@ export default function SpacePage(): JSX.Element {
             return <TextButton text="Отменить бронирование" handleClick={cancelAppointment} />;
         }
     };
-    const renderRemoveSpacePrompt = (): JSX.Element | void => {
+    const renderSpaceDescription = (): JSX.Element => {
+        return (
+            <div className="page-box space-description-page-box space-description-container">
+                <h3 className="heading heading--tertiary space-description-heading">Описание</h3>
+                <div className="space-description-paragraph-container">
+                    <p className="paragraph space-description-paragraph">{spaceData?.description}</p>
+                </div>
+            </div>
+        );
+    };
+
+    const renderRemoveSpaceConfirmDialog = (): JSX.Element | void => {
         if (deleteSpaceConfirmIsOpen) {
             const handlePositiveClick: MouseEventHandler = (): void => {
                 const deleteSpacePayload: IDeleteSpacePayload = {
@@ -308,28 +333,23 @@ export default function SpacePage(): JSX.Element {
     useEffect(applyConfirmDialogEvents);
 
     return (
-        <div className="space-page">
-            {renderSpaceOwnerMenu()}
+        <div className="page space-page">
             <div className="space-page__flows">
                 <div className="space-page__flows--left">
                     {renderImages()}
-                    <div className="space-description-container">
-                        <h3 className="heading heading--tertiary space-description-heading">Описание</h3>
-                        <div className="space-description-paragraph-container">
-                            <p className="paragraph space-description-paragraph">{spaceData?.description}</p>
-                        </div>
-                    </div>
+                    {renderSpaceDescription()}
                 </div>
                 <div className="space-page__flows--right">
                     <div className="locker-connection-status-bar">{renderLockerConnectedStatus()}</div>
-                    {renderSpaceInitialFields()}
+                    <div className="page-box">{renderSpaceInitialFields()}</div>
                     {renderAppointmentButton()}
                     {renderCancelAppointmentButton()}
                     {renderDatePicker()}
+                    {renderSpaceOwnerMenu()}
                 </div>
             </div>
             {renderEditSpaceModal()}
-            {renderRemoveSpacePrompt()}
+            {renderRemoveSpaceConfirmDialog()}
             {renderDisappearingAlertOnDeleteError()}
         </div>
     );

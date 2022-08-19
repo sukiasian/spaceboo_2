@@ -86,8 +86,49 @@
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
     grid-template-rows: 50px;
+    align-items: center;
+
+    a {
+        color: white;
+        text-decoration: none;
+    }
+}
+
+.banner__texts {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    h1,
+    p {
+        color: white;
+        text-align: center;
+    }
 }
 
 .logo--white {
     background: url('../../assets/new-logo-white-4.svg') no-repeat;
+    height: 50px;
+}
+
+.calls-to-action {
+    position: absolute;
+    display: flex;
+    width: 40%;
+    justify-content: space-between;
+    margin-top: 19rem;
+}
+
+.text {
+    background: inherit;
+    background-size: cover;
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+}
+.how-it-works__banner__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
 }

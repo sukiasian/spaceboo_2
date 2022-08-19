@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import RefreshButton from '../buttons/RefreshButton';
+import AppointedSpaces from '../components/AppointedSpaces';
 import Space from '../components/Space';
 import { toggleMyAppointmentsFinalLocationIsDefined } from '../redux/actions/commonActions';
 import {
@@ -74,7 +75,7 @@ export default function ActiveAppointmentsPage(): JSX.Element {
             <div className="spaces-by-appointments">
                 <div className="spaces-with-active-appointments">
                     {renderNoSpacesAppointedMessage()}
-                    {renderSpaces()}
+                    <AppointedSpaces spaces={spaces || []} />
                 </div>
             </div>
             <div className="upcoming-appointments__reload"> {renderReloadOnError()}</div>

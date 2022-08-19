@@ -49,9 +49,11 @@ export default function MyAppointmentsPage(): JSX.Element {
 
     return (
         <div className="page my-appointments-page">
-            <Titles heading="Мои бронирования" paragraph="Здесь можно управлять бронированиями." />
-            <div className="type-of-appointments-tabs-bar">{renderTabsBar()}</div>
-            <MyAppointmentsPageRoutes />
+            <div className="page-box">
+                <Titles heading="Мои бронирования" paragraph="Здесь можно управлять бронированиями." />
+                <div className="type-of-appointments-tabs-bar">{renderTabsBar()}</div>
+                <MyAppointmentsPageRoutes />
+            </div>
         </div>
     );
 }

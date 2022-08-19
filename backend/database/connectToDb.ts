@@ -16,7 +16,7 @@ export default async (sequelize: Sequelize): Promise<void> => {
         await sequelize.sync(syncOptions);
         logger.info('Synchronized');
 
-        if (process.env.NODE_ENV !== Environment.PRODUCTION && syncOptions.force) {
+        if (process.env.NODE_ENV !== Environment.PRODUCTION || syncOptions.force) {
             await sequelize.query(citiesSqlFile);
         }
     } catch (err) {

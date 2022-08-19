@@ -1,20 +1,33 @@
-.table-cell {
-    &--appointed {
-        background-color: red;
+.appointment-date-picker {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: min-content;
+    padding: 3rem;
+}
+
+.appointment-button {
+    width: min-content;
+
+    &:hover {
+        background-color: transparent;
+        border: 2px solid $color-primary-2;
+        color: $color-primary-2;
     }
 
-    &--available {
-        background-color: green;
-    }
-
-    &--unclickable {
-        &:hover {
-            background-color: transparent !important;
-            cursor: auto;
-        }
+    &--active {
+        background-color: transparent !important;
+        color: $color-primary-2;
+        transition: 0.3s;
     }
 }
 
 .date-picker__table {
     user-select: none;
+}
+
+.appoint-button {
+    margin-top: 1rem;
+    width: min-content;
 }

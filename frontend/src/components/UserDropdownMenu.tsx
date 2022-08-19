@@ -28,7 +28,7 @@ export default function UserDropdownMenu(): JSX.Element {
         {
             tabName: 'Мои бронирования',
             className: '',
-            linkTo: '/my-appointments/active',
+            linkTo: '/my-appointments',
             onClick: setFinalLocationFalsy,
         },
         {

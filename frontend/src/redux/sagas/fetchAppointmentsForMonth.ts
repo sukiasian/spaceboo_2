@@ -9,7 +9,7 @@ import {
     setFetchAppointmentsForMonthSuccessResponseAction,
 } from '../actions/appointmentActions';
 import {} from '../actions/spaceActions';
-import { IFetchAppointmentsForMonthPayload } from '../reducers/spaceReducer';
+import { IFetchAppointmentsForMonthPayload } from '../reducers/appointmentReducer';
 
 const fetchAppointmentsForMonth = ({
     spaceId,

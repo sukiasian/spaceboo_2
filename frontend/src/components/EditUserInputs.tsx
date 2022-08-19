@@ -52,7 +52,6 @@ export default function EditUserInputs(): JSX.Element {
 
                 setTimeout(() => {
                     setValidationErrorIsActive(false);
-                    console.log(111111);
                 }, 3000);
                 e.target.classList.add('validator--allowed');
             },

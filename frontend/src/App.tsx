@@ -37,10 +37,8 @@ function App(): JSX.Element {
 
     return (
         <div className="App">
-            <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-                <section className="navbar-section">
-                    <Navbar />
-                </section>
+            <div className="navbar-and-page">
+                <Navbar />
                 <Routes />
             </div>
             <section className="footer-section">

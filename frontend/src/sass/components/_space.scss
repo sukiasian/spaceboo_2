@@ -1,10 +1,8 @@
 .spaces {
-    margin-top: 6rem;
     display: grid;
     grid-template-rows: max-content;
     grid-template-columns: repeat(3, 23rem);
     gap: 3rem;
-    padding-bottom: 2rem;
     min-height: 22rem;
 }
 
@@ -52,7 +50,7 @@
             box-shadow: 10px 10px 21px #d3d3d6, -10px -10px 21px #fff;
         }
 
-        &:active {
+        &:active:not(:has(:active)) {
             transform: scale(1.01);
         }
 

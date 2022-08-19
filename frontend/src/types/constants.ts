@@ -12,3 +12,4 @@ export const monthStrings = [
     'Ноябрь',
     'Декабрь',
 ];
+

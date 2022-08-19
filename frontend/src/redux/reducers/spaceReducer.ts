@@ -62,11 +62,6 @@ export interface ISpaceState {
     deleteSpaceFailureResponse?: IServerResponse;
 }
 
-export interface IFetchAppointmentsForMonthPayload {
-    spaceId: string;
-    requiredDates: string;
-}
-
 export enum SpaceType {
     FLAT = 'Квартира',
     HOUSE = 'Жилой дом',
@@ -128,6 +123,13 @@ export const spaceReducer = (state = initialState, action: IAction): ISpaceState
                 ...state,
                 fetchSpacesSuccessResponse: [],
                 fetchSpacesFailureResponse: undefined,
+            };
+
+        case ReduxSpaceAction.ANNUALIZE_DELETE_SPACE_RESPONSES:
+            return {
+                ...state,
+                deleteSpaceSuccessResponse: undefined,
+                deleteSpaceFailureResponse: undefined,
             };
 
         case ReduxSpaceAction.SET_FETCH_SPACES_FAILURE_RESPONSE:

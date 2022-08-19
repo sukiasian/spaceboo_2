@@ -30,6 +30,9 @@
 @import './components/page';
 @import './components/confirm-dialog';
 @import './components/appointment-date-picker';
+@import './components/query-date-picker';
+@import './components/dashboard';
+@import './components/page-box';
 
 @import './layout/flex';
 
@@ -38,7 +41,7 @@
 
 @import './pages/home';
 @import './pages/form';
-@import './pages/appointment';
+@import './pages/my-appointments';
 @import './pages/how-it-works';
 @import './pages/settings';
 @import './pages/contact';

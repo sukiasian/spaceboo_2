@@ -51,9 +51,11 @@ export default function ProvideSpacePage(): JSX.Element {
 
     return (
         <div className="page provide-space-page">
-            <Titles heading="Предоставить пространство" />
-            <ProvideSpaceForm />
-            <Alert failureResponse={postProvideSpaceFailureResponse} />
+            <div className="page-box">
+                <Titles heading="Предоставить пространство" />
+                <ProvideSpaceForm />
+                <Alert failureResponse={postProvideSpaceFailureResponse} />
+            </div>
         </div>
     );
 }

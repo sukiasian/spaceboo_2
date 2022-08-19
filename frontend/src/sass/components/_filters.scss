@@ -1,8 +1,14 @@
+.filters-page-box {
+    margin-top: 3rem !important;
+    width: 95%;
+    padding: 1rem !important;
+}
+
 .filters-section {
-    margin-top: 4rem;
     display: flex;
     justify-content: space-evenly;
     width: 90%;
+    align-items: center;
 }
 
 .filter {
@@ -31,9 +37,19 @@
 
         &__drop-down {
             min-width: max-content;
-            margin: 5px 0 0 -4rem;
+            margin: 10px 0 0 -4rem;
             z-index: 1000;
             color: $color-grey-dark-1;
+
+            p {
+                &:hover {
+                    color: $color-primary-1-lightened;
+                }
+
+                &:active {
+                    color: $color-primary-1;
+                }
+            }
         }
     }
 
@@ -43,7 +59,7 @@
 
         &__drop-down {
             min-width: max-content;
-            margin: 5px 0 0 -6.4rem;
+            margin: 10px 0 0 -6.4rem;
             color: $color-grey-dark-1;
         }
     }

@@ -32,7 +32,6 @@ const postProvideSpace = (formData: IProvideSpaceData): Promise<IServerResponse>
 function* postProvideSpaceWorker(action: IAction): Generator<CallEffect<any> | PutEffect<AnyAction>, void> {
     try {
         const response = yield call(postProvideSpace, action.payload);
-        console.log(response);
 
         if (serverResponseIsSuccessful(response as IServerResponse)) {
             yield put(setProvideSpaceSuccessResponseAction(response as IServerResponse));
@@ -46,3 +45,4 @@ function* postProvideSpaceWorker(action: IAction): Generator<CallEffect<any> | P
 export function* watchPostProvideSpace(): Generator<ForkEffect, void, void> {
     yield takeLatest(SagaTask.POST_PROVIDE_SPACE, postProvideSpaceWorker);
 }
+

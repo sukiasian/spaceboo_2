@@ -245,7 +245,7 @@ export default function Filters(): JSX.Element {
                             className={`sort-by-option--${option.field}`}
                             onClick={(e) => {
                                 e.stopPropagation();
-                                toggleFilterBoxIsOpen(FilterNames.SORT_BY);
+                                toggleFilterBoxIsOpen(FilterNames.SORT_BY)(e);
                                 updateQueryDataSortBy(option.field);
                             }}
                             key={i}
@@ -351,41 +351,46 @@ export default function Filters(): JSX.Element {
     }, [priceRange]);
 
     return (
-        <section className="filters-section">
-            <div
-                className="filter filters__sort-by"
-                onClick={toggleFilterBoxIsOpen(FilterNames.SORT_BY)}
-                ref={sortByRef}
-            >
-                <div className="heading-container">
-                    <h3 className="heading heading--tertiary">
-                        Сортировка<span className={defineFilterBoxArrowClassName(sortByDropDownBoxIsOpen)}>^</span>
-                    </h3>
-                </div>
-                {renderSortByFilterDropDown()}
-            </div>
-            <div
-                className="filter filters__price-range"
-                onClick={toggleFilterBoxIsOpen(FilterNames.PRICE)}
-                ref={priceRangeRef}
-            >
-                <div className="heading-container">
-                    <h3 className="heading heading--tertiary">
-                        Цена<span className={defineFilterBoxArrowClassName(priceRangeDropDownBoxIsOpen)}>^</span>
-                    </h3>
-                </div>
-                {renderPriceRangeInputs()}
-            </div>
-            <div className="filter filters__required-reservation-dates-picker">
-                <div className="filters-content" onClick={toggleFilterBoxIsOpen(FilterNames.RESERVATION_DATE_PICKER)}>
-                    <div className="dates-range">
-                        {renderPickDatesMessage()}
-                        {renderRequiredReservationData()}
+        <div className="page-box filters-page-box">
+            <section className="filters-section">
+                <div
+                    className="filter filters__sort-by"
+                    onClick={toggleFilterBoxIsOpen(FilterNames.SORT_BY)}
+                    ref={sortByRef}
+                >
+                    <div className="heading-container">
+                        <h3 className="heading heading--tertiary">
+                            Сортировка<span className={defineFilterBoxArrowClassName(sortByDropDownBoxIsOpen)}>^</span>
+                        </h3>
                     </div>
-                    <CalendarIcon />
+                    {renderSortByFilterDropDown()}
                 </div>
-                {renderDatePicker()}
-            </div>
-        </section>
+                <div
+                    className="filter filters__price-range"
+                    onClick={toggleFilterBoxIsOpen(FilterNames.PRICE)}
+                    ref={priceRangeRef}
+                >
+                    <div className="heading-container">
+                        <h3 className="heading heading--tertiary">
+                            Цена<span className={defineFilterBoxArrowClassName(priceRangeDropDownBoxIsOpen)}>^</span>
+                        </h3>
+                    </div>
+                    {renderPriceRangeInputs()}
+                </div>
+                <div className="filter filters__required-reservation-dates-picker">
+                    <div
+                        className="filters-content"
+                        onClick={toggleFilterBoxIsOpen(FilterNames.RESERVATION_DATE_PICKER)}
+                    >
+                        <div className="dates-range">
+                            {renderPickDatesMessage()}
+                            {renderRequiredReservationData()}
+                        </div>
+                        <CalendarIcon />
+                    </div>
+                    {renderDatePicker()}
+                </div>
+            </section>
+        </div>
     );
 }

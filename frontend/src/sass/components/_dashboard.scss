@@ -1,0 +1,12 @@
+.dashboard {
+    height: 100vh;
+    display: grid;
+    grid-template-rows: 100%;
+    grid-template-columns: 20% 4fr;
+
+    &__navigation-panel {
+        background-color: $color-primary-2;
+        box-shadow: 1px 0 0px 0px rgba(209, 209, 209, 0.2);
+        min-width: 200px;
+    }
+}

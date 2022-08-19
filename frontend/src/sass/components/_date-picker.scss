@@ -24,7 +24,8 @@
         }
 
         .picked-day {
-            background-color: $color-primary-1;
+            background-color: $color-primary-2;
+            color: white !important;
         }
 
         .table-cell {
@@ -34,12 +35,23 @@
             cursor: pointer;
 
             &--today {
-                outline: 1px solid $color-primary-2;
+                outline: 1px solid $color-primary-1;
                 border-radius: $box-border-radius;
+                color: $color-primary-1;
+
+                &.picked-day {
+                    outline: none;
+                    color: white;
+
+                    &:hover {
+                        background-color: $color-primary-2;
+                    }
+                }
 
                 &:hover {
                     outline: none;
-                    background-color: $color-primary-2-lightened;
+                    background-color: $color-primary-1-lightened;
+                    color: white;
                 }
             }
 
@@ -52,18 +64,35 @@
                 color: #c9c9c9;
             }
 
-            &:hover:not(.table-cell--past):not(.table-cell--today):not(.picked-day) {
-                background-color: $color-primary-1-lightened;
+            &--appointed {
+                background-color: $color-grey-light-4;
+                color: white;
+            }
+
+            &--unclickable {
+                &:hover {
+                    background-color: transparent !important;
+                    cursor: auto;
+                }
+            }
+
+            &--appointable:not(.picked-day) {
+                background-color: rgba($color-primary-2-lightened, 0.5);
+                color: white;
+            }
+
+            &--unappointable {
+                background-color: rgba($color-grey-dark-2, 0.5);
+            }
+
+            color: $color-primary-2;
+
+            &:hover:not(.table-cell--past):not(.table-cell--today):not(.picked-day):not(.table-cell--unappointable):not(.table-cell--appointable) {
+                background-color: $color-primary-2-lightened;
+                color: white;
             }
         }
     }
-}
-
-.drop-down.query-date-picker.date-picker {
-    position: absolute;
-    min-width: 370px;
-    z-index: 10;
-    margin-left: -23px;
 }
 
 .active-month {

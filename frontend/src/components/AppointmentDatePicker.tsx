@@ -1,14 +1,15 @@
-import { ReactNode, RefObject, useEffect, useRef, useState } from 'react';
+import { MouseEventHandler, ReactNode, RefObject, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import DecreaseArrow from '../icons/DecreaseArrow';
 import IncreaseArrow from '../icons/IncreaseArrow';
-import NextIcon from '../icons/NextIcon';
-import { fetchAppointmentsForMonthAction } from '../redux/actions/appointmentActions';
+import { fetchAppointmentsForMonthAction, postCreateAppointmentAction } from '../redux/actions/appointmentActions';
 import { setDatePickerDateAction } from '../redux/actions/commonActions';
+import { ICreateAppointmentPayload } from '../redux/reducers/appointmentReducer';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { monthStrings } from '../types/constants';
 import { createDateRangeWithTimestamp, formatSingleDigitUnitToTwoDigitString } from '../utils/utilFunctions';
+import ConfirmDialog from './ConfirmDialog';
 import { IDatesRange } from './Filters';
 
 interface IDatePickerDate {
@@ -23,7 +24,6 @@ interface IDatePickerProps {
     setDatesForRender: React.Dispatch<React.SetStateAction<IDatesRange | undefined>>;
     innerRef?: RefObject<HTMLDivElement>;
     componentClassNames?: string;
-    children?: JSX.Element | null;
     presentMonthDaysClassNamesCombined?: (day: number) => string;
 }
 
@@ -37,8 +37,7 @@ interface IAppointmentsParsedAndOrganized {
 }
 
 export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Element {
-    // NOTE probably we dont need datesForRender since we do not render anything
-    const { componentClassNames, innerRef, children, datesForRender, setDatesForRender } = props;
+    const { componentClassNames, innerRef, datesForRender, setDatesForRender } = props;
     const { presentMonthDaysClassNamesCombined } = props;
     const [datesForAppointment, setDatesForAppointment] = useState<IDatesRange>();
     const [dateIsPicked, setDateIsPicked] = useState(false);
@@ -55,12 +54,19 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
     const [monthsWithYearsDropDownMenuIsOpen, setMonthsWithYearsDropDownMenuIsOpen] = useState(false);
     const [outOfCurrentMonthDayPicked, setOutOfCurrentMonthDayPicked] = useState<number | undefined>();
     const [parsedAppointmentsList, setParsedAppointmentsList] = useState<IAppointmentsParsedAndOrganized>({});
+    const [pointedDate, setPointedDate] = useState<Date>();
+    const [unappointableDaysPointed, setUnappointableDaysPointed] = useState(false);
+    const [confirmAppointmentIsOpen, setConfirmAppointmentIsOpen] = useState(false);
+
     const { datePickerDate } = useSelector((state: IReduxState) => state.commonStorage);
     const { fetchAppointmentsForMonthSuccessResponse } = useSelector((state: IReduxState) => state.appointmentStorage);
+
     const dispatch = useDispatch();
     const { spaceId } = useParams();
+
     const appointments = fetchAppointmentsForMonthSuccessResponse?.data;
     const amountOfMonthsAvailableToLookUp = 12;
+
     const getDatePickerDateFromTodayDate = (date: Date): IDatePickerDate => {
         const year = date.getFullYear();
         const month = date.getMonth();
@@ -83,35 +89,40 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
     const applyEffectsOnInit = (): void => {
         defineCurrentDateAndPickOnInit();
     };
+
     const createPropertyForParsedAppointmentsByYearAndMonth = (): string => {
-        return `${datePickerDate.year}, ${datePickerDate.month}`;
+        return `${datePickerDate.year}, ${datePickerDate.month + 1}`;
     };
+
     const parseAppointments = (): void => {
         if (appointments) {
-            appointments.forEach((appointment: string) => {
-                const dates = appointment.split(',');
-                const beginningDateWithTimestamp = dates[0].slice(1);
-                const endingDateWithTimestamp = dates[1].slice(1, dates[1].length - 1);
+            const newParsedAppointmentsList: IAppointmentsParsedAndOrganized = {
+                ...parsedAppointmentsList,
+            };
 
-                const newParsedAppointmentsList: IAppointmentsParsedAndOrganized = { ...parsedAppointmentsList };
+            appointments.forEach((appointment: any) => {
+                const { isoDatesReserved } = appointment;
+
+                const beginningDateWithTimestamp = isoDatesReserved[0].value;
+                const endingDateWithTimestamp = isoDatesReserved[1].value;
 
                 newParsedAppointmentsList[createPropertyForParsedAppointmentsByYearAndMonth()] = [
-                    ...newParsedAppointmentsList[createPropertyForParsedAppointmentsByYearAndMonth()],
+                    ...(newParsedAppointmentsList[createPropertyForParsedAppointmentsByYearAndMonth()] || []),
                     {
-                        beginningDateWithTimestamp: beginningDateWithTimestamp,
-                        endingDateWithTimestamp: endingDateWithTimestamp,
+                        beginningDateWithTimestamp,
+                        endingDateWithTimestamp,
                     },
                 ];
-
-                setParsedAppointmentsList(newParsedAppointmentsList);
             });
+
+            setParsedAppointmentsList(newParsedAppointmentsList);
         }
     };
     const requestAppointmentsOnMonthChange = (): void => {
         if (datePickerDate.year !== 0 && datePickerData.lastDayOfCurrentMonth > 0) {
             const requiredDates = createDateRangeWithTimestamp(
                 datePickerDate.year,
-                datePickerDate.month,
+                datePickerDate.month + 1,
                 datePickerData.lastDayOfCurrentMonth
             );
 
@@ -126,7 +137,7 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
                 const beginningDate = new Date(monthAppointments.beginningDateWithTimestamp);
                 const endingDate = new Date(monthAppointments.endingDateWithTimestamp);
 
-                if (day >= beginningDate.getUTCDate() || day < endingDate.getUTCDate()) {
+                if (day >= beginningDate.getUTCDate() && day < endingDate.getUTCDate()) {
                     return true;
                 }
             }
@@ -134,9 +145,30 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
 
         return false;
     };
+
     const defineAppointedDayClassName = (day: number): string => {
         if (!dayIsInThePast(day)) {
-            return dayIsAppointed(day) ? 'table-cell--appointed' : 'table-cell--available';
+            return dayIsAppointed(day) ? 'table-cell--appointed' : '';
+        }
+
+        return '';
+    };
+    const defineUnappointableDayClassName = (day: number): string => {
+        // NOTE: needed for hover (onMouseEnter event)
+        const dateForCell = new Date(datePickerDate.year, datePickerDate.month, day);
+
+        // если есть pointedDate это означает что appointable? или же в любом случае должен быть pointedDate?
+        if (
+            pointedDate &&
+            datesForAppointment?.beginningDate &&
+            dateForCell >= new Date(datesForAppointment.beginningDate) &&
+            dateForCell < pointedDate
+        ) {
+            if (unappointableDaysPointed) {
+                return 'table-cell--unappointable';
+            } else {
+                return 'table-cell--appointable';
+            }
         }
 
         return '';
@@ -203,7 +235,7 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
         const pickedDate = generateAppointmentDateString(datePickerDate.year, datePickerDate.month, day);
 
         //  if a day is in the past
-        if (dayIsInThePast(day)) {
+        if (dayIsInThePast(day) || dayIsAppointed(day)) {
             return;
         } else {
             if (newDatesForQuery.beginningDate && newDatesForQuery.endingDate) {
@@ -241,6 +273,10 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
             beginningDate: newDatesForRender.beginningDate,
             endingDate: newDatesForRender.endingDate,
         });
+    };
+    const annualizePointedDateAndUnappointableDaysPointed = (): void => {
+        setPointedDate(undefined);
+        setUnappointableDaysPointed(false);
     };
     const toggleMonthsWithYearsDropDownMenu = (): void => {
         setMonthsWithYearsDropDownMenuIsOpen((prev) => !prev);
@@ -301,6 +337,10 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
         };
     };
 
+    const toggleConfirmAppointmentDialog = (): void => {
+        setConfirmAppointmentIsOpen((prev) => !prev);
+    };
+
     const defineTodayClassName = (day: number): string => {
         if (
             datePickerDate.month === currentDate.month &&
@@ -331,6 +371,23 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
 
         return '';
     };
+    // NOTE: why not used?
+    const defineAppointedDaysClassName = (day: number): string => {
+        const date = new Date(datePickerDate.year, datePickerDate.month, day);
+
+        if (!dayIsInThePast(day)) {
+            parsedAppointmentsList[createPropertyForParsedAppointmentsByYearAndMonth()].forEach((appointmentParsed) => {
+                if (
+                    date >= new Date(appointmentParsed.beginningDateWithTimestamp) &&
+                    date < new Date(appointmentParsed.endingDateWithTimestamp)
+                ) {
+                    return 'table-cell--appointed';
+                }
+            });
+        }
+
+        return '';
+    };
     const defineUnclickableDaysForUpcomingMonthClassName = (): string => {
         return datesForAppointment?.beginningDate ? 'table-cell--unclickable' : '';
     };
@@ -354,6 +411,7 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
 
         return '';
     };
+
     const renderDayCells = (): JSX.Element[] => {
         let tableRows = [];
 
@@ -382,6 +440,7 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
                         <td
                             className={`table-cell table-cell--out-of-month table-cell--${j} ${defineUnclickableDaysForUpcomingMonthClassName()}`}
                             onClick={handleAfterCurrentMonthDaysClick(day)}
+                            onMouseEnter={annualizePointedDateAndUnappointableDaysPointed}
                             key={i * j}
                         >
                             {day}
@@ -396,44 +455,77 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
                                 dayCorrespondingToCalendar
                             )} ${definePickedDaysClassName(dayCorrespondingToCalendar)} ${defineAppointedDayClassName(
                                 dayCorrespondingToCalendar
-                            )}  ${
+                            )} ${defineUnappointableDayClassName(dayCorrespondingToCalendar)} ${
                                 presentMonthDaysClassNamesCombined
                                     ? presentMonthDaysClassNamesCombined!(dayCorrespondingToCalendar)
                                     : ''
                             }`}
                             onClick={() => {
-                                // const date = new Date(
-                                //     generateAppointmentDateString(
-                                //         datePickerDate.year,
-                                //         datePickerDate.month,
-                                //         dayCorrespondingToCalendar
-                                //     )
-                                // );
-                                // parsedAppointmentsList.current.forEach((appointment: IAppointmentParsed) => {
-                                //     if (
-                                //         date >= new Date(appointment.beginningDateWithTimestamp) &&
-                                //         date < new Date(appointment.endingDateWithTimestamp)
-                                //     ) {
-                                //         return;
-                                //     }
-                                // });
-                                // pickDate(dayCorrespondingToCalendar);
+                                pickDate(dayCorrespondingToCalendar);
                             }}
-                            onMouseEnter={(e) => {
-                                if (datesForAppointment?.beginningDate) {
-                                    const dateForCurrentDay = new Date(
-                                        generateAppointmentDateString(
-                                            datePickerDate.year,
-                                            datePickerDate.month,
-                                            dayCorrespondingToCalendar
-                                        )
-                                    );
-                                    const beginningDate = new Date(datesForAppointment.beginningDate as string);
-                                    
+                            onMouseLeave={() => {
+                                setUnappointableDaysPointed(false);
+                            }}
+                            onMouseEnter={() => {
+                                const dateForCurrentDay = new Date(
+                                    generateAppointmentDateString(
+                                        datePickerDate.year,
+                                        datePickerDate.month,
+                                        dayCorrespondingToCalendar
+                                    )
+                                );
 
-                                    // встает проблема как быть с parsedAppointments - они
-                                    // меняются при каждом изменении месяца.
-                                    // Подтягивать каждый раз новые?
+                                if (datesForAppointment?.beginningDate) {
+                                    const beginningDate = new Date(
+                                        `${datesForAppointment.beginningDate}T14:00:00.000Z`
+                                    );
+                                    const numberOfDays =
+                                        (dateForCurrentDay.getTime() - beginningDate.getTime()) / (1000 * 3600 * 24);
+
+                                    const dates: Date[] = [];
+                                    const beginningRange = `${beginningDate.getFullYear()}, ${
+                                        beginningDate.getMonth() + 1
+                                    }`;
+                                    const ranges: string[] = [beginningRange];
+
+                                    setPointedDate(dateForCurrentDay);
+
+                                    for (let i = 1; i < numberOfDays + 1; i++) {
+                                        const date = new Date(beginningDate.getTime() + 1000 * 3600 * 24 * i);
+
+                                        dates.push(date);
+
+                                        // NOTE: we changed i from 0 to 1 and thus if we return changes we need to do i !== 0 instead of i === 1
+                                        if (i !== 1 && date.getDate() === 1) {
+                                            ranges.push(`${date.getFullYear()}, ${date.getMonth()}`);
+                                        }
+                                    }
+                                    console.log(dates);
+
+                                    ranges.forEach((range, i) => {
+                                        if (parsedAppointmentsList[range]) {
+                                            dates.forEach((date) => {
+                                                for (const appointmentsForPeriod of parsedAppointmentsList[range]) {
+                                                    console.log(
+                                                        date,
+                                                        new Date(appointmentsForPeriod.endingDateWithTimestamp)
+                                                    );
+
+                                                    if (
+                                                        date >=
+                                                            new Date(
+                                                                appointmentsForPeriod.beginningDateWithTimestamp
+                                                            ) &&
+                                                        date < new Date(appointmentsForPeriod.endingDateWithTimestamp)
+                                                    ) {
+                                                        setUnappointableDaysPointed(true);
+
+                                                        return;
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    });
                                 }
                             }}
                             key={i * j}
@@ -512,12 +604,58 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
             </div>
         );
     };
-    const renderNextStepsIcon = (): JSX.Element | null => {
-        if (dateIsPicked) {
-            return <NextIcon handleClick={() => {}} />;
-        }
+    const renderAppointButton = (): JSX.Element | null => {
+        const datesArePicked = datesForAppointment?.beginningDate && datesForAppointment?.endingDate;
 
-        return null;
+        const defineAvailableOrNonAvailableButtonClassName = (): string => {
+            return datesArePicked ? 'button--available button--primary' : 'button--unavailable';
+        };
+
+        const appointSpace = (): void => {
+            if (datesArePicked) {
+                // dispatch
+                // not dispatch. open a confirm dialog first
+
+                toggleConfirmAppointmentDialog();
+            }
+        };
+
+        return (
+            <div className="appoint-button-container">
+                <div
+                    className={`button appoint-button ${defineAvailableOrNonAvailableButtonClassName()}`}
+                    onClick={appointSpace}
+                >
+                    Забронировать
+                </div>
+            </div>
+        );
+    };
+    const renderConfirmAppointmentDialog = (): JSX.Element | void => {
+        const handlePositiveClick: MouseEventHandler<HTMLDivElement> = () => {
+            const payload: ICreateAppointmentPayload = {
+                resIsoDatesToReserve: {
+                    beginningDate: datesForAppointment?.beginningDate,
+                    endingDate: datesForAppointment?.endingDate,
+                },
+                spaceId: spaceId!,
+            };
+
+            dispatch(postCreateAppointmentAction(payload));
+        };
+
+        if (confirmAppointmentIsOpen) {
+            return (
+                <ConfirmDialog
+                    question={`Забронировать с ${datesForAppointment?.beginningDate}, 14:00, до ${datesForAppointment?.endingDate}?`}
+                    positive={'Нет'}
+                    negative={'Да'}
+                    handlePositiveClick={handlePositiveClick}
+                    handleNegativeClick={toggleConfirmAppointmentDialog}
+                    handleCloseButtonClick={toggleConfirmAppointmentDialog}
+                />
+            );
+        }
     };
 
     useEffect(applyEffectsOnInit, []);
@@ -529,43 +667,39 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
     useEffect(requestAppointmentsOnMonthChange, [datePickerDate, datePickerData]);
     useEffect(parseAppointments, [fetchAppointmentsForMonthSuccessResponse]);
     useEffect(() => {}, [appointments]);
-
-    /*  
-    
-    Как проверять при наведении?
-
-    То есть как только выбрана первая дата, при наведении мы должны пройтись по всем датам от начала 
-    до наведенной даты и проверить входят ли они в parsedAppointments или нет.
-
-    
-
-    
-    
-    */
+    useEffect(() => {
+        document.addEventListener('mouseleave', (e) => {
+            document.querySelectorAll('.table-cell--unappointable').forEach((el) => {});
+        });
+    });
 
     return (
-        <div
-            className={`${componentClassNames} date-picker`}
-            onClick={(e) => e.stopPropagation()}
-            ref={innerRef ?? undefined}
-        >
-            {renderDatePickerControlPanel()}
-            <table className="date-picker__table">
-                <tbody>
-                    <tr className="weekdays">
-                        <th className="weekday weekday--monday">Пн</th>
-                        <th className="weekday weekday--tuesday">Вт</th>
-                        <th className="weekday weekday--wednessday">Ср</th>
-                        <th className="weekday weekday--thursday">Чт</th>
-                        <th className="weekday weekday--friday">Пт</th>
-                        <th className="weekday weekday--saturday">Сб</th>
-                        <th className="weekday weekday--sunday">Вс</th>
-                    </tr>
-                    {renderDayCells()}
-                    {renderNextStepsIcon()}
-                </tbody>
-            </table>
-            {children}
-        </div>
+        <>
+            <div
+                className={`${componentClassNames || ''} date-picker appointment-date-picker`}
+                onClick={(e) => e.stopPropagation()}
+                ref={innerRef ?? undefined}
+            >
+                <div>
+                    {renderDatePickerControlPanel()}
+                    <table className="date-picker__table">
+                        <tbody onMouseLeave={annualizePointedDateAndUnappointableDaysPointed}>
+                            <tr className="weekdays">
+                                <th className="weekday weekday--monday">Пн</th>
+                                <th className="weekday weekday--tuesday">Вт</th>
+                                <th className="weekday weekday--wednessday">Ср</th>
+                                <th className="weekday weekday--thursday">Чт</th>
+                                <th className="weekday weekday--friday">Пт</th>
+                                <th className="weekday weekday--saturday">Сб</th>
+                                <th className="weekday weekday--sunday">Вс</th>
+                            </tr>
+                            {renderDayCells()}
+                        </tbody>
+                    </table>
+                </div>
+                {renderAppointButton()}
+            </div>
+            {renderConfirmAppointmentDialog()}
+        </>
     );
 }

@@ -17,6 +17,8 @@ export class AppointmentController extends Singleton {
         //     throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.DATES_SHOULD_BE_PRESENT);
         // }
 
+        // NOTE скорее всего нам нужно будет парсить время из локального в UTC.
+
         const userId = req.user.id;
 
         resIsoDatesToReserve.beginningTime = resIsoDatesToReserve.beginningTime ?? '14:00';

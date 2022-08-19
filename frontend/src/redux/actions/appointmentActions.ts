@@ -1,8 +1,17 @@
 import { IServerResponse, ReduxAppointmentAction, SagaTask } from '../../types/types';
-import { IFetchAppointmentsForMonthPayload } from '../reducers/spaceReducer';
+import {
+    ICreateAppointmentPayload,
+    IDeleteCancelAppointmentPayload,
+    IFetchAppointmentsForMonthPayload,
+} from '../reducers/appointmentReducer';
 import { IAction } from './ActionTypes';
 
-export const createAppointmentAction = () => {};
+export const postCreateAppointmentAction = (payload: ICreateAppointmentPayload) => {
+    return {
+        type: SagaTask.POST_CREATE_APPOINTMENT,
+        payload,
+    };
+};
 
 export const fetchAppointmentsForMonthAction = (payload: IFetchAppointmentsForMonthPayload): IAction<SagaTask> => {
     return {
@@ -11,9 +20,30 @@ export const fetchAppointmentsForMonthAction = (payload: IFetchAppointmentsForMo
     };
 };
 
-export const deleteCancelAppointmentAction = (): IAction<SagaTask, void> => {
+export const deleteCancelAppointmentAction = (
+    payload: IDeleteCancelAppointmentPayload
+): IAction<SagaTask, IDeleteCancelAppointmentPayload> => {
     return {
         type: SagaTask.DELETE_CANCEL_APPOINTMENT,
+        payload,
+    };
+};
+
+export const setPostCreateAppointmentSuccessResponse = (
+    payload: IServerResponse
+): IAction<ReduxAppointmentAction, IServerResponse> => {
+    return {
+        type: ReduxAppointmentAction.SET_POST_CREATE_APPOINTMENT_SUCCESS_RESPONSE,
+        payload,
+    };
+};
+
+export const setPostCreateAppointmentFailureResponse = (
+    payload: IServerResponse
+): IAction<ReduxAppointmentAction, IServerResponse> => {
+    return {
+        type: ReduxAppointmentAction.SET_POST_CREATE_APPOINTMENT_FAILURE_RESPONSE,
+        payload,
     };
 };
 
