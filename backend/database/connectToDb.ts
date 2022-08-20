@@ -7,7 +7,6 @@ import { Environment } from '../types/enums';
 
 export default async (sequelize: Sequelize): Promise<void> => {
     try {
-        // await sequelize.sync({ force: process.env.NODE_ENV !== Environment.PRODUCTION ? true : false });
         const syncOptions: SyncOptions = {
             force: false,
         };
@@ -20,6 +19,6 @@ export default async (sequelize: Sequelize): Promise<void> => {
             await sequelize.query(citiesSqlFile);
         }
     } catch (err) {
-        logger.error(err);
+        // logger.error(err);
     }
 };

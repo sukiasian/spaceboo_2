@@ -7,8 +7,10 @@ import UtilFunctions from './utils/UtilFunctions';
 import databaseConnection from './database/connectToDb';
 import { Singleton, SingletonFactory } from './utils/Singleton';
 import setCrons from './crons';
+import { redis } from './Redis';
 
 class Server extends Singleton {
+    public readonly redis = redis;
     private readonly appConfig = appConfig;
     private readonly app = appConfig.app;
     private readonly PORT = process.env.PORT || 8000;
@@ -26,12 +28,13 @@ class Server extends Singleton {
         }
     };
 
-    public startCrons = () => {
+    public startCrons = (): void => {
         setCrons();
     };
 
     public start = async () => {
         await databaseConnection(this.appConfig.sequelize);
+        await this.redis.startRedis();
 
         const server = this.app.listen(this.PORT, () => {
             logger.info(`Server is listening on ${this.PORT}`);

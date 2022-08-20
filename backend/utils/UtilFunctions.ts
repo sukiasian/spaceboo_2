@@ -7,10 +7,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as jwt from 'jsonwebtoken';
 import logger from '../loggers/logger';
-import { appConfig } from '../AppConfig';
 import { TIsoDatesReserved } from '../models/appointment.model';
 import { Environment, ErrorMessages, HttpStatus, ResponseMessages, ResponseStatus } from '../types/enums';
-import AppError from './AppError';
+import { redis } from '../Redis';
 
 enum DateFormat {
     NATIVE = 'native',
@@ -61,57 +60,120 @@ class UtilFunctions {
 
     public static exitHandler = (server: any, sequelize: Sequelize) => {
         process
-            .on('unhandledRejection', (reason, p) => {
-                console.error(reason, 'Unhandled Rejection at Promise', p);
+            .on('unhandledRejection', async (reason, p) => {
+                logger.error(`${reason}, 'Unhandled Rejection at Promise', ${p}`);
+
+                let errorExists;
+
                 server.close((err: any) => {
                     if (err) {
                         logger.error(err);
-                        process.exit(1);
+
+                        errorExists = err;
                     }
-                    sequelize.close().then(() => {
-                        logger.error('Sequelize connection disconnected');
-                        process.exit(0);
-                    });
                 });
+
+                await sequelize.close();
+
+                logger.info('Sequelize disconnected.');
+
+                await redis.client.quit();
+
+                logger.info('Redis disconnected.');
+
+                process.exit(errorExists ? 1 : 0);
             })
-            .on('uncaughtException', (err) => {
+            .on('uncaughtException', async (err) => {
                 logger.error('Uncaught Exception thrown');
+
+                let errorExists;
+
                 server.close((err: any) => {
                     if (err) {
                         logger.error(err);
-                        process.exit(1);
+
+                        errorExists = err;
                     }
-                    sequelize.close().then(() => {
-                        logger.info('Sequelize connection disconnected');
-                        process.exit(0);
-                    });
                 });
+
+                await sequelize.close();
+
+                logger.info('Sequelize disconnected.');
+
+                await redis.client.quit();
+
+                logger.info('Redis disconnected.');
+
+                process.exit(errorExists ? 1 : 0);
             })
-            .on('SIGTERM', () => {
-                console.info('SIGTERM signal received.');
+            .on('SIGTERM', async () => {
+                logger.info('SIGTERM signal received.');
+
+                let errorExists;
+
                 server.close((err: any) => {
                     if (err) {
                         logger.error(err);
-                        process.exit(1);
+
+                        errorExists = err;
                     }
-                    sequelize.close().then(() => {
-                        logger.info('Sequelize connection disconnected');
-                        process.exit(0);
-                    });
                 });
+
+                await sequelize.close();
+
+                logger.info('Sequelize disconnected.');
+
+                await redis.client.quit();
+
+                logger.info('Redis disconnected.');
+
+                process.exit(errorExists ? 1 : 0);
             })
-            .on('SIGINT', function () {
-                console.info('SIGINT signal received.');
+            .on('SIGINT', async () => {
+                logger.info('SIGINT signal received.');
+
+                let errorExists;
+
                 server.close((err: any) => {
                     if (err) {
                         logger.error(err);
-                        process.exit(1);
+
+                        errorExists = err;
                     }
-                    sequelize.close().then(() => {
-                        logger.info('Sequelize connection disconnected');
-                        process.exit(0);
-                    });
                 });
+
+                await sequelize.close();
+
+                logger.info('Sequelize disconnected.');
+
+                await redis.client.quit();
+
+                logger.info('Redis disconnected.');
+
+                process.exit(errorExists ? 1 : 0);
+            })
+            .on('beforeExit', async () => {
+                logger.info('Exit occured.');
+
+                let errorExists;
+
+                server.close((err: any) => {
+                    if (err) {
+                        logger.error(err);
+
+                        errorExists = err;
+                    }
+                });
+
+                await sequelize.close();
+
+                logger.info('Sequelize disconnected.');
+
+                await redis.client.quit();
+
+                logger.info('Redis disconnected.');
+
+                process.exit(errorExists ? 1 : 0);
             });
     };
 
@@ -226,6 +288,10 @@ class UtilFunctions {
 
         res.cookie('jwt', token, cookieOptions);
     };
+
+    public static makeDecimal = (valueToNumber: string): number => { 
+        return parseInt(valueToNumber, 10);
+    }
 }
 
 export default UtilFunctions;

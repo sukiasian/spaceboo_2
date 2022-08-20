@@ -8,20 +8,58 @@ import { JwtFromRequestFunction, Strategy as JwtStrategy } from 'passport-jwt';
 import { ExtractJwt } from 'passport-jwt';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
 import { UserScopes, User } from '../models/user.model';
-import { ErrorMessages, HttpStatus } from '../types/enums';
+import { ErrorMessages, HttpStatus, RedisVariable } from '../types/enums';
 import logger from '../loggers/logger';
 import { userSequelizeDao, UserSequelizeDao } from '../daos/user.sequelize.dao';
 import * as express from 'express';
 import AppError from '../utils/AppError';
+import UtilFunctions from '../utils/UtilFunctions';
+import { redis } from '../Redis';
 
 export class PassportConfig extends Singleton {
     private readonly userDao: UserSequelizeDao = userSequelizeDao;
     private readonly userModel: typeof User = User;
-    private passport: PassportStatic = passport;
-
+    private readonly passport: PassportStatic = passport;
+    private readonly redisClient = redis.client;
+    private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
+    private readonly attemptsAllowed = '2';
     public initializePassport(): express.Handler {
         return this.passport.initialize();
     }
+
+    private assignAvailableAttempts = async (key: string): Promise<AppError | void> => {
+        const loginAttemptsValue = await this.redisClient.get(key);
+
+        if (loginAttemptsValue === null) {
+            await this.redisClient.set(key, '1');
+        } else if (loginAttemptsValue === this.attemptsAllowed) {
+            await this.redisClient.setEx(key, 60 * 30, this.attemptsAllowed);
+        } else {
+            await this.redisClient.set(key, `${this.utilFunctions.makeDecimal(loginAttemptsValue) + 1}`);
+        }
+    };
+
+    private outOfAttempts = async (key: string): Promise<boolean> => {
+        const loginAttemptsValue = await this.redisClient.get(key);
+
+        return loginAttemptsValue === this.attemptsAllowed ?? false;
+    };
+
+    private handleAttempts = async (ip: string) => {
+        const loginAttemptsKey = `${RedisVariable.LOGIN_ATTEMPTS}:${ip}`;
+
+        await this.assignAvailableAttempts(loginAttemptsKey);
+
+        const outOfAttempts = await this.outOfAttempts(loginAttemptsKey);
+
+        if (outOfAttempts) {
+            throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.WAIT_TO_ATTEMPT_AGAIN);
+        }
+    };
+
+    private annualizeAttempts = async (ip: string) => {
+        await this.redisClient.set(`${RedisVariable.LOGIN_ATTEMPTS}:${ip}`, '0');
+    };
 
     public configurePassport(): void {
         const tokenExtractorFromCookie: JwtFromRequestFunction = (req) => {
@@ -36,26 +74,25 @@ export class PassportConfig extends Singleton {
 
         this.passport.use(
             new LocalStrategy(
-                { usernameField: 'email', passwordField: 'password', session: false },
-                async (email, password, done) => {
+                { usernameField: 'email', passwordField: 'password', session: false, passReqToCallback: true },
+                async (req, email, password, done) => {
                     try {
                         let user: User;
+
                         user = await this.userModel.scope(UserScopes.WITH_PASSWORD).findOne({ where: { email } });
 
-                        if (!user) {
+                        await this.handleAttempts(req.ip);
+
+                        if (!user || !(await user.verifyPassword(user)(password))) {
                             return done(
                                 new AppError(HttpStatus.UNAUTHORIZED, ErrorMessages.USERNAME_OR_PASSWORD_INCORRECT),
                                 false
                             );
                         }
 
-                        if (!(await user.verifyPassword(user)(password))) {
-                            return done(
-                                new AppError(HttpStatus.UNAUTHORIZED, ErrorMessages.USERNAME_OR_PASSWORD_INCORRECT)
-                            );
-                        }
-
                         user = await this.userModel.findOne({ raw: true, where: { email } });
+
+                        await this.annualizeAttempts(req.ip);
 
                         return done(null, { id: user.id });
                     } catch (err) {

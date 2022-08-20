@@ -5,7 +5,6 @@ import { Singleton, SingletonFactory } from '../utils/Singleton';
 import { ErrorMessages, HttpStatus, ResponseMessages } from '../types/enums';
 import { authSequelizeDao, AuthSequelizeDao } from '../daos/auth.sequelize.dao';
 import UtilFunctions from '../utils/UtilFunctions';
-import { sendMail } from '../emails/Email';
 import { UserScopes } from '../models/user.model';
 import AppError from '../utils/AppError';
 
@@ -17,7 +16,6 @@ interface IUserLoginState {
 export class AuthController extends Singleton {
     private readonly authSequelizeDao: AuthSequelizeDao = authSequelizeDao;
     private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
-    private readonly sendEmail = sendMail;
 
     public signUpLocal = this.utilFunctions.catchAsync(async (req, res, next) => {
         const user = await this.authSequelizeDao.signUpLocal(req.body);

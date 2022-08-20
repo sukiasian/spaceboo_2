@@ -147,6 +147,7 @@ export enum ErrorMessages {
     DATES_SHOULD_BE_PRESENT = 'Даты должны быть в настоящем.',
     REQUIRED_DATES_ARE_MISSING = 'Пожалуйста, укажите интересующие даты',
     SPACE_ID_IS_MISSING = 'Укажите ID пространства.',
+    WAIT_TO_ATTEMPT_AGAIN = 'Попробуйте через некоторое время.',
 }
 
 export enum Environment {
@@ -169,4 +170,8 @@ export enum QuerySortDirection {
 // NOTE guees we need that for everything
 export enum SpaceFields {
     PRICE_PER_NIGHT = 'pricePerNight',
+}
+
+export enum RedisVariable {
+    LOGIN_ATTEMPTS = 'login:attempts',
 }
