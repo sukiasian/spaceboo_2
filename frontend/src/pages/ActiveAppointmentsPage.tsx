@@ -1,9 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import RefreshButton from '../buttons/RefreshButton';
 import AppointedSpaces from '../components/AppointedSpaces';
-import Space from '../components/Space';
+import AppointmentControlDropdown from '../components/UpcomingAppointmentsControlDropdown';
+import ConfirmDialog from '../components/ConfirmDialog';
+import { deleteCancelAppointmentAction } from '../redux/actions/appointmentActions';
 import { toggleMyAppointmentsFinalLocationIsDefined } from '../redux/actions/commonActions';
 import {
     annualizeFetchSpacesForUserActiveAppointmentsResponsesAction,
@@ -13,14 +15,23 @@ import { IReduxState } from '../redux/reducers/rootReducer';
 
 // NOTE: control panel should be about stopping appointment. That means that the user should leave the house within 1 hour
 export default function ActiveAppointmentsPage(): JSX.Element {
+    const [cancelAppointmentConfirmDialogIsOpen, setCancelAppointmentConfirmDialogIsOpen] = useState(false);
+
     const { fetchSpacesByUserActiveAppointmentsSuccessResponse, fetchSpacesByUserActiveAppointmentsFailureResponse } =
         useSelector((state: IReduxState) => state.spaceStorage);
     const { myAppointmentsFinalLocationIsDefined } = useSelector((state: IReduxState) => state.commonStorage);
+
     const spaces = fetchSpacesByUserActiveAppointmentsSuccessResponse?.data;
-    const navigate = useNavigate();
+
     const dispatch = useDispatch();
+    const { spaceId } = useParams();
+    const navigate = useNavigate();
+
     const fetchSpacesForUserActiveAppointments = (): void => {
         dispatch(fetchSpacesByUserActiveAppointmentsAction());
+    };
+    const cancelAppointment = (): void => {
+        dispatch(deleteCancelAppointmentAction({ spaceId: spaceId! }));
     };
     const applyEffectsOnInit = (): void => {
         fetchSpacesForUserActiveAppointments();
@@ -46,6 +57,11 @@ export default function ActiveAppointmentsPage(): JSX.Element {
         dispatch(annualizeFetchSpacesForUserActiveAppointmentsResponsesAction());
         fetchSpacesForUserActiveAppointments();
     };
+
+    const toggleAppointmentConfirmDialog = (): void => {
+        setCancelAppointmentConfirmDialogIsOpen((prev) => !prev);
+    };
+
     const renderNoSpacesAppointedMessage = (): JSX.Element | void => {
         if (spaces?.length === 0) {
             return <p>Нет бронирований.</p>;
@@ -56,10 +72,19 @@ export default function ActiveAppointmentsPage(): JSX.Element {
             return <RefreshButton handleClick={handleRefreshButton} />;
         }
     };
-    const renderSpaces = (): JSX.Element[] => {
-        return spaces?.map((space: any, i: number) => {
-            return <Space space={space} index={i} key={i} />;
-        });
+    const renderCancelAppointmentDialog = (): JSX.Element | void => {
+        if (cancelAppointmentConfirmDialogIsOpen) {
+            return (
+                <ConfirmDialog
+                    question="Отменить бронирование?"
+                    positive="Да"
+                    negative="нет"
+                    handlePositiveClick={cancelAppointment}
+                    handleNegativeClick={toggleAppointmentConfirmDialog}
+                    handleCloseButtonClick={toggleAppointmentConfirmDialog}
+                />
+            );
+        }
     };
 
     useEffect(applyEffectsOnInit, []);
@@ -75,8 +100,17 @@ export default function ActiveAppointmentsPage(): JSX.Element {
             <div className="spaces-by-appointments">
                 <div className="spaces-with-active-appointments">
                     {renderNoSpacesAppointedMessage()}
-                    <AppointedSpaces spaces={spaces || []} />
+                    <AppointedSpaces
+                        spaces={spaces || []}
+                        appointmentControlDropdown={
+                            <AppointmentControlDropdown
+                                cancelAppointmentClassNames={'cancel-appointment-button'}
+                                cancelAppointment={toggleAppointmentConfirmDialog}
+                            />
+                        }
+                    />
                 </div>
+                {renderCancelAppointmentDialog()}
             </div>
             <div className="upcoming-appointments__reload"> {renderReloadOnError()}</div>
         </div>

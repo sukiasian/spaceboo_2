@@ -7,3 +7,17 @@
         color: red;
     }
 }
+
+.appointment-control-drop-down {
+    position: relative;
+    bottom: 344px;
+    left: 30px;
+
+    &-container {
+        position: absolute;
+    }
+}
+
+.spaces-with-appointments {
+    margin-top: 3rem;
+}

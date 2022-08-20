@@ -180,6 +180,20 @@ export default function ProvideSpaceForm(): JSX.Element {
             const { files } = e.target;
             const spaceImages = transformSpaceImagesFileListIntoArray(files);
 
+            // сюда добавить сведения о размере файлов
+
+            for (let i = 0; i < spaceImages.length; i++) {
+                const image = spaceImages[i];
+
+                if (image.size > 10485760) {
+                    spaceImages.splice(i, 1);
+                }
+            }
+
+            for (const image of spaceImages) {
+                console.log(image.size);
+            }
+
             if (
                 provideSpaceData?.spaceImages &&
                 provideSpaceData.spaceImages.length + files.length > imagesAmountAllowed

@@ -30,6 +30,7 @@ export default function AppointmentControlDropdown({
                     option.classNames || ''
                 }`}
                 onClick={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     option.handleClick();
                 }}
@@ -41,8 +42,16 @@ export default function AppointmentControlDropdown({
     });
 
     return (
-        <div className="drop-down appointment-control-drop-down" onClick={(e) => e.preventDefault()}>
-            <div className="appointment-control-options">{renderOptions}</div>
+        <div className="appointment-control-drop-down-container">
+            <div
+                className="drop-down appointment-control-drop-down"
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }}
+            >
+                <div className="appointment-control-options">{renderOptions}</div>
+            </div>
         </div>
     );
 }
