@@ -7,6 +7,7 @@ import SignupModal from '../modals/SignupModal';
 import { annualizeFetchLogoutResponseAction, fetchUserLoginStateAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { UrlPathname } from '../types/types';
+import BurgerMenu from './BurgerMenu';
 import CityPicker from './CityPicker';
 import UserAvatarOrInitials from './UserAvatarOrInitials';
 import UserDropdownMenu from './UserDropdownMenu';
@@ -175,6 +176,7 @@ export default function Navbar(): JSX.Element {
                 {renderAuthTabsOpeningModals()}
                 {renderAuthTabsLeadingToPages()}
                 {renderUserAvatarOrInitals()}
+                <BurgerMenu />
             </nav>
         </section>
     );

@@ -70,5 +70,3 @@ export const appConfig = SingletonFactory.produce<AppConfig>(AppConfig);
 
 appConfig.setupPassport();
 appConfig.configureApp();
-
-// export const app = appConfig.app;

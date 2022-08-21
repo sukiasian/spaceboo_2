@@ -1,4 +1,8 @@
 .slider {
+    @include respond(phone) {
+        display: none;
+    }
+
     width: 97vw;
     align-self: center;
     margin-top: 1rem;

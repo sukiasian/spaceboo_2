@@ -12,11 +12,11 @@ const logger = winston.createLogger({
             ),
         }),
         new winston.transports.File({
-            dirname: '../log',
+            dirname: './log',
             filename: 'error.log',
             level: 'error',
         }),
-        new winston.transports.File({ dirname: '../log', filename: 'info.log', level: 'info' }),
+        new winston.transports.File({ dirname: './log', filename: 'info.log', level: 'info' }),
     ],
 });
 
