@@ -148,6 +148,7 @@ export enum ErrorMessages {
     REQUIRED_DATES_ARE_MISSING = 'Пожалуйста, укажите интересующие даты',
     SPACE_ID_IS_MISSING = 'Укажите ID пространства.',
     WAIT_TO_ATTEMPT_AGAIN = 'Попробуйте через некоторое время.',
+    CREATE_SPACE_LIMIT_EXCEEDED = 'Лимит создания - 4 пространства в сутки.',
 }
 
 export enum Environment {
@@ -174,4 +175,5 @@ export enum SpaceFields {
 
 export enum RedisVariable {
     LOGIN_ATTEMPTS = 'login:attempts',
+    CREATE_SPACE_ATTEMPTS = 'create:space:attempts',
 }

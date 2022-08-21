@@ -8,7 +8,7 @@ import { router as appointmentRouter } from './routes/appointment.router';
 import { router as imageRouter } from './routes/image.router';
 import { router as emailVerificationRouter } from './routes/email-verification.router';
 import { router as cityRouter } from './routes/city.router';
-import { ApiRoutes } from './types/enums';
+import { ApiRoutes, Environment } from './types/enums';
 import globalErrorController from './controllers/error.controller';
 import { Singleton, SingletonFactory } from './utils/Singleton';
 import { User } from './models/user.model';
@@ -19,9 +19,11 @@ import { Appointment } from './models/appointment.model';
 import { EmailVerification } from './models/email-verification.model';
 import { District } from './models/district.model';
 import { Region } from './models/region.model';
+import cors = require('cors');
+import CorsConfig from './configurations/cors.config';
+import helmet from 'helmet';
 
 export class AppConfig extends Singleton {
-    private readonly passportConfig: PassportConfig = passportConfig;
     public readonly app: express.Express = express();
     public readonly sequelize: Sequelize = new Sequelize({
         dialect: 'postgres',
@@ -36,8 +38,15 @@ export class AppConfig extends Singleton {
         models: [District, Region, City, User, Space, Appointment, EmailVerification],
         logging: false,
     });
+    private readonly passportConfig: PassportConfig = passportConfig;
+    private readonly corsConfig: typeof CorsConfig = CorsConfig;
 
     public configureApp = (): void => {
+        if (process.env.NODE_ENV === Environment.PRODUCTION) {
+            this.app.use(cors(this.corsConfig.corsOptions));
+        }
+
+        this.app.use(helmet());
         this.app.use(express.json({ limit: '10Kb' })); // NOTE
         this.app.use(express.static('assets/images'));
         this.app.use(cookieParser());

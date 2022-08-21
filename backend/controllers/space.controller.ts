@@ -1,12 +1,15 @@
 import { Singleton, SingletonFactory } from '../utils/Singleton';
 import { spaceSequelizeDao, SpaceSequelizeDao } from '../daos/space.sequelize.dao';
 import UtilFunctions from '../utils/UtilFunctions';
-import { ErrorMessages, HttpStatus, ResponseMessages } from '../types/enums';
+import { Environment, ErrorMessages, HttpStatus, RedisVariable, ResponseMessages } from '../types/enums';
 import AppError from '../utils/AppError';
+import { redis } from '../Redis';
 
 export class SpaceController extends Singleton {
     private readonly dao: SpaceSequelizeDao = spaceSequelizeDao;
     private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
+    private readonly redisClient = redis.client;
+    private readonly createSpaceAttemptsPerDay = '4';
 
     public provideSpace = this.utilFunctions.catchAsync(async (req, res, next) => {
         const { id: userId } = req.user;
@@ -98,6 +101,32 @@ export class SpaceController extends Singleton {
         await this.dao.deleteSpaceById(spaceId);
 
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.SPACE_DELETED);
+    });
+
+    public checkAttempts = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        const { id: userId } = req.user;
+
+        const createSpaceAttemptsKey = `${RedisVariable.CREATE_SPACE_ATTEMPTS}:${userId}`;
+        const createSpaceAttemptsValue = await this.redisClient.get(createSpaceAttemptsKey);
+
+        if (createSpaceAttemptsValue === null) {
+            await this.redisClient.set(createSpaceAttemptsKey, '1');
+        } else if (createSpaceAttemptsValue === this.createSpaceAttemptsPerDay) {
+            await this.redisClient.setEx(
+                createSpaceAttemptsKey,
+                process.env.NODE_ENV === Environment.DEVELOPMENT ? 10 : 60 * 60 * 24,
+                this.createSpaceAttemptsPerDay
+            );
+
+            throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.CREATE_SPACE_LIMIT_EXCEEDED);
+        } else {
+            await this.redisClient.set(
+                createSpaceAttemptsKey,
+                `${this.utilFunctions.makeDecimal(createSpaceAttemptsValue) + 1}`
+            );
+        }
+
+        next();
     });
 }
 

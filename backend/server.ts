@@ -8,6 +8,7 @@ import databaseConnection from './database/connectToDb';
 import { Singleton, SingletonFactory } from './utils/Singleton';
 import setCrons from './crons';
 import { redis } from './Redis';
+import { CorsOptions } from 'cors';
 
 class Server extends Singleton {
     public readonly redis = redis;

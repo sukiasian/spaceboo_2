@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import * as passport from 'passport';
-import { imageUpload } from '../configurations/storage.config';
 import { ImageController, imageController } from '../controllers/image.controller';
 import { SpaceController, spaceController } from '../controllers/space.controller';
 import { PassportStrategies } from '../types/enums';
@@ -20,6 +19,7 @@ class SpaceRouter extends Singleton implements IRouter {
             .route('/')
             .post(
                 this.passport.authenticate(PassportStrategies.JWT, { session: false }),
+                this.spaceController.checkAttempts,
                 this.imageController.uploadSpaceImagesToStorage,
                 this.spaceController.provideSpace,
                 this.imageController.updateSpaceImagesInDb
