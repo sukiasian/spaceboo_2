@@ -1,0 +1,74 @@
+.user-panel {
+    display: flex;
+    padding: 0.4rem 1rem;
+    justify-content: space-around;
+    align-items: center;
+    position: fixed;
+    top: 95vh;
+    background-color: $color-white;
+    width: 100vw;
+    box-shadow: $box-shadow;
+
+    &__elem {
+        width: 25px;
+        height: 25px;
+
+        &.my-appointments-button {
+            background-image: url('../../assets/user-panel/my-appointments.png');
+            background-size: cover;
+
+            &--active {
+                background-image: url('../../assets/user-panel/my-appointments-active.png');
+            }
+        }
+
+        &.my-spaces-button {
+            background-image: url('../../assets/user-panel/my-spaces.svg');
+            background-size: 25px 25px;
+            background-repeat: no-repeat;
+
+            &--active {
+                background-image: url('../../assets/user-panel/my-spaces-active.svg');
+            }
+        }
+
+        &.provide-space-button {
+            background-image: url('../../assets/user-panel/provide-space.png');
+            background-size: cover;
+
+            &--active {
+                background-image: url('../../assets/user-panel/provide-space-active.png');
+            }
+        }
+
+        &.keys-button {
+            background-image: url('../../assets/user-panel/key.png');
+            background-size: cover;
+
+            &--active {
+                background-image: url('../../assets/user-panel/key-active.png');
+            }
+        }
+
+        & .burger-menu {
+            width: 25px;
+            height: 25px;
+            border-radius: 7px;
+            box-shadow: none;
+            padding: 0.2rem;
+            justify-content: space-evenly;
+            background-color: $color-grey-dark-1;
+            z-index: 0;
+            &__stripe {
+                height: 14px;
+                width: 1px;
+            }
+
+            &--active {
+                & .burger-menu__stripe {
+                    background-color: $color-white;
+                }
+            }
+        }
+    }
+}

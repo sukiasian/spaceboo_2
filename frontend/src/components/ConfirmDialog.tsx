@@ -1,6 +1,6 @@
-import { RefObject, useEffect } from 'react';
+import { RefObject } from 'react';
+import DarkScreen from '../hoc/DarkScreen';
 import RemoveIcon from '../icons/RemoveIcon';
-import { EventKey } from '../types/types';
 
 interface IConfirmDialogProps {
     question: string;
@@ -15,28 +15,8 @@ interface IConfirmDialogProps {
 export default function ConfirmDialog(props: IConfirmDialogProps): JSX.Element {
     const { question, positive, negative, handlePositiveClick, handleNegativeClick, handleCloseButtonClick } = props;
 
-    const closeDialogOnEscapePress = (e: KeyboardEvent) => {
-        if (e.key === EventKey.ESCAPE) {
-            handleCloseButtonClick(e);
-        }
-    };
-    const applyEffectsOnInit = (): (() => void) => {
-        document.addEventListener('keydown', closeDialogOnEscapePress);
-
-        return () => {
-            document.removeEventListener('keydown', closeDialogOnEscapePress);
-        };
-    };
-
-    useEffect(applyEffectsOnInit, []);
-
     return (
-        <div
-            className="dark-screen"
-            onClick={() => {
-                handleCloseButtonClick();
-            }}
-        >
+        <DarkScreen handleCloseButtonClick={handleCloseButtonClick}>
             <div className="confirm-dialog" onClick={(e) => e.stopPropagation()}>
                 <RemoveIcon handleClick={handleCloseButtonClick} />
                 <div className="question-container">
@@ -51,6 +31,6 @@ export default function ConfirmDialog(props: IConfirmDialogProps): JSX.Element {
                     </div>
                 </div>
             </div>
-        </div>
+        </DarkScreen>
     );
 }

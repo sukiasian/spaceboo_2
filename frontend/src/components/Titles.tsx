@@ -9,19 +9,13 @@ interface ITitleProps extends IComponentClassNameProps {
 export default function Titles(props: ITitleProps): JSX.Element {
     const renderParagraph = (): JSX.Element | void => {
         if (props.paragraph) {
-            return (
-                <div className="titles__paragraph-container">
-                    <p className="paragraph paragraph--light titles__paragraph">{props.paragraph}</p>{' '}
-                </div>
-            );
+            return <p className="paragraph paragraph--light titles__paragraph">{props.paragraph}</p>;
         }
     };
 
     return (
         <div className={`titles ${props.mainDivClassName ?? ''}`}>
-            <div className="titles__heading-container">
-                <h1 className="heading heading--primary titles__heading">{props.heading}</h1>
-            </div>
+            <h1 className="heading heading--primary titles__heading">{props.heading}</h1>
             {renderParagraph()}
             {props.children}
         </div>

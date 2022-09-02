@@ -1,5 +1,6 @@
 import { ChangeEventHandler } from 'react';
 import { IComponentClassNameProps } from '../types/types';
+import RequiredField from './RequiredField';
 
 export enum InputType {
     PASSWORD = 'password',
@@ -43,17 +44,16 @@ export default function InputWithLabel(props: IInputWithLableProps) {
     const autoComplete = props.inputAutoComplete || InputAutoCompleteOption.OFF;
     const renderRequiredField = (): JSX.Element | void => {
         if (props.isRequiredField) {
-            return <span className="required-field">*</span>;
+            return <RequiredField />;
         }
     };
     return (
-        <div className={`${props.mainDivClassName}-input-container`}>
-            <label>
+        <div className={`input-container ${props.mainDivClassName}-input-container`}>
+            <label className={`label label--${props.inputClassName}`}>
                 {props.inputLabel}
                 {renderRequiredField()}
             </label>
             <input
-                className={`label label--${props.inputClassName}`}
                 type={inputType}
                 name={props.inputName}
                 placeholder={props.inputPlaceholder}

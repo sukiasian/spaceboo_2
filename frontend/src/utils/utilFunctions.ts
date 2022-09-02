@@ -78,3 +78,62 @@ export const createDateRangeWithTimestamp = (year: number, month: number, lastDa
 
     return `[${year}-${month}-01T14:00:00.000Z, ${year}-${month}-${lastDayOfMonth}T14:00:00.000Z]`;
 };
+
+export const turnOffScrollingOnInit = (): (() => void) => {
+    var keys = { 37: 1, 38: 1, 39: 1, 40: 1 };
+
+    const preventDefault = (e: Event) => {
+        e.preventDefault();
+    };
+
+    function preventDefaultForScrollKeys(e: any) {
+        // @ts-ignore
+        if (keys[e.keyCode]) {
+            e.preventDefault(e);
+            return false;
+        }
+    }
+
+    let supportsPassive = false;
+
+    try {
+        // @ts-ignore
+        window.addEventListener(
+            'test',
+            null,
+            Object.defineProperty({}, 'passive', {
+                get: function () {
+                    supportsPassive = true;
+                },
+            })
+        );
+    } catch (e) {}
+
+    const wheelOpt = supportsPassive ? { passive: false } : false;
+    const wheelEvent = 'onwheel' in document.createElement('div') ? 'wheel' : 'mousewheel';
+
+    // call this to Disable
+    const disableScroll = (): void => {
+        window.addEventListener('DOMMouseScroll', preventDefault, false);
+        window.addEventListener(wheelEvent, preventDefault, wheelOpt);
+        window.addEventListener('touchmove', preventDefault, wheelOpt);
+        window.addEventListener('keydown', preventDefaultForScrollKeys, false);
+    };
+
+    const enableScroll = (): void => {
+        window.removeEventListener('DOMMouseScroll', preventDefault, false);
+        window.removeEventListener(wheelEvent, preventDefault);
+        window.removeEventListener('touchmove', preventDefault);
+        window.removeEventListener('keydown', preventDefaultForScrollKeys, false);
+    };
+
+    disableScroll();
+
+    return () => {
+        enableScroll();
+    };
+};
+
+export const isMobile = (): boolean => {
+    return window.innerWidth <= 600 ?? false;
+};

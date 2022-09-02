@@ -1,12 +1,13 @@
 #logo {
-    align-self: flex-start;
-    width: 200px;
-    height: 40px;
-    margin-top: 0.9rem;
+    width: 320px;
     pointer-events: none;
 
     text {
         color: blue;
+    }
+
+    @include respond(phone) {
+        width: 250px;
     }
 }
 
@@ -26,8 +27,8 @@
     margin-left: -5rem;
 }
 
-svg {
-    font-family: SukhumvitSet-Medium;
+.svg-container {
+    margin-top: 8px;
 }
 
 .navbar {
@@ -39,21 +40,10 @@ svg {
     box-shadow: 0 0 1px 3px rgba(209, 209, 209, 0.2);
     padding: 0.5rem 1.5rem;
     border-radius: 4px;
+    background-color: $color-white;
 
-    &-elem {
-        &--1 {
-            width: 100px;
-        }
-
-        &--2 {
-            width: 100px;
-        }
-
-        h3:hover {
-            color: $color-primary-1;
-            transition: 0.1s;
-            cursor: pointer;
-        }
+    @include respond(phone) {
+        justify-content: center;
     }
 
     &-link {
@@ -86,6 +76,32 @@ svg {
             border-radius: 100px;
         }
     }
+
+    &-section {
+        &.fixed {
+            width: 100vw;
+        }
+
+        position: fixed;
+        width: 100vw;
+        z-index: 1000;
+    }
+
+    &__elem {
+        & .burger-menu {
+            @include respond(phone) {
+                margin-top: 85vh;
+                right: 5%;
+            }
+        }
+    }
+}
+
+#navbar-container-for-fixed {
+    width: 100vw;
+    height: 60px;
+    // top: 0;
+    // height: 0;
 }
 
 .active {
@@ -98,24 +114,19 @@ svg {
     }
 
     padding: 0.4rem 1.2rem;
+
+    @include respond(tab-port) {
+        background-color: transparent !important;
+        border: none;
+        background-image: url('../../assets/icons/icon-add-hover.png') !important;
+        background-size: cover;
+        width: 2.5rem;
+        height: 2.5rem;
+        padding: 0 !important;
+        color: transparent !important;
+    }
 }
 
-.burger-menu {
-    padding: 0.5rem;
-    border: 1px solid black;
-    display: none;
-    width: 50px;
-    height: 50px;
-
-    &__stripe {
-        background-color: black;
-        width: 1px;
-        height: 8px;
-        padding: 2px;
-    }
-
-    @include respond(phone) {
-        display: flex;
-        justify-content: space-between;
-    }
+.provide-space-button-container {
+    @include hide-phone;
 }

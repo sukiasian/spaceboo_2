@@ -1,0 +1,24 @@
+.login-form {
+    & .input-container {
+        margin-bottom: 1rem;
+    }
+}
+
+.modal .auth-form-container .auth-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    & .input-container {
+        align-items: center;
+
+        & label {
+            margin-bottom: 0.5rem;
+        }
+    }
+}
+
+.auth-form .input-container input {
+    width: 200px;
+}

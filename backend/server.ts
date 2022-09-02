@@ -8,7 +8,6 @@ import databaseConnection from './database/connectToDb';
 import { Singleton, SingletonFactory } from './utils/Singleton';
 import setCrons from './crons';
 import { redis } from './Redis';
-import { CorsOptions } from 'cors';
 
 class Server extends Singleton {
     public readonly redis = redis;
@@ -54,4 +53,6 @@ Server.configureDotenv();
 const server = SingletonFactory.produce<Server>(Server);
 
 server.startCrons();
+// NOTE remove method after dockerization
+server.redis.startRedisServerOnMachine();
 server.start();

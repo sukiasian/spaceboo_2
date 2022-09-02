@@ -89,7 +89,7 @@ export default function QueriedSpaces(): JSX.Element {
     useEffect(handleScrollForFetchingSpaces, [fetchedSpaces]);
 
     return (
-        <section className="spaces-section page-box">
+        <section className="spaces-section">
             <div className="spaces" ref={spacesRef}>
                 {renderSpaces()}
             </div>

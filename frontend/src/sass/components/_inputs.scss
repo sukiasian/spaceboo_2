@@ -20,6 +20,11 @@ textarea {
     box-sizing: border-box;
     width: 170px;
     outline: 2px solid $color-primary-2;
+
+    &-container {
+        display: flex;
+        flex-direction: column;
+    }
 }
 
 select {

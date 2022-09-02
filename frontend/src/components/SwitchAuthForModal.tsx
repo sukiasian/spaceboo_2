@@ -20,14 +20,16 @@ interface ISwitchTypeOfAuthProps extends IComponentClassNameProps {
 }
 
 export function SwitchAuthForModal(props: ISwitchTypeOfAuthProps): JSX.Element {
-    const dispatch = useDispatch();
     const { loginModalIsOpen, signupModalIsOpen } = useSelector((state: IReduxState) => state.modalStorage);
+
+    const dispatch = useDispatch();
 
     return (
         <div className={`authorization-counter-action authorization-counter-action--${props.mainDivClassName}`}>
             <p className="paragraph">
                 {props.switchQuestion}{' '}
                 <span
+                    className="auth-modal-call-to-action"
                     onClick={toggleLoginOrSignupModal(
                         props.openingModalAction,
                         props.closingModalAction,

@@ -6,6 +6,11 @@
         grid-template-rows: 1fr;
         grid-template-columns: 2fr 2fr;
         grid-gap: 5rem;
+
+        @include respond(phone) {
+            display: flex;
+            flex-direction: column;
+        }
     }
 }
 

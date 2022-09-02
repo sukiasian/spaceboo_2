@@ -101,23 +101,23 @@ export default function SpacePage(): JSX.Element {
             }
         };
     };
-    const closeConfirmDialogOnOutsideClick = (e: MouseEvent) => {
-        if (e.target !== confirmDialogRef.current) {
-            toggleDeleteSpaceConfirm();
-        }
-    };
+    // const closeConfirmDialogOnOutsideClick = (e: MouseEvent) => {
+    //     if (e.target !== confirmDialogRef.current) {
+    //         toggleDeleteSpaceConfirm();
+    //     }
+    // };
     const annualizeDeleteSpaceResponses = (): void => {
         dispatch(annualizeDeleteSpaceResponsesAction());
     };
-    const applyConfirmDialogEvents = (): (() => void) => {
-        if (deleteSpaceConfirmIsOpen) {
-            window.addEventListener('click', closeConfirmDialogOnOutsideClick);
-        }
+    // const applyConfirmDialogEvents = (): (() => void) => {
+    //     if (deleteSpaceConfirmIsOpen) {
+    //         window.addEventListener('click', closeConfirmDialogOnOutsideClick);
+    //     }
 
-        return () => {
-            window.removeEventListener('click', closeConfirmDialogOnOutsideClick);
-        };
-    };
+    //     return () => {
+    //         window.removeEventListener('click', closeConfirmDialogOnOutsideClick);
+    //     };
+    // };
     const toggleDatePicker: MouseEventHandler = () => {
         setDatePickerIsOpen((prev) => !prev);
     };
@@ -330,7 +330,7 @@ export default function SpacePage(): JSX.Element {
     useEffect(redirectIfSpaceIsNotFound, [fetchSpaceByIdFailureResponse, navigate]);
     useEffect(applyModalEventListenersEffects, [editSpaceModalIsOpen]);
     useEffect(redirectIfSpaceIsDeleted, [deleteSpaceSuccessResponse]);
-    useEffect(applyConfirmDialogEvents);
+    // useEffect(applyConfirmDialogEvents);
 
     return (
         <div className="page space-page">

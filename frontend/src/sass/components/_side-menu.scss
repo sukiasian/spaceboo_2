@@ -1,0 +1,23 @@
+.side-menu {
+    position: fixed;
+    background-color: $color-white;
+    width: 70%;
+    top: 60px;
+    height: calc(100vh - 60px);
+    right: 0;
+    border-radius: 25px 0 0 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: $box-shadow;
+
+    &-container {
+        display: none;
+        position: relative;
+
+        @include respond(phone) {
+            display: block;
+        }
+    }
+}

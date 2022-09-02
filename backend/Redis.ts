@@ -1,5 +1,8 @@
 import { createClient } from 'redis';
+import * as childProcess from 'child_process';
+import { promisify } from 'util';
 import logger from './loggers/logger';
+import { Environment } from './types/enums';
 
 class Redis {
     public readonly client = createClient();
@@ -13,6 +16,26 @@ class Redis {
         });
 
         await this.client.connect();
+    };
+
+    private executeCommand = (command: string): Promise<{ stdout: string; stderr: string }> => {
+        if (process.env.NODE_ENV === Environment.DEVELOPMENT) {
+            try {
+                const exec = promisify(childProcess.exec);
+
+                return exec(command);
+            } catch (err) {
+                this.logger.error(err);
+            }
+        }
+    };
+
+    public startRedisServerOnMachine = (): void => {
+        this.executeCommand('redis-cli shutdown & redis-server');
+    };
+
+    public shutdownRedisServerOnMachine = async (): Promise<void> => {
+        this.executeCommand('redis-cli shutdown');
     };
 }
 

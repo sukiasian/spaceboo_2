@@ -28,3 +28,9 @@
         }
     }
 }
+
+@mixin hide-phone() {
+    @include respond(phone) {
+        display: none;
+    }
+}

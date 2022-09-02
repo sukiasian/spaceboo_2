@@ -2,14 +2,12 @@
     overflow: hidden;
     transition: 0.2s;
 
-    @include respond(phone) {
-        font-size: 0.7rem;
-    }
-
     &-content {
         padding: 2rem;
         background-color: $color-footer;
         border-radius: 4px;
+
+        @include hide-phone;
     }
 
     &-section {
@@ -20,21 +18,25 @@
         }
     }
 
-    &-link {
-        color: $color-white;
-
-        &:hover {
-            color: $color-primary-1-lightened;
-        }
-
-        &:active {
-            color: $color-primary-1;
-        }
-    }
-
     &-links {
         margin-left: 1rem;
         margin-top: 1rem;
+
+        & > * > a {
+            &,
+            &:visited {
+                font-size: 1.1rem;
+                color: $color-white;
+            }
+
+            &:hover {
+                color: $color-primary-1-lightened;
+            }
+
+            &:active {
+                color: $color-primary-1;
+            }
+        }
     }
 
     &-sections {

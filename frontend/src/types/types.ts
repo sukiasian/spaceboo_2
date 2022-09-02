@@ -289,6 +289,10 @@ export enum UrlPathname {
     PROVIDE_SPACE = '/provide-space',
     HOW_IT_WORKS = '/how-it-works',
     SPACES = '/spaces',
+    CONTACT = '/contact',
+    FOR_INVESTORS = '/for-investors',
+    MY_APPOINTMENTS = '/my-appointments',
+    KEYS = '/keys',
 }
 
 export enum QueryDefaultValue {
@@ -298,8 +302,8 @@ export enum QueryDefaultValue {
 }
 
 export type TActiveTab = {
-    defineActiveClassName: (url: string) => string | undefined;
-    handleActiveTab: (url: string) => void;
+    defineActiveClassName?: (url: string) => string | undefined;
+    handleActiveTab?: (url: string) => void;
 };
 
 export interface IArrowIconProps {

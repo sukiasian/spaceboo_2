@@ -9,6 +9,7 @@ import { LocalStorageItem } from '../types/types';
 import { handleFormSubmit } from '../utils/utilFunctions';
 import { postSignupUserAction } from '../redux/actions/authActions';
 import Alert from '../components/Alert';
+import AltButton from '../components/AltButton';
 
 export interface ISignupData {
     [key: keyof IFormInputs]: string | undefined;
@@ -156,12 +157,16 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
 
     // TODO validators!
     return (
-        <div className="signup-form-container">
-            <form className="signup-form" onSubmit={handleFormSubmit}>
+        <div className="form-container auth-form-container signup-form-container">
+            <form className="form auth-form signup-form" onSubmit={handleFormSubmit}>
                 {renderInputs()}
-                <button className="button--primary" onClick={handleSignupButton}>
-                    Зарегистрироваться
-                </button>
+
+                <AltButton
+                    buttonText="Зарегистрироваться"
+                    mainDivClassName="button--primary"
+                    handleClick={handleSignupButton}
+                />
+
                 {renderFirstDbErrorAlert()}
                 <div>{loading ? 'loading...' : 'loaded!'}</div>
             </form>

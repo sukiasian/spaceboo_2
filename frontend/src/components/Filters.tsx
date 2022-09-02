@@ -34,7 +34,6 @@ export interface IQueryData extends IDatesRange {
     endingTime?: string;
     cityId?: string;
 }
-
 export enum FilterNames {
     SORT_BY = 'sortBy',
     PRICE = 'price',
@@ -58,6 +57,9 @@ export default function Filters(): JSX.Element {
     const [sortByDropDownBoxIsOpen, setSortByDropDownBoxIsOpen] = useState(false);
     const [priceRangeDropDownBoxIsOpen, setPriceRangeDropDownBoxIsOpen] = useState(false);
     const [requiredReservationDatesPickerIsOpen, setRequiredReservationDatesPickerIsOpen] = useState(false);
+
+    const { fetchSpacesQueryData } = useSelector((state: IReduxState) => state.spaceStorage);
+
     const sortByDropDownOptions: ISortByDropDownOptions[] = [
         {
             field: SpaceQuerySortFields.PRICEDOWN,
@@ -76,11 +78,6 @@ export default function Filters(): JSX.Element {
             text: 'Сначала новые',
         },
     ];
-    const { fetchSpacesQueryData } = useSelector((state: IReduxState) => state.spaceStorage);
-    const sortByRef = useRef<HTMLDivElement>(null);
-    const priceRangeRef = useRef<HTMLDivElement>(null);
-    const datePickerRef = useRef<HTMLDivElement>(null);
-    const annualizeDatesIconRef = useRef<HTMLDivElement>(null);
     const priceRangeInputs: IPriceRangeInput[] = [
         {
             inputLabel: 'От',
@@ -97,7 +94,14 @@ export default function Filters(): JSX.Element {
             priceRangeQueryDataReference: PriceRangeQueryDataReferences.PRICE_TO,
         },
     ];
+
+    const sortByRef = useRef<HTMLDivElement>(null);
+    const priceRangeRef = useRef<HTMLDivElement>(null);
+    const datePickerRef = useRef<HTMLDivElement>(null);
+    const annualizeDatesIconRef = useRef<HTMLDivElement>(null);
+
     const dispatch = useDispatch();
+
     const applyCloseSortByEvents = (): (() => void) => {
         if (sortByDropDownBoxIsOpen) {
             document.addEventListener('click', closeSortByOnOutsideClick);
@@ -125,6 +129,7 @@ export default function Filters(): JSX.Element {
             document.removeEventListener('click', closeDatePickerOnOutsideClick);
         };
     };
+
     const prepareNewFetchSpacesQueryDataForApplyingSortByFilter = () => {
         if (sortByQueryOption) {
             const newQueryData: IQueryData = { ...fetchSpacesQueryData! };
@@ -135,11 +140,19 @@ export default function Filters(): JSX.Element {
             dispatch(setFetchSpacesQueryDataAction(newQueryData));
         }
     };
+
     const toggleFilterBoxIsOpen = (filter: FilterNames): MouseEventHandler => {
         return (e): void => {
             switch (filter) {
                 case FilterNames.SORT_BY:
                     setSortByDropDownBoxIsOpen((prev) => !prev);
+
+                    if (priceRangeDropDownBoxIsOpen) {
+                        setPriceRangeDropDownBoxIsOpen(false);
+                    }
+                    if (requiredReservationDatesPickerIsOpen) {
+                        setRequiredReservationDatesPickerIsOpen(false);
+                    }
 
                     break;
 
@@ -165,11 +178,9 @@ export default function Filters(): JSX.Element {
         }
     };
     const updateQueryDataPriceRange: ChangeEventHandler<HTMLInputElement> = (e) => {
-        const newQueryData: any = { ...fetchSpacesQueryData };
         const { value } = e.currentTarget;
         const priceRangeQueryDataReference = e.currentTarget.getAttribute('data-tag');
 
-        // newQueryData[priceRangeQueryDataReference as string] = value;
         const newPriceRange: IPriceRange = { ...priceRange };
 
         newPriceRange[priceRangeQueryDataReference as keyof IPriceRange] = value;
@@ -180,8 +191,6 @@ export default function Filters(): JSX.Element {
 
                 return;
             }
-
-            // dispatch(setFetchSpacesQueryDataAction(newQueryData));
         }
 
         dispatch(annualizeFetchSpacesResponsesAction());
@@ -236,6 +245,7 @@ export default function Filters(): JSX.Element {
             setRequiredReservationDatesPickerIsOpen(false);
         }
     };
+
     const renderSortByFilterDropDown = (): JSX.Element | void => {
         if (sortByDropDownBoxIsOpen) {
             const sortByDropDownOptionsRender = sortByDropDownOptions.map(

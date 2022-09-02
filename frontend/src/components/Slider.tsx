@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { UrlPathname } from '../types/types';
+import { isMobile } from '../utils/utilFunctions';
 import AltButton, { IAltButtonProps } from './AltButton';
 
 interface ISliderProps {
@@ -29,7 +30,7 @@ document.addEventListener("visibilitychange", (event) => {
   }
 });
 */
-export default function Slider(props: ISliderProps): JSX.Element {
+export default function Slider(props: ISliderProps): JSX.Element | null {
     const buttonToHowItWorks: ISlideButton = {
         to: UrlPathname.HOW_IT_WORKS,
         buttonText: 'Узнать больше',
@@ -82,21 +83,23 @@ export default function Slider(props: ISliderProps): JSX.Element {
     };
 
     const changeSliderImage = (): void => {
-        sliderImageRef.current!.style.background = `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/images/slider/${slides[indexOfActiveImage].imageUrl}')`;
-        sliderImageRef.current!.style.backgroundColor = 'rgba(96, 96, 96, 0.5)';
-        sliderImageRef.current!.style.height = '400px';
+        if (sliderImageRef.current && opacityChangeRef.current && sliderImageRef && sliderImageContentMessageRef) {
+            sliderImageRef.current!.style.background = `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/images/slider/${slides[indexOfActiveImage].imageUrl}')`;
+            sliderImageRef.current!.style.backgroundColor = 'rgba(96, 96, 96, 0.5)';
+            sliderImageRef.current!.style.height = '400px';
 
-        let opacity = 0.5;
+            let opacity = 0.5;
 
-        opacityChangeRef.current = setInterval(() => {
-            if (opacity < 1) {
-                opacity += 0.001;
-                sliderImageRef.current!.style.opacity = `${opacity}`;
-                sliderImageContentMessageRef.current!.style.opacity = `${opacity}`;
-            } else {
-                clearInterval(opacityChangeRef.current!);
-            }
-        }, 0);
+            opacityChangeRef.current = setInterval(() => {
+                if (opacity < 1) {
+                    opacity += 0.001;
+                    sliderImageRef.current!.style.opacity = `${opacity}`;
+                    sliderImageContentMessageRef.current!.style.opacity = `${opacity}`;
+                } else {
+                    clearInterval(opacityChangeRef.current!);
+                }
+            }, 0);
+        }
     };
     const handleSliderImageFromMoveStatusBarOnClick = (i: number): (() => void) => {
         return (): void => {
@@ -163,16 +166,17 @@ export default function Slider(props: ISliderProps): JSX.Element {
         );
     };
 
-    useEffect(applyEffectsOnInit, []);
-    useEffect(changeSliderImage, [indexOfActiveImage]);
+    // useEffect(applyEffectsOnInit, []);
+    // useEffect(changeSliderImage, [indexOfActiveImage]);
 
-    return (
-        <section className="slider-section">
-            <div className="slider">
-                <div className="slider__image" ref={sliderImageRef}>
-                    {renderSlideContent() as JSX.Element}
-                </div>
-            </div>
-        </section>
-    );
+    // return !isMobile() ? (
+    //     <section className="slider-section">
+    //         <div className="slider">
+    //             <div className="slider__image" ref={sliderImageRef}>
+    //                 {renderSlideContent() as JSX.Element}
+    //             </div>
+    //         </div>
+    //     </section>
+    // ) : null;
+    return null;
 }

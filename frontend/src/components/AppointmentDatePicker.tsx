@@ -500,17 +500,11 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
                                             ranges.push(`${date.getFullYear()}, ${date.getMonth()}`);
                                         }
                                     }
-                                    console.log(dates);
 
                                     ranges.forEach((range, i) => {
                                         if (parsedAppointmentsList[range]) {
                                             dates.forEach((date) => {
                                                 for (const appointmentsForPeriod of parsedAppointmentsList[range]) {
-                                                    console.log(
-                                                        date,
-                                                        new Date(appointmentsForPeriod.endingDateWithTimestamp)
-                                                    );
-
                                                     if (
                                                         date >=
                                                             new Date(

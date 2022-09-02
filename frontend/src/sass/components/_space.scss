@@ -1,14 +1,42 @@
 .spaces {
     display: grid;
+    padding: 2rem;
     grid-template-rows: max-content;
     grid-template-columns: repeat(3, 23rem);
     gap: 3rem;
     min-height: 22rem;
+
+    @include respond(big-desktop) {
+        grid-template-columns: repeat(4, 23rem);
+    }
+
+    @include respond(tab-land) {
+        grid-template-columns: repeat(2, 23rem);
+    }
+
+    @include respond(tab-port) {
+        grid-template-columns: repeat(2, 18rem);
+        justify-content: center;
+    }
+
+    @include respond(phone) {
+        grid-template-columns: 15rem;
+    }
+
+    &-page-box {
+        width: 90%;
+    }
 }
 
 .space-card {
+    background-color: white;
+    border-radius: $box-border-radius;
+
+    &__content {
+    }
+
     &__image {
-        width: 20rem;
+        width: 100%;
         height: 16rem;
         border-radius: $box-border-radius;
         object-fit: cover;

@@ -1,24 +1,23 @@
 import { NavLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import {
-    annualizeFetchLogoutResponseAction,
-    fetchUserLoginStateAction,
-    postLogoutUserAction,
-} from '../redux/actions/authActions';
-import { useEffect } from 'react';
+
 import { ITab } from '../types/types';
 import { toggleMyAppointmentsFinalLocationIsDefined } from '../redux/actions/commonActions';
+import LogoutButton from '../buttons/LogoutButton';
 
 export default function UserDropdownMenu(): JSX.Element {
     const { fetchCurrentUserSuccessResponse } = useSelector((state: IReduxState) => state.userStorage);
-    const { fetchLogoutUserSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
+
+    const dispatch = useDispatch();
+
     const userData = fetchCurrentUserSuccessResponse?.data;
     const userFullName = userData ? `${userData!.name} ${userData!.surname}` : '';
-    const dispatch = useDispatch();
+
     const setFinalLocationFalsy = () => {
         dispatch(toggleMyAppointmentsFinalLocationIsDefined());
     };
+
     const dropdownLinkableTabs: ITab[] = [
         {
             tabName: 'Мои пространства',
@@ -38,15 +37,7 @@ export default function UserDropdownMenu(): JSX.Element {
             id: 'user-dropdown-menu__my-keys',
         },
     ];
-    const handleLogout = (): void => {
-        dispatch(postLogoutUserAction());
-    };
-    const refreshUserLoggedInAfterLogout = (): void => {
-        if (fetchLogoutUserSuccessResponse) {
-            dispatch(fetchUserLoginStateAction());
-            dispatch(annualizeFetchLogoutResponseAction());
-        }
-    };
+
     const renderTabs = (): JSX.Element[] => {
         return dropdownLinkableTabs.map((linkableTab, i: number) => {
             return (
@@ -64,9 +55,6 @@ export default function UserDropdownMenu(): JSX.Element {
             );
         });
     };
-
-    // useEffect(addSeparators, []);
-    useEffect(refreshUserLoggedInAfterLogout, [fetchLogoutUserSuccessResponse, dispatch]);
 
     return (
         <div className="user-drop-down-menu">
@@ -93,12 +81,7 @@ export default function UserDropdownMenu(): JSX.Element {
                 id="user-drop-down-menu-section-2"
                 className="user-drop-down-menu-section user-drop-down-menu-section--2"
             >
-                <div
-                    className={`user-drop-down-menu__item user-drop-down-menu__item--${dropdownLinkableTabs.length}`}
-                    onClick={handleLogout}
-                >
-                    <p className="paragraph">Выход</p>
-                </div>
+                <LogoutButton />
             </div>
         </div>
     );

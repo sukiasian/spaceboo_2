@@ -281,13 +281,6 @@ export default function EditUserInputs(): JSX.Element {
             setValidationErrorIsActive(true);
         }
     }, [validationError]);
-    // useEffect(() => {
-    //     if (validationErrorIsActive) {
-    //         console.log('since validation error is active we create a timeoutww');
-
-    //         // setTimeout(() => setValidationErrorIsActive(false), 3000);
-    //     }
-    // }, [validationErrorIsActive]);
 
     return (
         <>

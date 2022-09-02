@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Dispatch } from 'redux';
 import Footer from './components/Footer';
 import Navbar from './components/Navbar';
+import UserPanel from './components/UserPanel';
 import { IAction } from './redux/actions/ActionTypes';
 import { fetchUserLoginStateAction } from './redux/actions/authActions';
 import { fetchCitiesAction } from './redux/actions/cityActions';
@@ -10,6 +11,7 @@ import { fetchCurrentUserAction } from './redux/actions/userActions';
 import { IReduxState } from './redux/reducers/rootReducer';
 import Routes from './routes/AppRoutes';
 import './sass/main.scss';
+import { isMobile } from './utils/utilFunctions';
 
 function App(): JSX.Element {
     const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
@@ -41,9 +43,7 @@ function App(): JSX.Element {
                 <Navbar />
                 <Routes />
             </div>
-            <section className="footer-section">
-                <Footer />
-            </section>
+            {isMobile() ? <UserPanel /> : <Footer />}
         </div>
     );
 }

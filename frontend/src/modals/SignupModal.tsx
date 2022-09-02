@@ -20,7 +20,7 @@ export default function SignupModal(props: ISignupModalProps): JSX.Element {
         }
     };
     const handleSignupButton = (): void => {
-        props.handleActiveTab('signup');
+        props.handleActiveTab!('signup');
         openSignupModal();
     };
     const handleAfterSignup = (): void => {
@@ -31,7 +31,7 @@ export default function SignupModal(props: ISignupModalProps): JSX.Element {
     const renderSingupModalBox = (): JSX.Element | void => {
         if (signupModalIsOpen) {
             return (
-                <div className="modal signup-modal">
+                <div className="modal auth-modal signup-modal">
                     <Titles
                         mainDivClassName="login-modal__title"
                         heading="Приветствуем Вас!"

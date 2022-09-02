@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
+import HowItWorksLink from '../links/HowItWorksLink';
 import LoginModal from '../modals/LoginModal';
-import SignupModal from '../modals/SignupModal';
 import { annualizeFetchLogoutResponseAction, fetchUserLoginStateAction } from '../redux/actions/authActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { UrlPathname } from '../types/types';
+import AltButton from './AltButton';
 import BurgerMenu from './BurgerMenu';
 import CityPicker from './CityPicker';
 import UserAvatarOrInitials from './UserAvatarOrInitials';
@@ -65,55 +66,38 @@ export default function Navbar(): JSX.Element {
             }
         };
     };
+
     // TODO: решить где это будет - всплывающее уведомление как отдельный тип уведомлений.
     const renderAuthTabsOpeningModals = (): JSX.Element | void => {
-        if (!userLoginState?.loggedIn) {
+        if (
+            !userLoginState?.loggedIn &&
+            location.pathname !== UrlPathname.LOGIN &&
+            location.pathname !== UrlPathname.SIGNUP
+        ) {
             return (
-                <>
-                    <LoginModal
-                        mainDivClassName="navbar__login navbar-elem navbar-elem--4"
-                        defineActiveClassName={defineActiveClassNameForTab}
-                        handleActiveTab={handleActiveTab}
-                    />
-                    <div className="navbar__separator navbar-elem navbar-elem--5">
-                        <h3 className="heading heading--tertiary"> | </h3>
-                    </div>
-                    <SignupModal
-                        mainDivClassName="navbar__signup navbar-elem navbar-elem--6"
-                        defineActiveClassName={defineActiveClassNameForTab}
-                        handleActiveTab={handleActiveTab}
-                    />
-                </>
+                <LoginModal
+                    mainDivClassName="navbar__elem invisible--phone login-container"
+                    defineActiveClassName={defineActiveClassNameForTab}
+                    handleActiveTab={handleActiveTab}
+                />
             );
         }
     };
     const renderAuthTabsLeadingToPages = (): JSX.Element | void => {
         if (
-            (location.pathname === UrlPathname.LOGIN || location.pathname === UrlPathname.SIGNUP) &&
-            !userLoginState?.loggedIn
+            !userLoginState?.loggedIn &&
+            (location.pathname === UrlPathname.LOGIN || location.pathname === UrlPathname.SIGNUP)
         ) {
             return (
-                <>
+                <div className="navbar__elem invisible--phone">
                     <NavLink to={UrlPathname.LOGIN} className="navbar-link">
-                        <div
-                            className={`heading heading--tertiary ${defineActiveClassNameForTab('login')}`}
-                            onClick={handleActiveTab('login')}
-                        >
-                            Войти
-                        </div>
+                        <AltButton
+                            buttonText="Войти"
+                            mainDivClassName={`heading heading--tertiary ${defineActiveClassNameForTab('login')}`}
+                            handleClick={handleActiveTab('login')}
+                        />
                     </NavLink>
-                    <div className="navbar__separator navbar-elem navbar-elem--5">
-                        <h3 className="heading heading--tertiary"> | </h3>
-                    </div>
-                    <NavLink to={UrlPathname.SIGNUP} className="navbar-link">
-                        <div
-                            className={`heading heading--tertiary ${defineActiveClassNameForTab('signup')}`}
-                            onClick={handleActiveTab('signup')}
-                        >
-                            Зарегистрируйтесь
-                        </div>
-                    </NavLink>
-                </>
+                </div>
             );
         }
     };
@@ -121,7 +105,7 @@ export default function Navbar(): JSX.Element {
         if (userLoginState?.loggedIn) {
             return (
                 <div
-                    className={`navbar__user navbar-elem navbar-elem--4 ${defineActiveClassNameForUserAvatarOrInitials()}`}
+                    className={`navbar__user navbar-elem navbar-elem--6 ${defineActiveClassNameForUserAvatarOrInitials()}`}
                     onClick={handleToggleUserDropdownMenu}
                     ref={userDropdownMenuRef}
                 >
@@ -141,43 +125,49 @@ export default function Navbar(): JSX.Element {
     useEffect(closeUserDropdownMenuWhenClickingOutside, [userDropdownMenuIsOpen]);
     useEffect(closeUserDropdownMenuWhenChangingLocation, [window.location.pathname]);
 
-    // NOTE hereafter we will wrap a flex item in a div in order to be able to move without making position absolute
+    // сначала нужно сделать здесь  проверку на то мобильное устройство или нет
+    // затем нужно в стилях поменять - сделать прикладным бургер
     return (
-        <section className="navbar-section">
-            <nav id="navbar" className="navbar">
-                <NavLink to={UrlPathname.HOME} className="navbar-link">
-                    <object id="logo" data="/logo.svg" aria-labelledby={'logo'} />
-                </NavLink>
-                <div className="navbar__city-picker navbar-elem navbar-elem--1">
-                    <CityPicker
-                        mainDivClassName=""
-                        defineActiveClassName={defineActiveClassNameForTab}
-                        handleActiveTab={handleActiveTab}
-                    />
-                </div>
-                <div className="navbar__how-it-works navbar-elem navbar-elem--2">
-                    <div id="how-it-works">
-                        <NavLink
-                            to={UrlPathname.HOW_IT_WORKS}
-                            className={`navbar-link`}
-                            onClick={handleActiveTab('how-it-works')}
-                        >
-                            Как это работает?
+        <>
+            <section id="navbar-section" className="navbar-section">
+                <nav id="navbar" className="navbar">
+                    <div className="navbar__elem logo-container">
+                        <NavLink to={UrlPathname.HOME} className="navbar-link">
+                            <div
+                                className="svg-container
+                            "
+                            >
+                                <object id="logo" data="/logo.svg" aria-labelledby={'logo'} />
+                            </div>
                         </NavLink>
                     </div>
-                </div>
-                <div className="navbar__create-space navbar-elem navbar-elem--3">
-                    <NavLink to={getLinkForProvideSpaceButton()} className="navbar-link">
-                        <button className="button button--primary navbar-provide-space-button">
-                            Предоставить пространство
-                        </button>
-                    </NavLink>
-                </div>
-                {renderAuthTabsOpeningModals()}
-                {renderAuthTabsLeadingToPages()}
-                {renderUserAvatarOrInitals()}
-                <BurgerMenu />
-            </nav>
-        </section>
+                    <div className="navbar__elem city-picker-container invisible--phone">
+                        <CityPicker
+                            defineActiveClassName={defineActiveClassNameForTab}
+                            handleActiveTab={handleActiveTab}
+                        />
+                    </div>
+                    <div className="navbar__elem invisible--phone how-it-works-container">
+                        <HowItWorksLink handleActiveTab={handleActiveTab('how-it-works')} />
+                    </div>
+                    <div className="navbar__elem provide-space-button-container">
+                        <NavLink to={getLinkForProvideSpaceButton()} className="navbar-link">
+                            <button className="button button--primary navbar-provide-space-button">
+                                Предоставить пространство
+                            </button>
+                        </NavLink>
+                    </div>
+                    {renderAuthTabsOpeningModals()}
+                    {renderAuthTabsLeadingToPages()}
+                    {renderUserAvatarOrInitals()}
+                    {!userLoginState?.loggedIn ? (
+                        <div className="navbar__elem burger-menu-container">
+                            <BurgerMenu />
+                        </div>
+                    ) : null}
+                </nav>
+            </section>
+            <div id="navbar-container-for-fixed" />
+        </>
     );
 }

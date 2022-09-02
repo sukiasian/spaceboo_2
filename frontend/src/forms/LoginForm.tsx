@@ -6,6 +6,7 @@ import InputWithLabel, { InputAutoCompleteOption, IFormInputs, InputType } from 
 import Alert from '../components/Alert';
 import { handleFormSubmit } from '../utils/utilFunctions';
 import { postLoginUserAction } from '../redux/actions/authActions';
+import AltButton from '../components/AltButton';
 
 export interface ILoginData {
     [key: keyof IFormInputs]: string | undefined;
@@ -69,6 +70,7 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
     const renderInputs = (): JSX.Element[] => {
         return Object.keys(formInputs).map((inputName: string, i: number) => {
             const field = formInputs[inputName];
+
             return (
                 <InputWithLabel
                     mainDivClassName={field.mainDivClassName}
@@ -93,12 +95,10 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
 
     // TODO validators!
     return (
-        <div className="login-form-container">
-            <form className="login-form" onSubmit={handleFormSubmit}>
+        <div className="form-container auth-form-container login-form-container">
+            <form className="auth-form login-form" onSubmit={handleFormSubmit}>
                 {renderInputs()}
-                <button className="button--primary" onClick={handleLoginButton}>
-                    Войти
-                </button>
+                <AltButton buttonText="Войти" mainDivClassName="button--primary" handleClick={handleLoginButton} />
             </form>
             {renderLoginResponseAlert()}
         </div>

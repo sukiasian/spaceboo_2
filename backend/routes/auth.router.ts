@@ -42,7 +42,7 @@ class AuthRouter extends Singleton implements IRouter {
             .get(this.passport.authenticate(PassportStrategies.FACEBOOK), () => logger.info('signed up in Facebook'));
         this.router.route('/facebook/callback').get((req, res) => {
             res.redirect('/');
-            console.log('redirected');
+            console.log('Redirected');
         });
     };
 }

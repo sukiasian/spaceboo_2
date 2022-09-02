@@ -7,7 +7,6 @@ import {
 import {
     annualizeFetchSpacesQueryDataAction,
     annualizeFetchSpacesResponsesAction,
-    fetchSpacesAction,
 } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { IComponentClassNameProps, TActiveTab } from '../types/types';
@@ -89,7 +88,7 @@ export default function CityPicker(props: ICityPickerProps): JSX.Element {
     };
     const handlePickCity = (city: any): (() => void) => {
         return () => {
-            handleActiveTab('city');
+            handleActiveTab!('city');
             pickCurrentCity(city);
         };
     };

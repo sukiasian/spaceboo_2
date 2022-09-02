@@ -40,6 +40,6 @@ export default function Alert(props: IAlertProps): JSX.Element {
             {responseData.message}
         </div>
     ) : (
-        <div className="alert">{responseData?.message} hello</div>
+        <div className="alert">{responseData?.message}</div>
     );
 }

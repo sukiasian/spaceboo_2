@@ -1,0 +1,35 @@
+.burger-menu {
+    display: none;
+    padding: 0.6rem;
+    background-color: $color-primary-1;
+    border-radius: 15px;
+    width: 50px;
+    height: 50px;
+    z-index: 11000;
+    box-shadow: $box-shadow;
+
+    @include respond(phone) {
+        position: relative;
+        display: flex;
+        transform: rotate(90deg);
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    &--active {
+        background-color: $color-white;
+        transform: rotate(180deg) !important;
+
+        & .burger-menu__stripe {
+            background-color: $color-primary-1;
+        }
+    }
+
+    &__stripe {
+        background-color: $color-white;
+        width: 1px;
+        height: 100%;
+        padding: 2px;
+        border-radius: 4px;
+    }
+}
