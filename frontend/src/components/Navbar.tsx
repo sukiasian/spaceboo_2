@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
 import HowItWorksLink from '../links/HowItWorksLink';
-import LoginModal from '../modals/LoginModal';
 import { annualizeFetchLogoutResponseAction, fetchUserLoginStateAction } from '../redux/actions/authActions';
+import { toggleLoginModalAction } from '../redux/actions/modalActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { UrlPathname } from '../types/types';
 import AltButton from './AltButton';
@@ -16,13 +16,18 @@ import UserDropdownMenu from './UserDropdownMenu';
 export default function Navbar(): JSX.Element {
     const [activeTab, setActiveTab] = useState<string>();
     const [userDropdownMenuIsOpen, setUserDropdownMenuIsOpen] = useState(false);
+
     const { fetchUserLoginStateSuccessResponse, fetchLogoutUserSuccessResponse } = useSelector(
         (state: IReduxState) => state.authStorage
     );
-    const userLoginState = fetchUserLoginStateSuccessResponse?.data;
+
     const userDropdownMenuRef = useRef(null);
+
     const location = useLocation();
     const dispatch = useDispatch();
+
+    const userLoginState = fetchUserLoginStateSuccessResponse?.data;
+
     const getLinkForProvideSpaceButton = (): UrlPathname => {
         if (userLoginState?.loggedIn && !userLoginState?.confirmed) {
             return UrlPathname.HOME;
@@ -40,11 +45,21 @@ export default function Navbar(): JSX.Element {
     const defineActiveClassNameForUserAvatarOrInitials = (): string => {
         return userDropdownMenuIsOpen ? 'active' : '';
     };
+
     const handleActiveTab = (tab: string): (() => void) => {
         return (): void => {
             setActiveTab(tab);
         };
     };
+
+    const toggleLoginModal = (): void => {
+        dispatch(toggleLoginModalAction());
+    };
+    const handleLoginButton = (): void => {
+        toggleLoginModal();
+        handleActiveTab!('login');
+    };
+
     const handleToggleUserDropdownMenu = (): void => {
         setUserDropdownMenuIsOpen(!userDropdownMenuIsOpen);
     };
@@ -68,20 +83,12 @@ export default function Navbar(): JSX.Element {
     };
 
     // TODO: решить где это будет - всплывающее уведомление как отдельный тип уведомлений.
-    const renderAuthTabsOpeningModals = (): JSX.Element | void => {
-        if (
-            !userLoginState?.loggedIn &&
-            location.pathname !== UrlPathname.LOGIN &&
-            location.pathname !== UrlPathname.SIGNUP
-        ) {
-            return (
-                <LoginModal
-                    mainDivClassName="navbar__elem invisible--phone login-container"
-                    defineActiveClassName={defineActiveClassNameForTab}
-                    handleActiveTab={handleActiveTab}
-                />
-            );
-        }
+    const renderLoginTextButton = (): JSX.Element | null => {
+        return !userLoginState?.loggedIn ? (
+            <div className="navbar__elem login-container" onClick={handleLoginButton}>
+                Войти
+            </div>
+        ) : null;
     };
     const renderAuthTabsLeadingToPages = (): JSX.Element | void => {
         if (
@@ -157,7 +164,7 @@ export default function Navbar(): JSX.Element {
                             </button>
                         </NavLink>
                     </div>
-                    {renderAuthTabsOpeningModals()}
+                    {renderLoginTextButton()}
                     {renderAuthTabsLeadingToPages()}
                     {renderUserAvatarOrInitals()}
                     {!userLoginState?.loggedIn ? (

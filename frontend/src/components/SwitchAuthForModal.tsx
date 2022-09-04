@@ -1,8 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Action } from 'redux';
+import { toggleLoginModalAction, toggleSignupModalAction } from '../redux/actions/modalActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { IComponentClassNameProps, ReduxModalAction } from '../types/types';
-import { toggleLoginOrSignupModal } from '../utils/utilFunctions';
 
 export enum SwitchModalFor {
     SIGNUP = 'SIGNUP',
@@ -15,30 +15,26 @@ interface ISwitchTypeOfAuthProps extends IComponentClassNameProps {
     switchQuestion: string;
     switchCallToAction: string;
     switchFor: SwitchModalFor;
-    openingModalAction: () => Action<ReduxModalAction>;
-    closingModalAction: () => Action<ReduxModalAction>;
 }
 
-export function SwitchAuthForModal(props: ISwitchTypeOfAuthProps): JSX.Element {
-    const { loginModalIsOpen, signupModalIsOpen } = useSelector((state: IReduxState) => state.modalStorage);
-
+export function SwitchAuthForModal({
+    switchQuestion,
+    switchCallToAction,
+    mainDivClassName,
+}: ISwitchTypeOfAuthProps): JSX.Element {
     const dispatch = useDispatch();
 
+    const switchModals = (): void => {
+        dispatch(toggleLoginModalAction());
+        dispatch(toggleSignupModalAction());
+    };
+
     return (
-        <div className={`authorization-counter-action authorization-counter-action--${props.mainDivClassName}`}>
+        <div className={`authorization-counter-action authorization-counter-action--${mainDivClassName}`}>
             <p className="paragraph">
-                {props.switchQuestion}{' '}
-                <span
-                    className="auth-modal-call-to-action"
-                    onClick={toggleLoginOrSignupModal(
-                        props.openingModalAction,
-                        props.closingModalAction,
-                        dispatch,
-                        loginModalIsOpen,
-                        signupModalIsOpen
-                    )}
-                >
-                    {props.switchCallToAction}.
+                {switchQuestion}{' '}
+                <span className="auth-modal-call-to-action" onClick={switchModals}>
+                    {switchCallToAction}.
                 </span>
             </p>
         </div>

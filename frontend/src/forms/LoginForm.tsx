@@ -39,11 +39,12 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
             isRequiredField: true,
         },
     });
-    const { postLoginUserSuccessResponse, postLoginUserFailureResponse } = useSelector(
-        (state: IReduxState) => state.authStorage
-    );
+
+    const { postLoginUserSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
     const handleAfterLogin = (): void => {
         if (postLoginUserSuccessResponse) {
             props.handleAfterLogin();

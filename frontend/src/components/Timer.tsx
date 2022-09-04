@@ -17,7 +17,7 @@ export default function Timer(props: ITimerProps): JSX.Element {
                 setTimeLeft((prev) => prev - 1000);
             }, 1000);
             setTimerIsOn(true);
-        } else if (timerIsOn && timeLeft <= 0) {
+        } else if (timerIsOn && timeLeft < 1) {
             clearInterval(timerRef.current!);
             setTimerIsOn(false);
         }

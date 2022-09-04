@@ -11,13 +11,16 @@ import { updateDocumentTitle } from '../utils/utilFunctions';
 
 export default function ConfirmAccountPage(): JSX.Element {
     const timerRef = useRef<NodeJS.Timeout>();
+
     const {
         postSendVerificationCodeSuccessResponse,
         postSendVerificationCodeFailureResponse,
         postCheckVerificationCodeSuccessResponse,
         postCheckVerificationCodeFailureResponse,
     } = useSelector((state: IReduxState) => state.emailVerificationStorage);
+
     const dispatch = useDispatch();
+
     const handleDocumentTitle = (): void => {
         const documentTitle = 'Spaceboo | Последний шаг!';
 
@@ -90,18 +93,19 @@ export default function ConfirmAccountPage(): JSX.Element {
 
     return (
         <div className="page account-confirmation-page">
-            <section className="account-confirmation__titles">
-                <div className="heading">
+            <div className="page-box">
+                <section className="account-confirmation__titles">
                     <h2 className="heading heading--secondary"> Последний шаг - подтвердите аккаунт. </h2>
                     <h3 className="heading heading--tertiary">На вашу электронную почту отправлено письмо с кодом.</h3>
-                    <p className="paragraph"> Введите полученный 6-значный код. </p>
-                </div>
-
-                <SixDigitVerification />
-                <div className="send-code-options"> {renderSendCodeOptions()} </div>
-                {renderSendCodeAgainResponseAlert()}
-                {renderCheckCodeResponseAlert()}
-            </section>
+                    <div className="code-verification-field">
+                        <p className="paragraph"> Введите полученный 6-значный код. </p>
+                        <SixDigitVerification />
+                    </div>
+                    <div className="send-code-options"> {renderSendCodeOptions()} </div>
+                    {renderSendCodeAgainResponseAlert()}
+                    {renderCheckCodeResponseAlert()}
+                </section>
+            </div>
         </div>
     );
 }

@@ -96,13 +96,14 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
     const storeLastVerificationRequestedAtLocalStorage = (): void => {
         localStorage.setItem(
             LocalStorageItem.LAST_VERIFICATION_REQUESTED,
-            postCheckVerificationCodeSuccessResponse!.data.lastVerificationRequested
+            postSendVerificationCodeSuccessResponse!.data.lastVerificationRequested
         );
     };
     const handleAfterSignup = (): void => {
-        setLoading(false);
-
+        // setLoading(false);
         if (postSendVerificationCodeSuccessResponse) {
+            setLoading(false);
+
             storeLastVerificationRequestedAtLocalStorage();
             props.handleAfterSignup();
 
@@ -152,7 +153,7 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
         );
     };
 
-    useEffect(sendVerificationCodeOnSuccess, [postSignupUserSuccessResponse, dispatch]);
+    useEffect(sendVerificationCodeOnSuccess, [postSignupUserSuccessResponse]);
     useEffect(handleAfterSignup, [postSendVerificationCodeSuccessResponse, handleAfterSignup]);
 
     // TODO validators!
@@ -160,7 +161,6 @@ export default function SignupForm(props: ISignupFormProps): JSX.Element {
         <div className="form-container auth-form-container signup-form-container">
             <form className="form auth-form signup-form" onSubmit={handleFormSubmit}>
                 {renderInputs()}
-
                 <AltButton
                     buttonText="Зарегистрироваться"
                     mainDivClassName="button--primary"

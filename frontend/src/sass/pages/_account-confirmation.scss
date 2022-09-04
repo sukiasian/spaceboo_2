@@ -1,0 +1,58 @@
+.account-confirmation {
+    &__titles {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        h2,
+        h3 {
+            text-align: center;
+        }
+
+        @include respond(phone) {
+            h2 {
+                font-size: 1rem;
+            }
+            h3 {
+                font-size: 0.5rem;
+            }
+        }
+
+        .code-verification {
+            margin-top: 2rem;
+
+            @include respond(phone) {
+                width: 200px;
+            }
+
+            &-field {
+                margin: 3rem 0;
+
+                p {
+                    text-align: center;
+                }
+            }
+
+            &__digit-input {
+                color: $color-primary-2;
+
+                @include respond(phone) {
+                    width: 25px;
+                }
+            }
+        }
+    }
+}
+
+.send-code-options__get-new-code {
+    p {
+        color: $color-primary-2;
+        text-align: center;
+
+        &:hover {
+            color: $color-primary-2-lightened;
+            user-select: none;
+            cursor: pointer;
+        }
+    }
+}

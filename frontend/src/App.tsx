@@ -4,6 +4,7 @@ import { Dispatch } from 'redux';
 import Footer from './components/Footer';
 import Navbar from './components/Navbar';
 import UserPanel from './components/UserPanel';
+import AuthModals from './modals/AuthModals';
 import { IAction } from './redux/actions/ActionTypes';
 import { fetchUserLoginStateAction } from './redux/actions/authActions';
 import { fetchCitiesAction } from './redux/actions/cityActions';
@@ -43,6 +44,7 @@ function App(): JSX.Element {
                 <Navbar />
                 <Routes />
             </div>
+            <AuthModals />
             {isMobile() ? <UserPanel /> : <Footer />}
         </div>
     );
