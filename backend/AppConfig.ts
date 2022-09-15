@@ -47,7 +47,7 @@ export class AppConfig extends Singleton {
         }
 
         this.app.use(helmet());
-        this.app.use(express.json({ limit: '10Kb' })); // NOTE
+        this.app.use(express.json({ limit: '10Kb' }));
         this.app.use(express.static('assets/images'));
         this.app.use(cookieParser());
         this.app.use(this.passportConfig.initializePassport());
