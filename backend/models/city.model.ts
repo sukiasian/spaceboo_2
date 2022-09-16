@@ -1,8 +1,6 @@
 import { BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import { Optional } from 'sequelize';
 import { Region } from './region.model';
-import AppError from '../utils/AppError';
-import { HttpStatus } from '../types/enums';
 
 interface ICityAttributes {
     id: number;

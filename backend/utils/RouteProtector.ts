@@ -1,4 +1,5 @@
 import * as jwt from 'jsonwebtoken';
+import { appointmentSequelizeDao, AppointmentSequelizeDao } from '../daos/appointment.sequelize.dao';
 import { SpaceSequelizeDao, spaceSequelizeDao } from '../daos/space.sequelize.dao';
 import { userSequelizeDao, UserSequelizeDao } from '../daos/user.sequelize.dao';
 import { Space } from '../models/space.model';
@@ -9,11 +10,13 @@ import UtilFunctions from './UtilFunctions';
 
 export class RouteProtector {
     private static readonly userModel: typeof User = User;
-    private static readonly spaceModel: typeof Space = Space;
-    private static readonly jwt = jwt;
+
     private static readonly spaceDao: SpaceSequelizeDao = spaceSequelizeDao;
     private static readonly userDao: UserSequelizeDao = userSequelizeDao;
+    private static readonly appointmentDao: AppointmentSequelizeDao = appointmentSequelizeDao;
+    private static readonly jwt = jwt;
     private static readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
+
     // TODO регистрация админов не должна быть доступна для каждого - возможно только авторизованный админ должен уметь это делатьы
     public static adminOnlyProtector = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const { id: userId } = req.user;
@@ -28,7 +31,8 @@ export class RouteProtector {
 
     public static spaceOwnerProtector = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const { id: userId } = req.user;
-        const { spaceId } = req.params;
+        const { spaceId } = req.params || req.body || req.query;
+
         const space: Space = await this.spaceDao.findById(spaceId);
 
         if (space.userId !== userId) {
@@ -80,6 +84,19 @@ export class RouteProtector {
             id: user.id,
             recovery: true,
         };
+
+        next();
+    });
+
+    public static userHasActiveAppointment = this.utilFunctions.catchAsync(async (req, res, next) => {
+        const { id: userId } = req.user;
+        const { spaceId } = req.body;
+
+        const hasActiveAppointment = await this.appointmentDao.userHasActiveAppointmentsForSpace(userId, spaceId);
+
+        if (hasActiveAppointment) {
+            throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.NOT_ENOUGH_RIGHTS);
+        }
 
         next();
     });

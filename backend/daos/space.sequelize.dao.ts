@@ -4,12 +4,11 @@ import { QuerySortDirection } from '../types/enums';
 import { SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
 import { appConfig } from '../AppConfig';
-import { Appointment, IAppointment } from '../models/appointment.model';
+import { IAppointment } from '../models/appointment.model';
 import { City } from '../models/city.model';
+import { IQueryString } from '../types/interfaces';
 
-interface IQueryString {
-    page?: string | number;
-    limit?: string | number;
+interface ISpaceQueryString extends IQueryString {
     sortBy?: SpaceQuerySortFields;
     priceRange?: string | string[] | number[];
     datesToReserveQuery?: string | string[]; // '2020-03-14, 2020-03-18'
@@ -49,7 +48,7 @@ export class SpaceSequelizeDao extends Dao {
         }
     };
 
-    public getSpacesByQuery = async (queryStr: IQueryString): Promise<any> => {
+    public getSpacesByQuery = async (queryStr: ISpaceQueryString): Promise<any> => {
         let { page, limit, sortBy, datesToReserveQuery, timesToReserveQuery, cityId, priceRange } = queryStr;
         let isoDatesRange: string;
         let pricesFromAndTo: IPriceRange;

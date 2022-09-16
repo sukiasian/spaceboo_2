@@ -9,7 +9,6 @@ class CityRouter extends Singleton implements IRouter {
 
     public prepareRouter = (): void => {
         this.router.route('/').get(this.cityController.getCitiesByQuery);
-        this.router.route('/majors').get(this.cityController.getMajorCities);
     };
 }
 
@@ -18,3 +17,5 @@ const cityRouter = SingletonFactory.produce<CityRouter>(CityRouter);
 cityRouter.prepareRouter();
 
 export const router = cityRouter.router;
+
+// ttlock/locker?type=0, где 0 unlock 1 lock

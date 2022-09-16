@@ -25,7 +25,7 @@ interface ISpaceAttributes {
     description: string;
     roomsNumber: number;
     bedsNumber: number;
-    lockerConnected: boolean;
+    lockerId: number;
     cityId: number;
     userId: string;
     imagesUrl?: string[];
@@ -105,6 +105,10 @@ export class Space extends Model<ISpaceAttributes, ISpaceCreationAttributes> imp
 
     @Column({ defaultValue: false })
     public lockerConnected: boolean;
+    // FIXME: если lockerId определен, значит локер подключен
+
+    @Column({ type: DataType.INTEGER, allowNull: true })
+    public lockerId: number;
 
     @ForeignKey(() => User)
     @Column({ type: DataType.UUID })

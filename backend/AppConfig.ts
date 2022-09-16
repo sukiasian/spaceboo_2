@@ -8,6 +8,9 @@ import { router as appointmentRouter } from './routes/appointment.router';
 import { router as imageRouter } from './routes/image.router';
 import { router as emailVerificationRouter } from './routes/email-verification.router';
 import { router as cityRouter } from './routes/city.router';
+import { router as lockerRouter } from './routes/locker.router';
+import { router as lockerRequestRouter } from './routes/locker-request.router';
+import { router as ttLockRouter } from './routes/ttlock.router';
 import { ApiRoutes, Environment } from './types/enums';
 import globalErrorController from './controllers/error.controller';
 import { Singleton, SingletonFactory } from './utils/Singleton';
@@ -19,9 +22,10 @@ import { Appointment } from './models/appointment.model';
 import { EmailVerification } from './models/email-verification.model';
 import { District } from './models/district.model';
 import { Region } from './models/region.model';
-import cors = require('cors');
+import * as cors from 'cors';
 import CorsConfig from './configurations/cors.config';
 import helmet from 'helmet';
+import { Locker } from './models/locker.model';
 
 export class AppConfig extends Singleton {
     public readonly app: express.Express = express();
@@ -35,7 +39,7 @@ export class AppConfig extends Singleton {
         username: process.env.DATABASE_USERNAME || 'postgres',
         password: process.env.DATABASE_PASSWORD || 'postgres',
         database: process.env.DATABASE_NAME || 'postgres',
-        models: [District, Region, City, User, Space, Appointment, EmailVerification],
+        models: [District, Region, City, User, Space, Appointment, EmailVerification, Locker],
         logging: false,
     });
     private readonly passportConfig: PassportConfig = passportConfig;
@@ -56,6 +60,10 @@ export class AppConfig extends Singleton {
         this.app.use(ApiRoutes.EMAIL_VERIFICATION, emailVerificationRouter);
         this.app.use(ApiRoutes.SPACES, spaceRouter);
         this.app.use(ApiRoutes.APPOINTMENTS, appointmentRouter);
+        // TODO
+        this.app.use(ApiRoutes.LOCKERS, lockerRouter);
+        this.app.use(ApiRoutes.LOCKER_REQUESTS, lockerRequestRouter);
+        this.app.use(ApiRoutes.TTLOCK, ttLockRouter);
         this.app.use(ApiRoutes.IMAGES, imageRouter);
         this.app.use(ApiRoutes.CITIES, cityRouter);
         this.app.use(globalErrorController);

@@ -1,7 +1,7 @@
 import { appConfig } from '../AppConfig';
 import { Dao } from '../configurations/dao.config';
-
-import { Appointment, IAppointment } from '../models/appointment.model';
+import * as uuid from 'uuid';
+import { Appointment } from '../models/appointment.model';
 import { ErrorMessages, HttpStatus } from '../types/enums';
 import { IRequiredDates } from '../types/interfaces';
 import AppError from '../utils/AppError';
@@ -51,6 +51,21 @@ export class AppointmentSequelizeDao extends Dao {
         const findUserAppointmentsRawQuery = `SELECT * FROM "Appointments" WHERE "userId" = ${userId} AND "isoDatesReserved" && `;
 
         return Appointment.findAll();
+    };
+
+    public userHasActiveAppointmentsForSpace = async (userId: string, spaceId: string): Promise<boolean> => {
+        if (!uuid.validate(userId) || !uuid.validate(spaceId)) {
+            throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.INVALID_ID);
+        }
+
+        const getUserActiveAppointmentsForSpaceRawQuery = `SELECT * FROM "Appointments" WHERE "userId" = ${userId} AND "spaceId" = ${spaceId} AND "isoDatesReserved" @> CURRENT_TIMESTAMP;`;
+
+        const activeAppointments = (await this.utilFunctions.createSequelizeRawQuery(
+            appConfig.sequelize,
+            getUserActiveAppointmentsForSpaceRawQuery
+        )) as Promise<Appointment>;
+
+        return !!activeAppointments;
     };
 
     public getAppointmentsByRequiredDates = async (spaceId: string, requiredDates: string): Promise<Appointment[]> => {

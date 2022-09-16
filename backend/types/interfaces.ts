@@ -8,3 +8,8 @@ export interface IRequiredDates {
     beginningTime?: string;
     endingTime?: string;
 }
+
+export interface IQueryString {
+    page?: string | number;
+    limit?: string | number;
+}

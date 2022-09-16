@@ -86,5 +86,5 @@ class HttpRequest implements IHttpRequest {
 }
 
 // FIXME probably it should be process.env.something + don't forget about using proxy
-export const httpRequester = new HttpRequest('/api/v1/');
+export const httpRequester = new HttpRequest('/api/');
 // NOTE can we go with static methods ?

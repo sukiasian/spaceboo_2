@@ -50,6 +50,12 @@ export enum HttpStatus {
     errorMessage,
 }
 
+export enum QueryDefaultValue {
+    PAGE = 1,
+    LIMIT = 12,
+    OFFSET = 12,
+}
+
 export enum ResponseStatus {
     SUCCESS = 'Выполнено',
     FAILURE = 'Не выполнено',
@@ -69,13 +75,16 @@ export enum SequelizeModelProps {
 
 // NOTE do not use v1 hardcoded
 export enum ApiRoutes {
-    AUTH = '/api/v1/auth',
-    EMAIL_VERIFICATION = '/api/v1/emailVerification',
-    USERS = '/api/v1/users',
-    SPACES = '/api/v1/spaces',
-    APPOINTMENTS = '/api/v1/appointments',
-    IMAGES = '/api/v1/images',
-    CITIES = '/api/v1/cities',
+    AUTH = '/api/auth',
+    EMAIL_VERIFICATION = '/api/emailVerification',
+    USERS = '/api/users',
+    SPACES = '/api/spaces',
+    APPOINTMENTS = '/api/appointments',
+    IMAGES = '/api/images',
+    CITIES = '/api/cities',
+    LOCKERS = '/api/lockers',
+    LOCKER_REQUESTS = '/api/lockerRequests',
+    TTLOCK = '/api/ttlock',
 }
 
 export enum PassportStrategies {
@@ -99,17 +108,24 @@ export enum ResponseMessages {
     USER_IMAGE_UPDATED = 'Изображение обновлено.',
     EMAIL_SENT = 'Письмо с кодом отправлено на вашу эл. почту.',
     VERIFICATION_CODE_VALID = 'Введенный код верен.',
+
     PASSWORD_EDITED = 'Пароль успешно обновлен!',
     PASSWORD_RECOVERED = 'Пароль успешно сброшен.',
+
     USER_IS_LOGGED_IN = 'Пользователь авторизован.',
     USER_IS_NOT_LOGGED_IN = 'Пользователь не авторизован.',
     LOGGED_OUT = 'Будем скучать!',
     USER_NOT_FOUND = 'Пользователь не найден',
     USER_IS_CONFIRMED = 'Пользователь подтвержден.',
+
+    LOCKER_REQUEST_CREATED = 'Заявка на подключение локера принята. Наша команда свяжется с вами в ближайшее время.',
+
+    LOCKER_UNLOCKED = 'Локер разблокирован.',
 }
 
 export enum ErrorMessages {
     USER_NOT_FOUND = 'Пользователь не найден',
+
     PASSWORDS_DO_NOT_MATCH = 'Пароли должны совпадать.',
     PASSWORD_LENGTH_VALIDATE = 'Пароль должен состоять от 8 до 25 символов.',
     PASSWORD_IS_NOT_VALID = 'Пожалуйста, введите действительный пароль',
@@ -121,20 +137,28 @@ export enum ErrorMessages {
     IS_EMAIL_VALIDATE = 'Пожалуйста, введите действительный эл. адрес.',
     EMAIL_UNIQUE_VALIDATE = 'Пользователь с таким эл. адресом уже существует.',
     REQUIRED_FIELDS_VALIDATE = 'Пожалуйста, заполните все обязательные поля.',
+
     SPACE_IS_UNAVAILABLE = 'К сожалению, пространство занято. Вы можете посмотреть на другие даты.',
     SPACE_IMAGES_ARE_NOT_PROVIDED = 'Пожалуйста, добавьте изображения. Максимальное количество изображений - 5',
     SPACE_IMAGES_VALIDATE = 'Максимальное количество изображений для пространства — 5.',
     SPACE_IMAGES_AMOUNT_EXCEEDED = 'Превышено допустимое количество изображений для пространства. Максимальное количество изображений - 5.',
+    SPACE_ALREADY_HAS_LOCKER = 'У пространства уже есть локер.',
+    SPACE_LOCKER_REQUEST_EXISTS = 'Заявка на подключение локера ранее была подана.',
+
     APPLICATION_ERROR = 'Application Error',
-    UNKNOWN_ERROR = 'Произошла серьезная ошибка',
+    UNKNOWN_ERROR = 'Произошла серьезная ошибка.',
+    ERROR = 'Произошла ошибка',
+
     NO_IMAGE_FOUND = 'Изображение не найдено.',
     NO_IMAGES_FOUND = 'Не найдено изображений.',
     DIR_NOT_FOUND = 'Директория не найдена.',
     SPACE_NOT_FOUND = 'Пространство не найдено.',
     MULTER_ERROR = 'Произошла ошибка при загрузке файла.',
     NOT_ENOUGH_RIGHTS = 'Недостаточно прав.',
+
     VERIFICATION_CODE_NOT_VALID = 'Неверный код.',
     EMAIL_IS_EMPTY = 'Пожалуйста, укажите Вашу эл. почту.',
+
     NAME_SHOULD_BE_LITERAL_AND_CYRILLIC_ONLY = "Инициалы пользователя могут состоять только из символов А-Я, а также '-'.",
     USER_ALREADY_CONFIRMED = 'Аккаунт уже подтвержден.',
     USER_NOT_CONFIRMED = 'Подтвердите аккаунт.',
@@ -147,8 +171,13 @@ export enum ErrorMessages {
     DATES_SHOULD_BE_PRESENT = 'Даты должны быть в настоящем.',
     REQUIRED_DATES_ARE_MISSING = 'Пожалуйста, укажите интересующие даты',
     SPACE_ID_IS_MISSING = 'Укажите ID пространства.',
+
     WAIT_TO_ATTEMPT_AGAIN = 'Попробуйте через некоторое время.',
     CREATE_SPACE_LIMIT_EXCEEDED = 'Лимит создания - 4 пространства в сутки.',
+
+    FORBIDDEN = 'Запрещено.',
+
+    INVALID_ID = 'Недействительный id.',
 }
 
 export enum Environment {
