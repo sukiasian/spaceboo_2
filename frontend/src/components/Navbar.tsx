@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
 import HowItWorksLink from '../links/HowItWorksLink';
 import { annualizeFetchLogoutResponseAction, fetchUserLoginStateAction } from '../redux/actions/authActions';
@@ -20,12 +20,15 @@ export default function Navbar(): JSX.Element {
     const { fetchUserLoginStateSuccessResponse, fetchLogoutUserSuccessResponse } = useSelector(
         (state: IReduxState) => state.authStorage
     );
+    const { fetchCurrentUserSuccessResponse } = useSelector((state: IReduxState) => state.userStorage);
 
     const userDropdownMenuRef = useRef(null);
 
     const location = useLocation();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
+    const currentUser = fetchCurrentUserSuccessResponse?.data;
     const userLoginState = fetchUserLoginStateSuccessResponse?.data;
 
     const getLinkForProvideSpaceButton = (): UrlPathname => {
@@ -157,13 +160,24 @@ export default function Navbar(): JSX.Element {
                     <div className="navbar__elem invisible--phone how-it-works-container">
                         <HowItWorksLink handleActiveTab={handleActiveTab('how-it-works')} />
                     </div>
-                    <div className="navbar__elem provide-space-button-container">
-                        <NavLink to={getLinkForProvideSpaceButton()} className="navbar-link">
-                            <button className="button button--primary navbar-provide-space-button">
-                                Предоставить пространство
-                            </button>
-                        </NavLink>
-                    </div>
+                    {currentUser?.role !== 'admin' ? (
+                        <div className="navbar__elem provide-space-button-container">
+                            <NavLink to={getLinkForProvideSpaceButton()} className="navbar-link">
+                                <button className="button button--primary navbar-provide-space-button">
+                                    Предоставить пространство
+                                </button>
+                            </NavLink>
+                        </div>
+                    ) : (
+                        <div
+                            className="navbar__elem admin-panel-link-container"
+                            onClick={() => {
+                                navigate(UrlPathname.ADMIN_PANEL_REQUESTS);
+                            }}
+                        >
+                            <NavLink to={UrlPathname.ADMIN_PANEL}>Управление</NavLink>
+                        </div>
+                    )}
                     {renderLoginTextButton()}
                     {renderAuthTabsLeadingToPages()}
                     {renderUserAvatarOrInitals()}

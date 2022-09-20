@@ -11,8 +11,8 @@ class LockerRouter extends Singleton implements IRouter {
     public prepareRouter = (): void => {
         this.router
             .route('/')
-            .post(RouteProtector.adminOnlyProtector, this.controller.createLockerForSpace)
-            .delete(RouteProtector.adminOnlyProtector, this.controller.deleteLockerForSpace);
+            .post(RouteProtector.adminOnlyProtector, this.controller.pairLockerForSpace)
+            .delete(RouteProtector.adminOnlyProtector, this.controller.unpairLockerForSpace);
     };
 }
 

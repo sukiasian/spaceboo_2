@@ -87,6 +87,11 @@ export enum ApiRoutes {
     TTLOCK = '/api/ttlock',
 }
 
+export enum TTLockApiRoute {
+    GET_ACCESS_TOKEN = 'https://cnapi.ttlock.com/oauth2/token',
+    UNLOCK_LOCKER = 'https://cnapi.ttlock.com/v3/lock/unlock',
+}
+
 export enum PassportStrategies {
     LOCAL = 'local',
     FACEBOOK = 'facebook',

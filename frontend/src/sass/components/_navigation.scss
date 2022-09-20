@@ -127,6 +127,7 @@
     }
 }
 
-.provide-space-button-container {
+.provide-space-button-container,
+.admin-panel-link-container {
     @include hide-phone;
 }

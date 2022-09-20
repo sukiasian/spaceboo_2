@@ -1,5 +1,5 @@
 import { Dao } from '../configurations/dao.config';
-import { IUserEdit, User, userEditFields, UserScopes } from '../models/user.model';
+import { IUserEdit, User, userEditFields, UserRoles, UserScopes } from '../models/user.model';
 import { SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
 import { appConfig } from '../AppConfig';
@@ -17,6 +17,14 @@ export class UserSequelizeDao extends Dao {
     };
 
     public getCurrentUserById = async (userId: string): Promise<User> => {
+        // если админ то в скопе должна быть роль
+
+        const user = await this.model.scope(UserScopes.WITH_ROLE).findOne({ where: { id: userId } });
+
+        if (user.role === UserRoles.ADMIN) {
+            return user;
+        }
+
         return this.model.scope(UserScopes.PUBLIC).findOne({
             where: {
                 id: userId,

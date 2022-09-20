@@ -4,16 +4,16 @@ import { Locker } from '../models/locker.model';
 import { Space } from '../models/space.model';
 import { SingletonFactory } from '../utils/Singleton';
 
-interface ILockerData {
+interface ILockerPayload {
     spaceId: string;
 }
 
-interface ICreateLockerData extends ILockerData {
+interface ICreateLockerPayload extends ILockerPayload {
     lockerId: string;
     // NOTE неразумно на каждый локер записывать пароль арендодателя. А вообще пока нужно изучить документацию.
 }
 
-interface IDeleteLockerData extends ILockerData {}
+interface IDeleteLockerPayload extends ILockerPayload {}
 
 export class LockerSequelizeDao extends Dao {
     private readonly lockerModel: typeof Locker = Locker;
@@ -24,13 +24,13 @@ export class LockerSequelizeDao extends Dao {
         return this.lockerModel;
     }
 
-    public createLockerForSpace = async (createLockerData: ICreateLockerData): Promise<Locker> => {
+    public createLockerForSpace = async (createLockerData: ICreateLockerPayload): Promise<Locker> => {
         // NOTE: это создаст локер для конкретного спейса.
 
         return this.model.create(createLockerData);
     };
 
-    public deleteLockerForSpace = async (deleteLockerData: IDeleteLockerData) => {
+    public deleteLockerForSpace = async (deleteLockerData: IDeleteLockerPayload) => {
         const locker = await this.model.findOne({ where: { spaceId: deleteLockerData.spaceId } });
 
         await locker.destroy();

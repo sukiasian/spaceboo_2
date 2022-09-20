@@ -21,10 +21,17 @@ import { watchPutEditUser } from './putEditUserSaga';
 import { watchPutEditSpace } from './putEditSpaceSaga';
 import { watchDeleteCancelAppointment } from './deleteCancelAppointmentSaga';
 import { watchFetchSpacesForKeyControl } from './fetchSpacesForKeyControlSaga';
-import { watchToggleLocker } from './toggleLockerSaga';
 import { watchDeleteSpaceSaga } from './deleteSpaceSaga';
-import { watchFetchAppointmentsForMonthWorker } from './fetchAppointmentsForMonth';
+import { watchFetchAppointmentsForMonthWorker } from './fetchAppointmentsForMonthSaga';
 import { watchCreateAppointment } from './postCreateAppointmentSaga';
+import { watchDeleteLockerRequestById } from './deleteLockerRequestByIdSaga';
+import { watchFetchUnprocessedRequestsAmount } from './fetchUnprocessedRequestsAmountSaga';
+import { watchPostPairLocker } from './postPairLockerSaga';
+import { watchPostRequestLockerReturn } from './postRequestLockerReturnSaga';
+import { watchPostRequestLocker } from './postRequestLockerSaga';
+import { watchPostUnlockLocker } from './postUnlockLockerSaga';
+import { watchPostUnpairLocker } from './postUnpairLockerSaga';
+import { watchFetchLockerRequestsByQueryWorker } from './fetchLockerRequestsByQuerySaga';
 
 export function* rootSaga() {
     yield all([
@@ -48,11 +55,18 @@ export function* rootSaga() {
         watchFetchSpacesForKeyControl(),
         watchPutEditUser(),
         watchPutEditSpace(),
-        watchToggleLocker(),
         watchDeleteUserAvatar(),
         watchDeleteCancelAppointment(),
         watchDeleteSpaceSaga(),
         watchFetchAppointmentsForMonthWorker(),
         watchCreateAppointment(),
+        watchDeleteLockerRequestById(),
+        watchFetchUnprocessedRequestsAmount(),
+        watchPostPairLocker(),
+        watchPostRequestLockerReturn(),
+        watchPostRequestLocker(),
+        watchPostUnlockLocker(),
+        watchPostUnpairLocker(),
+        watchFetchLockerRequestsByQueryWorker(),
     ]);
 }

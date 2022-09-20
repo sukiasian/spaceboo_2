@@ -1,17 +1,13 @@
 import { Singleton, SingletonFactory } from '../utils/Singleton';
-import { ErrorMessages, HttpStatus, ResponseMessages } from '../types/enums';
+import { HttpStatus, ResponseMessages } from '../types/enums';
 import UtilFunctions from '../utils/UtilFunctions';
-import { IQueryString } from '../types/interfaces';
 import { lockerRequestSequelizeDao, LockerRequestSequelizeDao } from '../daos/locker-request.sequelize.dao';
-import { Space } from '../models/space.model';
-import AppError from '../utils/AppError';
 
 export interface IFindCitiesQuery {
     searchPattern: string;
 }
 
 export class LockerRequestController extends Singleton {
-    private readonly spaceModel = Space;
     private readonly dao: LockerRequestSequelizeDao = lockerRequestSequelizeDao;
     private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
 
@@ -21,9 +17,39 @@ export class LockerRequestController extends Singleton {
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.LOCKER_REQUEST_CREATED, lockerRequest);
     });
 
-    public getConnectionRequests = async (query: IQueryString) => {};
+    public createReturnRequest = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        const returnRequest = await this.dao.createReturnRequest(req.body);
 
-    public getReturnRequests = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {});
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.LOCKER_REQUEST_CREATED, returnRequest);
+    });
+
+    // public getConnectionRequests = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+    //     const requests = await this.dao.getConnectionRequests();
+
+    //     this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, requests);
+    // });
+
+    // public getReturnRequests = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+    //     const requests = await this.dao.getReturnRequests();
+
+    //     this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, requests);
+    // });
+
+    public getRequestsByQuery = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        const requests = await this.dao.getReturnRequests();
+
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, requests);
+    });
+
+    public getRequestsAmount = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        const amount = await this.dao.getRequestsAmount();
+
+        this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, amount);
+    });
+
+    public deleteRequestById = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        await this.dao.deleteRequestById(req.params.requestId);
+    });
 }
 
 export const lockerRequestController = SingletonFactory.produce<LockerRequestController>(LockerRequestController);

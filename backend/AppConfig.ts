@@ -60,7 +60,6 @@ export class AppConfig extends Singleton {
         this.app.use(ApiRoutes.EMAIL_VERIFICATION, emailVerificationRouter);
         this.app.use(ApiRoutes.SPACES, spaceRouter);
         this.app.use(ApiRoutes.APPOINTMENTS, appointmentRouter);
-        // TODO
         this.app.use(ApiRoutes.LOCKERS, lockerRouter);
         this.app.use(ApiRoutes.LOCKER_REQUESTS, lockerRequestRouter);
         this.app.use(ApiRoutes.TTLOCK, ttLockRouter);

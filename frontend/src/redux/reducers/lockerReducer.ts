@@ -2,24 +2,24 @@ import { IServerResponse, ReduxLockerAction } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 
 export interface ILockerState {
-    putToggleLockerSuccessResponse?: IServerResponse;
-    putToggleLockerFailureResponse?: IServerResponse;
+    postUnlockLockerSuccessResponse?: IServerResponse;
+    postUnlockLockerFailureResponse?: IServerResponse;
 }
 
 const initialState: ILockerState = {};
 
 export const lockerReducer = (state = initialState, action: IAction): ILockerState => {
     switch (action.type) {
-        case ReduxLockerAction.SET_PUT_TOGGLE_LOCKER_SUCCESS_RESPONSE:
+        case ReduxLockerAction.SET_POST_UNLOCK_LOCKER_SUCCESS_RESPONSE:
             return {
                 ...state,
-                putToggleLockerSuccessResponse: action.payload,
+                postUnlockLockerSuccessResponse: action.payload,
             };
 
-        case ReduxLockerAction.SET_PUT_TOGGLE_LOCKER_FAILURE_RESPONSE:
+        case ReduxLockerAction.SET_POST_UNLOCK_LOCKER_FAILURE_RESPONSE:
             return {
                 ...state,
-                putToggleLockerFailureResponse: action.payload,
+                postUnlockLockerFailureResponse: action.payload,
             };
 
         default: {

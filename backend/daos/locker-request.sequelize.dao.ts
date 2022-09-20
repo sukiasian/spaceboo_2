@@ -6,14 +6,14 @@ import { IQueryString } from '../types/interfaces';
 import AppError from '../utils/AppError';
 import { SingletonFactory } from '../utils/Singleton';
 
-interface ILockerRequestData {
+interface ILockerRequestPayload {
     spaceId: string;
     phoneNumber: string;
 }
 
-interface IRequestLockerConnectionData extends ILockerRequestData {}
+interface IRequestLockerConnectionPayload extends ILockerRequestPayload {}
 
-interface IRequestReturnLockerData extends ILockerRequestData {
+interface IRequestReturnLockerPayload extends ILockerRequestPayload {
     lockerId: string;
 }
 
@@ -29,7 +29,7 @@ export class LockerRequestSequelizeDao extends Dao {
         return this.lockerRequestModel;
     }
 
-    public requestLocker = async (requestLockerData: IRequestLockerConnectionData): Promise<LockerRequest> => {
+    public requestLocker = async (requestLockerData: IRequestLockerConnectionPayload): Promise<LockerRequest> => {
         const { spaceId } = requestLockerData;
 
         const requestExists = await this.model.findOne({ where: { spaceId } });
@@ -46,10 +46,11 @@ export class LockerRequestSequelizeDao extends Dao {
             throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.SPACE_ALREADY_HAS_LOCKER);
         }
 
-        return this.model.create(requestLockerData);
+        return this.model.create({ ...requestLockerData, type: LockerRequestType.CONNECTION });
     };
 
-    public createReturnRequest = async ({ spaceId, phoneNumber, lockerId }: IRequestReturnLockerData) => {
+    public createReturnRequest = async (requestReturnLockerData: IRequestReturnLockerPayload) => {
+        const { spaceId, phoneNumber, lockerId } = requestReturnLockerData;
         const space = await this.spaceModel.findOne({ where: { lockerId } });
 
         if (!space) {
@@ -62,37 +63,53 @@ export class LockerRequestSequelizeDao extends Dao {
     public getRequestsByQuery = async (query: IRequestQueryString) => {
         const page = query.page ? parseInt(query.page as string, 10) : QueryDefaultValue.PAGE;
         const limit = query.limit ? parseInt(query.limit as string, 10) : QueryDefaultValue.LIMIT;
-        const type = query.type ?? '1';
+        // NOTE может вылезти ошибка - если мы не уточним query.type возможно ничего не будет найдено
+        const type = query.type ?? undefined;
         const offset = (page - 1) * limit;
 
         return this.model.findAll({ type: type as string, limit, offset });
     };
 
+    public getConnectionRequests = async (): Promise<LockerRequest[]> => {
+        return this.model.findAll({ where: { type: LockerRequestType.CONNECTION } });
+    };
+
+    public getReturnRequests = async () => {
+        return this.model.findAll({ where: { type: LockerRequestType.RETURN } });
+    };
+
+    public getRequestsAmount = (): Promise<number> => {
+        return this.model.count();
+    };
+
+    // TODO: if everything works then remove below 2 methods
     public deleteConnectionRequest = async (spaceId: string): Promise<void> => {
-        const connectionRequest = await this.lockerRequestModel.findOne({ where: { spaceId } });
+        const connectionRequest = await this.lockerRequestModel.findOne({
+            where: { spaceId, type: LockerRequestType.CONNECTION },
+        });
 
         if (connectionRequest) {
             await connectionRequest.destroy();
         }
     };
 
-    public deleteReturnRequest = async (spaceId: string) => {
-        const returnRequest = await this.lockerRequestModel.findOne({ where: { spaceId } });
+    public deleteReturnRequest = async (spaceId: string): Promise<void> => {
+        const returnRequest = await this.lockerRequestModel.findOne({
+            where: { spaceId, type: LockerRequestType.RETURN },
+        });
 
         if (returnRequest) {
             await returnRequest.destroy();
         }
     };
 
-    /* 
-    
-    Пользователь отправляет заявку на подключение / отключение. Админ может либо отклонить, либо принять. и там и там 
-    реквест должен удаляться из базы данных, поэтому функции будут вызываться.
-    
-    Пользователь отправляет заявку на подключение / отключение. Админ подтверждает через эндпоинты LockerController.
+    public deleteRequestById = async (requestId: string): Promise<void> => {
+        const request = await this.findById(requestId);
 
-    
-    */
+        if (request) {
+            await request.destroy();
+        }
+    };
 }
 
 export const lockerRequestSequelizeDao = SingletonFactory.produce<LockerRequestSequelizeDao>(LockerRequestSequelizeDao);

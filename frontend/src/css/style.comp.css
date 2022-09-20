@@ -145,7 +145,8 @@ a {
       color: transparent !important; } }
 
 @media only screen and (max-width: 37.5em) {
-  .provide-space-button-container {
+  .provide-space-button-container,
+  .admin-panel-link-container {
     display: none; } }
 
 .footer {
@@ -1126,6 +1127,19 @@ select {
     padding: 2px;
     border-radius: 4px; }
 
+.with-side-bar {
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 100%;
+  grid-template-columns: 30% 4fr; }
+
+.side-bar {
+  background-color: #1476b3;
+  box-shadow: 1px 0 0px 0px rgba(209, 209, 209, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center; }
+
 .row {
   display: flex;
   flex-direction: row; }
@@ -1781,6 +1795,44 @@ input.validator--allowed {
 
 .address__input {
   background-size: 14px; }
+
+.account-confirmation__titles {
+  display: flex;
+  flex-direction: column;
+  align-items: center; }
+  .account-confirmation__titles h2,
+  .account-confirmation__titles h3 {
+    text-align: center; }
+  @media only screen and (max-width: 37.5em) {
+    .account-confirmation__titles h2 {
+      font-size: 1rem; }
+    .account-confirmation__titles h3 {
+      font-size: 0.5rem; } }
+  .account-confirmation__titles .code-verification {
+    margin-top: 2rem; }
+    @media only screen and (max-width: 37.5em) {
+      .account-confirmation__titles .code-verification {
+        width: 200px; } }
+    .account-confirmation__titles .code-verification-field {
+      margin: 3rem 0; }
+      .account-confirmation__titles .code-verification-field p {
+        text-align: center; }
+    .account-confirmation__titles .code-verification__digit-input {
+      color: #1476b3; }
+      @media only screen and (max-width: 37.5em) {
+        .account-confirmation__titles .code-verification__digit-input {
+          width: 25px; } }
+
+.send-code-options__get-new-code p {
+  color: #1476b3;
+  text-align: center; }
+  .send-code-options__get-new-code p:hover {
+    color: #2b99dd;
+    user-select: none;
+    cursor: pointer; }
+
+.admin-panel__interface {
+  padding: 2rem; }
 
 .section-not-found {
   background-color: #faf9f9;

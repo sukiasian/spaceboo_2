@@ -29,6 +29,21 @@ export class RouteProtector {
         next();
     });
 
+    // NOTE: if endpoints can be accessed both by users and admins
+    public static adminOrSpaceOwnerProtector = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+        const { id: userId } = req.user;
+        const { spaceId } = req.params || req.body || req.query;
+
+        const user: User = await this.userDao.findById(userId);
+        const space: Space = await this.spaceDao.findById(spaceId);
+
+        if (user.role !== UserRoles.ADMIN || space.userId !== user.id) {
+            throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.NOT_ENOUGH_RIGHTS);
+        }
+
+        next();
+    });
+
     public static spaceOwnerProtector = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const { id: userId } = req.user;
         const { spaceId } = req.params || req.body || req.query;

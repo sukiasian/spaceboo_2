@@ -1,7 +1,6 @@
 import { default as axios } from 'axios';
-import { Appointment } from '../models/appointment.model';
 import { Locker } from '../models/locker.model';
-import { ErrorMessages, HttpStatus, ResponseMessages } from '../types/enums';
+import { ErrorMessages, HttpStatus, ResponseMessages, TTLockApiRoute } from '../types/enums';
 import AppError from '../utils/AppError';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
 import UtilFunctions from '../utils/UtilFunctions';
@@ -15,14 +14,8 @@ interface IUnlockPayload {
     date: number;
 }
 
-enum LockerRequestType {
-    UNLOCK = '0',
-    LOCK = '1',
-}
-
 export class TTLockController extends Singleton {
     private readonly lockerModel: typeof Locker = Locker;
-    private readonly appointmentModel: typeof Appointment = Appointment;
 
     private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
     private requestOptions = {
@@ -39,7 +32,7 @@ export class TTLockController extends Singleton {
         payload.append('username', locker.ttlockEmail);
         payload.append('password', locker.ttlockPassword);
 
-        const res = await axios.post('https://cnapi.ttlock.com/oauth2/token', payload, this.requestOptions);
+        const res = await axios.post(TTLockApiRoute.GET_ACCESS_TOKEN, payload, this.requestOptions);
 
         if (res.data.errmsg) {
             throw new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.FORBIDDEN);
@@ -61,11 +54,7 @@ export class TTLockController extends Singleton {
             date: Date.now(),
         };
 
-        const ttLockResponse = await axios.post(
-            'https://cnapi.ttlock.com/v3/lock/unlock',
-            payload,
-            this.requestOptions
-        );
+        const ttLockResponse = await axios.post(TTLockApiRoute.UNLOCK_LOCKER, payload, this.requestOptions);
 
         if (ttLockResponse.data.errcode !== 0) {
             throw new AppError(HttpStatus.BAD_REQUEST, ErrorMessages.ERROR);

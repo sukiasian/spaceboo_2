@@ -1,12 +1,8 @@
-import { useSelector } from 'react-redux';
-import { NavLink, Route, Routes, useNavigate } from 'react-router-dom';
-import { IReduxState } from '../redux/reducers/rootReducer';
+import { NavLink, useNavigate } from 'react-router-dom';
 import SettingsPageRoutes from '../routes/SettingsPageRoutes';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { ITab } from '../types/types';
 import { checkIfRouteNeedsRedirectingToChildRoute } from '../utils/utilFunctions';
-import SecuritySettingsPage from './SecuritySettingsPage';
-import GeneralSettingsPage from './GeneralSettingsPage';
 
 export default function SettingsPage(): JSX.Element {
     const settingsLinkableTabs: ITab[] = [
@@ -19,9 +15,7 @@ export default function SettingsPage(): JSX.Element {
             linkTo: 'security',
         },
     ];
-    const [activeTab, setActiveTab] = useState();
-    const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
-    const userLoginState = fetchUserLoginStateSuccessResponse?.data;
+
     const pathname = window.location.pathname;
     const navigate = useNavigate();
     const redirectIfRouteIsNotSpecifiedOnInit = (): void => {
@@ -60,7 +54,7 @@ export default function SettingsPage(): JSX.Element {
     return (
         <section className="dashboard settings-page">
             <div className="dashboard__navigation-panel settings-page__navigation-panel">
-                <div className="settings-page__navigation-panel__content">
+                <div className="side-bar">
                     <div className="navigation-panel__title">
                         <h3 className="heading heading--tertiary">Настройки</h3>
                     </div>

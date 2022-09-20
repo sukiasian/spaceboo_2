@@ -17,10 +17,14 @@ import MyAppointmentsPage from '../pages/MyAppointmentsPage';
 import MySpacesPage from '../pages/MySpacesPage';
 import SpaceKeysPage from '../pages/SpaceKeysPage';
 import ScrollToTop from '../hoc/ScrollToTop';
+import AdminPanelPage from '../pages/AdminPanelPage';
 
 export default function AppRoutes(): JSX.Element {
     const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
+    const { fetchCurrentUserSuccessResponse } = useSelector((state: IReduxState) => state.userStorage);
+
     const userLoginState = fetchUserLoginStateSuccessResponse?.data;
+    const currentUser = fetchCurrentUserSuccessResponse?.data;
 
     if (userLoginState?.loggedIn && !userLoginState?.confirmed) {
         return (
@@ -76,6 +80,7 @@ export default function AppRoutes(): JSX.Element {
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/for-investors" element={<ForInvestorsPage />} />
                 <Route path="/how-it-works/*" element={<HowItWorksPage />} />
+                {currentUser?.role === 'admin' ? <Route path="admin-panel/*" element={<AdminPanelPage />} /> : null}
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
         </ScrollToTop>
