@@ -1,32 +1,48 @@
+import { MouseEventHandler } from 'react';
 import { useDispatch } from 'react-redux';
+import { togglePairLockerModal } from '../redux/actions/modalActions';
 import AltButton from './AltButton';
 
-export default function LockerRequest(): JSX.Element {
+interface ILockerRequestProps {
+    request: Record<any, any>;
+}
+
+export default function LockerRequest(props: ILockerRequestProps): JSX.Element {
+    const { request } = props;
+
     const dispatch = useDispatch();
-    // при нажатии на подключить должно открываться модальное окно. Поэтому добавляем в  modalStorage в redux
 
-    /* 
-    
-    подтягиваем информацию о реквесте. в нем есть поле спейс и соответственно оттуда получаем адрес. Из поля спейс мы также 
-    можем получить информацию об email.
+    const togglePairModal: MouseEventHandler = (e) => {
+        e.stopPropagation();
 
-    номер телефона есть в самом locker-request.
-    
+        dispatch(togglePairLockerModal());
+    };
 
-
-    */
-
-    const togglePairingLockerModal = (): void => {};
     const deleteRequest = (): void => {
         dispatch('');
     };
 
     return (
         <div className="locker-request">
-            <p> Type of request </p>
+            <div>
+                <h3> Тип запроса </h3>
+                <p> {request.type} </p>
+            </div>
+            <div>
+                <h3>id</h3>
+                <p>{request.id} </p>
+            </div>
+            <div>
+                <h3>Номер телефона</h3>
+                <p>{request.phoneNumber} </p>
+            </div>
+            <div>
+                <h3>Эл. почта</h3>
+                <p>{request.email} </p>
+            </div>
             <div className="buttons action-buttons">
-                <AltButton buttonText="Подключить" handleClick={togglePairingLockerModal} />
-                <AltButton buttonText="Отклонить заявку" />
+                <AltButton buttonText="Подключить" handleClick={togglePairModal} />
+                <AltButton buttonText="Отклонить заявку" handleClick={deleteRequest} />
             </div>
         </div>
     );

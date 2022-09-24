@@ -8,13 +8,11 @@ import {
     setFetchLockerRequestsByQueryFailureResponseAction,
     setFetchLockerRequestsByQuerySuccessResponseAction,
 } from '../actions/adminActions';
-import { IRequestQueryString } from '../reducers/lockerRequestsReducer';
+import { ILockerRequestsQueryString } from '../reducers/adminReducer';
 
-const fetchLockerRequestsByQuery = (query: IRequestQueryString): Promise<IServerResponse> => {
+const fetchLockerRequestsByQuery = (query: ILockerRequestsQueryString): Promise<IServerResponse> => {
     return httpRequester.get(
-        `${ApiUrl.LOCKER_REQUESTS}?page=${query.page || QueryDefaultValue.PAGE}&limit=${
-            query.limit || QueryDefaultValue.LIMIT
-        }&type=${query.type || ''}`
+        `${ApiUrl.LOCKERS}?page=${query.page || QueryDefaultValue.PAGE}&limit=${query.limit || QueryDefaultValue.LIMIT}`
     );
 };
 
@@ -31,6 +29,6 @@ function* fetchLockerRequestsByQueryWorker(action: IAction): Generator<CallEffec
         yield put(setFetchLockerRequestsByQueryFailureResponseAction(err as IServerResponse));
     }
 }
-export function* watchFetchLockerRequestsByQueryWorker(): Generator<ForkEffect, void, void> {
+export function* watchFetchLockerRequestsByQuery(): Generator<ForkEffect, void, void> {
     yield takeEvery(SagaTask.FETCH_LOCKER_REQUESTS_BY_QUERY, fetchLockerRequestsByQueryWorker);
 }

@@ -41,18 +41,8 @@ class LockerRequestRouter extends Singleton implements IRouter {
             RouteProtector.spaceOwnerProtector,
             this.lockerRequestController.requestLocker
         );
-        // .get(
-        //     this.passport.authenticate(PassportStrategies.JWT, { session: false }),
-        //     RouteProtector.adminOnlyProtector,
-        //     this.lockerRequestController.getConnectionRequests
-        // );
 
         this.router.route('/return').post(this.lockerRequestController.requestLocker);
-        // .get(
-        //     this.passport.authenticate(PassportStrategies.JWT, { session: false }),
-        //     RouteProtector.adminOnlyProtector,
-        //     this.lockerRequestController.getReturnRequests
-        // );
     };
 }
 

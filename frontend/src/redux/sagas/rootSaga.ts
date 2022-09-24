@@ -31,7 +31,8 @@ import { watchPostRequestLockerReturn } from './postRequestLockerReturnSaga';
 import { watchPostRequestLocker } from './postRequestLockerSaga';
 import { watchPostUnlockLocker } from './postUnlockLockerSaga';
 import { watchPostUnpairLocker } from './postUnpairLockerSaga';
-import { watchFetchLockerRequestsByQueryWorker } from './fetchLockerRequestsByQuerySaga';
+import { watchFetchLockerRequestsByQuery } from './fetchLockerRequestsByQuerySaga';
+import { watchFetchLockersByQuery } from './fetchLockersByQuerySaga';
 
 export function* rootSaga() {
     yield all([
@@ -67,6 +68,7 @@ export function* rootSaga() {
         watchPostRequestLocker(),
         watchPostUnlockLocker(),
         watchPostUnpairLocker(),
-        watchFetchLockerRequestsByQueryWorker(),
+        watchFetchLockerRequestsByQuery(),
+        watchFetchLockersByQuery(),
     ]);
 }

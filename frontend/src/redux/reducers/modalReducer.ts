@@ -5,6 +5,7 @@ export interface IModalState {
     loginModalIsOpen: boolean;
     signupModalIsOpen: boolean;
     editSpaceModalIsOpen: boolean;
+    pairLockerModalIsOpen?: boolean;
 }
 
 const initialState: IModalState = {
@@ -31,6 +32,12 @@ export const modalReducer = (state = initialState, action: IAction): IModalState
             return {
                 ...state,
                 editSpaceModalIsOpen: !state.editSpaceModalIsOpen,
+            };
+
+        case ReduxModalAction.TOGGLE_PAIR_LOCKER_MODAL:
+            return {
+                ...state,
+                pairLockerModalIsOpen: !state.pairLockerModalIsOpen,
             };
 
         default:

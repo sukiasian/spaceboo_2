@@ -198,9 +198,6 @@ export default function SpacePage(): JSX.Element {
         if (spaceBelongsToUser()) {
             return (
                 <div className="space-owner-menu">
-                    {/* <div className="space-owner-menu__edit" onClick={toggleEditSpaceModal}>
-                        <FontAwesomeIcon icon={faEdit} />
-                    </div> */}
                     <EditButton handleClick={toggleEditSpaceModal} />
                     <DeleteButton handleClick={toggleDeleteSpaceConfirm} />{' '}
                 </div>

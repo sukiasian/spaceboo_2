@@ -26,6 +26,7 @@ import * as cors from 'cors';
 import CorsConfig from './configurations/cors.config';
 import helmet from 'helmet';
 import { Locker } from './models/locker.model';
+import { LockerRequest } from './models/locker-request.model';
 
 export class AppConfig extends Singleton {
     public readonly app: express.Express = express();
@@ -39,7 +40,7 @@ export class AppConfig extends Singleton {
         username: process.env.DATABASE_USERNAME || 'postgres',
         password: process.env.DATABASE_PASSWORD || 'postgres',
         database: process.env.DATABASE_NAME || 'postgres',
-        models: [District, Region, City, User, Space, Appointment, EmailVerification, Locker],
+        models: [District, Region, City, User, Space, Appointment, EmailVerification, Locker, LockerRequest],
         logging: false,
     });
     private readonly passportConfig: PassportConfig = passportConfig;

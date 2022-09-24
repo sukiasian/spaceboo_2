@@ -1,4 +1,4 @@
-import { Dispatch, FormEventHandler } from 'react';
+import { Dispatch, FormEventHandler, MouseEventHandler } from 'react';
 import { Action } from 'redux';
 import { IAction } from '../redux/actions/ActionTypes';
 import { HttpStatus, IServerResponse, ReduxModalAction } from '../types/types';
@@ -42,7 +42,7 @@ export const serverResponseIsSuccessful = (response: IServerResponse): boolean =
     return response.statusCode >= HttpStatus.OK && response.statusCode < HttpStatus.AMBIGUOUS ? true : false;
 };
 
-export const defineActiveClassName = (activeTab: string, tab: string): string => {
+export const defineActiveClassName = (activeTab: string | number, tab: string | number): string => {
     if (activeTab === tab) {
         return 'active';
     }
@@ -136,4 +136,8 @@ export const turnOffScrollingOnInit = (): (() => void) => {
 
 export const isMobile = (): boolean => {
     return window.innerWidth <= 600 ?? false;
+};
+
+export const stopPropagation: MouseEventHandler = (e) => {
+    e.stopPropagation();
 };

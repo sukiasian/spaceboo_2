@@ -23,6 +23,7 @@ export class PassportConfig extends Singleton {
     private readonly redisClient = redis.client;
     private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
     private readonly attemptsAllowed = '2';
+
     public initializePassport(): express.Handler {
         return this.passport.initialize();
     }
@@ -33,7 +34,8 @@ export class PassportConfig extends Singleton {
         if (loginAttemptsValue === null) {
             await this.redisClient.set(key, '1');
         } else if (loginAttemptsValue === this.attemptsAllowed) {
-            await this.redisClient.setEx(key, 60 * 30, this.attemptsAllowed);
+            // FIXME: change the value from 0.1 to 60 * 30
+            await this.redisClient.setEx(key, 5, this.attemptsAllowed);
         } else {
             await this.redisClient.set(key, `${this.utilFunctions.makeDecimal(loginAttemptsValue) + 1}`);
         }
@@ -99,57 +101,6 @@ export class PassportConfig extends Singleton {
                         done(err);
                         logger.error(err);
                     }
-                }
-            )
-        );
-
-        this.passport.use(
-            new FacebookStrategy(
-                {
-                    clientID: '890851108189818',
-                    clientSecret: 'f6a91a16da6c4eb4c376895afed8b9cf',
-                    callbackURL: 'http://localhost:8000/auth/facebook/callback', // NOTE http or https?
-                },
-                async function (accessToken, refreshToken, profile, cb) {
-                    await this.userModel
-                        .findOrCreate({ where: { facebookId: profile.id } })
-                        .then(function (user: [User, boolean]) {
-                            return cb(null, user);
-                        });
-                }
-            )
-        );
-        // FIXME
-        this.passport.use(
-            new VkontakteStrategy(
-                {
-                    clientID: 'VKONTAKTE_APP_ID', // VK.com docs call it 'API ID', 'app_id', 'api_id', 'client_id' or 'apiId'
-                    clientSecret: 'VKONTAKTE_APP_SECRET',
-                    callbackURL: 'http://localhost:3000/auth/vkontakte/callback',
-                },
-                function myVerifyCallbackFn(accessToken, refreshToken, params, profile, done) {
-                    this.userModel
-                        .findOrCreate({ where: { vkontakteId: profile.id } })
-                        .then(function (user) {
-                            done(null, user);
-                        })
-                        .catch(done);
-                }
-            )
-        );
-
-        this.passport.use(
-            new OdnoklassnikiStrategy(
-                {
-                    clientID: 'ODNOKLASSNIKI_APP_ID',
-                    clientPublic: 'ODNOKLASSNIKI_APP_PUBLIC_KEY',
-                    clientSecret: 'ODNOKLASSNIKI_APP_SECRET_KEY',
-                    callbackURL: 'http://localhost:3000/auth/odnoklassniki/callback',
-                },
-                function (accessToken, refreshToken, profile, done) {
-                    this.userModel.findOrCreate({ where: { odnoklassnikiId: profile.id } }).then(function (user) {
-                        return done(null, user);
-                    });
                 }
             )
         );

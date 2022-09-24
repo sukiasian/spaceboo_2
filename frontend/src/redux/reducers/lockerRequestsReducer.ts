@@ -1,12 +1,11 @@
-import { IQueryString, IServerResponse, ReduxLockerRequestsAction } from '../../types/types';
+import { IServerResponse, ReduxLockerRequestsAction } from '../../types/types';
 import { IAction } from '../actions/ActionTypes';
 
-export interface ILockerState {
+export interface ILockerRequestsState {
     postRequestLockerSuccessResponse?: IServerResponse;
     postRequestLockerFailureResponse?: IServerResponse;
     postRequestLockerReturnSuccessResponse?: IServerResponse;
     postRequestLockerReturnFailureResponse?: IServerResponse;
-    fetchAllLockerRequestsQueryData?: IServerResponse;
 }
 
 export interface ILockerRequestPayload {
@@ -20,13 +19,9 @@ export interface IRequestReturnLockerPayload extends ILockerRequestPayload {
     lockerId: string;
 }
 
-export interface IRequestQueryString extends IQueryString {
-    type: string | number;
-}
+const initialState: ILockerRequestsState = {};
 
-const initialState: ILockerState = {};
-
-export const adminReducer = (state = initialState, action: IAction): ILockerState => {
+export const lockerRequestsReducer = (state = initialState, action: IAction): ILockerRequestsState => {
     switch (action.type) {
         case ReduxLockerRequestsAction.SET_POST_REQUEST_LOCKER_SUCCESS_RESPONSE:
             return {
@@ -50,12 +45,6 @@ export const adminReducer = (state = initialState, action: IAction): ILockerStat
             return {
                 ...state,
                 postRequestLockerReturnFailureResponse: action.payload,
-            };
-
-        case ReduxLockerRequestsAction.SET_FETCH_ALL_LOCKER_REQUESTS_QUERY_DATA:
-            return {
-                ...state,
-                fetchAllLockerRequestsQueryData: action.payload,
             };
 
         default: {

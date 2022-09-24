@@ -8,6 +8,10 @@ import { commonReducer, ICommonState } from './commonReducer';
 import { IUserState, userReducer } from './userReducer';
 import { IImageState, imageReducer } from './imageReducer';
 import { appointmentReducer, IAppointmentState } from './appointmentReducer';
+import { ILockerRequestsState, lockerRequestsReducer } from './lockerRequestsReducer';
+import { ILockerState, lockerReducer } from './lockerReducer';
+import { ILockerApiState, lockerApiReducer } from './lockerApiReducer';
+import { adminReducer, IAdminState } from './adminReducer';
 
 export interface IReduxState {
     spaceStorage: ISpaceState;
@@ -19,6 +23,10 @@ export interface IReduxState {
     modalStorage: IModalState;
     emailVerificationStorage: IEmailVerificationState;
     commonStorage: ICommonState;
+    lockerRequestsStorage: ILockerRequestsState;
+    lockerStorage: ILockerState;
+    lockerApiStorage: ILockerApiState;
+    adminStorage: IAdminState;
 }
 
 const rootReducer: Reducer<IReduxState> = combineReducers({
@@ -31,6 +39,10 @@ const rootReducer: Reducer<IReduxState> = combineReducers({
     modalStorage: modalReducer,
     emailVerificationStorage: emailVerificationReducer,
     commonStorage: commonReducer,
+    lockerRequestsStorage: lockerRequestsReducer,
+    lockerStorage: lockerReducer,
+    lockerApiStorage: lockerApiReducer,
+    adminStorage: adminReducer,
 });
 
 export default rootReducer;

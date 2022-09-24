@@ -1,58 +1,42 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
-import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 import Titles from '../components/Titles';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { fetchUserSpacesAction } from '../redux/actions/spaceActions';
 import LoadingSpin from '../components/LoadingSpin';
-import Space from '../components/Space';
 import { UrlPathname } from '../types/types';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import AddButton from '../buttons/AddButton';
+import SpacesWithMenus from '../components/SpacesWithMenus';
+import SpaceOwnerMenu from '../components/SpaceOwnerMenu';
 
 export default function MySpacesPage(): JSX.Element {
-    const [spaceActionsDropdownIsOpen, setSpaceActionsDropdownIsOpen] = useState(false);
     const { fetchUserSpacesSuccessResponse } = useSelector((state: IReduxState) => state.spaceStorage);
+
+    const spaces = fetchUserSpacesSuccessResponse?.data;
+
     const dispatch = useDispatch();
+
     const applyEffectsOnInit = (): void => {
         dispatch(fetchUserSpacesAction());
     };
+
     const renderLoadingSpin = (): ReactNode => {
         if (!fetchUserSpacesSuccessResponse) {
             return <LoadingSpin />;
         }
     };
-    const renderUserSpaces = (): JSX.Element => {
-        return fetchUserSpacesSuccessResponse?.data?.map((space: any, i: number) => {
-            return (
-                <div className="user-space" key={i}>
-                    <Space space={space} index={i} key={i} />
-                </div>
-            );
-        });
-    };
+
     const renderAddSpaceButton = (): JSX.Element | void => {
         if (fetchUserSpacesSuccessResponse) {
             return (
                 <NavLink to={UrlPathname.PROVIDE_SPACE}>
-                    <AddButton />
+                    <AddButton /> abcdefg
                 </NavLink>
             );
         }
     };
-    const renderSpaceActionsDropdown = (): JSX.Element | void => {
-        if (spaceActionsDropdownIsOpen) {
-            return (
-                <div className="space-actions-dropdown-menu">
-                    <div className="">
-                        <FontAwesomeIcon icon={faCalendar} />
-                    </div>
-                    <div className=""></div>
-                </div>
-            );
-        }
-    };
+
     useEffect(applyEffectsOnInit, [dispatch]);
 
     return (
@@ -62,7 +46,14 @@ export default function MySpacesPage(): JSX.Element {
                 {renderLoadingSpin()}
                 {/* below should be grid or flex */}
                 <div className="spaces">
-                    {renderUserSpaces()}
+                    <SpacesWithMenus
+                        spaces={spaces}
+                        children={(spaceId: string, handleOnDemounting: (...props: any) => any) => (
+                            <SpaceOwnerMenu spaceId={spaceId} handleOnDemounting={handleOnDemounting} />
+                        )}
+                        childrenRequiredArgument={'id'}
+                        childrenRequiredDemountingHandler={true}
+                    />
                     {renderAddSpaceButton()}
                 </div>
             </section>

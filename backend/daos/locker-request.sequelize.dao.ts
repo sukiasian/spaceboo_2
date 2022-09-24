@@ -60,22 +60,14 @@ export class LockerRequestSequelizeDao extends Dao {
         return this.model.create({ id: parseInt(lockerId, 10), type: LockerRequestType.RETURN, phoneNumber, spaceId });
     };
 
-    public getRequestsByQuery = async (query: IRequestQueryString) => {
-        const page = query.page ? parseInt(query.page as string, 10) : QueryDefaultValue.PAGE;
-        const limit = query.limit ? parseInt(query.limit as string, 10) : QueryDefaultValue.LIMIT;
+    public getRequestsByQuery = async (queryStr: IRequestQueryString) => {
+        const page = queryStr.page ? parseInt(queryStr.page as string, 10) : QueryDefaultValue.PAGE;
+        const limit = queryStr.limit ? parseInt(queryStr.limit as string, 10) : QueryDefaultValue.LIMIT;
         // NOTE может вылезти ошибка - если мы не уточним query.type возможно ничего не будет найдено
-        const type = query.type ?? undefined;
+        const type = queryStr.type ?? undefined;
         const offset = (page - 1) * limit;
 
-        return this.model.findAll({ type: type as string, limit, offset });
-    };
-
-    public getConnectionRequests = async (): Promise<LockerRequest[]> => {
-        return this.model.findAll({ where: { type: LockerRequestType.CONNECTION } });
-    };
-
-    public getReturnRequests = async () => {
-        return this.model.findAll({ where: { type: LockerRequestType.RETURN } });
+        return this.model.findAll({ where: { type }, offset, limit });
     };
 
     public getRequestsAmount = (): Promise<number> => {

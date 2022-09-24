@@ -20,7 +20,7 @@ export class RouteProtector {
     // TODO регистрация админов не должна быть доступна для каждого - возможно только авторизованный админ должен уметь это делатьы
     public static adminOnlyProtector = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const { id: userId } = req.user;
-        const user: User = await this.userDao.findById(userId);
+        const user: User = await this.userModel.scope(UserScopes.WITH_ROLE).findOne({ where: { id: userId } });
 
         if (user.role !== UserRoles.ADMIN) {
             throw new AppError(HttpStatus.FORBIDDEN, ErrorMessages.NOT_ENOUGH_RIGHTS);

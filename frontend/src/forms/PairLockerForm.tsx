@@ -1,4 +1,4 @@
-export default function AddLockerForm(): JSX.Element {
+export default function PairLockerForm(): JSX.Element {
     return (
         <form className="form add-locker-form">
             <div className="add-locker-form__input add-locker-form__input--1">

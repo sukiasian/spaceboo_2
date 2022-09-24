@@ -29,12 +29,9 @@ export class LockerRequest
     @Column({ type: DataType.UUID, allowNull: false })
     public spaceId: string;
 
-    // @BelongsTo(() => Space)
-    // public space: Space;
-
     @Column({ type: DataType.STRING })
     public phoneNumber: string;
 
-    @Column({ type: DataType.INTEGER, defaultValue: LockerRequestType })
+    @Column({ type: DataType.STRING, defaultValue: LockerRequestType.CONNECTION, allowNull: false })
     public type: LockerRequestType;
 }

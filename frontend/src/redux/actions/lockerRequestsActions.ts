@@ -1,10 +1,6 @@
 import { IServerResponse, ReduxAdminAction, ReduxLockerRequestsAction, SagaTask } from '../../types/types';
 import { IDeleteLockerRequestPayload } from '../reducers/adminReducer';
-import {
-    IRequestLockerConnectionPayload,
-    IRequestQueryString,
-    IRequestReturnLockerPayload,
-} from '../reducers/lockerRequestsReducer';
+import { IRequestLockerConnectionPayload, IRequestReturnLockerPayload } from '../reducers/lockerRequestsReducer';
 import { IAction } from './ActionTypes';
 
 export const postRequestLockerAction = (
@@ -30,15 +26,6 @@ export const deleteLockerRequestByIdAction = (
 ): IAction<SagaTask, IDeleteLockerRequestPayload> => {
     return {
         type: SagaTask.DELETE_LOCKER_REQUEST_BY_ID,
-        payload,
-    };
-};
-
-export const setFetchAllLockerRequestsQueryData = (
-    payload: IRequestQueryString
-): IAction<ReduxLockerRequestsAction, IRequestQueryString> => {
-    return {
-        type: ReduxLockerRequestsAction.SET_FETCH_ALL_LOCKER_REQUESTS_QUERY_DATA,
         payload,
     };
 };

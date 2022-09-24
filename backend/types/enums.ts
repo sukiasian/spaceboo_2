@@ -125,6 +125,9 @@ export enum ResponseMessages {
 
     LOCKER_REQUEST_CREATED = 'Заявка на подключение локера принята. Наша команда свяжется с вами в ближайшее время.',
 
+    LOCKER_IS_PAIRED = 'Локер успешно привязан к пространству.',
+    LOCKER_IS_UNPAIRED = 'Локер успешно отвязан от пространства.',
+
     LOCKER_UNLOCKED = 'Локер разблокирован.',
 }
 

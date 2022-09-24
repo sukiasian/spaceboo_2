@@ -18,3 +18,9 @@ export const toggleEditSpaceModalAction = (): Action => {
         type: ReduxModalAction.TOGGLE_EDIT_SPACE_MODAL,
     };
 };
+
+export const togglePairLockerModal = (): Action => {
+    return {
+        type: ReduxModalAction.TOGGLE_PAIR_LOCKER_MODAL,
+    };
+};
