@@ -37,7 +37,7 @@ export default function EditSpaceForm(): JSX.Element {
     const [openedInput, setOpenedInput] = useState<EditSpaceOpenableField>();
     const [pickedCityName, setPickedCityName] = useState<string>();
     const [spaceImages, setSpaceImages] = useState<string[]>();
-    const [spaceImagesToRemove, setSpaceImagesToRemove] = useState<string[]>();
+    const [spaceImagesToRemove] = useState<string[]>();
     const openedInputRef = useRef<HTMLInputElement>(null);
     const { editSpaceData, fetchSpaceByIdSuccessResponse, putEditSpaceSuccessResponse, putEditSpaceFailureResponse } =
         useSelector((state: IReduxState) => state.spaceStorage);
@@ -90,11 +90,11 @@ export default function EditSpaceForm(): JSX.Element {
     };
     const setCityPickerValue = (): void => {
         if (openedInputRef.current?.name === 'cityId') {
-            openedInputRef.current.value = separateCityNameFromRegionIfCityNameContains(spaceData.city.name);
+            openedInputRef.current.value = separateCityNameFromRegionIfCityNameContains(spaceData?.city.name);
         }
     };
     const setSpaceImagesAfterFetchingSpaceData = (): void => {
-        const spaceImages = spaceData.imagesUrl;
+        const spaceImages = spaceData?.imagesUrl;
 
         setSpaceImages(spaceImages);
     };
@@ -266,7 +266,7 @@ export default function EditSpaceForm(): JSX.Element {
     };
     const renderTypeOfSpaceCheckboxes = (): JSX.Element[] => {
         return typeOfSpaceInputsData.map((typeOfSpaceInputData: ITypeOfSpaceInputData, i: number) => {
-            const checkboxIsChecked = typeOfSpaceInputData.spaceType === spaceData.type;
+            const checkboxIsChecked = typeOfSpaceInputData.spaceType === spaceData?.type;
 
             return (
                 <div
@@ -353,7 +353,7 @@ export default function EditSpaceForm(): JSX.Element {
                     <select
                         className="rooms-number__dropdown"
                         onChange={handleRoomsNumberDropDownSelect}
-                        defaultValue={spaceData.roomsNumber}
+                        defaultValue={spaceData?.roomsNumber}
                     >
                         {renderDropdownNumericalOptions()}
                     </select>
@@ -378,7 +378,7 @@ export default function EditSpaceForm(): JSX.Element {
                 ) : (
                     <div className="space-description">
                         <p onClick={handleActiveField(EditSpaceOpenableField.DESCRIPTION)}>
-                            {editSpaceData?.description || spaceData.description}
+                            {editSpaceData?.description || spaceData?.description}
                         </p>
                     </div>
                 )}
@@ -418,7 +418,7 @@ export default function EditSpaceForm(): JSX.Element {
                 ) : (
                     <div className="space-address">
                         <p onClick={handleActiveField(EditSpaceOpenableField.ADDRESS)}>
-                            {editSpaceData?.address || spaceData.address}
+                            {editSpaceData?.address || spaceData?.address}
                         </p>
                     </div>
                 )}
@@ -443,7 +443,7 @@ export default function EditSpaceForm(): JSX.Element {
                 ) : (
                     <div className="space-price-per-night">
                         <p onClick={handleActiveField(EditSpaceOpenableField.PRICE_PER_NIGHT)}>
-                            {editSpaceData?.pricePerNight || spaceData.pricePerNight}
+                            {editSpaceData?.pricePerNight || spaceData?.pricePerNight}
                         </p>
                     </div>
                 )}
@@ -465,7 +465,7 @@ export default function EditSpaceForm(): JSX.Element {
             ) : (
                 <div className="space-city">
                     <p onClick={handleActiveField(EditSpaceOpenableField.CITY)}>
-                        {pickedCityName || spaceData.city.name}
+                        {pickedCityName || spaceData?.city.name}
                     </p>
                 </div>
             )}
