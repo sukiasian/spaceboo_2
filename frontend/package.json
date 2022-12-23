@@ -33,7 +33,7 @@
         "eject": "react-scripts eject",
         "watch:sass": "node-sass src/sass/main.scss src/css/style.comp.css -w",
         "compile:sass": "node-sass src/sass/main.scss src/css/style.comp.css",
-        "concat:css": "concat -o src/css/style.concat.css src/css/icon-style.css src/css/style.comp.css",
+        "concat:css": "concat -o src/css/style.concat.css src/css/style.comp.css",
         "prefix:css": "postcss --use autoprefixer -b 'last 10 versions' src/css/style.concat.css -o src/css/style.prefix.css",
         "compress:css": "node-sass src/css/style.prefix.css src/css/style.css --output-style compressed",
         "build:css": "npm run compile:sass && npm run concat:css && npm run prefix:css && npm run compress:css"
@@ -62,6 +62,9 @@
         "@types/react-router-dom": "^5.3.3",
         "@types/redux": "^3.6.0",
         "@types/uuid": "^8.3.4",
-        "node-sass": "^7.0.1"
+        "concat": "^1.0.3",
+        "node-sass": "^7.0.1",
+        "postcss": "^8.4.20",
+        "postcss-cli": "^10.1.0"
     }
 }

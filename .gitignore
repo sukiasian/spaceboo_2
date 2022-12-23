@@ -3,6 +3,8 @@
 /.vscode
 /dist
 /.idea
+/spaceboo-ec2-policy.json
+/spaceboo-ec2-policy.json.*
 
 /backend/node_modules
 /backend/log
