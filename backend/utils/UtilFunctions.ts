@@ -6,6 +6,7 @@ import { promisify } from 'util';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as jwt from 'jsonwebtoken';
+import * as uuid from 'uuid';
 import logger from '../loggers/logger';
 import { TIsoDatesReserved } from '../models/appointment.model';
 import { Environment, ErrorMessages, HttpStatus, ResponseMessages, ResponseStatus } from '../types/enums';
@@ -225,6 +226,13 @@ class UtilFunctions {
 
     public static makeDecimal = (valueToNumber: string): number => {
         return parseInt(valueToNumber, 10);
+    };
+
+    public static isUUID = (id: string): boolean => {
+        // NOTE: does not work
+        // return uuid.validate(id);
+
+        return id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i) ? true : false;
     };
 }
 

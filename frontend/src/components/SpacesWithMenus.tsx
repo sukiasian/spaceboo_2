@@ -1,4 +1,5 @@
-import React, { MouseEventHandler, useState } from 'react';
+import React, { MouseEventHandler, useEffect, useState } from 'react';
+import AddButton from '../buttons/AddButton';
 import TripleDotButton from '../buttons/TripleDotButton';
 import Space from './Space';
 
@@ -28,13 +29,15 @@ export default function SpacesWithMenus(props: ISpacesWithMenusProps): JSX.Eleme
 
     const renderChildren = (space: Record<any, any>): JSX.Element => {
         if (props.childrenRequiredArgument && childrenRequiredDemountingHandler) {
-            return props.children!(space[props.childrenRequiredArgument], () =>
-                setIndexOfSpaceWhereTripleDotsClicked(undefined)
+            return props.children!(
+                space[props.childrenRequiredArgument],
+                () => setIndexOfSpaceWhereTripleDotsClicked(undefined),
+                space.lockerId
             );
         } else if (props.childrenRequiredArgument && !childrenRequiredDemountingHandler) {
-            return props.children!(space[props.childrenRequiredArgument]);
+            return props.children!(space[props.childrenRequiredArgument], null, space.lockerId);
         } else if (!props.childrenRequiredArgument && childrenRequiredDemountingHandler) {
-            return props.children!(null, () => setIndexOfSpaceWhereTripleDotsClicked(undefined));
+            return props.children!(null, () => setIndexOfSpaceWhereTripleDotsClicked(undefined), space.lockerId);
         }
 
         return props.children!();
@@ -53,5 +56,12 @@ export default function SpacesWithMenus(props: ISpacesWithMenusProps): JSX.Eleme
             {i === indexOfSpaceWhereTripleDotsClicked ? renderChildren(space) : null}
         </React.Fragment>
     ));
-    return <div className="spaces-with-menus">{renderSpaces}</div>;
+
+    useEffect(() => {
+        return () => {
+            setIndexOfSpaceWhereTripleDotsClicked(undefined);
+        };
+    }, []);
+
+    return <>{renderSpaces}</>;
 }

@@ -153,6 +153,8 @@ export enum ErrorMessages {
     SPACE_ALREADY_HAS_LOCKER = 'У пространства уже есть локер.',
     SPACE_LOCKER_REQUEST_EXISTS = 'Заявка на подключение локера ранее была подана.',
 
+    LOCKER_NOT_FOUND_FOR_SPACE = 'Локер не найден для данного пространства.',
+
     APPLICATION_ERROR = 'Application Error',
     UNKNOWN_ERROR = 'Произошла серьезная ошибка.',
     ERROR = 'Произошла ошибка',

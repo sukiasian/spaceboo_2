@@ -336,118 +336,110 @@ export default function EditSpaceForm(): JSX.Element {
     // NOTE if here we use select tag then in dropdown menus we should also use that in other places and vice versa
 
     return (
-        <form className="provide-space__form" onSubmit={handleFormSubmit} encType="multipart/form-data">
-            <div className="space-input-fields--type-of-space">
-                <div className="type-of-space__label-container">
-                    <label className="label label--type-of-space">Тип пространства</label>
-                    <RequiredField />
-                </div>
-                <div className="type-of-space__checkboxes">{renderTypeOfSpaceCheckboxes()}</div>
+        <form className="edit-space-form" onSubmit={handleFormSubmit} encType="multipart/form-data">
+            <div className="type-of-space__label-container">
+                <label className="label label--type-of-space">Тип пространства</label>
+                <RequiredField />
             </div>
-            <div className="space-input-fields--rooms-number">
-                <div className="rooms-number__label-container">
-                    <label className="label label--rooms-number">Количество комнат</label>
-                    <RequiredField />
-                </div>
-                <div className="rooms-number__dropdown-container">
-                    <select
-                        className="rooms-number__dropdown"
-                        onChange={handleRoomsNumberDropDownSelect}
-                        defaultValue={spaceData?.roomsNumber}
-                    >
-                        {renderDropdownNumericalOptions()}
-                    </select>
-                </div>
+            <div className="type-of-space__checkboxes">{renderTypeOfSpaceCheckboxes()}</div>
+
+            <div className="rooms-number__label-container">
+                <label className="label label--rooms-number">Количество комнат</label>
+                <RequiredField />
             </div>
-            <div className="space-input-fields--description">
-                <div className="description__label-container">
-                    <label className="label label--description">Описание</label>
-                </div>
-                {checkIfFieldIsOpen(EditSpaceOpenableField.DESCRIPTION) ? (
-                    <div className="description__input-container">
-                        <input
-                            ref={openedInputRef}
-                            className="description__input"
-                            name="description"
-                            type="text"
-                            placeholder="Добавьте описание..."
-                            data-required={true}
-                            data-has-dropdown={false}
-                        />
-                    </div>
-                ) : (
-                    <div className="space-description">
-                        <p onClick={handleActiveField(EditSpaceOpenableField.DESCRIPTION)}>
-                            {editSpaceData?.description || spaceData?.description}
-                        </p>
-                    </div>
-                )}
+            <div className="rooms-number__dropdown-container">
+                <select
+                    className="rooms-number__dropdown"
+                    onChange={handleRoomsNumberDropDownSelect}
+                    defaultValue={spaceData?.roomsNumber}
+                >
+                    {renderDropdownNumericalOptions()}
+                </select>
             </div>
-            <div className="space-input-fields--beds-number">
-                <div className="beds-number__label-container">
-                    <label className="label label--rooms-number">Количество спальных мест</label>
-                    <RequiredField />
-                </div>
-                <div className="beds-number__dropdown-container">
-                    <select
-                        className="beds-number__dropdown"
-                        onChange={handleRoomsNumberDropDownSelect}
-                        defaultValue={initialRoomsNumber}
-                    >
-                        {renderDropdownNumericalOptions()}
-                    </select>
-                </div>
+
+            <div className="description__label-container">
+                <label className="label label--description">Описание</label>
             </div>
-            <div className="space-input-fields--address">
-                <div className="address__label-container">
-                    <label className="label label--address">Адрес</label>
-                    <RequiredField />
+            {checkIfFieldIsOpen(EditSpaceOpenableField.DESCRIPTION) ? (
+                <div className="description__input-container">
+                    <input
+                        ref={openedInputRef}
+                        className="description__input"
+                        name="description"
+                        type="text"
+                        placeholder="Добавьте описание..."
+                        data-required={true}
+                        data-has-dropdown={false}
+                    />
                 </div>
-                {checkIfFieldIsOpen(EditSpaceOpenableField.ADDRESS) ? (
-                    <div className="address__input-container">
-                        <input
-                            ref={openedInputRef}
-                            name="address"
-                            className="address__input"
-                            type="text"
-                            placeholder="Введите адрес..."
-                            data-required={true}
-                            data-has-dropdown={false}
-                        />
-                    </div>
-                ) : (
-                    <div className="space-address">
-                        <p onClick={handleActiveField(EditSpaceOpenableField.ADDRESS)}>
-                            {editSpaceData?.address || spaceData?.address}
-                        </p>
-                    </div>
-                )}
-            </div>
-            <div className="space-input-fields--price-per-night">
-                <div className="label-container">
-                    <label className="label label--price-per-night">Цена за 1 ночь</label>
-                    <RequiredField />
+            ) : (
+                <div className="space-description">
+                    <p onClick={handleActiveField(EditSpaceOpenableField.DESCRIPTION)}>
+                        {editSpaceData?.description || spaceData?.description}
+                    </p>
                 </div>
-                {checkIfFieldIsOpen(EditSpaceOpenableField.PRICE_PER_NIGHT) ? (
-                    <div className="price-per-night__input-container">
-                        <input
-                            ref={openedInputRef}
-                            name="pricePerNight"
-                            className="price-per-night__input"
-                            type="tel"
-                            placeholder="Укажите цену за 1 ночь..."
-                            data-required={true}
-                            data-has-dropdown={false}
-                        />
-                    </div>
-                ) : (
-                    <div className="space-price-per-night">
-                        <p onClick={handleActiveField(EditSpaceOpenableField.PRICE_PER_NIGHT)}>
-                            {editSpaceData?.pricePerNight || spaceData?.pricePerNight}
-                        </p>
-                    </div>
-                )}
+            )}
+
+            <div className="beds-number__label-container">
+                <label className="label label--rooms-number">Количество спальных мест</label>
+                <RequiredField />
             </div>
+            <div className="beds-number__dropdown-container">
+                <select
+                    className="beds-number__dropdown"
+                    onChange={handleRoomsNumberDropDownSelect}
+                    defaultValue={initialRoomsNumber}
+                >
+                    {renderDropdownNumericalOptions()}
+                </select>
+            </div>
+
+            <div className="address__label-container">
+                <label className="label label--address">Адрес</label>
+                <RequiredField />
+            </div>
+            {checkIfFieldIsOpen(EditSpaceOpenableField.ADDRESS) ? (
+                <div className="address__input-container">
+                    <input
+                        ref={openedInputRef}
+                        name="address"
+                        className="address__input"
+                        type="text"
+                        placeholder="Введите адрес..."
+                        data-required={true}
+                        data-has-dropdown={false}
+                    />
+                </div>
+            ) : (
+                <div className="space-address">
+                    <p onClick={handleActiveField(EditSpaceOpenableField.ADDRESS)}>
+                        {editSpaceData?.address || spaceData?.address}
+                    </p>
+                </div>
+            )}
+            <div className="label-container">
+                <label className="label label--price-per-night">Цена за 1 ночь</label>
+                <RequiredField />
+            </div>
+            {checkIfFieldIsOpen(EditSpaceOpenableField.PRICE_PER_NIGHT) ? (
+                <div className="price-per-night__input-container">
+                    <input
+                        ref={openedInputRef}
+                        name="pricePerNight"
+                        className="price-per-night__input"
+                        type="tel"
+                        placeholder="Укажите цену за 1 ночь..."
+                        data-required={true}
+                        data-has-dropdown={false}
+                    />
+                </div>
+            ) : (
+                <div className="space-price-per-night">
+                    <p onClick={handleActiveField(EditSpaceOpenableField.PRICE_PER_NIGHT)}>
+                        {editSpaceData?.pricePerNight || spaceData?.pricePerNight}
+                    </p>
+                </div>
+            )}
             {checkIfFieldIsOpen(EditSpaceOpenableField.CITY) ? (
                 <div className="city-picker__search">
                     <input
@@ -469,38 +461,37 @@ export default function EditSpaceForm(): JSX.Element {
                     </p>
                 </div>
             )}
-            <div className="space-input-fields--photos">
-                <div className="photos__label-and-label-description-container">
-                    <div className="label-description-container">
-                        <p className="paragraph paragraph--light paragraph--label-description">До 5 фотографий</p>
-                    </div>
-                </div>
 
-                <div className="images-container">
-                    {renderExistingImages()}
-                    {renderUploadedImages()}
-                    <label
-                        className="add-button-icon"
-                        // TODO: this is a working  example to go with in css
-                        style={{
-                            display: 'block',
-                            width: '45px',
-                            height: '45px',
-                            background: 'url(/images/icons/icon-add.png)',
-                            backgroundSize: 'cover',
-                        }}
-                    >
-                        <input
-                            style={{ display: 'none' }}
-                            name="spaceImages"
-                            className="photos__input"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleUploadSpaceImages}
-                            multiple
-                        />
-                    </label>
+            <div className="photos__label-and-label-description-container">
+                <div className="label-description-container">
+                    <p className="paragraph paragraph--light paragraph--label-description">До 5 фотографий</p>
                 </div>
+            </div>
+
+            <div className="images-container">
+                {renderExistingImages()}
+                {renderUploadedImages()}
+                <label
+                    className="add-button-icon"
+                    // TODO: this is a working  example to go with in css
+                    style={{
+                        display: 'block',
+                        width: '45px',
+                        height: '45px',
+                        background: 'url(/images/icons/icon-add.png)',
+                        backgroundSize: 'cover',
+                    }}
+                >
+                    <input
+                        style={{ display: 'none' }}
+                        name="spaceImages"
+                        className="photos__input"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleUploadSpaceImages}
+                        multiple
+                    />
+                </label>
             </div>
             <button className="button button--provide-space" onClick={handleSubmitButton}>
                 Обновить данные

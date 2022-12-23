@@ -23,18 +23,6 @@ export class LockerRequestController extends Singleton {
         this.utilFunctions.sendResponse(res)(HttpStatus.OK, ResponseMessages.LOCKER_REQUEST_CREATED, returnRequest);
     });
 
-    // public getConnectionRequests = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
-    //     const requests = await this.dao.getConnectionRequests();
-
-    //     this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, requests);
-    // });
-
-    // public getReturnRequests = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
-    //     const requests = await this.dao.getReturnRequests();
-
-    //     this.utilFunctions.sendResponse(res)(HttpStatus.OK, null, requests);
-    // });
-
     public getRequestsByQuery = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const requests = await this.dao.getRequestsByQuery(req.query);
 

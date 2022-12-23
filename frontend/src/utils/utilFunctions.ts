@@ -1,4 +1,4 @@
-import { Dispatch, FormEventHandler, MouseEventHandler } from 'react';
+import { Dispatch, EventHandler, FormEventHandler, MouseEventHandler } from 'react';
 import { Action } from 'redux';
 import { IAction } from '../redux/actions/ActionTypes';
 import { HttpStatus, IServerResponse, ReduxModalAction } from '../types/types';
@@ -138,6 +138,10 @@ export const isMobile = (): boolean => {
     return window.innerWidth <= 600 ?? false;
 };
 
-export const stopPropagation: MouseEventHandler = (e) => {
+export const stopPropagation: EventHandler<any> = (e) => {
     e.stopPropagation();
+};
+
+export const preventDefault: EventHandler<any> = (e) => {
+    e.preventDefault();
 };

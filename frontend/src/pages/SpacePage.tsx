@@ -1,30 +1,23 @@
-import { MouseEventHandler, useEffect, useRef, useState } from 'react';
+import { MouseEventHandler, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faChevronLeft, faChevronRight, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import {
     annualizeDeleteSpaceResponsesAction,
-    deleteSpaceAction,
     fetchSpaceByIdAction,
     fetchSpacesByUserActiveAppointmentsAction,
     fetchSpacesByUserUpcomingAppointmentsAction,
     fetchUserSpacesAction,
 } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import EditSpaceModal from '../modals/EditSpaceModal';
-import { toggleEditSpaceModalAction } from '../redux/actions/modalActions';
-import { EventListenerType } from '../types/types';
+import { toggleAppointmentDatePickerAction } from '../redux/actions/modalActions';
 import { updateDocumentTitle } from '../utils/utilFunctions';
-import ConfirmDialog from '../components/ConfirmDialog';
-import { IDeleteSpacePayload } from '../redux/reducers/spaceReducer';
 import DisappearingAlert from '../components/DisappearingAlert';
 import AppointmentDatePicker from '../components/AppointmentDatePicker';
 import TextButton from '../buttons/TextButton';
 import { IDatesRange } from '../components/Filters';
-import AltButton from '../components/AltButton';
-import EditButton from '../buttons/EditButton';
-import DeleteButton from '../buttons/DeleteButton';
+import SpaceActionButtonsForOwner from '../components/SpaceActionButtonsForOwner';
 
 interface ISpaceInitialField {
     fieldName: string;
@@ -34,8 +27,6 @@ interface ISpaceInitialField {
 export default function SpacePage(): JSX.Element {
     const [activeImageIndex, setActiveImageIndex] = useState(0);
     const [datesForRender, setDatesForRender] = useState<IDatesRange>();
-    const [deleteSpaceConfirmIsOpen, setDeleteSpaceConfirmIsOpen] = useState(false);
-    const [datePickerIsOpen, setDatePickerIsOpen] = useState(false);
     const {
         fetchSpaceByIdSuccessResponse,
         fetchSpaceByIdFailureResponse,
@@ -44,10 +35,10 @@ export default function SpacePage(): JSX.Element {
         fetchSpacesByUserUpcomingAppointmentsSuccessResponse,
         fetchSpacesByUserActiveAppointmentsSuccessResponse,
     } = useSelector((state: IReduxState) => state.spaceStorage);
+
     const { fetchCurrentUserSuccessResponse } = useSelector((state: IReduxState) => state.userStorage);
-    const { editSpaceModalIsOpen } = useSelector((state: IReduxState) => state.modalStorage);
-    const editSpaceModalRef = useRef<HTMLDivElement>(null);
-    const confirmDialogRef = useRef<HTMLDivElement>(null);
+    const { appointmentDatePickerIsOpen } = useSelector((state: IReduxState) => state.modalStorage);
+
     const spaceData = fetchSpaceByIdSuccessResponse?.data;
     const currentUserData = fetchCurrentUserSuccessResponse?.data;
     const spaceInitialFields: ISpaceInitialField[] = [
@@ -64,7 +55,8 @@ export default function SpacePage(): JSX.Element {
             fieldDescription: 'КОЛИЧЕСТВО СПАЛЬНЫХ МЕСТ',
         },
     ];
-    const amountOfImages = spaceData?.imagesUrl.length;
+
+    const amountOfImages = spaceData?.imagesUrl?.length;
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const params = useParams();
@@ -101,43 +93,15 @@ export default function SpacePage(): JSX.Element {
             }
         };
     };
-    // const closeConfirmDialogOnOutsideClick = (e: MouseEvent) => {
-    //     if (e.target !== confirmDialogRef.current) {
-    //         toggleDeleteSpaceConfirm();
-    //     }
-    // };
     const annualizeDeleteSpaceResponses = (): void => {
         dispatch(annualizeDeleteSpaceResponsesAction());
     };
-    // const applyConfirmDialogEvents = (): (() => void) => {
-    //     if (deleteSpaceConfirmIsOpen) {
-    //         window.addEventListener('click', closeConfirmDialogOnOutsideClick);
-    //     }
-
-    //     return () => {
-    //         window.removeEventListener('click', closeConfirmDialogOnOutsideClick);
-    //     };
-    // };
     const toggleDatePicker: MouseEventHandler = () => {
-        setDatePickerIsOpen((prev) => !prev);
-    };
-    const toggleDeleteSpaceConfirm = (): void => {
-        setDeleteSpaceConfirmIsOpen((prev) => !prev);
-    };
-    const closeModalOnOutsideClick = (e: MouseEvent) => {
-        if (!editSpaceModalRef.current?.contains(e.target as HTMLDivElement)) {
-            dispatch(toggleEditSpaceModalAction());
+        if (!appointmentDatePickerIsOpen) {
+            dispatch(toggleAppointmentDatePickerAction());
         }
     };
-    const applyModalEventListenersEffects = (): (() => void) => {
-        if (editSpaceModalIsOpen) {
-            document.addEventListener(EventListenerType.CLICK, closeModalOnOutsideClick);
-        }
 
-        return () => {
-            document.removeEventListener(EventListenerType.CLICK, closeModalOnOutsideClick);
-        };
-    };
     const redirectIfSpaceIsNotFound = (): void => {
         // TODO: maybe better throw error ?
         if (fetchSpaceByIdFailureResponse) {
@@ -152,15 +116,10 @@ export default function SpacePage(): JSX.Element {
             }, 2000);
         }
     };
-    const spaceBelongsToUser = (): boolean => {
-        return spaceData && spaceData?.userId === currentUserData?.id ? true : false;
-    };
-    const userHasActiveAppointments = (): boolean => {
-        return fetchSpacesByUserActiveAppointmentsSuccessResponse?.data.length > 0;
-    };
-    const spaceIsAppointedByUser = (): boolean => {
-        return fetchSpacesByUserUpcomingAppointmentsSuccessResponse?.data.includes(spaceId);
-    };
+    const spaceBelongsToUser = spaceData && spaceData?.userId === currentUserData?.id ? true : false;
+    const userHasActiveAppointments = fetchSpacesByUserActiveAppointmentsSuccessResponse?.data.length > 0;
+    const spaceIsAppointedByUser = fetchSpacesByUserUpcomingAppointmentsSuccessResponse?.data.includes(spaceId);
+
     const appointSpace = (): void => {
         // забронировать и обновить список upcoming appointm ent-ов пользователя
         // чтобы появилась кнопка отменить бронь
@@ -169,9 +128,6 @@ export default function SpacePage(): JSX.Element {
     };
     const cancelAppointment: MouseEventHandler<HTMLDivElement> = () => {
         // TODO: эта функция будет использоваться не только здесь, так что нужно будет ее вынести в общую.
-    };
-    const toggleEditSpaceModal = (): void => {
-        dispatch(toggleEditSpaceModalAction());
     };
     const flipImageLeft = (): void => {
         const defineShouldBePreviousImageOrLast = activeImageIndex > 0 ? activeImageIndex - 1 : amountOfImages - 1;
@@ -189,23 +145,8 @@ export default function SpacePage(): JSX.Element {
             setActiveImageIndex(0);
         }
     };
-    const renderEditSpaceModal = (): JSX.Element | void => {
-        if (editSpaceModalIsOpen) {
-            return <EditSpaceModal editSpaceModalRef={editSpaceModalRef} />;
-        }
-    };
-    const renderSpaceOwnerMenu = (): JSX.Element | void => {
-        if (spaceBelongsToUser()) {
-            return (
-                <div className="space-owner-menu">
-                    <EditButton handleClick={toggleEditSpaceModal} />
-                    <DeleteButton handleClick={toggleDeleteSpaceConfirm} />{' '}
-                </div>
-            );
-        }
-    };
     const renderLockerConnectedStatus = (): JSX.Element => {
-        return spaceData?.lockerConnected ? (
+        return spaceData?.lockerId ? (
             <>
                 <div className="icon icon-connection icon-connection--connected">
                     <FontAwesomeIcon icon={faCheckCircle} />
@@ -255,31 +196,23 @@ export default function SpacePage(): JSX.Element {
         );
     };
     const renderAppointmentButton = (): JSX.Element | null => {
-        const activeClassName = datePickerIsOpen ? 'appointment-button--active' : '';
-        // проверить есть ли активные бронирования у пользователя
-        if (!spaceBelongsToUser()) {
-            return (
-                <div
-                    className={`button button--secondary appointment-button ${activeClassName}`}
-                    onClick={toggleDatePicker}
-                >
-                    Бронирование
-                </div>
-            );
-        }
+        const activeClassName = appointmentDatePickerIsOpen ? 'appointment-button--active' : '';
 
-        return null;
-    };
-    const renderDatePicker = (): JSX.Element | void => {
-        if (datePickerIsOpen) {
-            return <AppointmentDatePicker datesForRender={datesForRender} setDatesForRender={setDatesForRender} />;
-        }
+        // проверить есть ли активные бронирования у пользователя. проверка !spaceIsAppointedByUser нужна только для того чтобы отменять бронирование
+        return !spaceBelongsToUser && !userHasActiveAppointments ? (
+            <div
+                className={`button button--secondary appointment-button ${activeClassName}`}
+                onClick={toggleDatePicker}
+            >
+                Бронирование
+            </div>
+        ) : null;
     };
     const renderCancelAppointmentButton = (): JSX.Element | void => {
         // проверить есть ли в бронировании спейса id пользователя - если есть
         // или посмотреть есть ли в предстоящих бронированиях пользователя данный спейс
-        if (spaceIsAppointedByUser()) {
-            return <TextButton text="Отменить бронирование" handleClick={cancelAppointment} />;
+        if (spaceIsAppointedByUser) {
+            return <TextButton handleClick={cancelAppointment}> Отменить бронирование</TextButton>;
         }
     };
     const renderSpaceDescription = (): JSX.Element => {
@@ -293,29 +226,6 @@ export default function SpacePage(): JSX.Element {
         );
     };
 
-    const renderRemoveSpaceConfirmDialog = (): JSX.Element | void => {
-        if (deleteSpaceConfirmIsOpen) {
-            const handlePositiveClick: MouseEventHandler = (): void => {
-                const deleteSpacePayload: IDeleteSpacePayload = {
-                    spaceId: spaceId!,
-                };
-
-                dispatch(deleteSpaceAction(deleteSpacePayload));
-            };
-
-            return (
-                <ConfirmDialog
-                    question={'Удалить пространство?'}
-                    positive={'Да'}
-                    negative={'Отмена'}
-                    handlePositiveClick={handlePositiveClick}
-                    handleNegativeClick={toggleDeleteSpaceConfirm}
-                    handleCloseButtonClick={toggleDeleteSpaceConfirm}
-                    innerRef={confirmDialogRef}
-                />
-            );
-        }
-    };
     const renderDisappearingAlertOnDeleteError = (): JSX.Element | void => {
         if (deleteSpaceFailureResponse) {
             return <DisappearingAlert failureResponse={deleteSpaceFailureResponse} />;
@@ -325,9 +235,7 @@ export default function SpacePage(): JSX.Element {
     useEffect(applyEffectsOnInit, []);
     useEffect(handleDocumentTitle, [fetchSpaceByIdSuccessResponse]);
     useEffect(redirectIfSpaceIsNotFound, [fetchSpaceByIdFailureResponse, navigate]);
-    useEffect(applyModalEventListenersEffects, [editSpaceModalIsOpen]);
     useEffect(redirectIfSpaceIsDeleted, [deleteSpaceSuccessResponse]);
-    // useEffect(applyConfirmDialogEvents);
 
     return (
         <div className="page space-page">
@@ -341,12 +249,10 @@ export default function SpacePage(): JSX.Element {
                     <div className="page-box">{renderSpaceInitialFields()}</div>
                     {renderAppointmentButton()}
                     {renderCancelAppointmentButton()}
-                    {renderDatePicker()}
-                    {renderSpaceOwnerMenu()}
+                    <SpaceActionButtonsForOwner />
+                    <AppointmentDatePicker datesForRender={datesForRender} setDatesForRender={setDatesForRender} />
                 </div>
             </div>
-            {renderEditSpaceModal()}
-            {renderRemoveSpaceConfirmDialog()}
             {renderDisappearingAlertOnDeleteError()}
         </div>
     );

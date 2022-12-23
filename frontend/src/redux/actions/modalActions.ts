@@ -1,5 +1,6 @@
 import { Action } from 'redux';
 import { ReduxModalAction } from '../../types/types';
+import { IAction } from './ActionTypes';
 
 export const toggleLoginModalAction = (): Action => {
     return {
@@ -22,5 +23,29 @@ export const toggleEditSpaceModalAction = (): Action => {
 export const togglePairLockerModal = (): Action => {
     return {
         type: ReduxModalAction.TOGGLE_PAIR_LOCKER_MODAL,
+    };
+};
+
+export const toggleLockerRequestModalAction = (): IAction<ReduxModalAction> => {
+    return {
+        type: ReduxModalAction.TOGGLE_LOCKER_REQUEST_MODAL,
+    };
+};
+
+export const toggleLockerReturnRequestModalAction = (): IAction<ReduxModalAction> => {
+    return {
+        type: ReduxModalAction.TOGGLE_LOCKER_RETURN_REQUEST_MODAL,
+    };
+};
+
+export const toggleConfirmDialogAction = (): IAction<ReduxModalAction> => {
+    return {
+        type: ReduxModalAction.TOGGLE_CONFIRM_DIALOG,
+    };
+};
+
+export const toggleAppointmentDatePickerAction = (): IAction<ReduxModalAction> => {
+    return {
+        type: ReduxModalAction.TOGGLE_APPOINTMENT_DATE_PICKER,
     };
 };

@@ -95,3 +95,16 @@
         background: url(../../assets/icons/icon-more-active.png) no-repeat;
     }
 }
+
+.locker-connection-or-return-request-form .button {
+    &--inactive {
+        background-color: $color-grey-light-4;
+        border: none;
+
+        &:hover {
+            background-color: $color-grey-light-4;
+            color: $color-white;
+            cursor: not-allowed;
+        }
+    }
+}

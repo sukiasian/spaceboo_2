@@ -1,6 +1,10 @@
 import { IServerResponse, ReduxAdminAction, ReduxLockerRequestsAction, SagaTask } from '../../types/types';
 import { IDeleteLockerRequestPayload } from '../reducers/adminReducer';
-import { IRequestLockerConnectionPayload, IRequestReturnLockerPayload } from '../reducers/lockerRequestsReducer';
+import {
+    ILockerRequestPayload,
+    IRequestLockerConnectionPayload,
+    IRequestReturnLockerPayload,
+} from '../reducers/lockerRequestsReducer';
 import { IAction } from './ActionTypes';
 
 export const postRequestLockerAction = (
@@ -80,5 +84,35 @@ export const setDeleteLockerRequestByIdFailureResponseAction = (
     return {
         type: ReduxAdminAction.SET_DELETE_LOCKER_REQUESTS_BY_ID_FAILURE_RESPONSE,
         payload,
+    };
+};
+
+export const setLockerRequestPayloadAction = (
+    payload: ILockerRequestPayload
+): IAction<ReduxLockerRequestsAction, ILockerRequestPayload> => {
+    return {
+        type: ReduxLockerRequestsAction.SET_REQUEST_LOCKER_PAYLOAD,
+        payload,
+    };
+};
+
+export const setLockerReturnRequestPayloadAction = (
+    payload: IRequestReturnLockerPayload
+): IAction<ReduxLockerRequestsAction, IRequestReturnLockerPayload> => {
+    return {
+        type: ReduxLockerRequestsAction.SET_REQUEST_LOCKER_RETURN_PAYLOAD,
+        payload,
+    };
+};
+
+export const annualizeLockerRequestResponsesAction = (): IAction<ReduxLockerRequestsAction> => {
+    return {
+        type: ReduxLockerRequestsAction.ANNUALIZE_POST_REQUEST_LOCKER_RESPONSES,
+    };
+};
+
+export const annualizeLockerReturnRequestResponsesAction = (): IAction<ReduxLockerRequestsAction> => {
+    return {
+        type: ReduxLockerRequestsAction.ANNUALIZE_POST_REQUEST_LOCKER_RETURN_RESPONSES,
     };
 };

@@ -11,7 +11,7 @@ import {
 import { IRequestReturnLockerPayload } from '../reducers/lockerRequestsReducer';
 
 const postRequestLockerReturn = (payload: IRequestReturnLockerPayload): Promise<IServerResponse> => {
-    return httpRequester.post(`${ApiUrl.LOCKER_REQUESTS}/${payload.lockerId}`, payload);
+    return httpRequester.post(ApiUrl.LOCKER_REQUESTS_RETURN, payload);
 };
 
 function* postRequestLockerReturnWorker(action: IAction): Generator<CallEffect<any> | PutEffect<AnyAction>, void> {

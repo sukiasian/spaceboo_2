@@ -15,7 +15,7 @@ import { City } from './city.model';
 import { Appointment } from './appointment.model';
 import { User } from './user.model';
 import { ErrorMessages } from '../types/enums';
-import { validate } from 'node-cron';
+import { Locker } from './locker.model';
 
 interface ISpaceAttributes {
     id: string;
@@ -107,15 +107,15 @@ export class Space extends Model<ISpaceAttributes, ISpaceCreationAttributes> imp
     public lockerConnected: boolean;
     // FIXME: если lockerId определен, значит локер подключен
 
-    @Column({ type: DataType.INTEGER, allowNull: true })
-    public lockerId: number;
-
     @ForeignKey(() => User)
     @Column({ type: DataType.UUID })
     userId: string;
 
     @BelongsTo(() => User)
     public user: User;
+
+    @Column({ type: DataType.INTEGER })
+    lockerId: number;
 
     @Column({
         type: DataType.ARRAY(DataType.STRING),

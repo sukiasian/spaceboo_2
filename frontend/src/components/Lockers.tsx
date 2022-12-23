@@ -17,7 +17,7 @@ export default function Lockers(): JSX.Element {
         dispatch(fetchLockersByQueryAction(fetchLockersQueryData || {}));
     };
 
-    const renderLockers = lockers?.map((locker: Record<any, any>) => <Locker locker={locker} />);
+    const renderLockers = lockers?.map((locker: Record<any, any>, i: number) => <Locker locker={locker} key={i} />);
 
     useEffect(getLockersByQuery, [fetchLockersQueryData]);
 

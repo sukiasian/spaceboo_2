@@ -10,13 +10,13 @@ import {
 } from '../actions/adminActions';
 import { IDeleteLockerPayload } from '../reducers/adminReducer';
 
-const postUnpairLocker = (payload: IDeleteLockerPayload): Promise<IServerResponse> => {
+const deleteUnpairLocker = (payload: IDeleteLockerPayload): Promise<IServerResponse> => {
     return httpRequester.delete(`${ApiUrl.LOCKERS}?spaceId=${payload.spaceId}`);
 };
 
-function* postUnpairLockerWorker(action: IAction): Generator<CallEffect<any> | PutEffect<AnyAction>, void> {
+function* deleteUnpairLockerWorker(action: IAction): Generator<CallEffect<any> | PutEffect<AnyAction>, void> {
     try {
-        const response = yield call(postUnpairLocker, action.payload);
+        const response = yield call(deleteUnpairLocker, action.payload);
 
         if (serverResponseIsSuccessful(response as IServerResponse)) {
             yield put(setPostUnpairLockerSuccessResponseAction(response as IServerResponse));
@@ -27,6 +27,6 @@ function* postUnpairLockerWorker(action: IAction): Generator<CallEffect<any> | P
         yield put(setPostUnpairLockerFailureResponseAction(err as IServerResponse));
     }
 }
-export function* watchPostUnpairLocker(): Generator<ForkEffect, void, void> {
-    yield takeEvery(SagaTask.POST_UNPAIR_LOCKER, postUnpairLockerWorker);
+export function* watchDeleteUnpairLocker(): Generator<ForkEffect, void, void> {
+    yield takeEvery(SagaTask.DELETE_UNPAIR_LOCKER, deleteUnpairLockerWorker);
 }

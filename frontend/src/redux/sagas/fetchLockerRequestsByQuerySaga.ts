@@ -12,7 +12,9 @@ import { ILockerRequestsQueryString } from '../reducers/adminReducer';
 
 const fetchLockerRequestsByQuery = (query: ILockerRequestsQueryString): Promise<IServerResponse> => {
     return httpRequester.get(
-        `${ApiUrl.LOCKERS}?page=${query.page || QueryDefaultValue.PAGE}&limit=${query.limit || QueryDefaultValue.LIMIT}`
+        `${ApiUrl.LOCKER_REQUESTS}?page=${query.page || QueryDefaultValue.PAGE}&limit=${
+            query.limit || QueryDefaultValue.LIMIT
+        }&type=${query.type || 1}`
     );
 };
 

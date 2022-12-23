@@ -7,8 +7,8 @@ export interface IAltButtonProps extends IComponentClassNameProps {
 }
 
 export default function AltButton(props: IAltButtonProps): JSX.Element {
-    const mainDivClassName = props.mainDivClassName || 'primary';
     const { children } = props;
+    const mainDivClassName = props.mainDivClassName || 'primary';
 
     return (
         <div className={`button ${mainDivClassName}`} onClick={props.handleClick}>

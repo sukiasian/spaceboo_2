@@ -80,3 +80,16 @@
     justify-content: space-evenly;
     margin-top: 2rem;
 }
+
+.edit-space-form {
+    display: grid;
+    grid-template-columns: 250px repeat(3, 100px);
+    grid-template-rows: repeat(7, min-content) max-content max-content;
+    grid-row-gap: 40px;
+    grid-template-areas: 'a1 b1 b1 b1' 'a2 b2 b2 b2' 'a3 b3 b3 b3' 'a4 b4 b4 b4' 'a5 b5 b5 b5' 'a6 b6 b6 b6' 'a7 b7 b7 b7' 'a8 b8 b8 b8' 'a9 a9 a9 a9';
+
+    @include respond(phone) {
+        display: flex;
+        flex-direction: column;
+    }
+}

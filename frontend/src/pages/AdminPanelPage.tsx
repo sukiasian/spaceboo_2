@@ -9,6 +9,7 @@ export default function AdminPanelPage(): JSX.Element {
     const linkPathIsNotDefined =
         !window.location.pathname.includes('admin-panel/requests') &&
         !window.location.pathname.includes('admin-panel/control');
+
     const redirectToRequestsOnInit = (): void => {
         if (linkPathIsNotDefined) {
             navigate('/admin-panel/requests');

@@ -1,10 +1,16 @@
-import { MouseEventHandler, ReactNode, RefObject, useEffect, useState } from 'react';
+import { MouseEventHandler, ReactNode, RefObject, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import HideComponentOnOutsideClickOrEscapePress from '../hoc/HideComponentOnOutsideClickOrEscapePress';
 import DecreaseArrow from '../icons/DecreaseArrow';
 import IncreaseArrow from '../icons/IncreaseArrow';
 import { fetchAppointmentsForMonthAction, postCreateAppointmentAction } from '../redux/actions/appointmentActions';
 import { setDatePickerDateAction } from '../redux/actions/commonActions';
+import {
+    toggleAppointmentDatePickerAction,
+    toggleConfirmDialogAction,
+    toggleLoginModalAction,
+} from '../redux/actions/modalActions';
 import { ICreateAppointmentPayload } from '../redux/reducers/appointmentReducer';
 import { IReduxState } from '../redux/reducers/rootReducer';
 import { monthStrings } from '../types/constants';
@@ -21,8 +27,8 @@ interface ICurrentDate extends IDatePickerDate {
 }
 interface IDatePickerProps {
     datesForRender: IDatesRange | undefined;
+    // innerRef: RefObject<HTMLDivElement>;
     setDatesForRender: React.Dispatch<React.SetStateAction<IDatesRange | undefined>>;
-    innerRef?: RefObject<HTMLDivElement>;
     componentClassNames?: string;
     presentMonthDaysClassNamesCombined?: (day: number) => string;
 }
@@ -36,11 +42,20 @@ interface IAppointmentsParsedAndOrganized {
     [key: string]: IAppointmentParsed[];
 }
 
-export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Element {
-    const { componentClassNames, innerRef, datesForRender, setDatesForRender } = props;
+/* 
+
+Что происходит: 
+мы делаем запрос на занятые клетки и если клетка занята то мы не можем ее выбрать. 
+Чтобы проверить работает ли это или нет нам нужно с другого акк забронировать и затем с этого акк посмотреть можем ли 
+мы выбрать или нет 
+
+*/
+
+export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Element | null {
+    const { componentClassNames, datesForRender, setDatesForRender } = props;
     const { presentMonthDaysClassNamesCombined } = props;
+
     const [datesForAppointment, setDatesForAppointment] = useState<IDatesRange>();
-    const [dateIsPicked, setDateIsPicked] = useState(false);
     const [currentDate, setCurrentDate] = useState<ICurrentDate>({
         year: 0,
         month: 0,
@@ -56,13 +71,19 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
     const [parsedAppointmentsList, setParsedAppointmentsList] = useState<IAppointmentsParsedAndOrganized>({});
     const [pointedDate, setPointedDate] = useState<Date>();
     const [unappointableDaysPointed, setUnappointableDaysPointed] = useState(false);
-    const [confirmAppointmentIsOpen, setConfirmAppointmentIsOpen] = useState(false);
 
     const { datePickerDate } = useSelector((state: IReduxState) => state.commonStorage);
     const { fetchAppointmentsForMonthSuccessResponse } = useSelector((state: IReduxState) => state.appointmentStorage);
+    const { appointmentDatePickerIsOpen } = useSelector((state: IReduxState) => state.modalStorage);
+    const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);
+    const { confirmDialogIsOpen } = useSelector((state: IReduxState) => state.modalStorage);
+
+    const componentRef = useRef<HTMLDivElement>(null);
 
     const dispatch = useDispatch();
     const { spaceId } = useParams();
+
+    const userLoginState = fetchUserLoginStateSuccessResponse?.data;
 
     const appointments = fetchAppointmentsForMonthSuccessResponse?.data;
     const amountOfMonthsAvailableToLookUp = 12;
@@ -88,6 +109,10 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
     };
     const applyEffectsOnInit = (): void => {
         defineCurrentDateAndPickOnInit();
+    };
+
+    const toggleComponent = (): void => {
+        dispatch(toggleAppointmentDatePickerAction());
     };
 
     const createPropertyForParsedAppointmentsByYearAndMonth = (): string => {
@@ -338,7 +363,7 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
     };
 
     const toggleConfirmAppointmentDialog = (): void => {
-        setConfirmAppointmentIsOpen((prev) => !prev);
+        dispatch(toggleConfirmDialogAction());
     };
 
     const defineTodayClassName = (day: number): string => {
@@ -410,6 +435,10 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
         }
 
         return '';
+    };
+
+    const toggleLoginModal = (): void => {
+        dispatch(toggleLoginModalAction());
     };
 
     const renderDayCells = (): JSX.Element[] => {
@@ -618,7 +647,7 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
             <div className="appoint-button-container">
                 <div
                     className={`button appoint-button ${defineAvailableOrNonAvailableButtonClassName()}`}
-                    onClick={appointSpace}
+                    onClick={userLoginState?.loggedIn ? appointSpace : toggleLoginModal}
                 >
                     Забронировать
                 </div>
@@ -638,12 +667,12 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
             dispatch(postCreateAppointmentAction(payload));
         };
 
-        if (confirmAppointmentIsOpen) {
+        if (confirmDialogIsOpen) {
             return (
                 <ConfirmDialog
                     question={`Забронировать с ${datesForAppointment?.beginningDate}, 14:00, до ${datesForAppointment?.endingDate}?`}
-                    positive={'Нет'}
-                    negative={'Да'}
+                    positive={'Да'}
+                    negative={'Нет'}
                     handlePositiveClick={handlePositiveClick}
                     handleNegativeClick={toggleConfirmAppointmentDialog}
                     handleCloseButtonClick={toggleConfirmAppointmentDialog}
@@ -667,33 +696,35 @@ export default function AppointmentDatePicker(props: IDatePickerProps): JSX.Elem
         });
     });
 
-    return (
+    return appointmentDatePickerIsOpen ? (
         <>
-            <div
-                className={`${componentClassNames || ''} date-picker appointment-date-picker`}
-                onClick={(e) => e.stopPropagation()}
-                ref={innerRef ?? undefined}
-            >
-                <div>
-                    {renderDatePickerControlPanel()}
-                    <table className="date-picker__table">
-                        <tbody onMouseLeave={annualizePointedDateAndUnappointableDaysPointed}>
-                            <tr className="weekdays">
-                                <th className="weekday weekday--monday">Пн</th>
-                                <th className="weekday weekday--tuesday">Вт</th>
-                                <th className="weekday weekday--wednessday">Ср</th>
-                                <th className="weekday weekday--thursday">Чт</th>
-                                <th className="weekday weekday--friday">Пт</th>
-                                <th className="weekday weekday--saturday">Сб</th>
-                                <th className="weekday weekday--sunday">Вс</th>
-                            </tr>
-                            {renderDayCells()}
-                        </tbody>
-                    </table>
+            <HideComponentOnOutsideClickOrEscapePress innerRef={componentRef} handleHideComponent={toggleComponent}>
+                <div
+                    className={`${componentClassNames || ''} date-picker appointment-date-picker`}
+                    onClick={(e) => e.stopPropagation()}
+                    ref={componentRef}
+                >
+                    <div>
+                        {renderDatePickerControlPanel()}
+                        <table className="date-picker__table">
+                            <tbody onMouseLeave={annualizePointedDateAndUnappointableDaysPointed}>
+                                <tr className="weekdays">
+                                    <th className="weekday weekday--monday">Пн</th>
+                                    <th className="weekday weekday--tuesday">Вт</th>
+                                    <th className="weekday weekday--wednessday">Ср</th>
+                                    <th className="weekday weekday--thursday">Чт</th>
+                                    <th className="weekday weekday--friday">Пт</th>
+                                    <th className="weekday weekday--saturday">Сб</th>
+                                    <th className="weekday weekday--sunday">Вс</th>
+                                </tr>
+                                {renderDayCells()}
+                            </tbody>
+                        </table>
+                    </div>
+                    {renderAppointButton()}
                 </div>
-                {renderAppointButton()}
-            </div>
+            </HideComponentOnOutsideClickOrEscapePress>
             {renderConfirmAppointmentDialog()}
         </>
-    );
+    ) : null;
 }

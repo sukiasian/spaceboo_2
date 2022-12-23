@@ -1,14 +1,14 @@
 import { MouseEventHandler } from 'react';
 
 interface ITextButtonProps {
-    text: string;
+    children?: JSX.Element | string;
     handleClick?: MouseEventHandler<HTMLDivElement>;
 }
 
-export default function TextButton({ text, handleClick }: ITextButtonProps): JSX.Element {
+export default function TextButton({ children, handleClick }: ITextButtonProps): JSX.Element {
     return (
         <div className="button button--text" onClick={handleClick}>
-            {text}
+            {children}
         </div>
     );
 }

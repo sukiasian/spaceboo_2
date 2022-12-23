@@ -17,7 +17,7 @@ export const postPairLockerAction = (payload: ICreateLockerPayload): IAction<Sag
 
 export const postUnpairLockerAction = (payload: IDeleteLockerPayload): IAction<SagaTask, IDeleteLockerPayload> => {
     return {
-        type: SagaTask.POST_UNPAIR_LOCKER,
+        type: SagaTask.DELETE_UNPAIR_LOCKER,
         payload,
     };
 };
@@ -85,7 +85,7 @@ export const setPostUnpairLockerSuccessResponseAction = (
     payload: IServerResponse
 ): IAction<ReduxAdminAction, IServerResponse> => {
     return {
-        type: ReduxAdminAction.SET_POST_UNPAIR_LOCKER_SUCCESS_RESPONSE,
+        type: ReduxAdminAction.SET_DELETE_UNPAIR_LOCKER_SUCCESS_RESPONSE,
         payload,
     };
 };
@@ -94,7 +94,7 @@ export const setPostUnpairLockerFailureResponseAction = (
     payload: IServerResponse
 ): IAction<ReduxAdminAction, IServerResponse> => {
     return {
-        type: ReduxAdminAction.SET_POST_UNPAIR_LOCKER_FAILURE_RESPONSE,
+        type: ReduxAdminAction.SET_DELETE_UNPAIR_LOCKER_FAILURE_RESPONSE,
         payload,
     };
 };
@@ -149,5 +149,32 @@ export const setFetchLockersQueryDataAction = (
     return {
         type: ReduxAdminAction.SET_FETCH_LOCKERS_QUERY_DATA,
         payload,
+    };
+};
+
+export const setPostPairLockerPayloadAction = (
+    payload: ICreateLockerPayload
+): IAction<ReduxAdminAction, ICreateLockerPayload> => {
+    return {
+        type: ReduxAdminAction.SET_POST_PAIR_LOCKER_PAYLOAD,
+        payload,
+    };
+};
+
+export const annualizePostPairLockerResponsesAction = (): IAction<ReduxAdminAction> => {
+    return {
+        type: ReduxAdminAction.ANNUALIZE_POST_PAIR_LOCKER_RESPONSES,
+    };
+};
+
+export const annualizeDeleteLockerRequestResponsesAction = (): IAction<ReduxAdminAction> => {
+    return {
+        type: ReduxAdminAction.ANNUALIZE_DELETE_LOCKER_REQUEST_RESPONSES,
+    };
+};
+
+export const annualizeDeleteUnpairLockerResponsesAction = (): IAction<ReduxAdminAction> => {
+    return {
+        type: ReduxAdminAction.ANNUALIZE_DELETE_UNPAIR_LOCKER_RESPONSES,
     };
 };

@@ -11,8 +11,8 @@ import { fetchCitiesAction } from './redux/actions/cityActions';
 import { fetchCurrentUserAction } from './redux/actions/userActions';
 import { IReduxState } from './redux/reducers/rootReducer';
 import Routes from './routes/AppRoutes';
-import './sass/main.scss';
 import { isMobile } from './utils/utilFunctions';
+import './sass/main.scss';
 
 function App(): JSX.Element {
     const { fetchUserLoginStateSuccessResponse } = useSelector((state: IReduxState) => state.authStorage);

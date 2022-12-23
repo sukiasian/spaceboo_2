@@ -1,4 +1,4 @@
-.provide-space__form {
+.provide-space-form {
     display: grid;
     grid-template-columns: 250px repeat(3, 100px);
     grid-template-rows: repeat(7, min-content) max-content max-content;

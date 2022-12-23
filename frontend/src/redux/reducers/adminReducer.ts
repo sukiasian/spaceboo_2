@@ -10,18 +10,25 @@ export interface ILockerQueryString extends IQueryString {}
 export interface IAdminState {
     postPairLockerSuccessResponse?: IServerResponse;
     postPairLockerFailureResponse?: IServerResponse;
-    postUnpairLockerSuccessResponse?: IServerResponse;
-    postUnpairLockerFailureResponse?: IServerResponse;
+
+    deleteUnpairLockerSuccessResponse?: IServerResponse;
+    deleteUnpairLockerFailureResponse?: IServerResponse;
+
     fetchUnprocessedRequestsAmountSuccessResponse?: IServerResponse;
     fetchUnprocessRequestsAmountFailureResponse?: IServerResponse;
+
     fetchLockerRequestsByQuerySuccessResponse?: IServerResponse;
     fetchLockerRequestsByQueryFailureResponse?: IServerResponse;
+
     fetchLockersByQuerySuccessResponse?: IServerResponse;
     fetchLockersByQueryFailureResponse?: IServerResponse;
+
     deleteLockerRequestByIdSuccessResponse?: IServerResponse;
     deleteLockerRequestByIdFailureResponse?: IServerResponse;
+
     fetchAllLockerRequestsQueryData?: ILockerRequestsQueryString;
     fetchLockersQueryData?: ILockerQueryString;
+    postPairLockerPayload?: ICreateLockerPayload;
 }
 
 interface ILockerPayload {
@@ -29,7 +36,9 @@ interface ILockerPayload {
 }
 
 export interface ICreateLockerPayload extends ILockerPayload {
-    lockerId: string;
+    id: string;
+    ttlockEmail: string;
+    ttlockPassword: string;
 }
 
 export interface IDeleteLockerPayload extends ILockerPayload {}
@@ -56,16 +65,16 @@ export const adminReducer = (state = initialState, action: IAction): IAdminState
                 postPairLockerFailureResponse: action.payload,
             };
 
-        case ReduxAdminAction.SET_POST_UNPAIR_LOCKER_SUCCESS_RESPONSE:
+        case ReduxAdminAction.SET_DELETE_UNPAIR_LOCKER_SUCCESS_RESPONSE:
             return {
                 ...state,
-                postUnpairLockerSuccessResponse: action.payload,
+                deleteUnpairLockerSuccessResponse: action.payload,
             };
 
-        case ReduxAdminAction.SET_POST_UNPAIR_LOCKER_FAILURE_RESPONSE:
+        case ReduxAdminAction.SET_DELETE_UNPAIR_LOCKER_FAILURE_RESPONSE:
             return {
                 ...state,
-                postUnpairLockerFailureResponse: action.payload,
+                deleteUnpairLockerFailureResponse: action.payload,
             };
 
         case ReduxAdminAction.SET_FETCH_UNPROCESSED_REQUESTS_AMOUNT_SUCCESS_RESPONSE:
@@ -126,6 +135,33 @@ export const adminReducer = (state = initialState, action: IAction): IAdminState
             return {
                 ...state,
                 fetchLockersQueryData: action.payload,
+            };
+
+        case ReduxAdminAction.SET_POST_PAIR_LOCKER_PAYLOAD:
+            return {
+                ...state,
+                postPairLockerPayload: action.payload,
+            };
+
+        case ReduxAdminAction.ANNUALIZE_POST_PAIR_LOCKER_RESPONSES:
+            return {
+                ...state,
+                postPairLockerSuccessResponse: undefined,
+                postPairLockerFailureResponse: undefined,
+            };
+
+        case ReduxAdminAction.ANNUALIZE_DELETE_LOCKER_REQUEST_RESPONSES:
+            return {
+                ...state,
+                deleteLockerRequestByIdSuccessResponse: undefined,
+                deleteLockerRequestByIdFailureResponse: undefined,
+            };
+
+        case ReduxAdminAction.ANNUALIZE_DELETE_UNPAIR_LOCKER_RESPONSES:
+            return {
+                ...state,
+                deleteUnpairLockerSuccessResponse: undefined,
+                deleteUnpairLockerFailureResponse: undefined,
             };
 
         default: {

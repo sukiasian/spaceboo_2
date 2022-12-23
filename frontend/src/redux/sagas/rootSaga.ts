@@ -30,7 +30,7 @@ import { watchPostPairLocker } from './postPairLockerSaga';
 import { watchPostRequestLockerReturn } from './postRequestLockerReturnSaga';
 import { watchPostRequestLocker } from './postRequestLockerSaga';
 import { watchPostUnlockLocker } from './postUnlockLockerSaga';
-import { watchPostUnpairLocker } from './postUnpairLockerSaga';
+import { watchDeleteUnpairLocker } from './deleteUnpairLockerSaga';
 import { watchFetchLockerRequestsByQuery } from './fetchLockerRequestsByQuerySaga';
 import { watchFetchLockersByQuery } from './fetchLockersByQuerySaga';
 
@@ -67,7 +67,7 @@ export function* rootSaga() {
         watchPostRequestLockerReturn(),
         watchPostRequestLocker(),
         watchPostUnlockLocker(),
-        watchPostUnpairLocker(),
+        watchDeleteUnpairLocker(),
         watchFetchLockerRequestsByQuery(),
         watchFetchLockersByQuery(),
     ]);

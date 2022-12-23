@@ -37,15 +37,21 @@ interface ITypeOfSpaceInputData {
 
 */
 
-export default function ProvideSpaceForm(): JSX.Element {
+export default function ProvideOrEditSpaceForm(): JSX.Element {
     const [imagesAmountExceeded, setImagesAmountExceeded] = useState(false);
-    const findCityRef = useRef<HTMLInputElement>(null);
+
     const { provideSpaceData } = useSelector((state: IReduxState) => state.spaceStorage);
     const { fetchCitiesByPatternSuccessResponse } = useSelector((state: IReduxState) => state.cityStorage);
+
+    const findCityRef = useRef<HTMLInputElement>(null);
+
     const dispatch = useDispatch();
+
     const initialRoomsNumber = 2;
     const initialBedsNumber = 2;
     const roomsMaximumNumber = 11;
+    const imagesAmountAllowed = 5;
+
     const typeOfSpaceInputsData: ITypeOfSpaceInputData[] = [
         {
             spaceType: SpaceType.FLAT,
@@ -54,7 +60,7 @@ export default function ProvideSpaceForm(): JSX.Element {
             spaceType: SpaceType.HOUSE,
         },
     ];
-    const imagesAmountAllowed = 5;
+
     const validatorAllowedClassName = 'validator--allowed';
     const validatorDisallowedClassName = 'validator--disallowed';
     const applyDropdownValuesToFormDataOnInit = (): void => {
@@ -329,7 +335,7 @@ export default function ProvideSpaceForm(): JSX.Element {
     useEffect(applyEffectsOnInit, []);
 
     return (
-        <form className="provide-space__form" onSubmit={handleFormSubmit} encType="multipart/form-data">
+        <form className="form provide-space-form" onSubmit={handleFormSubmit} encType="multipart/form-data">
             <div className="type-of-space__label-container">
                 <label className="label label--type-of-space">Тип пространства</label>
                 <RequiredField />

@@ -9,16 +9,35 @@ import { UrlPathname } from '../types/types';
 import AddButton from '../buttons/AddButton';
 import SpacesWithMenus from '../components/SpacesWithMenus';
 import SpaceOwnerMenu from '../components/SpaceOwnerMenu';
+import {
+    annualizeLockerRequestResponsesAction,
+    annualizeLockerReturnRequestResponsesAction,
+} from '../redux/actions/lockerRequestsActions';
 
 export default function MySpacesPage(): JSX.Element {
     const { fetchUserSpacesSuccessResponse } = useSelector((state: IReduxState) => state.spaceStorage);
+    const {
+        postRequestLockerSuccessResponse,
+        postRequestLockerFailureResponse,
+        postRequestLockerReturnSuccessResponse,
+        postRequestLockerReturnFailureResponse,
+    } = useSelector((state: IReduxState) => state.lockerRequestsStorage);
 
     const spaces = fetchUserSpacesSuccessResponse?.data;
 
     const dispatch = useDispatch();
 
-    const applyEffectsOnInit = (): void => {
+    const annualizeLockerRequestsResponses = (): void => {
+        dispatch(annualizeLockerRequestResponsesAction());
+        dispatch(annualizeLockerReturnRequestResponsesAction());
+    };
+
+    const applyEffectsOnInit = (): (() => void) => {
         dispatch(fetchUserSpacesAction());
+
+        return () => {
+            annualizeLockerRequestsResponses();
+        };
     };
 
     const renderLoadingSpin = (): ReactNode => {
@@ -27,36 +46,39 @@ export default function MySpacesPage(): JSX.Element {
         }
     };
 
-    const renderAddSpaceButton = (): JSX.Element | void => {
-        if (fetchUserSpacesSuccessResponse) {
-            return (
-                <NavLink to={UrlPathname.PROVIDE_SPACE}>
-                    <AddButton /> abcdefg
-                </NavLink>
-            );
-        }
-    };
-
-    useEffect(applyEffectsOnInit, [dispatch]);
+    useEffect(applyEffectsOnInit, []);
 
     return (
-        <section className="my-spaces-page">
+        <section className="page my-spaces-page">
             <Titles heading="Мои пространства" />
-            <section className="spaces-section">
-                {renderLoadingSpin()}
-                {/* below should be grid or flex */}
-                <div className="spaces">
-                    <SpacesWithMenus
-                        spaces={spaces}
-                        children={(spaceId: string, handleOnDemounting: (...props: any) => any) => (
-                            <SpaceOwnerMenu spaceId={spaceId} handleOnDemounting={handleOnDemounting} />
-                        )}
-                        childrenRequiredArgument={'id'}
-                        childrenRequiredDemountingHandler={true}
-                    />
-                    {renderAddSpaceButton()}
-                </div>
-            </section>
+            <div className="page-box">
+                <section className="spaces-section">
+                    {renderLoadingSpin()}
+                    <div className="spaces">
+                        <SpacesWithMenus
+                            spaces={spaces}
+                            children={(
+                                spaceId: string,
+                                handleOnDemounting: (...props: any) => any,
+                                lockerId: string
+                            ) => (
+                                <SpaceOwnerMenu
+                                    spaceId={spaceId}
+                                    handleOnDemounting={handleOnDemounting}
+                                    lockerId={lockerId}
+                                />
+                            )}
+                            childrenRequiredArgument={'id'}
+                            childrenRequiredDemountingHandler={true}
+                        />
+                        <div className="provide-space-link-container">
+                            <NavLink to={UrlPathname.PROVIDE_SPACE}>
+                                <AddButton />
+                            </NavLink>
+                        </div>
+                    </div>
+                </section>
+            </div>
         </section>
     );
 }

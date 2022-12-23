@@ -1,13 +1,24 @@
-import { ETIME } from 'constants';
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import Alert from '../components/Alert';
 import PairLockerForm from '../forms/PairLockerForm';
+import DarkScreen from '../hoc/DarkScreen';
+import HideComponentOnOutsideClickOrEscapePress from '../hoc/HideComponentOnOutsideClickOrEscapePress';
 import { togglePairLockerModal } from '../redux/actions/modalActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
-import { EventKey } from '../types/types';
+import { stopPropagation } from '../utils/utilFunctions';
 
-export default function PairLockerModal(): JSX.Element | null {
+interface IProps {
+    spaceId: string;
+}
+
+export default function PairLockerModal(props: IProps): JSX.Element | null {
+    const { spaceId } = props;
+
     const { pairLockerModalIsOpen } = useSelector((state: IReduxState) => state.modalStorage);
+    const { postPairLockerSuccessResponse, postPairLockerFailureResponse } = useSelector(
+        (state: IReduxState) => state.adminStorage
+    );
 
     const modalRef = useRef<HTMLDivElement>(null);
 
@@ -17,37 +28,22 @@ export default function PairLockerModal(): JSX.Element | null {
         dispatch(togglePairLockerModal());
     };
 
-    const closeModalOnOutsideClick = (e: Event) => {
-        if (e.target !== modalRef.current) {
+    const toggleModalAfterSuccessfulFormSubmit = () => {
+        if (postPairLockerSuccessResponse) {
             toggleModal();
         }
     };
-    const closeModalOnEscapePress = (e: KeyboardEvent) => {
-        if (e.key === EventKey.ESCAPE) {
-            toggleModal();
-        }
-    };
-    const applyEventListenersForModal = (): (() => void) | void => {
-        if (modalRef.current) {
-            document.addEventListener('click', closeModalOnOutsideClick);
-            document.addEventListener('keypress', closeModalOnEscapePress);
 
-            return () => {
-                document.removeEventListener('click', closeModalOnOutsideClick);
-                document.removeEventListener('keypress', closeModalOnOutsideClick);
-            };
-        }
-    };
+    useEffect(toggleModalAfterSuccessfulFormSubmit, [postPairLockerSuccessResponse]);
 
-    useEffect(applyEventListenersForModal);
-
-    return (
-        <>
-            {pairLockerModalIsOpen ? (
-                <div className="modal pair-locker-modal" ref={modalRef} onClick={(e) => e.stopPropagation()}>
-                    <PairLockerForm />
+    return pairLockerModalIsOpen ? (
+        <HideComponentOnOutsideClickOrEscapePress handleHideComponent={toggleModal} innerRef={modalRef}>
+            <DarkScreen>
+                <div className="modal pair-locker-modal" onClick={stopPropagation}>
+                    <PairLockerForm spaceId={spaceId} />
+                    <Alert failureResponse={postPairLockerFailureResponse} />
                 </div>
-            ) : null}
-        </>
-    );
+            </DarkScreen>
+        </HideComponentOnOutsideClickOrEscapePress>
+    ) : null;
 }

@@ -48,7 +48,6 @@ export default function LoginForm(props: ILoginFormProps): JSX.Element {
     const handleAfterLogin = (): void => {
         if (postLoginUserSuccessResponse) {
             props.handleAfterLogin();
-            navigate('/');
         }
     };
     const handleInputChange = (fieldName: string): ChangeEventHandler<HTMLInputElement> => {

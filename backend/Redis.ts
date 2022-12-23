@@ -31,11 +31,14 @@ class Redis {
     };
 
     public startRedisServerOnMachine = (): void => {
-        this.executeCommand('redis-cli shutdown & redis-server');
+        // this.executeCommand('redis-cli shutdown & redis-server');
+        this.executeCommand('redis-server');
     };
 
     public shutdownRedisServerOnMachine = async (): Promise<void> => {
-        this.executeCommand('redis-cli shutdown');
+        await this.executeCommand('redis-cli shutdown');
+
+        await this.client.disconnect();
     };
 }
 

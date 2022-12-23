@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Alert from '../components/Alert';
 import Titles from '../components/Titles';
-import ProvideSpaceForm from '../forms/ProvideSpaceForm';
+import ProvideOrEditSpaceForm from '../forms/ProvideOrEditSpaceForm';
 import { fetchUserLoginStateAction } from '../redux/actions/authActions';
 import { annualizeProvideSpaceDataAction, annualizeProvideSpaceResponsesAction } from '../redux/actions/spaceActions';
 import { IReduxState } from '../redux/reducers/rootReducer';
@@ -53,7 +53,7 @@ export default function ProvideSpacePage(): JSX.Element {
         <div className="page provide-space-page">
             <div className="page-box">
                 <Titles heading="Предоставить пространство" />
-                <ProvideSpaceForm />
+                <ProvideOrEditSpaceForm />
                 <Alert failureResponse={postProvideSpaceFailureResponse} />
             </div>
         </div>

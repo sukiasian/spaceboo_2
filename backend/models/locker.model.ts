@@ -1,4 +1,15 @@
-import { BeforeCreate, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import {
+    BeforeCreate,
+    BeforeUpdate,
+    BelongsTo,
+    Column,
+    DataType,
+    ForeignKey,
+    HasOne,
+    Model,
+    PrimaryKey,
+    Table,
+} from 'sequelize-typescript';
 import { Optional } from 'sequelize';
 import * as crypto from 'crypto';
 import { Space } from './space.model';
@@ -19,7 +30,7 @@ export class Locker extends Model<ILockerAttributes, ILockerCreationAttributes> 
     public id: number;
 
     @ForeignKey(() => Space)
-    @Column({ type: DataType.UUID, allowNull: false })
+    @Column({ type: DataType.UUID, allowNull: false, unique: true })
     public spaceId: string;
 
     @BelongsTo(() => Space)
@@ -31,10 +42,11 @@ export class Locker extends Model<ILockerAttributes, ILockerCreationAttributes> 
     @Column
     public ttlockPassword: string;
 
+    @BeforeUpdate
     @BeforeCreate // === pre-hook
     static async hashPasswordAndRemovePasswordConfirmation(instance: Locker): Promise<void> {
         if (instance.ttlockPassword) {
-            crypto.createHash('md5').update(instance.ttlockPassword);
+            instance.ttlockPassword = String(crypto.createHash('md5').update(instance.ttlockPassword));
         }
     }
 }

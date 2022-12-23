@@ -15,39 +15,39 @@
     padding: 0rem;
     margin-bottom: 3rem;
 }
-.form {
-    display: grid;
-    gap: 15px;
-    grid-template-rows: repeat(4, 3rem);
-    grid-template-columns: 400px 400px;
-    grid-template-areas:
-        'first last'
-        'email phone'
-        'address address'
-        'notes notes';
+// .form {
+//     display: grid;
+//     gap: 15px;
+//     grid-template-rows: repeat(4, 3rem);
+//     grid-template-columns: 400px 400px;
+//     grid-template-areas:
+//         'first last'
+//         'email phone'
+//         'address address'
+//         'notes notes';
 
-    justify-content: space-around;
-    // justify-items: center;
-    // align-items: center;
+//     justify-content: space-around;
+//     // justify-items: center;
+//     // align-items: center;
 
-    @include respond(big-desktop) {
-        grid-template-columns: repeat(3, 500px);
-    }
+//     @include respond(big-desktop) {
+//         grid-template-columns: repeat(3, 500px);
+//     }
 
-    @include respond(tab-land) {
-    }
-    @include respond(tab-port) {
-        grid-template-columns: 250px 250px;
-    }
-    @include respond(phone) {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: space-around;
-        padding: 5px;
-        width: 250px;
-    }
-}
+//     @include respond(tab-land) {
+//     }
+//     @include respond(tab-port) {
+//         grid-template-columns: 250px 250px;
+//     }
+//     @include respond(phone) {
+//         display: flex;
+//         flex-direction: column;
+//         justify-content: center;
+//         align-items: space-around;
+//         padding: 5px;
+//         width: 250px;
+//     }
+// }
 
 .item--1 {
     grid-area: first;

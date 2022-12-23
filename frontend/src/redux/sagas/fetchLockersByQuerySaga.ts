@@ -9,9 +9,7 @@ import { ILockerRequestsQueryString } from '../reducers/adminReducer';
 
 const fetchLockersByQuery = (query: ILockerRequestsQueryString): Promise<IServerResponse> => {
     return httpRequester.get(
-        `${ApiUrl.LOCKER_REQUESTS}?page=${query.page || QueryDefaultValue.PAGE}&limit=${
-            query.limit || QueryDefaultValue.LIMIT
-        }`
+        `${ApiUrl.LOCKERS}?page=${query.page || QueryDefaultValue.PAGE}&limit=${query.limit || QueryDefaultValue.LIMIT}`
     );
 };
 
@@ -29,5 +27,5 @@ function* fetchLockersByQueryWorker(action: IAction): Generator<CallEffect<any> 
     }
 }
 export function* watchFetchLockersByQuery(): Generator<ForkEffect, void, void> {
-    yield takeEvery(SagaTask.FETCH_LOCKER_REQUESTS_BY_QUERY, fetchLockersByQueryWorker);
+    yield takeEvery(SagaTask.FETCH_LOCKERS_BY_QUERY, fetchLockersByQueryWorker);
 }

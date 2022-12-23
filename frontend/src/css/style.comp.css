@@ -320,6 +320,14 @@ a {
   .triple-dot-button--active {
     background: url(../../assets/icons/icon-more-active.png) no-repeat; }
 
+.locker-connection-or-return-request-form .button--inactive {
+  background-color: #c9c9c9;
+  border: none; }
+  .locker-connection-or-return-request-form .button--inactive:hover {
+    background-color: #c9c9c9;
+    color: #fff;
+    cursor: not-allowed; }
+
 .alert {
   padding: 1rem 1.5rem;
   border-radius: 15px;
@@ -927,6 +935,15 @@ select {
   .arrow--inactive:hover {
     color: #c9c9c9; }
 
+.provide-space-link-container .add-button-icon {
+  background: url("../../assets/icons/icon-add.png") no-repeat;
+  width: 70px;
+  height: 70px;
+  background-size: cover; }
+  .provide-space-link-container .add-button-icon:hover {
+    background: url("../../assets/icons/icon-add-hover.png") no-repeat;
+    background-size: cover; }
+
 .code-verification {
   display: flex;
   width: 400px;
@@ -1140,6 +1157,20 @@ select {
   flex-direction: column;
   align-items: center; }
 
+.pagination-bar {
+  display: flex;
+  border: 1px solid #c9c9c9;
+  width: 300px;
+  margin-top: 2rem;
+  border-radius: 15px;
+  padding: 0.3rem 0.8rem; }
+
+.locker-request {
+  padding: 1rem;
+  border: 1px solid #c9c9c9;
+  border-radius: 15px;
+  width: 400px; }
+
 .row {
   display: flex;
   flex-direction: row; }
@@ -1260,28 +1291,6 @@ select {
   margin-top: 3rem;
   padding: 0rem;
   margin-bottom: 3rem; }
-
-.form {
-  display: grid;
-  gap: 15px;
-  grid-template-rows: repeat(4, 3rem);
-  grid-template-columns: 400px 400px;
-  grid-template-areas: 'first last' 'email phone' 'address address' 'notes notes';
-  justify-content: space-around; }
-  @media only screen and (min-width: 112.5em) {
-    .form {
-      grid-template-columns: repeat(3, 500px); } }
-  @media only screen and (max-width: 56.25em) {
-    .form {
-      grid-template-columns: 250px 250px; } }
-  @media only screen and (max-width: 37.5em) {
-    .form {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: space-around;
-      padding: 5px;
-      width: 250px; } }
 
 .item--1 {
   grid-area: first; }
@@ -1647,6 +1656,17 @@ input::placeholder {
   justify-content: space-evenly;
   margin-top: 2rem; }
 
+.edit-space-form {
+  display: grid;
+  grid-template-columns: 250px repeat(3, 100px);
+  grid-template-rows: repeat(7, min-content) max-content max-content;
+  grid-row-gap: 40px;
+  grid-template-areas: 'a1 b1 b1 b1' 'a2 b2 b2 b2' 'a3 b3 b3 b3' 'a4 b4 b4 b4' 'a5 b5 b5 b5' 'a6 b6 b6 b6' 'a7 b7 b7 b7' 'a8 b8 b8 b8' 'a9 a9 a9 a9'; }
+  @media only screen and (max-width: 37.5em) {
+    .edit-space-form {
+      display: flex;
+      flex-direction: column; } }
+
 .for-investors-page a {
   color: #ffda55;
   font-weight: bolder; }
@@ -1654,14 +1674,14 @@ input::placeholder {
     color: #fec602;
     transition: 0.2s; }
 
-.provide-space__form {
+.provide-space-form {
   display: grid;
   grid-template-columns: 250px repeat(3, 100px);
   grid-template-rows: repeat(7, min-content) max-content max-content;
   grid-row-gap: 40px;
   grid-template-areas: 'a1 b1 b1 b1' 'a2 b2 b2 b2' 'a3 b3 b3 b3' 'a4 b4 b4 b4' 'a5 b5 b5 b5' 'a6 b6 b6 b6' 'a7 b7 b7 b7' 'a8 b8 b8 b8' 'a9 a9 a9 a9'; }
   @media only screen and (max-width: 37.5em) {
-    .provide-space__form {
+    .provide-space-form {
       display: flex;
       flex-direction: column; } }
 

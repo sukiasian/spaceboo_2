@@ -46,7 +46,7 @@ export class RouteProtector {
 
     public static spaceOwnerProtector = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const { id: userId } = req.user;
-        const { spaceId } = req.params || req.body || req.query;
+        const spaceId = req.params.spaceId || req.body.spaceId || req.query.spaceId;
 
         const space: Space = await this.spaceDao.findById(spaceId);
 

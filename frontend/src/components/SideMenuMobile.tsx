@@ -39,7 +39,7 @@ export default function SideMenuMobile({ handleCloseButtonClick }: ISideMenuMobi
     useEffect(turnOffScrollingOnInit, []);
 
     return (
-        <DarkScreen handleCloseButtonClick={handleCloseButtonClick}>
+        <DarkScreen>
             <aside className="side-menu-container" onClick={(e) => e.stopPropagation()}>
                 <div className={`side-menu ${authorizationStatusClassName}`}>{renderMenuComponentsForAuthorized()}</div>
             </aside>

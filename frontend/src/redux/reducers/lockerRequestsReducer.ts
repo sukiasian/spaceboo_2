@@ -6,18 +6,17 @@ export interface ILockerRequestsState {
     postRequestLockerFailureResponse?: IServerResponse;
     postRequestLockerReturnSuccessResponse?: IServerResponse;
     postRequestLockerReturnFailureResponse?: IServerResponse;
+    requestLockerPayload?: ILockerRequestPayload;
 }
 
 export interface ILockerRequestPayload {
-    spaceId: string;
-    phoneNumber: string;
+    phoneNumber?: string;
+    spaceId?: string;
 }
 
 export interface IRequestLockerConnectionPayload extends ILockerRequestPayload {}
 
-export interface IRequestReturnLockerPayload extends ILockerRequestPayload {
-    lockerId: string;
-}
+export interface IRequestReturnLockerPayload extends ILockerRequestPayload {}
 
 const initialState: ILockerRequestsState = {};
 
@@ -45,6 +44,26 @@ export const lockerRequestsReducer = (state = initialState, action: IAction): IL
             return {
                 ...state,
                 postRequestLockerReturnFailureResponse: action.payload,
+            };
+
+        case ReduxLockerRequestsAction.SET_REQUEST_LOCKER_PAYLOAD:
+            return {
+                ...state,
+                requestLockerPayload: action.payload,
+            };
+
+        case ReduxLockerRequestsAction.ANNUALIZE_POST_REQUEST_LOCKER_RESPONSES:
+            return {
+                ...state,
+                postRequestLockerSuccessResponse: undefined,
+                postRequestLockerFailureResponse: undefined,
+            };
+
+        case ReduxLockerRequestsAction.ANNUALIZE_POST_REQUEST_LOCKER_RETURN_RESPONSES:
+            return {
+                ...state,
+                postRequestLockerReturnSuccessResponse: undefined,
+                postRequestLockerReturnFailureResponse: undefined,
             };
 
         default: {

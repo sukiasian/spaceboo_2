@@ -1,17 +1,14 @@
 import * as passport from 'passport';
 import { PassportStatic } from 'passport';
-import { Strategy as FacebookStrategy } from 'passport-facebook';
 import { Strategy as LocalStrategy } from 'passport-local';
-import { Strategy as VkontakteStrategy } from 'passport-vkontakte';
-import { Strategy as OdnoklassnikiStrategy } from 'passport-odnoklassniki';
 import { JwtFromRequestFunction, Strategy as JwtStrategy } from 'passport-jwt';
 import { ExtractJwt } from 'passport-jwt';
+import * as express from 'express';
 import { Singleton, SingletonFactory } from '../utils/Singleton';
 import { UserScopes, User } from '../models/user.model';
-import { ErrorMessages, HttpStatus, RedisVariable } from '../types/enums';
+import { Environment, ErrorMessages, HttpStatus, RedisVariable } from '../types/enums';
 import logger from '../loggers/logger';
 import { userSequelizeDao, UserSequelizeDao } from '../daos/user.sequelize.dao';
-import * as express from 'express';
 import AppError from '../utils/AppError';
 import UtilFunctions from '../utils/UtilFunctions';
 import { redis } from '../Redis';
@@ -22,7 +19,7 @@ export class PassportConfig extends Singleton {
     private readonly passport: PassportStatic = passport;
     private readonly redisClient = redis.client;
     private readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
-    private readonly attemptsAllowed = '2';
+    private readonly attemptsAllowed = process.env.NODE_ENV === Environment.DEVELOPMENT ? '100' : '7';
 
     public initializePassport(): express.Handler {
         return this.passport.initialize();

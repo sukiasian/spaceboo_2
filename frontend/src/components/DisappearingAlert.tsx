@@ -3,18 +3,20 @@ import Alert, { IAlertProps } from './Alert';
 
 interface IDisappearingAlertProps extends Omit<IAlertProps, 'innerRef'> {}
 
-export default function DisappearingAlert(props: IDisappearingAlertProps): JSX.Element {
+export default function DisappearingAlert(props: IDisappearingAlertProps): JSX.Element | null {
     const { successResponse, failureResponse } = props;
     const [isRendered, setIsRendered] = useState(true);
     const alertRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         setTimeout(() => {
-            setIsRendered(false);
+            if (successResponse || failureResponse) {
+                setIsRendered(false);
+            }
         }, 2000);
     }, []);
 
-    return (
+    return successResponse || failureResponse ? (
         <>
             {isRendered ? (
                 <Alert
@@ -25,5 +27,5 @@ export default function DisappearingAlert(props: IDisappearingAlertProps): JSX.E
                 />
             ) : null}
         </>
-    );
+    ) : null;
 }
