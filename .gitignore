@@ -8,7 +8,6 @@
 
 /backend/node_modules
 /backend/log
-/backend/.env
 /backend/test.env
 
 # dependencies
