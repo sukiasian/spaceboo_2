@@ -182,12 +182,12 @@ input.validator--allowed {
     display: block;
     height: 50px;
     width: 50px;
-    background: url('../../assets/icons/icon-add.png');
+    background: url('../assets/icons/icon-add.png');
     background-size: cover;
     cursor: pointer;
 
     &:hover {
-        background-image: url('../../assets/icons/icon-add-hover.png');
+        background-image: url('../assets/icons/icon-add-hover.png');
     }
 }
 

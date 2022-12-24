@@ -81,10 +81,10 @@
 .triple-dot-button {
     width: 24px;
     height: 24px;
-    background: url(../../assets/icons/icon-more.png) no-repeat;
+    background: url(../assets/icons/icon-more.png) no-repeat;
 
     &:hover:not(:active) {
-        background: url(../../assets/icons/icon-more-hover.png) no-repeat;
+        background: url(../assets/icons/icon-more-hover.png) no-repeat;
     }
 
     &--vertical {
@@ -92,7 +92,7 @@
     }
 
     &--active {
-        background: url(../../assets/icons/icon-more-active.png) no-repeat;
+        background: url(../assets/icons/icon-more-active.png) no-repeat;
     }
 }
 

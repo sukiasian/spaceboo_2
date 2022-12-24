@@ -14,39 +14,39 @@
         height: 25px;
 
         &.my-appointments-button {
-            background-image: url('../../assets/user-panel/my-appointments.png');
+            background-image: url('../assets/user-panel/my-appointments.png');
             background-size: cover;
 
             &--active {
-                background-image: url('../../assets/user-panel/my-appointments-active.png');
+                background-image: url('../assets/user-panel/my-appointments-active.png');
             }
         }
 
         &.my-spaces-button {
-            background-image: url('../../assets/user-panel/my-spaces.svg');
+            background-image: url('../assets/user-panel/my-spaces.svg');
             background-size: 25px 25px;
             background-repeat: no-repeat;
 
             &--active {
-                background-image: url('../../assets/user-panel/my-spaces-active.svg');
+                background-image: url('../assets/user-panel/my-spaces-active.svg');
             }
         }
 
         &.provide-space-button {
-            background-image: url('../../assets/user-panel/provide-space.png');
+            background-image: url('../assets/user-panel/provide-space.png');
             background-size: cover;
 
             &--active {
-                background-image: url('../../assets/user-panel/provide-space-active.png');
+                background-image: url('../assets/user-panel/provide-space-active.png');
             }
         }
 
         &.keys-button {
-            background-image: url('../../assets/user-panel/key.png');
+            background-image: url('../assets/user-panel/key.png');
             background-size: cover;
 
             &--active {
-                background-image: url('../../assets/user-panel/key-active.png');
+                background-image: url('../assets/user-panel/key-active.png');
             }
         }
 

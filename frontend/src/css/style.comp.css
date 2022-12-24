@@ -137,7 +137,7 @@ a {
     .navbar-provide-space-button {
       background-color: transparent !important;
       border: none;
-      background-image: url("../../assets/icons/icon-add-hover.png") !important;
+      background-image: url("../assets/icons/icon-add-hover.png") !important;
       background-size: cover;
       width: 2.5rem;
       height: 2.5rem;
@@ -312,13 +312,13 @@ a {
 .triple-dot-button {
   width: 24px;
   height: 24px;
-  background: url(../../assets/icons/icon-more.png) no-repeat; }
+  background: url(../assets/icons/icon-more.png) no-repeat; }
   .triple-dot-button:hover:not(:active) {
-    background: url(../../assets/icons/icon-more-hover.png) no-repeat; }
+    background: url(../assets/icons/icon-more-hover.png) no-repeat; }
   .triple-dot-button--vertical {
     transform: rotate(90deg); }
   .triple-dot-button--active {
-    background: url(../../assets/icons/icon-more-active.png) no-repeat; }
+    background: url(../assets/icons/icon-more-active.png) no-repeat; }
 
 .locker-connection-or-return-request-form .button--inactive {
   background-color: #c9c9c9;
@@ -837,7 +837,7 @@ select {
     .slider {
       display: none; } }
   .slider__image {
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(../../assets/how-it-works-doors.jpg);
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(../assets/how-it-works-doors.jpg);
     background-color: rgba(96, 96, 96, 0.5);
     border-radius: 15px;
     box-shadow: 0 0 1px 3px rgba(209, 209, 209, 0.2); }
@@ -936,12 +936,12 @@ select {
     color: #c9c9c9; }
 
 .provide-space-link-container .add-button-icon {
-  background: url("../../assets/icons/icon-add.png") no-repeat;
+  background: url("../assets/icons/icon-add.png") no-repeat;
   width: 70px;
   height: 70px;
   background-size: cover; }
   .provide-space-link-container .add-button-icon:hover {
-    background: url("../../assets/icons/icon-add-hover.png") no-repeat;
+    background: url("../assets/icons/icon-add-hover.png") no-repeat;
     background-size: cover; }
 
 .code-verification {
@@ -1081,26 +1081,26 @@ select {
     width: 25px;
     height: 25px; }
     .user-panel__elem.my-appointments-button {
-      background-image: url("../../assets/user-panel/my-appointments.png");
+      background-image: url("../assets/user-panel/my-appointments.png");
       background-size: cover; }
       .user-panel__elem.my-appointments-button--active {
-        background-image: url("../../assets/user-panel/my-appointments-active.png"); }
+        background-image: url("../assets/user-panel/my-appointments-active.png"); }
     .user-panel__elem.my-spaces-button {
-      background-image: url("../../assets/user-panel/my-spaces.svg");
+      background-image: url("../assets/user-panel/my-spaces.svg");
       background-size: 25px 25px;
       background-repeat: no-repeat; }
       .user-panel__elem.my-spaces-button--active {
-        background-image: url("../../assets/user-panel/my-spaces-active.svg"); }
+        background-image: url("../assets/user-panel/my-spaces-active.svg"); }
     .user-panel__elem.provide-space-button {
-      background-image: url("../../assets/user-panel/provide-space.png");
+      background-image: url("../assets/user-panel/provide-space.png");
       background-size: cover; }
       .user-panel__elem.provide-space-button--active {
-        background-image: url("../../assets/user-panel/provide-space-active.png"); }
+        background-image: url("../assets/user-panel/provide-space-active.png"); }
     .user-panel__elem.keys-button {
-      background-image: url("../../assets/user-panel/key.png");
+      background-image: url("../assets/user-panel/key.png");
       background-size: cover; }
       .user-panel__elem.keys-button--active {
-        background-image: url("../../assets/user-panel/key-active.png"); }
+        background-image: url("../assets/user-panel/key-active.png"); }
     .user-panel__elem .burger-menu {
       width: 25px;
       height: 25px;
@@ -1349,7 +1349,7 @@ input::placeholder {
   margin-top: 3rem; }
 
 .how-it-works__banner__image {
-  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(../../assets/how-it-works-doors.jpg);
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(../assets/how-it-works-doors.jpg);
   background-color: rgba(96, 96, 96, 0.5);
   width: 100vw;
   height: 50vh;
@@ -1367,7 +1367,7 @@ input::placeholder {
   position: relative;
   left: 100%;
   transform: translate(-89%, 0);
-  background: url(../../assets/how-it-works-phone.jpg);
+  background: url(../assets/how-it-works-phone.jpg);
   width: 300px;
   height: 200px;
   background-size: cover;
@@ -1428,7 +1428,7 @@ input::placeholder {
     text-align: center; }
 
 .logo--white {
-  background: url("../../assets/logo-white.svg") no-repeat;
+  background: url("../assets/logo-white.svg") no-repeat;
   height: 50px; }
 
 .calls-to-action {
@@ -1804,11 +1804,11 @@ input.validator--allowed {
   display: block;
   height: 50px;
   width: 50px;
-  background: url("../../assets/icons/icon-add.png");
+  background: url("../assets/icons/icon-add.png");
   background-size: cover;
   cursor: pointer; }
   .add-photo-icon:hover {
-    background-image: url("../../assets/icons/icon-add-hover.png"); }
+    background-image: url("../assets/icons/icon-add-hover.png"); }
 
 .photos__input {
   display: none; }

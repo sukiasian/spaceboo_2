@@ -39,13 +39,13 @@
 }
 
 .provide-space-link-container .add-button-icon {
-    background: url('../../assets/icons/icon-add.png') no-repeat;
+    background: url('../assets/icons/icon-add.png') no-repeat;
     width: 70px;
     height: 70px;
     background-size: cover;
 
     &:hover {
-        background: url('../../assets/icons/icon-add-hover.png') no-repeat;
+        background: url('../assets/icons/icon-add-hover.png') no-repeat;
         background-size: cover;
     }
 }

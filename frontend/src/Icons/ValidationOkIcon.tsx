@@ -14,3 +14,4 @@ export default function ValidationOkIcon(props: ValidationOkIconProps): JSX.Elem
         </div>
     );
 }
+console.log()
