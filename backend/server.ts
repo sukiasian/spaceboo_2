@@ -33,20 +33,23 @@ class Server extends Singleton {
     };
 
     public start = async () => {
-        await databaseConnection(this.appConfig.sequelize);
+        // await databaseConnection(this.appConfig.sequelize);
         // await this.redis.startRedis();
 
         const server = this.app.listen(this.PORT, () => {
             logger.info(`Server is listening on ${this.PORT}`);
 
             if (process.env.NODE_ENV === Environment.PRODUCTION) {
-                process.send('Server is ready');
+                logger.info('Server is ready');
             }
         });
 
-        this.utilFunctions.exitHandler(server, this.appConfig.sequelize);
+        // this.utilFunctions.exitHandler(server, this.appConfig.sequelize);
     };
 }
+
+console.log();
+
 
 Server.configureDotenv();
 
@@ -54,9 +57,7 @@ const server = SingletonFactory.produce<Server>(Server);
 
 server.startCrons();
 // NOTE remove method after dockerization
-console.log(5555);
 
 // server.redis.startRedisServerOnMachine();
-console.log(6666);
 
 server.start();

@@ -4,6 +4,7 @@ exports.appConfig = exports.AppConfig = void 0;
 const express = require("express");
 const sequelize_typescript_1 = require("sequelize-typescript");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 const user_router_1 = require("./routes/user.router");
 const space_router_1 = require("./routes/space.router");
 const auth_router_1 = require("./routes/auth.router");
@@ -68,6 +69,12 @@ class AppConfig extends Singleton_1.Singleton {
             this.app.use(enums_1.ApiRoutes.TTLOCK, ttlock_router_1.router);
             this.app.use(enums_1.ApiRoutes.IMAGES, image_router_1.router);
             this.app.use(enums_1.ApiRoutes.CITIES, city_router_1.router);
+            if (process.env.NODE_ENV === 'production') {
+                this.app.use('/', express.static(path.resolve('../frontend', 'build')));
+                this.app.get('*', (req, res) => {
+                    res.sendFile(path.resolve('../frontend', 'build', 'index.html'));
+                });
+            }
             this.app.use(error_controller_1.default);
         };
         this.setupPassport = () => {

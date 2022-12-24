@@ -67,8 +67,8 @@ UtilFunctions.shutdownOpenProcesses = async (server, sequelize) => {
     });
     await sequelize.close();
     logger_1.default.info('Sequelize disconnected.');
-    await _a.redis.client.quit();
-    await _a.redis.shutdownRedisServerOnMachine();
+    // await this.redis.client.quit();
+    // await this.redis.shutdownRedisServerOnMachine();
     logger_1.default.info('Redis disconnected.');
     process.exit(errorExists ? 1 : 0);
 };

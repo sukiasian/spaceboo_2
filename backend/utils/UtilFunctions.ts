@@ -75,8 +75,8 @@ class UtilFunctions {
 
         logger.info('Sequelize disconnected.');
 
-        await this.redis.client.quit();
-        await this.redis.shutdownRedisServerOnMachine();
+        // await this.redis.client.quit();
+        // await this.redis.shutdownRedisServerOnMachine();
 
         logger.info('Redis disconnected.');
 

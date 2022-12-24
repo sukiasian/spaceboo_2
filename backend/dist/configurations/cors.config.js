@@ -5,10 +5,12 @@ class CorsConfig {
 exports.default = CorsConfig;
 CorsConfig.corsOptions = {
     origin: function (origin, callback) {
-        if (CorsConfig.whiteList.indexOf(origin) !== -1) {
+        if (!origin || CorsConfig.whiteList.indexOf(origin) !== -1) {
+            console.log(origin);
             callback(null, true);
         }
         else {
+            console.log(origin);
             callback(new Error('Not allowed by CORS.'));
         }
     },

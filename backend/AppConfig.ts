@@ -1,6 +1,7 @@
 import * as express from 'express';
 import { Sequelize } from 'sequelize-typescript';
 import * as cookieParser from 'cookie-parser';
+import * as path from 'path';
 import { router as userRouter } from './routes/user.router';
 import { router as spaceRouter } from './routes/space.router';
 import { router as authRouter } from './routes/auth.router';
@@ -66,6 +67,26 @@ export class AppConfig extends Singleton {
         this.app.use(ApiRoutes.TTLOCK, ttLockRouter);
         this.app.use(ApiRoutes.IMAGES, imageRouter);
         this.app.use(ApiRoutes.CITIES, cityRouter);
+
+		if (process.env.NODE_ENV === 'production') {
+			this.app.use(
+				'/',
+				express.static(
+					path.resolve('../frontend', 'build')
+				)
+			)
+		
+			this.app.get('*', (req, res) => {
+				res.sendFile(
+					path.resolve(
+						'../frontend',
+						'build',
+						'index.html'
+					)
+				)
+			})
+		}
+
         this.app.use(globalErrorController);
     };
 
