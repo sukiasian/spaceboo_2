@@ -12,19 +12,19 @@ describe('City (e2e)', () => {
     let cityModel;
     beforeAll(async () => {
         dotenv.config({ path: '../test.env' });
-        appConfig = lib_1.createAppConfig();
+        appConfig = (0, lib_1.createAppConfig)();
         app = appConfig.app;
         db = appConfig.sequelize;
         cityModel = city_model_1.City;
-        server = (await lib_1.openTestEnv(appConfig)).server;
+        server = (await (0, lib_1.openTestEnv)(appConfig)).server;
         city = await cityModel.findOne({ raw: true });
     });
     beforeEach(async () => { });
     afterEach(async () => {
-        lib_1.clearDb(db);
+        (0, lib_1.clearDb)(db);
     });
     afterAll(async () => {
-        await lib_1.closeTestEnv(db, server);
+        await (0, lib_1.closeTestEnv)(db, server);
     });
     it('/cities should get all cities by query', async () => {
         expect(1).toBe(1);

@@ -96,11 +96,11 @@ let User = class User extends sequelize_typescript_1.Model {
 };
 __decorate([
     sequelize_typescript_1.PrimaryKey,
-    sequelize_typescript_1.Column({ type: sequelize_typescript_1.DataType.UUID, defaultValue: sequelize_typescript_1.DataType.UUIDV4, allowNull: false }),
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.UUID, defaultValue: sequelize_typescript_1.DataType.UUIDV4, allowNull: false }),
     __metadata("design:type", String)
 ], User.prototype, "id", void 0);
 __decorate([
-    sequelize_typescript_1.Column({
+    (0, sequelize_typescript_1.Column)({
         allowNull: false,
         validate: {
             len: {
@@ -116,7 +116,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "name", void 0);
 __decorate([
-    sequelize_typescript_1.Column({
+    (0, sequelize_typescript_1.Column)({
         allowNull: false,
         validate: {
             len: {
@@ -132,7 +132,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "surname", void 0);
 __decorate([
-    sequelize_typescript_1.Column({
+    (0, sequelize_typescript_1.Column)({
         allowNull: false,
         validate: {
             len: {
@@ -148,7 +148,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "middleName", void 0);
 __decorate([
-    sequelize_typescript_1.Column({
+    (0, sequelize_typescript_1.Column)({
         allowNull: false,
         validate: {
             notNull: {
@@ -166,11 +166,11 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
-    sequelize_typescript_1.Column({ allowNull: false, defaultValue: UserRoles.USER }),
+    (0, sequelize_typescript_1.Column)({ allowNull: false, defaultValue: UserRoles.USER }),
     __metadata("design:type", String)
 ], User.prototype, "role", void 0);
 __decorate([
-    sequelize_typescript_1.Column({
+    (0, sequelize_typescript_1.Column)({
         validate: {
             len: { msg: enums_1.ErrorMessages.PASSWORD_LENGTH_VALIDATE, args: [8, 25] },
             // FIXME comparePasswords, not checkAvailability
@@ -188,7 +188,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "passwordConfirmation", void 0);
 __decorate([
-    sequelize_typescript_1.Column({ allowNull: false, defaultValue: false }),
+    (0, sequelize_typescript_1.Column)({ allowNull: false, defaultValue: false }),
     __metadata("design:type", Boolean)
 ], User.prototype, "confirmed", void 0);
 __decorate([
@@ -204,15 +204,15 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "odnoklassnikiId", void 0);
 __decorate([
-    sequelize_typescript_1.Column({ allowNull: true }),
+    (0, sequelize_typescript_1.Column)({ allowNull: true }),
     __metadata("design:type", String)
 ], User.prototype, "avatarUrl", void 0);
 __decorate([
-    sequelize_typescript_1.Column({ type: sequelize_typescript_1.DataType.BIGINT }),
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.BIGINT }),
     __metadata("design:type", Number)
 ], User.prototype, "lastVerificationRequested", void 0);
 __decorate([
-    sequelize_typescript_1.HasMany(() => appointment_model_1.Appointment),
+    (0, sequelize_typescript_1.HasMany)(() => appointment_model_1.Appointment),
     __metadata("design:type", Array)
 ], User.prototype, "appointments", void 0);
 __decorate([
@@ -224,7 +224,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], User, "hashPasswordAndRemovePasswordConfirmation", null);
 User = __decorate([
-    sequelize_typescript_1.Table({
+    (0, sequelize_typescript_1.Table)({
         timestamps: true,
         defaultScope: {
             attributes: {

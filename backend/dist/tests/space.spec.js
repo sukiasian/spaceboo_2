@@ -41,7 +41,7 @@ describe('Space (e2e)', () => {
         isoDatesToReserve_1 = UtilFunctions_1.default.createIsoDatesRangeToCreateAppointments('2020-12-15', '14:00', '2020-12-20', '12:00');
         isoDatesToReserve_2 = UtilFunctions_1.default.createIsoDatesRangeToCreateAppointments('2021-12-15', '14:00', '2021-12-20', '12:00');
         isoDatesToReserve_3 = UtilFunctions_1.default.createIsoDatesRangeToCreateAppointments('2022-12-15', '14:00', '2022-12-20', '12:00');
-        appConfig = lib_1.createAppConfig();
+        appConfig = (0, lib_1.createAppConfig)();
         pathToTestImage = path.resolve('tests', 'files', 'images', '1.png');
         app = appConfig.app;
         db = appConfig.sequelize;
@@ -50,16 +50,16 @@ describe('Space (e2e)', () => {
         spaceModel = space_model_1.Space;
         cityModel = city_model_1.City;
         appointmentModel = appointment_model_1.Appointment;
-        userData = lib_1.createUserData();
-        server = (await lib_1.openTestEnv(appConfig)).server;
+        userData = (0, lib_1.createUserData)();
+        server = (await (0, lib_1.openTestEnv)(appConfig)).server;
     });
     beforeEach(async () => {
         city = await cityModel.findOne({ raw: true });
         city_2 = await cityModel.findOne({ where: { name: 'Краснодар' } });
         user = await userModel.create(userData);
-        spaceData = lib_1.createSpaceData(user.id, city.id, 1500);
-        spaceData_2 = lib_1.createSpaceData(user.id, city_2.id);
-        token = lib_1.createTokenAndSign({ id: user.id });
+        spaceData = (0, lib_1.createSpaceData)(user.id, city.id, 1500);
+        spaceData_2 = (0, lib_1.createSpaceData)(user.id, city_2.id);
+        token = (0, lib_1.createTokenAndSign)({ id: user.id });
         space_1 = await spaceModel.create(spaceData);
         space_1 = await spaceModel.findOne({
             where: { id: space_1.id },
@@ -69,11 +69,11 @@ describe('Space (e2e)', () => {
         space_2 = await spaceModel.findOne({ where: { id: space_2.id }, include: [cityModel, appointmentModel] });
     });
     afterEach(async () => {
-        lib_1.clearDb(db);
-        userData = lib_1.createUserData();
+        (0, lib_1.clearDb)(db);
+        userData = (0, lib_1.createUserData)();
     });
     afterAll(async () => {
-        await lib_1.closeTestEnv(db, server);
+        await (0, lib_1.closeTestEnv)(db, server);
     });
     it('POST /spaces should create a space', async () => {
         await spaceModel.destroy({ truncate: true, cascade: true });
@@ -334,15 +334,15 @@ describe('Space (e2e)', () => {
         const freshSpace = await spaceDao.findById(space_1.id);
     });
     it("GET /spaces/user/outdated should get user's outdated appointments", async () => {
-        const outdatedAppointmentDataForSpace_1 = lib_1.createAppoinmentData([
+        const outdatedAppointmentDataForSpace_1 = (0, lib_1.createAppoinmentData)([
             { value: '2020-01-01T14:00:00.000Z', inclusive: true },
             { value: '2020-01-05T12:00:00.000Z', inclusive: false },
         ], space_1.id, user.id);
-        const activeAppointmentDataForSpace_2 = lib_1.createAppoinmentData([
+        const activeAppointmentDataForSpace_2 = (0, lib_1.createAppoinmentData)([
             { value: new Date().toISOString(), inclusive: true },
             { value: new Date(Date.now() + 100000000).toISOString(), inclusive: false },
         ], space_2.id, user.id);
-        const upcomingAppointmentDataForSpace_2 = lib_1.createAppoinmentData([
+        const upcomingAppointmentDataForSpace_2 = (0, lib_1.createAppoinmentData)([
             { value: '2050-01-01T14:00:00.000Z', inclusive: true },
             { value: '2050-01-05T12:00:00.000Z', inclusive: false },
         ], space_2.id, user.id);
@@ -362,15 +362,15 @@ describe('Space (e2e)', () => {
         expect(res.body.data[0].id).toBe(space_1.id);
     });
     it("GET /spaces/user/active should get user's active appointments", async () => {
-        const outdatedAppointmentDataForSpace_1 = lib_1.createAppoinmentData([
+        const outdatedAppointmentDataForSpace_1 = (0, lib_1.createAppoinmentData)([
             { value: '2020-01-01T14:00:00.000Z', inclusive: true },
             { value: '2020-01-05T12:00:00.000Z', inclusive: false },
         ], space_1.id, user.id);
-        const upcomingAppointmentDataForSpace_1 = lib_1.createAppoinmentData([
+        const upcomingAppointmentDataForSpace_1 = (0, lib_1.createAppoinmentData)([
             { value: '2050-01-01T14:00:00.000Z', inclusive: true },
             { value: '2050-01-05T12:00:00.000Z', inclusive: false },
         ], space_1.id, user.id);
-        const activeAppointmentDataForSpace_2 = lib_1.createAppoinmentData([
+        const activeAppointmentDataForSpace_2 = (0, lib_1.createAppoinmentData)([
             { value: new Date().toISOString(), inclusive: true },
             { value: new Date(Date.now() + 100000000).toISOString(), inclusive: false },
         ], space_2.id, user.id);
@@ -390,15 +390,15 @@ describe('Space (e2e)', () => {
         expect(res.body.data[0].id).toBe(space_2.id);
     });
     it("GET /spaces/user/upcoming should get user's upcoming appointments", async () => {
-        const outdatedAppointmentDataForSpace_1 = lib_1.createAppoinmentData([
+        const outdatedAppointmentDataForSpace_1 = (0, lib_1.createAppoinmentData)([
             { value: '2020-01-01T14:00:00.000Z', inclusive: true },
             { value: '2020-01-05T12:00:00.000Z', inclusive: false },
         ], space_1.id, user.id);
-        const activeAppointmentDataForSpace_1 = lib_1.createAppoinmentData([
+        const activeAppointmentDataForSpace_1 = (0, lib_1.createAppoinmentData)([
             { value: new Date().toISOString(), inclusive: true },
             { value: new Date(Date.now() + 100000000).toISOString(), inclusive: false },
         ], space_1.id, user.id);
-        const upcomingAppointmentDataForSpace_2 = lib_1.createAppoinmentData([
+        const upcomingAppointmentDataForSpace_2 = (0, lib_1.createAppoinmentData)([
             { value: '2050-01-01T14:00:00.000Z', inclusive: true },
             { value: '2050-01-05T12:00:00.000Z', inclusive: false },
         ], space_2.id, user.id);

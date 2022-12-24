@@ -9,7 +9,7 @@ const Singleton_1 = require("../utils/Singleton");
 class UserRouter extends Singleton_1.Singleton {
     constructor() {
         super(...arguments);
-        this.router = express_1.Router();
+        this.router = (0, express_1.Router)();
         this.passport = passport;
         this.userController = user_controller_1.userController;
         this.prepareRouter = () => {

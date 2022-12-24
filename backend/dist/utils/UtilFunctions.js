@@ -1,4 +1,5 @@
 "use strict";
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 const util_1 = require("util");
@@ -7,7 +8,7 @@ const path = require("path");
 const jwt = require("jsonwebtoken");
 const logger_1 = require("../loggers/logger");
 const enums_1 = require("../types/enums");
-const AppError_1 = require("./AppError");
+const Redis_1 = require("../Redis");
 var DateFormat;
 (function (DateFormat) {
     DateFormat["NATIVE"] = "native";
@@ -15,7 +16,10 @@ var DateFormat;
 })(DateFormat || (DateFormat = {}));
 class UtilFunctions {
 }
+_a = UtilFunctions;
 UtilFunctions.signToken = jwt.sign;
+UtilFunctions.logger = logger_1.default;
+UtilFunctions.redis = Redis_1.redis;
 UtilFunctions.defineResponseStatus = (httpStatus) => {
     if (httpStatus >= enums_1.HttpStatus.OK && httpStatus < enums_1.HttpStatus.FORBIDDEN) {
         return enums_1.ResponseStatus.SUCCESS;
@@ -29,83 +33,66 @@ UtilFunctions.sendResponse = (res) => {
     return (statusCode, message, data) => {
         if (!message && data) {
             res.status(statusCode).json({
-                status: this.defineResponseStatus(statusCode),
+                status: _a.defineResponseStatus(statusCode),
                 data,
             });
         }
         else if (message && data !== undefined) {
             res.status(statusCode).json({
-                status: this.defineResponseStatus(statusCode),
+                status: _a.defineResponseStatus(statusCode),
                 message,
                 data,
             });
         }
         else if (message && data === undefined) {
             res.status(statusCode).json({
-                status: this.defineResponseStatus(statusCode),
+                status: _a.defineResponseStatus(statusCode),
                 message,
             });
         }
         else {
             res.status(statusCode).json({
-                status: this.defineResponseStatus(statusCode),
+                status: _a.defineResponseStatus(statusCode),
             });
         }
     };
 };
+UtilFunctions.shutdownOpenProcesses = async (server, sequelize) => {
+    let errorExists;
+    server.close((err) => {
+        if (err) {
+            logger_1.default.error(err);
+            errorExists = err;
+        }
+    });
+    await sequelize.close();
+    logger_1.default.info('Sequelize disconnected.');
+    await _a.redis.client.quit();
+    await _a.redis.shutdownRedisServerOnMachine();
+    logger_1.default.info('Redis disconnected.');
+    process.exit(errorExists ? 1 : 0);
+};
 UtilFunctions.exitHandler = (server, sequelize) => {
     process
         .on('unhandledRejection', (reason, p) => {
-        console.error(reason, 'Unhandled Rejection at Promise', p);
-        server.close((err) => {
-            if (err) {
-                logger_1.default.error(err);
-                process.exit(1);
-            }
-            sequelize.close().then(() => {
-                logger_1.default.error('Sequelize connection disconnected');
-                process.exit(0);
-            });
-        });
+        logger_1.default.error('Unhandled Rejection: ', reason, p);
+        _a.shutdownOpenProcesses(server, sequelize);
     })
         .on('uncaughtException', (err) => {
         logger_1.default.error('Uncaught Exception thrown');
-        server.close((err) => {
-            if (err) {
-                logger_1.default.error(err);
-                process.exit(1);
-            }
-            sequelize.close().then(() => {
-                logger_1.default.info('Sequelize connection disconnected');
-                process.exit(0);
-            });
-        });
+        _a.shutdownOpenProcesses(server, sequelize);
     })
         .on('SIGTERM', () => {
-        console.info('SIGTERM signal received.');
-        server.close((err) => {
-            if (err) {
-                logger_1.default.error(err);
-                process.exit(1);
-            }
-            sequelize.close().then(() => {
-                logger_1.default.info('Sequelize connection disconnected');
-                process.exit(0);
-            });
-        });
+        logger_1.default.info('SIGTERM signal received.');
+        _a.shutdownOpenProcesses(server, sequelize);
     })
-        .on('SIGINT', function () {
-        console.info('SIGINT signal received.');
-        server.close((err) => {
-            if (err) {
-                logger_1.default.error(err);
-                process.exit(1);
-            }
-            sequelize.close().then(() => {
-                logger_1.default.info('Sequelize connection disconnected');
-                process.exit(0);
-            });
-        });
+        .on('SIGINT', () => {
+        logger_1.default.info('SIGINT signal received.');
+        _a.shutdownOpenProcesses(server, sequelize);
+    })
+        .on('beforeExit', () => {
+        logger_1.default.info('Exit occured.');
+        _a.shutdownOpenProcesses(server, sequelize);
     });
 };
 UtilFunctions.catchAsync = (fn) => {
@@ -154,21 +141,22 @@ UtilFunctions.createIsoDatesRangeToFindAppointments = (beginningDate, beginningT
 UtilFunctions.createSequelizeRawQuery = async (sequelize, query, options = {}) => {
     return sequelize.query(query, Object.assign({ type: sequelize_1.QueryTypes.SELECT }, options));
 };
-UtilFunctions.makeDirectory = util_1.promisify(fs.mkdir);
-UtilFunctions.readDirectory = util_1.promisify(fs.readdir);
-UtilFunctions.checkIfExists = util_1.promisify(fs.exists);
-UtilFunctions.removeDirectory = util_1.promisify(fs.rmdir);
-UtilFunctions.removeFile = util_1.promisify(fs.rm);
+UtilFunctions.makeDirectory = (0, util_1.promisify)(fs.mkdir);
+UtilFunctions.readDirectory = (0, util_1.promisify)(fs.readdir);
+UtilFunctions.checkIfExists = (0, util_1.promisify)(fs.exists);
+UtilFunctions.removeDirectory = (0, util_1.promisify)(fs.rmdir);
+UtilFunctions.removeFile = (0, util_1.promisify)(fs.rm);
 UtilFunctions.findAndRemoveImage = async (userId, imageToRemoveFilename) => {
     const pathToFile = path.resolve('assets/images', imageToRemoveFilename);
     const checkIfFileExists = await UtilFunctions.checkIfExists(pathToFile);
     if (!checkIfFileExists) {
-        throw new AppError_1.default(enums_1.HttpStatus.NOT_FOUND, enums_1.ErrorMessages.NO_IMAGE_FOUND);
+        _a.logger.error(enums_1.ErrorMessages.NO_IMAGE_FOUND);
+        return;
     }
     await UtilFunctions.removeFile(pathToFile);
 };
 UtilFunctions.signTokenAndStoreInCookies = async (res, jwtPayload, signOptions = {}) => {
-    const token = this.signToken(jwtPayload, process.env.JWT_SECRET_KEY, signOptions);
+    const token = _a.signToken(jwtPayload, process.env.JWT_SECRET_KEY, signOptions);
     const cookieOptions = {
         httpOnly: true,
         expires: new Date(Date.now() + 90 * 24 * 3600000),
@@ -178,6 +166,14 @@ UtilFunctions.signTokenAndStoreInCookies = async (res, jwtPayload, signOptions =
         cookieOptions.secure = true;
     }
     res.cookie('jwt', token, cookieOptions);
+};
+UtilFunctions.makeDecimal = (valueToNumber) => {
+    return parseInt(valueToNumber, 10);
+};
+UtilFunctions.isUUID = (id) => {
+    // NOTE: does not work
+    // return uuid.validate(id);
+    return id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i) ? true : false;
 };
 exports.default = UtilFunctions;
 //# sourceMappingURL=UtilFunctions.js.map

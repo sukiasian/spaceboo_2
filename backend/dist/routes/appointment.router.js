@@ -11,11 +11,12 @@ class AppointmentRouter extends Singleton_1.Singleton {
         super(...arguments);
         this.appointmentController = appointment_controller_1.appointmentController;
         this.passport = passport;
-        this.router = express_1.Router();
+        this.router = (0, express_1.Router)();
         this.prepareRouter = () => {
             this.router
                 .route('/')
-                .post(this.passport.authenticate(enums_1.PassportStrategies.JWT, { session: false }), this.appointmentController.createAppointment);
+                .post(this.passport.authenticate(enums_1.PassportStrategies.JWT, { session: false }), this.appointmentController.createAppointment)
+                .get(this.appointmentController.getAppointmentsByRequiredDates);
         };
     }
 }

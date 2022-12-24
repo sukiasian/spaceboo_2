@@ -35,14 +35,14 @@ describe('NodeCronjob (e2e)', () => {
     let isoDatesReserved_2;
     beforeAll(async () => {
         dotenv.config({ path: '../test.env' });
-        appConfig = lib_1.createAppConfig();
-        nodeCronFunctions = lib_1.createNodeCronFunctions();
+        appConfig = (0, lib_1.createAppConfig)();
+        nodeCronFunctions = (0, lib_1.createNodeCronFunctions)();
         userModel = user_model_1.User;
         spaceModel = space_model_1.Space;
         appointmentModel = appointment_model_1.Appointment;
         cityModel = city_model_1.City;
-        userData_1 = lib_1.createUserData();
-        userData_2 = lib_1.createUserData();
+        userData_1 = (0, lib_1.createUserData)();
+        userData_2 = (0, lib_1.createUserData)();
         pathToTestImage_1 = path.resolve('tests', 'files', 'images', '1.png');
         pathToTestImage_2 = path.resolve('tests', 'files', 'images', '2.jpeg');
         isoDatesReserved_1 = [
@@ -67,7 +67,7 @@ describe('NodeCronjob (e2e)', () => {
         ];
         app = appConfig.app;
         sequelize = appConfig.sequelize;
-        server = (await lib_1.openTestEnv(appConfig)).server;
+        server = (await (0, lib_1.openTestEnv)(appConfig)).server;
     });
     beforeEach(async () => {
         city = await cityModel.findOne();
@@ -77,20 +77,20 @@ describe('NodeCronjob (e2e)', () => {
         token_2 = jwt.sign({ id: user_2.id }, process.env.JWT_SECRET_KEY);
     });
     afterEach(async () => {
-        lib_1.clearDb(sequelize);
+        (0, lib_1.clearDb)(sequelize);
     });
     afterAll(async () => {
-        await lib_1.clearDbAndStorage(sequelize);
-        await lib_1.closeTestEnv(sequelize, server);
+        await (0, lib_1.clearDbAndStorage)(sequelize);
+        await (0, lib_1.closeTestEnv)(sequelize, server);
     });
     it('Function "archiveOutdatedAppointments" should set all appointments\' "archived" property to true', async () => {
-        const spaceData_1 = lib_1.createSpaceData(user_1.id, city.id);
+        const spaceData_1 = (0, lib_1.createSpaceData)(user_1.id, city.id);
         const space_1 = await spaceModel.create(spaceData_1);
-        const appointmentData_1 = lib_1.createAppoinmentData(isoDatesReserved_1, space_1.id, user_1.id);
+        const appointmentData_1 = (0, lib_1.createAppoinmentData)(isoDatesReserved_1, space_1.id, user_1.id);
         const appointmentForSpace_1 = await appointmentModel.create(appointmentData_1);
-        const spaceData_2 = lib_1.createSpaceData(user_2.id, city.id);
+        const spaceData_2 = (0, lib_1.createSpaceData)(user_2.id, city.id);
         const space_2 = await spaceModel.create(spaceData_2);
-        const appointmentData_2 = lib_1.createAppoinmentData(isoDatesReserved_2, space_2.id, user_2.id);
+        const appointmentData_2 = (0, lib_1.createAppoinmentData)(isoDatesReserved_2, space_2.id, user_2.id);
         const appointmentForSpace_2 = await appointmentModel.create(appointmentData_2);
         expect(appointmentForSpace_1.archived).toBeFalsy();
         expect(appointmentForSpace_2.archived).toBeFalsy();
@@ -140,8 +140,8 @@ describe('NodeCronjob (e2e)', () => {
         expect(checkIfOutdatedAvatarExistsForUser_2).toBeFalsy();
     });
     it('Function "removeOutdatedSpaceImagesFromStorage" should remove outdated space images according to avatarUrl', async () => {
-        const spaceData_1 = lib_1.createSpaceData(user_1.id, city.id, 1000);
-        const spaceData_2 = lib_1.createSpaceData(user_2.id, city.id, 1000);
+        const spaceData_1 = (0, lib_1.createSpaceData)(user_1.id, city.id, 1000);
+        const spaceData_2 = (0, lib_1.createSpaceData)(user_2.id, city.id, 1000);
         const configureRequestForSpace = (request) => {
             let req = request.post(enums_1.ApiRoutes.SPACES);
             for (const field in spaceData_1) {
@@ -162,8 +162,8 @@ describe('NodeCronjob (e2e)', () => {
         });
     });
     it('Function "removeOutdatedEmailsFromDb" should remove outdated space images according to avatarUrl', async () => {
-        const spaceData_1 = lib_1.createSpaceData(user_1.id, city.id, 1000);
-        const spaceData_2 = lib_1.createSpaceData(user_2.id, city.id, 1000);
+        const spaceData_1 = (0, lib_1.createSpaceData)(user_1.id, city.id, 1000);
+        const spaceData_2 = (0, lib_1.createSpaceData)(user_2.id, city.id, 1000);
         const space_1 = await request(app)
             .post(enums_1.ApiRoutes.SPACES)
             .send(spaceData_1)

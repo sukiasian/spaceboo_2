@@ -28,14 +28,14 @@ describe('Appointment (e2e)', () => {
     let resIsoDatesToReserveWide;
     beforeAll(async () => {
         dotenv.config({ path: '../test.env' });
-        appConfig = lib_1.createAppConfig();
+        appConfig = (0, lib_1.createAppConfig)();
         app = appConfig.app;
         db = appConfig.sequelize;
         userModel = user_model_1.User;
         spaceModel = space_model_1.Space;
         cityModel = city_model_1.City;
         appointmentModel = appointment_model_1.Appointment;
-        userData = lib_1.createUserData();
+        userData = (0, lib_1.createUserData)();
         resIsoDatesToReserve = {
             beginningDate: '2020-12-15',
             beginningTime: '14:00',
@@ -54,18 +54,18 @@ describe('Appointment (e2e)', () => {
             endingDate: '2020-12-25',
             endingTime: '12:00',
         };
-        server = (await lib_1.openTestEnv(appConfig)).server;
+        server = (await (0, lib_1.openTestEnv)(appConfig)).server;
     });
     beforeEach(async () => {
         city = await cityModel.findOne({ raw: true });
         user = await userModel.create(userData);
-        spaceData = lib_1.createSpaceData(user.id, city.id);
+        spaceData = (0, lib_1.createSpaceData)(user.id, city.id);
         space = await spaceModel.create(spaceData, { include: [city_model_1.City] });
         space = await spaceModel.findOne({
             where: { id: space.id },
             include: [city_model_1.City, appointment_model_1.Appointment],
         });
-        token = lib_1.createTokenAndSign({ id: user.id });
+        token = (0, lib_1.createTokenAndSign)({ id: user.id });
         /*
             TODO: здесь мы создаем напрямую. если у нас стоят валидаторы у модели то здесь мы не должны суметь создавать записи на время
             которое меньше чем дата сейчас.
@@ -74,10 +74,10 @@ describe('Appointment (e2e)', () => {
         */
     });
     afterEach(async () => {
-        lib_1.clearDb(db);
+        (0, lib_1.clearDb)(db);
     });
     afterAll(async () => {
-        await lib_1.closeTestEnv(db, server);
+        await (0, lib_1.closeTestEnv)(db, server);
     });
     it('POST /appointments should create an appointment', async () => {
         const res = await request(app)
@@ -136,6 +136,22 @@ describe('Appointment (e2e)', () => {
             { inclusive: true, value: '2020-12-15T14:00:00.000Z' },
             { inclusive: false, value: '2020-12-20T12:00:00.000Z' },
         ]);
+    });
+    it('POST /appointments should check if date is not in the past', async () => { });
+    it('GET /appointments should get appointments by required dates', async () => {
+        await request(app)
+            .post(`${enums_1.ApiRoutes.APPOINTMENTS}`)
+            .send({
+            resIsoDatesToReserve,
+            spaceId: space.id,
+        })
+            .set('Authorization', `Bearer ${token}`);
+        const res = await request(app)
+            .get(`${enums_1.ApiRoutes.APPOINTMENTS}`)
+            .send({
+            requiredDates: "'[2020-12-01, 2020-12-31]'",
+        })
+            .set('Authorization', `Bearer ${token}`);
     });
 });
 //# sourceMappingURL=appointment.spec.js.map

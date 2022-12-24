@@ -16,28 +16,30 @@ let City = class City extends sequelize_typescript_1.Model {
 };
 __decorate([
     sequelize_typescript_1.PrimaryKey,
-    sequelize_typescript_1.Column({ type: sequelize_typescript_1.DataType.INTEGER }),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.INTEGER,
+    }),
     __metadata("design:type", Number)
 ], City.prototype, "id", void 0);
 __decorate([
-    sequelize_typescript_1.ForeignKey(() => region_model_1.Region),
-    sequelize_typescript_1.Column({ type: sequelize_typescript_1.DataType.INTEGER }),
+    (0, sequelize_typescript_1.ForeignKey)(() => region_model_1.Region),
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.INTEGER }),
     __metadata("design:type", Number)
 ], City.prototype, "regionId", void 0);
 __decorate([
-    sequelize_typescript_1.Column({ type: sequelize_typescript_1.DataType.STRING }),
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING }),
     __metadata("design:type", String)
 ], City.prototype, "name", void 0);
 __decorate([
-    sequelize_typescript_1.Column({ defaultValue: false }),
+    (0, sequelize_typescript_1.Column)({ defaultValue: false }),
     __metadata("design:type", Boolean)
 ], City.prototype, "supports_locker", void 0);
 __decorate([
-    sequelize_typescript_1.BelongsTo(() => region_model_1.Region),
+    (0, sequelize_typescript_1.BelongsTo)(() => region_model_1.Region),
     __metadata("design:type", region_model_1.Region)
 ], City.prototype, "region", void 0);
 City = __decorate([
-    sequelize_typescript_1.Table({ timestamps: false })
+    (0, sequelize_typescript_1.Table)({ timestamps: false })
 ], City);
 exports.City = City;
 //# sourceMappingURL=city.model.js.map

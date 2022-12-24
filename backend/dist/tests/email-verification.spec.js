@@ -18,23 +18,23 @@ describe('Email Verification (e2e)', () => {
     let userModel;
     let emailVerificationModel;
     beforeAll(async () => {
-        appConfig = lib_1.createAppConfig();
+        appConfig = (0, lib_1.createAppConfig)();
         app = appConfig.app;
         db = appConfig.sequelize;
-        invalidUserData = lib_1.createInvalidUserData();
+        invalidUserData = (0, lib_1.createInvalidUserData)();
         userModel = user_model_1.User;
-        userData = lib_1.createUserData();
+        userData = (0, lib_1.createUserData)();
         emailVerificationModel = email_verification_model_1.EmailVerification;
-        server = (await lib_1.openTestEnv(appConfig)).server;
+        server = (await (0, lib_1.openTestEnv)(appConfig)).server;
     });
     beforeEach(async () => {
         user = await userModel.create(userData);
     });
     afterEach(async () => {
-        lib_1.clearDb(db);
+        (0, lib_1.clearDb)(db);
     });
     afterAll(async () => {
-        await lib_1.closeTestEnv(db, server);
+        await (0, lib_1.closeTestEnv)(db, server);
     });
     it('POST /emailVerification/:purpose should send an email to user email address', async () => {
         const res = await request(app).post(`${enums_1.ApiRoutes.EMAIL_VERIFICATION}/${email_verification_router_1.EmailPurpose[10]}`).send({

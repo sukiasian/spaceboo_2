@@ -8,14 +8,14 @@ class CityRouter extends Singleton_1.Singleton {
     constructor() {
         super(...arguments);
         this.cityController = city_controller_1.cityController;
-        this.router = express_1.Router();
+        this.router = (0, express_1.Router)();
         this.prepareRouter = () => {
             this.router.route('/').get(this.cityController.getCitiesByQuery);
-            this.router.route('/majors').get(this.cityController.getMajorCities);
         };
     }
 }
 const cityRouter = Singleton_1.SingletonFactory.produce(CityRouter);
 cityRouter.prepareRouter();
 exports.router = cityRouter.router;
+// ttlock/locker?type=0, где 0 unlock 1 lock
 //# sourceMappingURL=city.router.js.map

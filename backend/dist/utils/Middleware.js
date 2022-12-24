@@ -1,4 +1,5 @@
 "use strict";
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Middleware = void 0;
 const jwt = require("jsonwebtoken");
@@ -9,19 +10,20 @@ const UtilFunctions_1 = require("./UtilFunctions");
 class Middleware {
 }
 exports.Middleware = Middleware;
+_a = Middleware;
 Middleware.userModel = user_model_1.User;
 Middleware.utilFunctions = UtilFunctions_1.default;
-Middleware.retrieveEmailFromRequest = this.utilFunctions.catchAsync(async (req, res, next) => {
+Middleware.retrieveEmailFromRequest = _a.utilFunctions.catchAsync(async (req, res, next) => {
     const token = req.cookies['jwt'];
     let email;
     let user;
     if (token) {
         const payload = jwt.decode(token);
-        user = await this.userModel.scope(user_model_1.UserScopes.PUBLIC).findOne({ where: { id: payload.id } });
+        user = await _a.userModel.scope(user_model_1.UserScopes.PUBLIC).findOne({ where: { id: payload.id } });
     }
     else {
         email = req.body.email;
-        user = await this.userModel.findOne({
+        user = await _a.userModel.findOne({
             where: {
                 email,
             },

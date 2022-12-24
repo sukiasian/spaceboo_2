@@ -15,11 +15,11 @@ let EmailVerification = class EmailVerification extends sequelize_typescript_1.M
 };
 __decorate([
     sequelize_typescript_1.PrimaryKey,
-    sequelize_typescript_1.Column({ type: sequelize_typescript_1.DataType.UUID, defaultValue: sequelize_typescript_1.DataType.UUIDV4 }),
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.UUID, defaultValue: sequelize_typescript_1.DataType.UUIDV4 }),
     __metadata("design:type", String)
 ], EmailVerification.prototype, "id", void 0);
 __decorate([
-    sequelize_typescript_1.Column({
+    (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER,
     }),
     __metadata("design:type", Number)
@@ -29,7 +29,7 @@ __decorate([
     __metadata("design:type", String)
 ], EmailVerification.prototype, "email", void 0);
 EmailVerification = __decorate([
-    sequelize_typescript_1.Table({ timestamps: true })
+    (0, sequelize_typescript_1.Table)({ timestamps: true })
 ], EmailVerification);
 exports.EmailVerification = EmailVerification;
 //# sourceMappingURL=email-verification.model.js.map

@@ -33,56 +33,73 @@ exports.spaceEditFields = [
 ];
 // TODO do we need paranoid or no? paranoid just 'mutes', hides
 let Space = class Space extends sequelize_typescript_1.Model {
+    static uppercaseAddress(instance) {
+        instance.address = `${instance.address[0].toUpperCase()}${instance.address.slice(1)}`;
+    }
 };
 __decorate([
     sequelize_typescript_1.PrimaryKey,
-    sequelize_typescript_1.Column({ type: sequelize_typescript_1.DataType.UUID, defaultValue: sequelize_typescript_1.DataType.UUIDV4 }),
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.UUID, defaultValue: sequelize_typescript_1.DataType.UUIDV4 }),
     __metadata("design:type", String)
 ], Space.prototype, "id", void 0);
 __decorate([
-    sequelize_typescript_1.Column({ allowNull: false }),
+    (0, sequelize_typescript_1.Column)({ allowNull: false }),
     __metadata("design:type", String)
 ], Space.prototype, "address", void 0);
 __decorate([
-    sequelize_typescript_1.Column({ allowNull: false }),
+    (0, sequelize_typescript_1.Column)({ allowNull: false }),
     __metadata("design:type", Number)
 ], Space.prototype, "pricePerNight", void 0);
 __decorate([
-    sequelize_typescript_1.Column({ allowNull: false, type: sequelize_typescript_1.DataType.STRING }),
+    (0, sequelize_typescript_1.Column)({
+        allowNull: false,
+        type: sequelize_typescript_1.DataType.STRING,
+        validate: {
+            isCorrect(value) {
+                if (value !== SpaceType.FLAT && value !== SpaceType.HOUSE) {
+                    throw new Error(enums_1.ErrorMessages.INVALID_TYPE_OF_SPACE);
+                }
+            },
+        },
+    }),
     __metadata("design:type", String)
 ], Space.prototype, "type", void 0);
 __decorate([
-    sequelize_typescript_1.Column({ allowNull: false, type: sequelize_typescript_1.DataType.SMALLINT }),
+    (0, sequelize_typescript_1.Column)({ allowNull: false, type: sequelize_typescript_1.DataType.SMALLINT }),
     __metadata("design:type", Number)
 ], Space.prototype, "roomsNumber", void 0);
 __decorate([
-    sequelize_typescript_1.Column({ allowNull: false, type: sequelize_typescript_1.DataType.SMALLINT }),
+    (0, sequelize_typescript_1.Column)({ allowNull: false, type: sequelize_typescript_1.DataType.SMALLINT }),
     __metadata("design:type", Number)
 ], Space.prototype, "bedsNumber", void 0);
 __decorate([
-    sequelize_typescript_1.ForeignKey(() => city_model_1.City),
-    sequelize_typescript_1.Column({ allowNull: false }),
+    (0, sequelize_typescript_1.ForeignKey)(() => city_model_1.City),
+    (0, sequelize_typescript_1.Column)({ allowNull: false }),
     __metadata("design:type", Number)
 ], Space.prototype, "cityId", void 0);
 __decorate([
-    sequelize_typescript_1.BelongsTo(() => city_model_1.City),
+    (0, sequelize_typescript_1.BelongsTo)(() => city_model_1.City),
     __metadata("design:type", city_model_1.City)
 ], Space.prototype, "city", void 0);
 __decorate([
-    sequelize_typescript_1.Column({ defaultValue: false }),
+    (0, sequelize_typescript_1.Column)({ defaultValue: false }),
     __metadata("design:type", Boolean)
 ], Space.prototype, "lockerConnected", void 0);
 __decorate([
-    sequelize_typescript_1.ForeignKey(() => user_model_1.User),
-    sequelize_typescript_1.Column({ type: sequelize_typescript_1.DataType.UUID }),
+    (0, sequelize_typescript_1.ForeignKey)(() => user_model_1.User),
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.UUID }),
     __metadata("design:type", String)
 ], Space.prototype, "userId", void 0);
 __decorate([
-    sequelize_typescript_1.BelongsTo(() => user_model_1.User),
+    (0, sequelize_typescript_1.BelongsTo)(() => user_model_1.User),
     __metadata("design:type", user_model_1.User)
 ], Space.prototype, "user", void 0);
 __decorate([
-    sequelize_typescript_1.Column({
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.INTEGER }),
+    __metadata("design:type", Number)
+], Space.prototype, "lockerId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.ARRAY(sequelize_typescript_1.DataType.STRING),
         validate: {
             isSpecificLength(value) {
@@ -95,19 +112,26 @@ __decorate([
     __metadata("design:type", Array)
 ], Space.prototype, "imagesUrl", void 0);
 __decorate([
-    sequelize_typescript_1.Column({ type: sequelize_typescript_1.DataType.CHAR(200) }),
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.CHAR(200) }),
     __metadata("design:type", String)
 ], Space.prototype, "description", void 0);
 __decorate([
-    sequelize_typescript_1.Column({ type: sequelize_typescript_1.DataType.ARRAY(sequelize_typescript_1.DataType.STRING) }),
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.ARRAY(sequelize_typescript_1.DataType.STRING) }),
     __metadata("design:type", Array)
 ], Space.prototype, "facilities", void 0);
 __decorate([
-    sequelize_typescript_1.HasMany(() => appointment_model_1.Appointment),
+    (0, sequelize_typescript_1.HasMany)(() => appointment_model_1.Appointment),
     __metadata("design:type", Array)
 ], Space.prototype, "appointments", void 0);
+__decorate([
+    sequelize_typescript_1.BeforeCreate,
+    sequelize_typescript_1.BeforeUpdate,
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Space]),
+    __metadata("design:returntype", void 0)
+], Space, "uppercaseAddress", null);
 Space = __decorate([
-    sequelize_typescript_1.Table({ timestamps: true, paranoid: false })
+    (0, sequelize_typescript_1.Table)({ timestamps: true, paranoid: false })
 ], Space);
 exports.Space = Space;
 //# sourceMappingURL=space.model.js.map

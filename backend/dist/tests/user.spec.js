@@ -33,7 +33,7 @@ describe('User (e2e)', () => {
     let fakePassword;
     let fakeName;
     beforeAll(async () => {
-        appConfig = lib_1.createAppConfig();
+        appConfig = (0, lib_1.createAppConfig)();
         app = appConfig.app;
         db = appConfig.sequelize;
         pathToTestImage = path.resolve('tests', 'files', 'images', '1.png');
@@ -42,30 +42,30 @@ describe('User (e2e)', () => {
         cityModel = city_model_1.City;
         appointmentModel = appointment_model_1.Appointment;
         userDao = user_sequelize_dao_1.userSequelizeDao;
-        userData_1 = lib_1.createUserData();
-        userData_2 = lib_1.createUserData();
+        userData_1 = (0, lib_1.createUserData)();
+        userData_2 = (0, lib_1.createUserData)();
         fakePassword = 'fakepassword';
         fakeName = 'Петр';
-        server = (await lib_1.openTestEnv(appConfig)).server;
+        server = (await (0, lib_1.openTestEnv)(appConfig)).server;
     });
     beforeEach(async () => {
         city = await cityModel.findOne({ raw: true });
         user_1 = await userModel.create(userData_1);
         user_2 = await userModel.create(userData_2);
-        spaceData_1 = lib_1.createSpaceData(user_1.id, city.id);
+        spaceData_1 = (0, lib_1.createSpaceData)(user_1.id, city.id);
         space_1 = await spaceModel.create(spaceData_1, { include: [city_model_1.City] });
         space_1 = await spaceModel.findOne({
             where: { id: space_1.id },
             include: [city_model_1.City, appointment_model_1.Appointment],
         });
-        token_1 = lib_1.createTokenAndSign({ id: user_1.id });
-        token_2 = lib_1.createTokenAndSign({ id: user_2.id });
+        token_1 = (0, lib_1.createTokenAndSign)({ id: user_1.id });
+        token_2 = (0, lib_1.createTokenAndSign)({ id: user_2.id });
     });
     afterEach(async () => {
-        lib_1.clearDbAndStorage(db);
+        (0, lib_1.clearDbAndStorage)(db);
     });
     afterAll(async () => {
-        await lib_1.closeTestEnv(db, server);
+        await (0, lib_1.closeTestEnv)(db, server);
     });
     it('POST /images/users should add avatarUrl to DB', async () => {
         expect(user_1.avatarUrl).toBeNull();

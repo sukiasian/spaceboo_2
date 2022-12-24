@@ -2,10 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.passportConfig = exports.PassportConfig = void 0;
 const passport = require("passport");
-const passport_facebook_1 = require("passport-facebook");
 const passport_local_1 = require("passport-local");
-const passport_vkontakte_1 = require("passport-vkontakte");
-const passport_odnoklassniki_1 = require("passport-odnoklassniki");
 const passport_jwt_1 = require("passport-jwt");
 const passport_jwt_2 = require("passport-jwt");
 const Singleton_1 = require("../utils/Singleton");
@@ -14,12 +11,46 @@ const enums_1 = require("../types/enums");
 const logger_1 = require("../loggers/logger");
 const user_sequelize_dao_1 = require("../daos/user.sequelize.dao");
 const AppError_1 = require("../utils/AppError");
+const UtilFunctions_1 = require("../utils/UtilFunctions");
+const Redis_1 = require("../Redis");
 class PassportConfig extends Singleton_1.Singleton {
     constructor() {
         super(...arguments);
         this.userDao = user_sequelize_dao_1.userSequelizeDao;
         this.userModel = user_model_1.User;
         this.passport = passport;
+        this.redisClient = Redis_1.redis.client;
+        this.utilFunctions = UtilFunctions_1.default;
+        this.attemptsAllowed = process.env.NODE_ENV === enums_1.Environment.DEVELOPMENT ? '100' : '7';
+        this.assignAvailableAttempts = async (key) => {
+            const loginAttemptsValue = await this.redisClient.get(key);
+            if (loginAttemptsValue === null) {
+                await this.redisClient.set(key, '1');
+            }
+            else if (loginAttemptsValue === this.attemptsAllowed) {
+                // FIXME: change the value from 0.1 to 60 * 30
+                await this.redisClient.setEx(key, 5, this.attemptsAllowed);
+            }
+            else {
+                await this.redisClient.set(key, `${this.utilFunctions.makeDecimal(loginAttemptsValue) + 1}`);
+            }
+        };
+        this.outOfAttempts = async (key) => {
+            var _a;
+            const loginAttemptsValue = await this.redisClient.get(key);
+            return (_a = loginAttemptsValue === this.attemptsAllowed) !== null && _a !== void 0 ? _a : false;
+        };
+        this.handleAttempts = async (ip) => {
+            const loginAttemptsKey = `${enums_1.RedisVariable.LOGIN_ATTEMPTS}:${ip}`;
+            await this.assignAvailableAttempts(loginAttemptsKey);
+            const outOfAttempts = await this.outOfAttempts(loginAttemptsKey);
+            if (outOfAttempts) {
+                throw new AppError_1.default(enums_1.HttpStatus.FORBIDDEN, enums_1.ErrorMessages.WAIT_TO_ATTEMPT_AGAIN);
+            }
+        };
+        this.annualizeAttempts = async (ip) => {
+            await this.redisClient.set(`${enums_1.RedisVariable.LOGIN_ATTEMPTS}:${ip}`, '0');
+        };
     }
     initializePassport() {
         return this.passport.initialize();
@@ -32,57 +63,22 @@ class PassportConfig extends Singleton_1.Singleton {
             }
             return token;
         };
-        this.passport.use(new passport_local_1.Strategy({ usernameField: 'email', passwordField: 'password', session: false }, async (email, password, done) => {
+        this.passport.use(new passport_local_1.Strategy({ usernameField: 'email', passwordField: 'password', session: false, passReqToCallback: true }, async (req, email, password, done) => {
             try {
                 let user;
                 user = await this.userModel.scope(user_model_1.UserScopes.WITH_PASSWORD).findOne({ where: { email } });
-                if (!user) {
+                await this.handleAttempts(req.ip);
+                if (!user || !(await user.verifyPassword(user)(password))) {
                     return done(new AppError_1.default(enums_1.HttpStatus.UNAUTHORIZED, enums_1.ErrorMessages.USERNAME_OR_PASSWORD_INCORRECT), false);
                 }
-                if (!(await user.verifyPassword(user)(password))) {
-                    return done(new AppError_1.default(enums_1.HttpStatus.UNAUTHORIZED, enums_1.ErrorMessages.USERNAME_OR_PASSWORD_INCORRECT));
-                }
                 user = await this.userModel.findOne({ raw: true, where: { email } });
+                await this.annualizeAttempts(req.ip);
                 return done(null, { id: user.id });
             }
             catch (err) {
                 done(err);
                 logger_1.default.error(err);
             }
-        }));
-        this.passport.use(new passport_facebook_1.Strategy({
-            clientID: '890851108189818',
-            clientSecret: 'f6a91a16da6c4eb4c376895afed8b9cf',
-            callbackURL: 'http://localhost:8000/auth/facebook/callback', // NOTE http or https?
-        }, async function (accessToken, refreshToken, profile, cb) {
-            await this.userModel
-                .findOrCreate({ where: { facebookId: profile.id } })
-                .then(function (user) {
-                return cb(null, user);
-            });
-        }));
-        // FIXME
-        this.passport.use(new passport_vkontakte_1.Strategy({
-            clientID: 'VKONTAKTE_APP_ID',
-            clientSecret: 'VKONTAKTE_APP_SECRET',
-            callbackURL: 'http://localhost:3000/auth/vkontakte/callback',
-        }, function myVerifyCallbackFn(accessToken, refreshToken, params, profile, done) {
-            this.userModel
-                .findOrCreate({ where: { vkontakteId: profile.id } })
-                .then(function (user) {
-                done(null, user);
-            })
-                .catch(done);
-        }));
-        this.passport.use(new passport_odnoklassniki_1.Strategy({
-            clientID: 'ODNOKLASSNIKI_APP_ID',
-            clientPublic: 'ODNOKLASSNIKI_APP_PUBLIC_KEY',
-            clientSecret: 'ODNOKLASSNIKI_APP_SECRET_KEY',
-            callbackURL: 'http://localhost:3000/auth/odnoklassniki/callback',
-        }, function (accessToken, refreshToken, profile, done) {
-            this.userModel.findOrCreate({ where: { odnoklassnikiId: profile.id } }).then(function (user) {
-                return done(null, user);
-            });
         }));
         this.passport.use(new passport_jwt_1.Strategy({
             jwtFromRequest: passport_jwt_2.ExtractJwt.fromExtractors([

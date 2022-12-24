@@ -15,11 +15,11 @@ class SpaceRouter extends Singleton_1.Singleton {
         this.imageController = image_controller_1.imageController;
         this.passport = passport;
         this.routeProtector = RouteProtector_1.RouteProtector;
-        this.router = express_1.Router();
+        this.router = (0, express_1.Router)();
         this.prepareRouter = () => {
             this.router
                 .route('/')
-                .post(this.passport.authenticate(enums_1.PassportStrategies.JWT, { session: false }), this.imageController.uploadSpaceImagesToStorage, this.spaceController.provideSpace, this.imageController.updateSpaceImagesInDb)
+                .post(this.passport.authenticate(enums_1.PassportStrategies.JWT, { session: false }), this.spaceController.checkAttempts, this.imageController.uploadSpaceImagesToStorage, this.spaceController.provideSpace, this.imageController.updateSpaceImagesInDb)
                 .get(this.spaceController.getSpacesByQuery);
             this.router
                 .route('/user')

@@ -15,7 +15,7 @@ class EmailVerificationRouter extends Singleton_1.Singleton {
         super(...arguments);
         this.emailVerificationController = email_verification_controller_1.emailVerificationController;
         this.middleware = Middleware_1.Middleware;
-        this.router = express_1.Router();
+        this.router = (0, express_1.Router)();
         this.prepareRouter = () => {
             this.router
                 .route('/')

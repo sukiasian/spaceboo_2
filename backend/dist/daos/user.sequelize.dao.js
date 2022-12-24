@@ -15,6 +15,11 @@ class UserSequelizeDao extends dao_config_1.Dao {
             return this.model.create(userData);
         };
         this.getCurrentUserById = async (userId) => {
+            // если админ то в скопе должна быть роль
+            const user = await this.model.scope(user_model_1.UserScopes.WITH_ROLE).findOne({ where: { id: userId } });
+            if (user.role === user_model_1.UserRoles.ADMIN) {
+                return user;
+            }
             return this.model.scope(user_model_1.UserScopes.PUBLIC).findOne({
                 where: {
                     id: userId,

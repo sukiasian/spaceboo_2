@@ -21,7 +21,7 @@ const startServer = (app) => {
 };
 exports.startServer = startServer;
 const startDb = async (sequelize) => {
-    await connectToDb_1.default(sequelize);
+    await (0, connectToDb_1.default)(sequelize);
 };
 exports.startDb = startDb;
 const closeServer = async (server) => {
@@ -52,8 +52,8 @@ const clearStorage = () => {
 };
 exports.clearStorage = clearStorage;
 const clearDbAndStorage = async (sequelize) => {
-    exports.clearDb(sequelize);
-    exports.clearStorage();
+    (0, exports.clearDb)(sequelize);
+    (0, exports.clearStorage)();
 };
 exports.clearDbAndStorage = clearDbAndStorage;
 const createAppConfig = () => {
@@ -110,7 +110,7 @@ const createSpaceData = (userId, cityId, pricePerNight = 1000) => {
         roomsNumber: 2,
         bedsNumber: 2,
         imagesUrl: ['/public/images/space/1.jpg'],
-        lockerConnected: false,
+        lockerId: 1,
         facilities: ['TV'],
         description: faker.lorem.sentence(5),
         userId,
@@ -141,16 +141,16 @@ exports.createTokenAndSign = createTokenAndSign;
 const openTestEnv = async (appConfig) => {
     appConfig.setupPassport();
     appConfig.configureApp();
-    await exports.startDb(appConfig.sequelize);
-    const server = exports.startServer(appConfig.app);
+    await (0, exports.startDb)(appConfig.sequelize);
+    const server = (0, exports.startServer)(appConfig.app);
     return {
         server,
     };
 };
 exports.openTestEnv = openTestEnv;
 const closeTestEnv = async (sequelize, server) => {
-    await exports.closeDb(sequelize);
-    await exports.closeServer(server);
+    await (0, exports.closeDb)(sequelize);
+    await (0, exports.closeServer)(server);
 };
 exports.closeTestEnv = closeTestEnv;
 //# sourceMappingURL=lib.js.map

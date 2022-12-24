@@ -7,7 +7,6 @@ const Singleton_1 = require("../utils/Singleton");
 const enums_1 = require("../types/enums");
 const auth_sequelize_dao_1 = require("../daos/auth.sequelize.dao");
 const UtilFunctions_1 = require("../utils/UtilFunctions");
-const Email_1 = require("../emails/Email");
 const user_model_1 = require("../models/user.model");
 const AppError_1 = require("../utils/AppError");
 class AuthController extends Singleton_1.Singleton {
@@ -15,7 +14,6 @@ class AuthController extends Singleton_1.Singleton {
         super(...arguments);
         this.authSequelizeDao = auth_sequelize_dao_1.authSequelizeDao;
         this.utilFunctions = UtilFunctions_1.default;
-        this.sendEmail = Email_1.sendMail;
         this.signUpLocal = this.utilFunctions.catchAsync(async (req, res, next) => {
             const user = await this.authSequelizeDao.signUpLocal(req.body);
             await this.utilFunctions.signTokenAndStoreInCookies(res, { id: user.id });
@@ -42,7 +40,7 @@ class AuthController extends Singleton_1.Singleton {
                 confirmed: false,
             };
             if (token) {
-                const verifyToken = util_1.promisify(jwt.verify);
+                const verifyToken = (0, util_1.promisify)(jwt.verify);
                 const payload = jwt.decode(token);
                 const user = await this.authSequelizeDao.model.scope(user_model_1.UserScopes.WITH_CONFIRMED).findOne({
                     where: {

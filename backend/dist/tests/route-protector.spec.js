@@ -27,36 +27,36 @@ describe('Route Protector (e2e)', () => {
     let space_1;
     let appointmentModel;
     beforeAll(async () => {
-        appConfig = lib_1.createAppConfig();
+        appConfig = (0, lib_1.createAppConfig)();
         app = appConfig.app;
         db = appConfig.sequelize;
         userModel = user_model_1.User;
         spaceModel = space_model_1.Space;
         cityModel = city_model_1.City;
         appointmentModel = appointment_model_1.Appointment;
-        userData_1 = lib_1.createUserData();
-        userData_2 = lib_1.createUserData();
-        server = (await lib_1.openTestEnv(appConfig)).server;
+        userData_1 = (0, lib_1.createUserData)();
+        userData_2 = (0, lib_1.createUserData)();
+        server = (await (0, lib_1.openTestEnv)(appConfig)).server;
     });
     beforeEach(async () => {
         city = await cityModel.findOne({ raw: true });
         user_1 = await userModel.create(userData_1);
         user_2 = await userModel.create(userData_2);
-        spaceData_1 = lib_1.createSpaceData(user_1.id, city.id);
-        spaceData_2 = lib_1.createSpaceData(user_2.id, city.id);
+        spaceData_1 = (0, lib_1.createSpaceData)(user_1.id, city.id);
+        spaceData_2 = (0, lib_1.createSpaceData)(user_2.id, city.id);
         space_1 = await spaceModel.create(spaceData_1, { include: [city_model_1.City] });
         space_1 = await spaceModel.findOne({
             where: { id: space_1.id },
             include: [city_model_1.City, appointment_model_1.Appointment],
         });
-        token_1 = await lib_1.createTokenAndSign({ id: user_1.id });
-        token_2 = await lib_1.createTokenAndSign({ id: user_2.id });
+        token_1 = await (0, lib_1.createTokenAndSign)({ id: user_1.id });
+        token_2 = await (0, lib_1.createTokenAndSign)({ id: user_2.id });
     });
     afterEach(async () => {
-        lib_1.clearDb(db);
+        (0, lib_1.clearDb)(db);
     });
     afterAll(async () => {
-        await lib_1.closeTestEnv(db, server);
+        await (0, lib_1.closeTestEnv)(db, server);
     });
     it('DELETE /images/users/:spaceId should disallow non-space owners to delete space images', async () => {
         // создать другого юзера user_2 и обратиться к space_1

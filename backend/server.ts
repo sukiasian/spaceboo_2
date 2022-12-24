@@ -34,7 +34,7 @@ class Server extends Singleton {
 
     public start = async () => {
         await databaseConnection(this.appConfig.sequelize);
-        await this.redis.startRedis();
+        // await this.redis.startRedis();
 
         const server = this.app.listen(this.PORT, () => {
             logger.info(`Server is listening on ${this.PORT}`);
@@ -54,5 +54,9 @@ const server = SingletonFactory.produce<Server>(Server);
 
 server.startCrons();
 // NOTE remove method after dockerization
-server.redis.startRedisServerOnMachine();
+console.log(5555);
+
+// server.redis.startRedisServerOnMachine();
+console.log(6666);
+
 server.start();

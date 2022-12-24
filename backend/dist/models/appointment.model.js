@@ -17,39 +17,39 @@ let Appointment = class Appointment extends sequelize_typescript_1.Model {
 };
 __decorate([
     sequelize_typescript_1.PrimaryKey,
-    sequelize_typescript_1.Column({ type: sequelize_typescript_1.DataType.UUID, defaultValue: sequelize_typescript_1.DataType.UUIDV4 }),
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.UUID, defaultValue: sequelize_typescript_1.DataType.UUIDV4 }),
     __metadata("design:type", String)
 ], Appointment.prototype, "id", void 0);
 __decorate([
-    sequelize_typescript_1.Column({
+    (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.RANGE(sequelize_typescript_1.DataType.DATE),
     }),
     __metadata("design:type", Array)
 ], Appointment.prototype, "isoDatesReserved", void 0);
 __decorate([
-    sequelize_typescript_1.ForeignKey(() => space_model_1.Space),
-    sequelize_typescript_1.Column({ type: sequelize_typescript_1.DataType.UUID }),
+    (0, sequelize_typescript_1.ForeignKey)(() => space_model_1.Space),
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.UUID }),
     __metadata("design:type", String)
 ], Appointment.prototype, "spaceId", void 0);
 __decorate([
-    sequelize_typescript_1.ForeignKey(() => user_model_1.User),
-    sequelize_typescript_1.Column({ type: sequelize_typescript_1.DataType.UUID }),
+    (0, sequelize_typescript_1.ForeignKey)(() => user_model_1.User),
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.UUID }),
     __metadata("design:type", String)
 ], Appointment.prototype, "userId", void 0);
 __decorate([
-    sequelize_typescript_1.Column({ defaultValue: false }),
+    (0, sequelize_typescript_1.Column)({ defaultValue: false }),
     __metadata("design:type", Boolean)
 ], Appointment.prototype, "archived", void 0);
 __decorate([
-    sequelize_typescript_1.BelongsTo(() => space_model_1.Space),
+    (0, sequelize_typescript_1.BelongsTo)(() => space_model_1.Space),
     __metadata("design:type", space_model_1.Space)
 ], Appointment.prototype, "space", void 0);
 __decorate([
-    sequelize_typescript_1.BelongsTo(() => user_model_1.User),
+    (0, sequelize_typescript_1.BelongsTo)(() => user_model_1.User),
     __metadata("design:type", user_model_1.User)
 ], Appointment.prototype, "user", void 0);
 Appointment = __decorate([
-    sequelize_typescript_1.Table({ timestamps: true })
+    (0, sequelize_typescript_1.Table)({ timestamps: true })
 ], Appointment);
 exports.Appointment = Appointment;
 //# sourceMappingURL=appointment.model.js.map

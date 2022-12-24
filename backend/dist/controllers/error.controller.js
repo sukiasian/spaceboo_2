@@ -1,20 +1,22 @@
 "use strict";
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = require("../loggers/logger");
 const enums_1 = require("../types/enums");
 class ErrorController {
 }
+_a = ErrorController;
 ErrorController.logger = logger_1.default;
 ErrorController.sendErrorProd = (err, res) => {
     if (err.isOperational) {
-        this.logger.error(`${err}, ${enums_1.ErrorMessages.APPLICATION_ERROR}`);
+        _a.logger.error(`${err}, ${enums_1.ErrorMessages.APPLICATION_ERROR}`);
         res.status(err.statusCode).json({
             status: err.status,
             message: err.message,
         });
     }
     else {
-        this.logger.error(`${err}, ${enums_1.ErrorMessages.UNKNOWN_ERROR}`);
+        _a.logger.error(`${err}, ${enums_1.ErrorMessages.UNKNOWN_ERROR}`);
         res.status(err.statusCode).json({
             status: err.status,
             message: enums_1.ErrorMessages.UNKNOWN_ERROR,
@@ -22,7 +24,7 @@ ErrorController.sendErrorProd = (err, res) => {
     }
 };
 ErrorController.sendErrorDev = (err, res) => {
-    this.logger.error(`${err}`);
+    _a.logger.error(`${err}`);
     res.status(err.statusCode).json({
         status: err.status,
         error: err,
@@ -32,13 +34,13 @@ ErrorController.sendErrorDev = (err, res) => {
 };
 ErrorController.sendErrorTest = (err, res) => {
     if (err.isOperational) {
-        this.logger.error(`${err}, ${enums_1.ErrorMessages.APPLICATION_ERROR}`);
+        _a.logger.error(`${err}, ${enums_1.ErrorMessages.APPLICATION_ERROR}`);
         res.status(err.statusCode).json({
             message: err.message,
         });
     }
     else {
-        this.logger.error(`${err}, ${enums_1.ErrorMessages.UNKNOWN_ERROR}`);
+        _a.logger.error(`${err}, ${enums_1.ErrorMessages.UNKNOWN_ERROR}`);
         res.status(err.statusCode).json({
             status: err.status,
             message: enums_1.ErrorMessages.UNKNOWN_ERROR,

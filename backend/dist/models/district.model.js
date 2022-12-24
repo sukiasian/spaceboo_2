@@ -16,19 +16,19 @@ let District = class District extends sequelize_typescript_1.Model {
 };
 __decorate([
     sequelize_typescript_1.PrimaryKey,
-    sequelize_typescript_1.Column({ type: sequelize_typescript_1.DataType.INTEGER }),
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.INTEGER }),
     __metadata("design:type", Number)
 ], District.prototype, "id", void 0);
 __decorate([
-    sequelize_typescript_1.Column({ type: sequelize_typescript_1.DataType.STRING }),
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING }),
     __metadata("design:type", String)
 ], District.prototype, "name", void 0);
 __decorate([
-    sequelize_typescript_1.HasMany(() => region_model_1.Region),
+    (0, sequelize_typescript_1.HasMany)(() => region_model_1.Region),
     __metadata("design:type", Array)
 ], District.prototype, "regions", void 0);
 District = __decorate([
-    sequelize_typescript_1.Table({ timestamps: false })
+    (0, sequelize_typescript_1.Table)({ timestamps: false })
 ], District);
 exports.District = District;
 //# sourceMappingURL=district.model.js.map

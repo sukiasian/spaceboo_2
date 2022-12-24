@@ -14,7 +14,7 @@ class AuthRouter extends Singleton_1.Singleton {
         this.authController = auth_controller_1.authController;
         this.routeProtector = RouteProtector_1.RouteProtector;
         this.passport = passport;
-        this.router = express_1.Router();
+        this.router = (0, express_1.Router)();
         this.prepareRouter = () => {
             this.router
                 .route('/login')
@@ -33,7 +33,7 @@ class AuthRouter extends Singleton_1.Singleton {
                 .get(this.passport.authenticate(enums_1.PassportStrategies.FACEBOOK), () => logger_1.default.info('signed up in Facebook'));
             this.router.route('/facebook/callback').get((req, res) => {
                 res.redirect('/');
-                console.log('redirected');
+                console.log('Redirected');
             });
         };
     }

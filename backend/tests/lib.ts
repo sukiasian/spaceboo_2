@@ -124,7 +124,7 @@ export const createSpaceData = (userId: string, cityId: number, pricePerNight = 
         roomsNumber: 2,
         bedsNumber: 2,
         imagesUrl: ['/public/images/space/1.jpg'],
-        lockerConnected: false,
+		lockerId: 1,
         facilities: ['TV'],
         description: faker.lorem.sentence(5),
         userId,

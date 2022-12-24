@@ -7,7 +7,7 @@ const enums_1 = require("../types/enums");
 const Singleton_1 = require("../utils/Singleton");
 const UtilFunctions_1 = require("../utils/UtilFunctions");
 const AppConfig_1 = require("../AppConfig");
-const city_model_1 = require("../models/city.model");
+const AppError_1 = require("../utils/AppError");
 var SpaceQuerySortFields;
 (function (SpaceQuerySortFields) {
     SpaceQuerySortFields["PRICEUP"] = "priceup";
@@ -25,10 +25,9 @@ class SpaceSequelizeDao extends dao_config_1.Dao {
         super(...arguments);
         this.spaceModel = space_model_1.Space;
         this.utilFunctions = UtilFunctions_1.default;
-        // NOTE аутентификация - протекция роута (только для авторизованных пользователей)
         this.provideSpace = async (data, files) => {
             try {
-                return await this.model.create(data);
+                return this.model.create(data);
             }
             catch (err) {
                 await this.findUploadedImagesAndRemove(data.userId, files);
@@ -65,17 +64,17 @@ class SpaceSequelizeDao extends dao_config_1.Dao {
             const offset = (page - 1) * limit;
             const order = sortBy
                 ? this.defineSortOrder(sortBy)
-                : `"${SpaceSortFields.DATE_OF_CREATION}" ${enums_1.QuerySortDirection.DESC}`;
+                : `s."${SpaceSortFields.DATE_OF_CREATION}" ${enums_1.QuerySortDirection.DESC}`;
             const queryFromParts = this.spacesQueryGeneratorByParts(order, limit, offset, isoDatesRange, cityId, pricesFromAndTo);
             return this.utilFunctions.createSequelizeRawQuery(AppConfig_1.appConfig.sequelize, queryFromParts);
         };
         this.getSpaceById = async (spaceId) => {
-            return this.model.findOne({
-                where: {
-                    id: spaceId,
-                },
-                include: [city_model_1.City],
-            });
+            if (!this.utilFunctions.isUUID(spaceId)) {
+                throw new AppError_1.default(enums_1.HttpStatus.FORBIDDEN, enums_1.ErrorMessages.INVALID_ID);
+            }
+            const query = `SELECT * FROM "Spaces" s JOIN (SELECT id as "lockerId", "spaceId" as "lockerSpaceId" FROM "Lockers") l ON s."id" = l."lockerSpaceId" WHERE s."id" = '${spaceId}';`;
+            const result = await this.utilFunctions.createSequelizeRawQuery(AppConfig_1.appConfig.sequelize, query);
+            return result[0];
         };
         this.getUserSpaces = async (userId) => {
             return this.model.findAll({
@@ -85,6 +84,9 @@ class SpaceSequelizeDao extends dao_config_1.Dao {
             });
         };
         this.getSpacesForUserOutdatedAppointmentsIds = async (userId) => {
+            if (!this.utilFunctions.isUUID(userId)) {
+                throw new AppError_1.default(enums_1.HttpStatus.FORBIDDEN, enums_1.ErrorMessages.INVALID_ID);
+            }
             const now = new Date().toISOString();
             const getOutdatedAppointmentsRawQuery = `SELECT * FROM "Appointments" a WHERE a."userId" = '${userId}' AND UPPER(a."isoDatesReserved") < '${now}';`;
             const userOutdatedAppointments = (await this.utilFunctions.createSequelizeRawQuery(AppConfig_1.appConfig.sequelize, getOutdatedAppointmentsRawQuery));
@@ -95,6 +97,9 @@ class SpaceSequelizeDao extends dao_config_1.Dao {
             return spacesForUserOutdatedAppointments;
         };
         this.getSpacesForUserActiveAppointmentsIds = async (userId) => {
+            if (!this.utilFunctions.isUUID(userId)) {
+                throw new AppError_1.default(enums_1.HttpStatus.FORBIDDEN, enums_1.ErrorMessages.INVALID_ID);
+            }
             const now = new Date().toISOString();
             const getActiveAppointmentsRawQuery = `SELECT * FROM "Appointments" a WHERE a."userId" = '${userId}' AND a."isoDatesReserved" @> '${now}'::timestamptz;`;
             const userActiveAppointments = (await this.utilFunctions.createSequelizeRawQuery(AppConfig_1.appConfig.sequelize, getActiveAppointmentsRawQuery));
@@ -102,6 +107,9 @@ class SpaceSequelizeDao extends dao_config_1.Dao {
             return spacesForUserActiveAppointments;
         };
         this.getSpacesForUserUpcomingAppointmentsIds = async (userId) => {
+            if (!this.utilFunctions.isUUID(userId)) {
+                throw new AppError_1.default(enums_1.HttpStatus.FORBIDDEN, enums_1.ErrorMessages.INVALID_ID);
+            }
             const now = new Date().toISOString();
             const getUpcomingAppointmentsRawQuery = `SELECT * FROM "Appointments" a WHERE a."userId" = '${userId}' AND LOWER(a."isoDatesReserved") > '${now}';`;
             const userUpcomingAppointments = (await this.utilFunctions.createSequelizeRawQuery(AppConfig_1.appConfig.sequelize, getUpcomingAppointmentsRawQuery));
@@ -109,10 +117,16 @@ class SpaceSequelizeDao extends dao_config_1.Dao {
             return spacesForUserUpcomingAppointments;
         };
         this.getSpaceByAppointment = async (appointment) => {
+            if (!this.utilFunctions.isUUID(appointment.id)) {
+                throw new AppError_1.default(enums_1.HttpStatus.FORBIDDEN, enums_1.ErrorMessages.INVALID_ID);
+            }
             const getSpaceForUserOutdatedAppointment = `SELECT * FROM "Appointments" a JOIN "Spaces" s ON a."spaceId" = s."id" WHERE a."id" = '${appointment.id}';`;
             return (await this.utilFunctions.createSequelizeRawQuery(AppConfig_1.appConfig.sequelize, getSpaceForUserOutdatedAppointment, { plain: true }));
         };
         this.getSpacesForKeyControl = async (userId) => {
+            if (!this.utilFunctions.isUUID(userId)) {
+                throw new AppError_1.default(enums_1.HttpStatus.FORBIDDEN, enums_1.ErrorMessages.INVALID_ID);
+            }
             const now = new Date().toISOString();
             const getUserActiveAppointmentsForLockConnectedSpacesRawQuery = `SELECT * FROM "Appointments" a WHERE a."userId" = '${userId}' AND "lockerConnected" = 'true' AND a."isoDatesReserved" @> '${now}'::timestamptz;`;
             const userActiveAppointments = (await this.utilFunctions.createSequelizeRawQuery(AppConfig_1.appConfig.sequelize, getUserActiveAppointmentsForLockConnectedSpacesRawQuery));
@@ -134,6 +148,9 @@ class SpaceSequelizeDao extends dao_config_1.Dao {
             await space.destroy();
         };
         this.updateSpaceImagesInDb = async (userId, spaceId, spaceImagesToRemove, uploadedFiles) => {
+            if (!this.utilFunctions.isUUID(spaceId)) {
+                throw new AppError_1.default(enums_1.HttpStatus.FORBIDDEN, enums_1.ErrorMessages.INVALID_ID);
+            }
             // NOTE SELECT array_cat(ARRAY[1,2,3], ARRAY[4,5]);
             const actualSpaceImagesUrls = (await this.findById(spaceId)).imagesUrl || [];
             let spaceImagesUrlsAfterRemoval = actualSpaceImagesUrls;
@@ -149,6 +166,9 @@ class SpaceSequelizeDao extends dao_config_1.Dao {
             await this.utilFunctions.createSequelizeRawQuery(AppConfig_1.appConfig.sequelize, updateRawQuery);
         };
         this.removeSpaceImagesFromDb = async (spaceId, spaceImagesToDelete) => {
+            if (!this.utilFunctions.isUUID(spaceId)) {
+                throw new AppError_1.default(enums_1.HttpStatus.FORBIDDEN, enums_1.ErrorMessages.INVALID_ID);
+            }
             let rawRemoveQueries = '';
             spaceImagesToDelete.forEach((spaceImageToDelete) => {
                 rawRemoveQueries += `UPDATE "Spaces" SET "imagesUrl" = ARRAY_REMOVE("imagesUrl", '${spaceImageToDelete}') WHERE id = '${spaceId}';`;
@@ -177,7 +197,7 @@ class SpaceSequelizeDao extends dao_config_1.Dao {
                 : '';
             const priceRangeFromPartialQuery = priceRange && priceRange.from !== undefined ? `AND s."pricePerNight" >= ${priceRange.from}` : '';
             const priceRangeToPartialQuery = priceRange && priceRange.to !== undefined ? `AND s."pricePerNight" <= ${priceRange.to}` : '';
-            return `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", "regionId", name FROM "Cities") c ON s."cityId" = c."cityId" ${cityPartialQuery} ${datesToReservePartialQuery} ${priceRangeFromPartialQuery} ${priceRangeToPartialQuery} ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
+            return `SELECT * FROM "Spaces" s JOIN (SELECT id as "cityId", "regionId", name as "cityName" FROM "Cities") c ON s."cityId" = c."cityId" LEFT JOIN (SELECT id as "lockerId", "spaceId" as "lockerSpaceId" FROM "Lockers") l ON l."lockerSpaceId" = s."id" ${cityPartialQuery} ${datesToReservePartialQuery} ${priceRangeFromPartialQuery} ${priceRangeToPartialQuery} ORDER BY ${order} LIMIT ${limit} OFFSET ${offset};`;
         };
         this.findUploadedImagesAndRemove = (userId, files) => {
             return Promise.all(files.map(async (file) => {

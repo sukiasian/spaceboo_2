@@ -34,7 +34,7 @@ describe('Image (e2e)', () => {
     let space_2;
     let pathToTestImage;
     beforeAll(async () => {
-        appConfig = lib_1.createAppConfig();
+        appConfig = (0, lib_1.createAppConfig)();
         app = appConfig.app;
         db = appConfig.sequelize;
         pathToTestImage = path.resolve('tests', 'files', 'images', '1.png');
@@ -44,16 +44,16 @@ describe('Image (e2e)', () => {
         spaceModel = space_model_1.Space;
         cityModel = city_model_1.City;
         appointmentModel = appointment_model_1.Appointment;
-        userData = lib_1.createUserData();
-        server = (await lib_1.openTestEnv(appConfig)).server;
+        userData = (0, lib_1.createUserData)();
+        server = (await (0, lib_1.openTestEnv)(appConfig)).server;
     });
     beforeEach(async () => {
         city = await cityModel.findOne({ raw: true });
         city_2 = await cityModel.findOne({ where: { name: 'Краснодар' } });
         user = await userModel.create(userData);
-        spaceData = lib_1.createSpaceData(user.id, city.id, 1500);
-        spaceData_2 = lib_1.createSpaceData(user.id, city_2.id);
-        token = await lib_1.createTokenAndSign({ id: user.id });
+        spaceData = (0, lib_1.createSpaceData)(user.id, city.id, 1500);
+        spaceData_2 = (0, lib_1.createSpaceData)(user.id, city_2.id);
+        token = await (0, lib_1.createTokenAndSign)({ id: user.id });
         space_1 = await spaceModel.create(spaceData);
         space_1 = await spaceModel.findOne({
             where: { id: space_1.id },
@@ -63,11 +63,11 @@ describe('Image (e2e)', () => {
         space_2 = await spaceModel.findOne({ where: { id: space_2.id }, include: [cityModel, appointmentModel] });
     });
     afterEach(async () => {
-        lib_1.clearDbAndStorage(db);
-        userData = lib_1.createUserData();
+        (0, lib_1.clearDbAndStorage)(db);
+        userData = (0, lib_1.createUserData)();
     });
     afterAll(async () => {
-        await lib_1.closeTestEnv(db, server);
+        await (0, lib_1.closeTestEnv)(db, server);
     });
     it("POST /images/users should upload a file into user's individual directory", async () => {
         await request(app)
@@ -78,7 +78,7 @@ describe('Image (e2e)', () => {
             .post(`${enums_1.ApiRoutes.IMAGES}/users`)
             .set('Authorization', `Bearer ${token}`)
             .attach(storage_config_1.StorageUploadFilenames.USER_AVATAR, pathToTestImage);
-        const pathToUserAvatarDir = lib_1.createPathToUserAvatarDir(user.id);
+        const pathToUserAvatarDir = (0, lib_1.createPathToUserAvatarDir)(user.id);
         const checkIfUserAvatarDirExists = await UtilFunctions_1.default.checkIfExists(pathToUserAvatarDir);
         expect(checkIfUserAvatarDirExists).toBe(true);
         const userImagesDirFiles = await UtilFunctions_1.default.readDirectory(pathToUserAvatarDir);
@@ -92,7 +92,7 @@ describe('Image (e2e)', () => {
             .attach(storage_config_1.StorageUploadFilenames.SPACE_IMAGES, pathToTestImage)
             .attach(storage_config_1.StorageUploadFilenames.SPACE_IMAGES, pathToTestImage)
             .attach(storage_config_1.StorageUploadFilenames.SPACE_IMAGES, pathToTestImage);
-        const pathToSpaceImagesDir = lib_1.createPathToSpaceImagesDir(space_1.id);
+        const pathToSpaceImagesDir = (0, lib_1.createPathToSpaceImagesDir)(space_1.id);
         const checkIfSpaceImagesDirExists = await UtilFunctions_1.default.checkIfExists(pathToSpaceImagesDir);
         expect(checkIfSpaceImagesDirExists).toBe(true);
         const userImagesDirFiles = await UtilFunctions_1.default.readDirectory(pathToSpaceImagesDir);
@@ -116,7 +116,7 @@ describe('Image (e2e)', () => {
             .attach(storage_config_1.StorageUploadFilenames.SPACE_IMAGES, pathToTestImage);
         expect(res.status).toBe(enums_1.HttpStatus.FORBIDDEN);
         const space = await spaceDao.findById(space_1.id);
-        const pathToSpaceImagesDir = lib_1.createPathToSpaceImagesDir(space_1.id);
+        const pathToSpaceImagesDir = (0, lib_1.createPathToSpaceImagesDir)(space_1.id);
         const spaceImagesDirFiles = await UtilFunctions_1.default.readDirectory(pathToSpaceImagesDir);
         expect(spaceImagesDirFiles.length).toBe(0);
     });
@@ -154,7 +154,7 @@ describe('Image (e2e)', () => {
             .set('Authorization', `Bearer ${token}`)
             .attach(storage_config_1.StorageUploadFilenames.USER_AVATAR, pathToTestImage);
         const freshUser = await userDao.findById(user.id);
-        const pathToUserAvatarIndividualDirectory = lib_1.createPathToUserAvatarDir(user.id);
+        const pathToUserAvatarIndividualDirectory = (0, lib_1.createPathToUserAvatarDir)(user.id);
         const pathToUserImage = path.join(pathToUserAvatarIndividualDirectory, freshUser.avatarUrl);
         expect(await UtilFunctions_1.default.checkIfExists(pathToUserImage)).toBeTruthy();
         await request(app)
@@ -169,7 +169,7 @@ describe('Image (e2e)', () => {
             .set('Authorization', `Bearer ${token}`)
             .attach(storage_config_1.StorageUploadFilenames.SPACE_IMAGES, pathToTestImage);
         const freshSpace = await spaceDao.findById(space_1.id);
-        const pathToSpaceImagesIndividualDirectory = lib_1.createPathToSpaceImagesDir(space_1.id);
+        const pathToSpaceImagesIndividualDirectory = (0, lib_1.createPathToSpaceImagesDir)(space_1.id);
         const pathToSpaceImage = path.join(pathToSpaceImagesIndividualDirectory, freshSpace.imagesUrl[1]);
         expect(await UtilFunctions_1.default.checkIfExists(pathToSpaceImage)).toBeTruthy();
         await request(app)

@@ -13,7 +13,7 @@ class ImageRouter extends Singleton_1.Singleton {
         this.routeProtector = RouteProtector_1.RouteProtector;
         this.imageController = image_controller_1.imageController;
         this.passport = passport;
-        this.router = express_1.Router();
+        this.router = (0, express_1.Router)();
         this.prepareRouter = () => {
             this.router
                 .route('/user')

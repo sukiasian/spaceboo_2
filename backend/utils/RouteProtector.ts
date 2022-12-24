@@ -15,10 +15,10 @@ export class RouteProtector {
     private static readonly userDao: UserSequelizeDao = userSequelizeDao;
     private static readonly appointmentDao: AppointmentSequelizeDao = appointmentSequelizeDao;
     private static readonly jwt = jwt;
-    private static readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
+    // private static readonly utilFunctions: typeof UtilFunctions = UtilFunctions;
 
     // TODO регистрация админов не должна быть доступна для каждого - возможно только авторизованный админ должен уметь это делатьы
-    public static adminOnlyProtector = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+    public static adminOnlyProtector = UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const { id: userId } = req.user;
         const user: User = await this.userModel.scope(UserScopes.WITH_ROLE).findOne({ where: { id: userId } });
 
@@ -30,7 +30,7 @@ export class RouteProtector {
     });
 
     // NOTE: if endpoints can be accessed both by users and admins
-    public static adminOrSpaceOwnerProtector = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+    public static adminOrSpaceOwnerProtector = UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const { id: userId } = req.user;
         const { spaceId } = req.params || req.body || req.query;
 
@@ -44,7 +44,7 @@ export class RouteProtector {
         next();
     });
 
-    public static spaceOwnerProtector = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+    public static spaceOwnerProtector = UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const { id: userId } = req.user;
         const spaceId = req.params.spaceId || req.body.spaceId || req.query.spaceId;
 
@@ -61,7 +61,7 @@ export class RouteProtector {
         next();
     });
 
-    public static confirmedUserProtector = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+    public static confirmedUserProtector = UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const user = await this.userModel.scope(UserScopes.WITH_CONFIRMED).findOne({
             where: {
                 id: req.user.id,
@@ -76,7 +76,7 @@ export class RouteProtector {
     });
 
     // FIXME: this is realized in passport JWT but in case if we need to allow access for unconfirmed users through passport jwt then we need to use this one.
-    public static passwordRecoveryProtector = this.utilFunctions.catchAsync(async (req, res, next): Promise<void> => {
+    public static passwordRecoveryProtector = UtilFunctions.catchAsync(async (req, res, next): Promise<void> => {
         const token = req.cookies['jwt'];
 
         if (!jwt.verify(token, process.env.JWT_SECRET_KEY)) {
@@ -103,7 +103,7 @@ export class RouteProtector {
         next();
     });
 
-    public static userHasActiveAppointment = this.utilFunctions.catchAsync(async (req, res, next) => {
+    public static userHasActiveAppointment = UtilFunctions.catchAsync(async (req, res, next) => {
         const { id: userId } = req.user;
         const { spaceId } = req.body;
 
