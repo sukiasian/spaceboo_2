@@ -9,7 +9,7 @@
 /backend/node_modules
 /backend/log
 /backend/test.env
-/backend/.env
+/backend/app.env
 
 # dependencies
 /frontend/node_modules
